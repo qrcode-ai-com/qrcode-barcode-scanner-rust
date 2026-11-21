@@ -155,13 +155,10 @@ jobs:
           lib=$(python3 -c 'import json, sys; print(*json.load(open(sys.argv[1]))["files"])' "$RUNNER_TEMP/binaries/manifest.json")
           cp "$RUNNER_TEMP/binaries/$lib" "$RUNNER_TEMP/binaries/$lib.sig" "$served/"
           python3 -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/serve" > "$RUNNER_TEMP/http.log" 2>&1 &
-          mv "$HOME/.cargo/bin" "$HOME/.cargo/bin.hidden"
-          kept=""
-          while IFS= read -r dir; do
-            if [ -n "$dir" ] && [ ! -e "$dir/rustup" ] && [ ! -e "$dir/cargo" ]; then kept="$kept:$dir"; fi
-          done < <(printf '%s\n' "$PATH" | tr ':' '\n')
-          export PATH="${kept#:}"
-          if command -v rustup || command -v cargo; then echo "rustup or cargo is still reachable"; exit 1; fi
+          if [ -d "$HOME/.cargo/bin" ]; then mv "$HOME/.cargo/bin" "$HOME/.cargo/bin.hidden"; fi
+          PATH=$(python3 scripts/flutter-precompiled.py path-without-rust --shadow "$RUNNER_TEMP/path-without-rust")
+          export PATH
+          if command -v rustup || command -v cargo || command -v rustc; then echo "a Rust tool is still reachable"; exit 1; fi
           consumer() {
             if [ "$PLATFORM" = android ]; then
               flutter build apk --verbose --release --target-platform android-arm64
@@ -369,12 +366,9 @@ jobs:
         run: |
           set -euo pipefail
           if [ -d "$HOME/.cargo/bin" ]; then mv "$HOME/.cargo/bin" "$HOME/.cargo/bin.hidden"; fi
-          kept=""
-          while IFS= read -r dir; do
-            if [ -n "$dir" ] && [ ! -e "$dir/rustup" ] && [ ! -e "$dir/cargo" ]; then kept="$kept:$dir"; fi
-          done < <(printf '%s\n' "$PATH" | tr ':' '\n')
-          export PATH="${kept#:}"
-          if command -v rustup || command -v cargo; then echo "rustup or cargo is still reachable"; exit 1; fi
+          PATH=$(python3 "$GITHUB_WORKSPACE/scripts/flutter-precompiled.py" path-without-rust --shadow "$RUNNER_TEMP/path-without-rust")
+          export PATH
+          if command -v rustup || command -v cargo || command -v rustc; then echo "a Rust tool is still reachable"; exit 1; fi
           if [ "$PLATFORM" = android ]; then
             flutter build apk --debug
             unzip -l build/app/outputs/flutter-apk/app-debug.apk | grep -F libqrcode_ai_scanner.so

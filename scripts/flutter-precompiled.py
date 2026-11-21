@@ -28,6 +28,8 @@ creates the `precompiled_<crate hash>` release.
   flutter-precompiled.py verify --dir DIR [--config PATH]
   flutter-precompiled.py verify-remote --manifest-dir DIR [--targets release|T,T]
       download every file and signature from the config's url_prefix
+  flutter-precompiled.py path-without-rust --shadow DIR
+      a PATH that reaches no rustup, cargo or rustc, for consumer checks
   flutter-precompiled.py publish --run RUN_ID [--repo OWNER/NAME] [--dry-run]
       the owner's release step, see RELEASING.md
   flutter-precompiled.py --self-test
@@ -348,6 +350,32 @@ def verify_remote(manifest_dir, targets):
     return digest, verified
 
 
+RUST_TOOLS = re.compile(r"(rustup.*|cargo|cargo-.*|rustc|rustdoc|rustfmt|rust-gdb.*|rust-lldb|clippy-driver)")
+
+
+def path_without_rust(path, shadow):
+    """PATH with no rustup, cargo or rustc: a directory holding one is replaced by a copy of its
+    other entries (symbolic links under SHADOW), so the tools beside them stay reachable."""
+    shadow = pathlib.Path(shadow)
+    shadow.mkdir(parents=True, exist_ok=False)
+    kept = []
+    for index, directory in enumerate(filter(None, path.split(os.pathsep))):
+        directory = pathlib.Path(directory)
+        if not directory.is_dir():
+            continue
+        names = sorted(entry.name for entry in directory.iterdir())
+        if not any(RUST_TOOLS.fullmatch(name) for name in names):
+            kept.append(str(directory))
+            continue
+        copy = shadow / str(index)
+        copy.mkdir()
+        for name in names:
+            if not RUST_TOOLS.fullmatch(name):
+                (copy / name).symlink_to(directory / name)
+        kept.append(str(copy))
+    return os.pathsep.join(kept)
+
+
 # ---------------------------------------------------------------- publish
 
 
@@ -568,6 +596,23 @@ def self_test():
             finally:
                 del os.environ["FLUTTER_PRECOMPILED_SECURITY"]
 
+        def test_path_without_rust(self):
+            tools, other = self.temp / "tools", self.temp / "other"
+            for directory, names in ((tools, ("rustup", "cargo", "cargo-clippy", "rustc", "pod", "git")),
+                                     (other, ("python3",))):
+                directory.mkdir()
+                for name in names:
+                    (directory / name).write_text("#!/bin/sh\n")
+                    (directory / name).chmod(0o755)
+            path = path_without_rust(os.pathsep.join([str(tools), str(self.temp / "absent"), str(other)]),
+                                     self.temp / "shadow")
+            entries = path.split(os.pathsep)
+            self.assertEqual(entries[1], str(other))
+            self.assertEqual(sorted(p.name for p in pathlib.Path(entries[0]).iterdir()), ["git", "pod"])
+            for name in ("rustup", "cargo", "rustc"):
+                self.assertIsNone(shutil.which(name, path=path))
+            self.assertIsNotNone(shutil.which("pod", path=path))
+
         def test_run_checks(self):
             good = {"workflowName": WORKFLOW, "event": "push", "headBranch": "v0.12.0", "status": "completed",
                     "conclusion": "success", "headSha": "a" * 40}
@@ -611,6 +656,8 @@ def main():
     command = commands.add_parser("verify-remote")
     command.add_argument("--manifest-dir", type=pathlib.Path, default=CONFIG.parent)
     command.add_argument("--targets", default="release")
+    command = commands.add_parser("path-without-rust")
+    command.add_argument("--shadow", type=pathlib.Path, required=True)
     command = commands.add_parser("publish")
     command.add_argument("--run", required=True)
     command.add_argument("--repo", default=REPO)
@@ -648,6 +695,8 @@ def main():
         targets = RELEASE_TARGETS if args.targets == "release" else tuple(args.targets.split(","))
         digest, verified = verify_remote(args.manifest_dir, targets)
         print(f"verified {len(verified)} remote binaries · crate hash {digest}")
+    elif args.command == "path-without-rust":
+        print(path_without_rust(os.environ.get("PATH", ""), args.shadow))
     elif args.command == "publish":
         return publish(args.run, args.repo, args.dry_run)
     else:
