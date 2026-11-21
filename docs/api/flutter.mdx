@@ -141,7 +141,7 @@ and `budgetExhausted` is `false`.
 
 Simulators and emulators run Flutter in debug mode, where cargokit builds the
 core with the package's dev profile. In the working source that profile is
-optimized (opt-level 3, 16 codegen units, no LTO). The
+optimized (opt-level 3, no debug assertions, no LTO). The
 [package README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#debug-builds-and-scan-time)
 gives the dated CI timings of the mixed QR/Code 128 fixture with it. They are
 CI observations, not device performance.

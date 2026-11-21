@@ -67,8 +67,8 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   settings, so simulators and emulators, which run Flutter only in debug mode,
   scanned with an unoptimized core and overran the default budgets on the iOS
   simulator. `bindings/flutter/rust/Cargo.toml` gives Cargo's dev profile
-  opt-level 3 without debug assertions, without incremental builds and with
-  16 codegen units; overflow checks stay on and there is no LTO.
+  opt-level 3 without debug assertions; overflow checks stay on and there is
+  no LTO.
 
 ### CI
 
