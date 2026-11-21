@@ -84,7 +84,7 @@ void main() {
         // failure says what the cut report read.
         final read = contents(report);
         final recordOnly = !strictBudgets && profile != 'full';
-        if (report.trace.budgetExhausted && recordOnly) {
+        if (report.trace.budgetExhausted == true && recordOnly) {
           final ms = report.trace.totalMs.toStringAsFixed(1);
           // ignore: avoid_print
           print('QRSCAN_BUDGET_CUT profile=$profile total_ms=$ms '
