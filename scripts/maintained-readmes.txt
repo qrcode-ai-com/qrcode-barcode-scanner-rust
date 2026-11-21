@@ -60,6 +60,7 @@ integrations/canva/README.md
 integrations/comfyui/README.md
 integrations/dify/README.md
 integrations/github-action/README.md
+integrations/make/README.md
 integrations/mcp/README.md
 integrations/n8n/README.md
 integrations/n8n/template/README.md
