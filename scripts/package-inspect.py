@@ -2158,7 +2158,7 @@ def flutter_precompiled():
 
 
 def check_flutter_precompiled(art: Artifact, package_root: pathlib.Path) -> None:
-    """rust/cargokit.yaml, when the package ships one, sends cargokit to this repository's releases."""
+    """rust/cargokit.yaml, when the package ships one, sends cargokit to GitHub release downloads."""
     config = package_root / "rust" / "cargokit.yaml"
     if not config.is_file():
         art.notes.append("no rust/cargokit.yaml: cargokit builds the library from source, which needs rustup")
@@ -2167,11 +2167,12 @@ def check_flutter_precompiled(art: Artifact, package_root: pathlib.Path) -> None
     try:
         key = precompiled.read_config(config)
     except (OSError, precompiled.Refused) as error:
-        art.check("rust/cargokit.yaml names this repository's precompiled releases and a 32-byte public key", False,
+        art.check("rust/cargokit.yaml names a GitHub release download prefix and a 32-byte public key", False,
                   str(error))
         return
-    art.check("rust/cargokit.yaml names this repository's precompiled releases and a 32-byte public key", True)
-    art.notes.append(f"precompiled binaries: {precompiled.URL_PREFIX}<crate hash> · public key {key}")
+    art.check("rust/cargokit.yaml names a GitHub release download prefix and a 32-byte public key", True)
+    url, _ = precompiled.config_values(config)
+    art.notes.append(f"precompiled binaries: {url}<crate hash> · public key {key}")
 
 
 def read_flutter_file(root: pathlib.Path, name: str) -> bytes:
@@ -4847,7 +4848,7 @@ def flutter_self_test():
          "README.md names no previous name"),
     ]
     for key, expected, needle in (("precompiled config", PASS, "public key " + "ab" * 32),
-                                  ("local precompiled config", FAIL, "precompiled releases")):
+                                  ("local precompiled config", FAIL, "GitHub release download prefix")):
         files, staged_from = variants[key]
         scenarios.append((f"release set with a {key}", files, sorted(names + ["rust/cargokit.yaml"]), 0, "", expected,
                           staged_from, True, needle))

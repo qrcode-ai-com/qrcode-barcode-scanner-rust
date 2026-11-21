@@ -24,14 +24,19 @@ creates the `precompiled_<crate hash>` release.
   flutter-precompiled.py check-config [--config PATH] [--url-prefix URL]
   flutter-precompiled.py merge --out DIR DIR...
       one unsigned set from the per-platform build outputs
-  flutter-precompiled.py sign --dir DIR [--key-file PATH] [--config PATH] [--manifest-dir DIR]
+  flutter-precompiled.py sign --dir DIR [--key-file PATH | --key-stdin] [--config PATH] [--manifest-dir DIR]
   flutter-precompiled.py verify --dir DIR [--config PATH]
   flutter-precompiled.py verify-remote --manifest-dir DIR [--targets release|T,T]
       download every file and signature from the config's url_prefix
   flutter-precompiled.py path-without-rust --shadow DIR
       a PATH that reaches no rustup, cargo or rustc, for consumer checks
-  flutter-precompiled.py publish --run RUN_ID [--repo OWNER/NAME] [--dry-run]
-      the owner's release step, see RELEASING.md
+  flutter-precompiled.py publish --run RUN_ID [--repo OWNER/NAME] [--dry-run] [--key-file PATH | --key-stdin]
+      the owner's release step, see RELEASING.md: the release's repository and
+      tag prefix are those of the staged package's url_prefix
+
+The key comes from the Keychain unless --key-file or --key-stdin (a hex seed
+line) names another source, such as a CI lane holding it in a protected
+environment.
   flutter-precompiled.py --self-test
 
 Key material is never printed and never passed on a command line: openssl
@@ -225,9 +230,15 @@ def write_key_file(path, seed):
         handle.write(check_seed(seed).hex() + "\n")
 
 
-def load_seed(key_file):
+def load_seed(key_file=None, key_stdin=False):
+    """The signing seed: from the Keychain (the owner's default), a key file or stdin (a CI lane)."""
+    require(not (key_file and key_stdin), "give --key-file or --key-stdin, not both")
     if key_file:
         return read_key_file(key_file)
+    if key_stdin:
+        value = sys.stdin.readline().strip()
+        require(re.fullmatch(r"[0-9a-f]{64}", value), "stdin does not hold a 32-byte hex seed")
+        return bytes.fromhex(value)
     seed = keychain_seed()
     require(seed is not None, f"no Keychain item {SERVICE} (run keygen once)")
     return seed
@@ -236,12 +247,31 @@ def load_seed(key_file):
 # ---------------------------------------------------------------- config and sets
 
 
-def read_config(path, url_prefix=URL_PREFIX):
-    """The public key of a cargokit.yaml written by keygen: exactly that text and that url_prefix."""
+def config_values(path):
+    """url_prefix and public_key of a cargokit.yaml written by keygen, exactly that text."""
     found = CONFIG_PATTERN.fullmatch(pathlib.Path(path).read_text())
     require(found, f"{path} is not the precompiled_binaries config keygen writes")
-    require(found["url"] == url_prefix, f"{path} url_prefix {found['url']} is not {url_prefix}")
-    return found["key"]
+    return found["url"], found["key"]
+
+
+def release_location(url_prefix):
+    """The repository and tag prefix of a GitHub release download prefix: the release that serves
+    `<url_prefix><crate hash>/<file>` is `<tag prefix><crate hash>` in that repository."""
+    found = re.fullmatch(r"https://github\.com/(?P<repo>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/releases/download/"
+                         r"(?P<tag>[A-Za-z0-9_.-]+)", url_prefix)
+    require(found, f"url_prefix {url_prefix} is not a GitHub release download prefix")
+    return found["repo"], found["tag"]
+
+
+def read_config(path, url_prefix=None):
+    """The public key of a shipped config: its url_prefix is URL_PREFIX when given, else any GitHub
+    release download prefix (the engine's releases, or another repository a later lane chooses)."""
+    url, key = config_values(path)
+    if url_prefix is None:
+        release_location(url)
+    else:
+        require(url == url_prefix, f"{path} url_prefix {url} is not {url_prefix}")
+    return key
 
 
 def write_config(path, url_prefix, key):
@@ -302,7 +332,7 @@ def sign_set(directory, seed, config, manifest_dir=None):
     manifest = read_set(directory)
     if manifest_dir:
         require(crate_hash(manifest_dir) == manifest["crate_hash"], "the set was built from another crate")
-    key = read_config(config, url_prefix=config_prefix(config))
+    _, key = config_values(config)
     require(public_key(seed) == key, "this key is not the one the config's public_key names")
     for name in manifest["files"]:
         sign_file(seed, pathlib.Path(directory) / name, pathlib.Path(directory) / f"{name}.sig")
@@ -311,18 +341,12 @@ def sign_set(directory, seed, config, manifest_dir=None):
 
 def verify_set(directory, config):
     manifest = read_set(directory, signed=True)
-    key = read_config(config, url_prefix=config_prefix(config))
+    _, key = config_values(config)
     for name in manifest["files"]:
         data = (pathlib.Path(directory) / name).read_bytes()
         signature = (pathlib.Path(directory) / f"{name}.sig").read_bytes()
         require(verify_bytes(key, data, signature), f"{name}: signature does not verify")
     return manifest
-
-
-def config_prefix(config):
-    found = CONFIG_PATTERN.fullmatch(pathlib.Path(config).read_text())
-    require(found, f"{config} is not the precompiled_binaries config keygen writes")
-    return found["url"]
 
 
 def fetch(url):
@@ -335,9 +359,7 @@ def fetch(url):
 
 def verify_remote(manifest_dir, targets):
     """What cargokit does on a consumer: download each file and its signature, verify both."""
-    config = pathlib.Path(manifest_dir) / "cargokit.yaml"
-    prefix = config_prefix(config)
-    key = read_config(config, url_prefix=prefix)
+    prefix, key = config_values(pathlib.Path(manifest_dir) / "cargokit.yaml")
     digest = crate_hash(manifest_dir)
     verified = {}
     for target in targets:
@@ -402,7 +424,9 @@ def check_run(run):
     return run["headSha"], run["headBranch"]
 
 
-def publish(run_id, repo, dry_run, key_file=None):
+def publish(run_id, repo, dry_run, key_file=None, key_stdin=False):
+    """Sign the unsigned set of run RUN_ID of REPO and create the release the staged package's
+    url_prefix names (its repository and tag prefix come from rust/cargokit.yaml)."""
     run = json.loads(gh("run", "view", str(run_id), "--repo", repo, "--json",
                         "workflowName,event,headBranch,headSha,status,conclusion"))
     commit, tag = check_run(run)
@@ -425,12 +449,14 @@ def publish(run_id, repo, dry_run, key_file=None):
         require(manifest["crate_hash"] == digest, "the set was built from another crate")
         config = package / "rust" / "cargokit.yaml"
         key = read_config(config)
-        seed = load_seed(key_file)
+        release_repo, tag_prefix = release_location(config_values(config)[0])
+        seed = load_seed(key_file, key_stdin)
         require(public_key(seed) == key, "this key is not the one the staged package names")
-        release = f"precompiled_{digest}"
-        exists = subprocess.run(["gh", "release", "view", release, "--repo", repo, "--json", "assets"],
+        release = f"{tag_prefix}{digest}"
+        exists = subprocess.run(["gh", "release", "view", release, "--repo", release_repo, "--json", "assets"],
                                 capture_output=True, text=True, check=False)
-        print(f"{tag} {commit}: crate hash {digest}, {len(manifest['files'])} binaries, release {release}")
+        print(f"{tag} {commit}: crate hash {digest}, {len(manifest['files'])} binaries, "
+              f"release {release} in {release_repo}")
         if exists.returncode == 0:
             print(f"{release} exists: verifying what it serves, uploading nothing")
             verify_remote(package / "rust", RELEASE_TARGETS)
@@ -441,7 +467,9 @@ def publish(run_id, repo, dry_run, key_file=None):
         sign_set(artifact / "binaries", seed, config, package / "rust")
         files = [str(artifact / "binaries" / name) for name in manifest["files"]]
         files += [f"{name}.sig" for name in files]
-        gh("release", "create", release, "--repo", repo, "--target", commit, "--latest=false",
+        # The tag points at the built commit when the release lives in the repository that built it.
+        target = ["--target", commit] if release_repo == repo else []
+        gh("release", "create", release, "--repo", release_repo, *target, "--latest=false",
            "--title", f"Precompiled Flutter binaries {digest[:8]} ({tag})",
            "--notes", f"Signed precompiled native libraries of the Flutter package qr_barcode_scanner "
                       f"at {tag} ({commit}), crate hash {digest}. cargokit downloads them and verifies "
@@ -504,6 +532,15 @@ def self_test():
                 write_config(path, URL_PREFIX, "cd" * 32)
             with self.assertRaisesRegex(Refused, "url_prefix"):
                 read_config(path, url_prefix="http://127.0.0.1:8765/precompiled_")
+            self.assertEqual(release_location(URL_PREFIX), (REPO, "precompiled_"))
+            self.assertEqual(release_location(
+                "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-distribution/releases/download/flutter-"),
+                ("qrcode-ai-com/qrcode-barcode-scanner-distribution", "flutter-"))
+            local = self.temp / "local.yaml"
+            write_config(local, "http://127.0.0.1:8765/precompiled_", "ab" * 32)
+            with self.assertRaisesRegex(Refused, "not a GitHub release download prefix"):
+                read_config(local)
+            self.assertEqual(config_values(local), ("http://127.0.0.1:8765/precompiled_", "ab" * 32))
             path.write_text(path.read_text() + "  extra: 1\n")
             with self.assertRaisesRegex(Refused, "not the precompiled_binaries config"):
                 read_config(path)
@@ -520,6 +557,15 @@ def self_test():
             with self.assertRaises(FileExistsError):
                 write_key_file(key_file, seed)
             self.assertEqual(read_key_file(key_file), seed)
+            stdin = sys.stdin
+            try:
+                import io
+                sys.stdin = io.StringIO(seed.hex() + "\n")
+                self.assertEqual(load_seed(key_stdin=True), seed)
+            finally:
+                sys.stdin = stdin
+            with self.assertRaisesRegex(Refused, "not both"):
+                load_seed(key_file, key_stdin=True)
             root = self.crate()
             config = root / "cargokit.yaml"
             write_config(config, "http://127.0.0.1:8765/precompiled_", public_key(seed))
@@ -641,13 +687,14 @@ def main():
     command.add_argument("--url-prefix", default=URL_PREFIX)
     command = commands.add_parser("check-config")
     command.add_argument("--config", type=pathlib.Path, default=CONFIG)
-    command.add_argument("--url-prefix", default=URL_PREFIX)
+    command.add_argument("--url-prefix", help="require exactly this prefix (default: a GitHub release prefix)")
     command = commands.add_parser("merge")
     command.add_argument("--out", type=pathlib.Path, required=True)
     command.add_argument("sources", type=pathlib.Path, nargs="+")
     command = commands.add_parser("sign")
     command.add_argument("--dir", type=pathlib.Path, required=True)
     command.add_argument("--key-file", type=pathlib.Path)
+    command.add_argument("--key-stdin", action="store_true")
     command.add_argument("--config", type=pathlib.Path, default=CONFIG)
     command.add_argument("--manifest-dir", type=pathlib.Path)
     command = commands.add_parser("verify")
@@ -660,8 +707,10 @@ def main():
     command.add_argument("--shadow", type=pathlib.Path, required=True)
     command = commands.add_parser("publish")
     command.add_argument("--run", required=True)
-    command.add_argument("--repo", default=REPO)
+    command.add_argument("--repo", default=REPO, help="the repository whose run built the set")
     command.add_argument("--dry-run", action="store_true")
+    command.add_argument("--key-file", type=pathlib.Path)
+    command.add_argument("--key-stdin", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
@@ -686,7 +735,7 @@ def main():
         manifest = merge(args.out, args.sources)
         print(f"merged {', '.join(manifest['targets'])} · crate hash {manifest['crate_hash']}")
     elif args.command == "sign":
-        manifest = sign_set(args.dir, load_seed(args.key_file), args.config, args.manifest_dir)
+        manifest = sign_set(args.dir, load_seed(args.key_file, args.key_stdin), args.config, args.manifest_dir)
         print(f"signed and verified {len(manifest['files'])} files · crate hash {manifest['crate_hash']}")
     elif args.command == "verify":
         manifest = verify_set(args.dir, args.config)
@@ -698,7 +747,7 @@ def main():
     elif args.command == "path-without-rust":
         print(path_without_rust(os.environ.get("PATH", ""), args.shadow))
     elif args.command == "publish":
-        return publish(args.run, args.repo, args.dry_run)
+        return publish(args.run, args.repo, args.dry_run, args.key_file, args.key_stdin)
     else:
         parser.error("give a command or --self-test")
     return 0
