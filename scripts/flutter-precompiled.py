@@ -660,9 +660,9 @@ def self_test():
             self.assertIsNotNone(shutil.which("pod", path=path))
 
         def test_run_checks(self):
-            good = {"workflowName": WORKFLOW, "event": "push", "headBranch": "v0.12.0", "status": "completed",
+            good = {"workflowName": WORKFLOW, "event": "push", "headBranch": "v-tag", "status": "completed",
                     "conclusion": "success", "headSha": "a" * 40}
-            self.assertEqual(check_run(good), ("a" * 40, "v0.12.0"))
+            self.assertEqual(check_run(good), ("a" * 40, "v-tag"))
             for change in ({"workflowName": "Flutter candidate qualification"}, {"event": "pull_request"},
                            {"headBranch": "main"}, {"conclusion": "failure"}, {"headSha": ""}):
                 with self.assertRaises(Refused):
