@@ -129,7 +129,7 @@ jobs:
           flutter test
       - name: FRB bindings are in sync with rust/src/api (no drift)
         run: |
-          cargo install flutter_rust_bridge_codegen --version 2.12.0 --locked
+          cargo install flutter_rust_bridge_codegen --version 2.13.0 --locked
           cp -R lib/src/rust "$RUNNER_TEMP/frb-dart-before"
           cp rust/src/frb_generated.rs "$RUNNER_TEMP/frb-rust-before.rs"
           flutter_rust_bridge_codegen generate
@@ -255,7 +255,8 @@ jobs:
       # accepts OIDC from a package whose admin has enabled GitHub-Actions
       # publishing — a setting that exists only once the package exists. The
       # first `flutter pub publish` is a manual operator act (Google account),
-      # then enable automated publishing (repo qrcode-ai-com/qrcode-barcode-scanner,
+      # then enable automated publishing (repo qrcode-ai-com/qrcode-barcode-scanner-rust,
+      # the repository's name since its rename, which the OIDC token carries;
       # tag pattern v{{version}}, required environment `pub`) and every later
       # tag publishes hands-free.
       - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1

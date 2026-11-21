@@ -1,3 +1,34 @@
+## Unreleased
+
+* `QrcodeAiScanner.scan` and `scanFrame` take an optional `budgetMs`, the
+  wall-clock budget in milliseconds, with the semantics of `budget_ms` in the
+  other bindings: `null` keeps the profile's default, `0` is unbounded, and a
+  value above 4294967295 throws `[QRS-006]` before the image is read. A
+  negative value throws a `RangeError`. Calls written for 0.11.0 compile and
+  behave as before.
+* Debug builds of the Rust core are optimized. Simulators and emulators run
+  Flutter only in debug mode, where cargokit builds the core with Cargo's dev
+  profile, and 0.11.0 left that profile unoptimized: on the iOS simulator,
+  scans overran their default budgets. `rust/Cargo.toml` now gives the dev
+  profile opt-level 3 without debug assertions. Overflow checks stay on, and
+  there is no LTO in debug builds. The README gives the CI timings on an
+  Android emulator and an iPhone simulator: under the default budgets, `full`
+  was final in every run and `frame` in all but one, while `fast` was cut in
+  most runs.
+* `flutter_rust_bridge` moves from 2.12.0 to 2.13.0: the Dart runtime, the
+  Rust crate and the generated bindings together. Its Dart package requires
+  Dart 3.9.2, so this package now declares Dart `>=3.9.2 <4.0.0` and Flutter
+  `>=3.35.3`, the first Flutter that bundles it.
+* The package metadata names the renamed repository,
+  `qrcode-ai-com/qrcode-barcode-scanner-rust`: the pubspec `repository`, the
+  podspec `homepage` and the Rust crate's `repository`.
+* The example app bundles the mixed QR/Code 128 fixture. Its integration tests
+  check that the three profiles read both codes, log each scan's time, and
+  exercise `budgetMs`. The `full` default budget must not cut the scan. A cut
+  `fast` or `frame` scan is recorded and must be a valid partial report, unless
+  `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes those budgets a test too,
+  for a run on a physical device.
+
 ## 0.11.0
 
 * Publish the Flutter binding under the package name `qr_barcode_scanner`.
