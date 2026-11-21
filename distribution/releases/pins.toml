@@ -145,6 +145,7 @@ paths = [
   ".github/workflows/integration-n8n-template.yml",
   ".github/workflows/integration-python-hosts.yml",
   ".github/workflows/integration-raycast.yml",
+  ".github/workflows/integration-replicate.yml",
   ".github/workflows/integration-vscode.yml",
 ]
 
