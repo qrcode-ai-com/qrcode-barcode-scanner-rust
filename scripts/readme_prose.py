@@ -42,6 +42,7 @@ GUIDES = {
     'integrations/wasm-inline/README.md': ('sdk/javascript', 'JavaScript'),
     'integrations/canva/README.md': ('integrations/canva', 'Canva'),
     'skills/qrcode-barcode-scanner/README.md': ('skills', 'agent skill'),
+    'tests/consumers/flutter/README.md': ('sdk/flutter', 'Flutter'),
     'tests/consumers/jitpack-android/README.md': ('sdk/android', 'Android'),
 }
 for _path in ('crates/qrcode-ai-scanner-cli', 'distribution/appimage', 'distribution/aur',
