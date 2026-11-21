@@ -52,9 +52,10 @@ overflow-checks = true
 # debug mode cargokit builds this crate with Cargo's dev profile. As its own
 # root, the crate does not inherit the engine workspace's [profile.dev] either:
 # without this table every crate here builds at opt-level 0, and on the iOS
-# simulator a scan of the mixed QR/Code 128 fixture took 7336 ms in `fast`
-# (budget 800 ms) and 6438 ms in `full` (budget 4000 ms), both cut by their
-# budgets (consumer runs of 21 November 2026, bindings/flutter/README.md).
+# simulator a scan of the mixed QR/Code 128 fixture of published 0.11.0 took
+# 7336 ms in `fast` (budget 800 ms) and 6438 ms in `full` (budget 4000 ms),
+# both cut by their budgets (public-package run 44900149034, 21 November
+# 2026). bindings/flutter/README.md gives the timings with this table.
 #
 # opt-level 3 is the release profile's optimization, and debug-assertions off
 # drops the standard library's and the dependencies' debug checks from the

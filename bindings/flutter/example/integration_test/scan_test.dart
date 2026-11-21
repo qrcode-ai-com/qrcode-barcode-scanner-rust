@@ -69,15 +69,16 @@ void main() {
         final bytes = await asset('mixed-code128-qr.png');
         final report = await timedScan('mixed-default', bytes, profile: profile);
         expect(report.trace.enginePanics, 0);
-        expect(contents(report), mixedContents);
         expect(report.versions.pipeline, 5);
         expect(report.versions.scoreContract, 5);
-        // Last, so that a failure here means only that the budget cut the
-        // scan: the reads above already held. A cut report may leave the
-        // score unjudged, so the score is checked only on a final report.
+        // A cut report is partial: it may miss a code or leave the score
+        // unjudged. So the budget is checked before the reads, and its
+        // failure says what the cut report read.
         expect(report.trace.budgetExhausted, isFalse,
             reason: 'the default $profile budget cut the scan after '
-                '${report.trace.totalMs.toStringAsFixed(1)} ms of ladder');
+                '${report.trace.totalMs.toStringAsFixed(1)} ms of ladder; '
+                'it read ${contents(report)}');
+        expect(contents(report), mixedContents);
         if (profile == 'frame') {
           expect(report.score, isNull); // frame profile skips scoring
         } else {

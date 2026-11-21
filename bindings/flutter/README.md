@@ -161,6 +161,45 @@ and then use `content.raw`, the payload's bytes.
 `content.eci` and `content.fnc1` are null when none was observed or the
 symbology does not report it — not proof that the symbol declares none.
 
+## Debug builds and scan time
+
+Simulators and emulators run Flutter only in debug mode. In debug mode,
+cargokit builds the Rust core with Cargo's dev profile, which the package sets
+in `rust/Cargo.toml`: opt-level 3, no debug assertions, overflow checks on, no
+incremental build, 16 codegen units and no LTO. Published 0.11.0 has no such
+table, so its debug builds are not optimized.
+
+The budget stops a scan from starting a stage or an attempt once its deadline
+has passed. It does not stop one that is running. A scan can therefore take
+longer than its budget and still be final (`budgetExhausted == false`).
+
+Runs of `flutter-qualification.yml` on 21 November 2026 scanned the mixed
+QR/Code 128 fixture under the default budgets (`fast` 800 ms, `frame` 80 ms,
+`full` 4000 ms), each profile once, `fast` first. The values are the report's
+`trace.totalMs`; "cut" means `budgetExhausted == true`.
+
+| Run | Rust build | Android emulator: fast, frame, full | iPhone simulator: fast, frame, full |
+|---|---|---|---|
+| [44931609066](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44931609066) | flutter_rust_bridge 2.12.0, opt-level 3 without debug assertions, Cargo's default codegen units, `CARGO_INCREMENTAL=0` from the toolchain action | 762 ms cut, 707 ms, 700 ms | 892 ms cut, 782 ms, 776 ms |
+| [44934537330](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44934537330) | flutter_rust_bridge 2.13.0, the same profile, incremental as in a consuming app | 849 ms cut, 673 ms, 679 ms | 935 ms cut, 863 ms, 920 ms |
+| [44934540185](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44934540185) | flutter_rust_bridge 2.13.0, this profile | 604 ms, 425 ms, 441 ms | 1532 ms cut, 175 ms cut, 1321 ms |
+
+On the Android emulator, 16 codegen units without incremental builds cut the
+direct stage of most scans from about 650 ms to about 410 ms, and the three
+default budgets held. Every Android scan read both codes.
+
+The iPhone simulator varied too much within one run to compare the two
+profiles. In run 44934537330, two `frame` scans of the same image with the
+same build took 863 ms and 2872 ms. `fast` was cut in every run. In run
+44934540185, the first stage of `frame` alone took 174 ms, so the 80 ms
+budget kept the second stage from starting and the scan read the QR code but
+not the Code 128.
+
+These are CI observations on shared hosted runners: an Android 14 x86_64
+emulator on Ubuntu and an iPhone simulator on macOS 15. They are not device
+performance, and they do not measure release builds, which use the release
+profile (thin LTO, one codegen unit).
+
 ## Packaging from a candidate checkout
 
 The development binding uses the workspace core by relative path. A pub.dev

@@ -10,14 +10,20 @@
   Flutter only in debug mode, where cargokit builds the core with Cargo's dev
   profile, and 0.11.0 left that profile unoptimized: on the iOS simulator,
   scans overran their default budgets. `rust/Cargo.toml` now gives the dev
-  profile opt-level 3 without debug assertions. Overflow checks stay on, and
-  there is no LTO in debug builds.
+  profile opt-level 3 without debug assertions, without incremental builds
+  and with 16 codegen units. Overflow checks stay on, and there is no LTO in
+  debug builds. The README gives the CI timings: on an Android emulator the
+  three default budgets hold, on an iPhone simulator `fast` is still cut.
+* `flutter_rust_bridge` moves from 2.12.0 to 2.13.0: the Dart runtime, the
+  Rust crate and the generated bindings together. Its Dart package requires
+  Dart 3.9.2, so this package now declares Dart `>=3.9.2 <4.0.0` and Flutter
+  `>=3.35.3`, the first Flutter that bundles it.
 * The package metadata names the renamed repository,
   `qrcode-ai-com/qrcode-barcode-scanner-rust`: the pubspec `repository`, the
   podspec `homepage` and the Rust crate's `repository`.
 * The example app bundles the mixed QR/Code 128 fixture. Its integration tests
-  check that the three profiles read both codes within their default budgets,
-  and exercise `budgetMs`.
+  check that the three profiles read both codes and that their default
+  budgets do not cut the scan, log each scan's time, and exercise `budgetMs`.
 
 ## 0.11.0
 

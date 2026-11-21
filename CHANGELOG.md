@@ -44,6 +44,10 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
 - Flutter: the pubspec `repository`, the podspec `homepage` and the Rust
   crate's `repository` name `qrcode-ai-com/qrcode-barcode-scanner-rust`, the
   repository's current address.
+- Flutter: `flutter_rust_bridge` moves from 2.12.0 to 2.13.0, in the Dart
+  runtime, the Rust crate and the generated bindings. Its Dart package
+  requires Dart 3.9.2, so the package declares Dart `>=3.9.2` and Flutter
+  `>=3.35.3`.
 
 ### Fixed
 
@@ -63,7 +67,8 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   settings, so simulators and emulators, which run Flutter only in debug mode,
   scanned with an unoptimized core and overran the default budgets on the iOS
   simulator. `bindings/flutter/rust/Cargo.toml` gives Cargo's dev profile
-  opt-level 3 without debug assertions; overflow checks stay on.
+  opt-level 3 without debug assertions, without incremental builds and with
+  16 codegen units; overflow checks stay on and there is no LTO.
 
 ### CI
 
@@ -73,8 +78,9 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
 - The Flutter publish job names its Flutter and Dart versions and installs
   from a tracked `pubspec.lock`.
 - `flutter-qualification.yml` runs the example's integration tests on an
-  Android emulator and an iPhone simulator, with no Cargo profile variable,
-  and reports the time of each scan of the mixed QR/Code 128 fixture.
+  Android emulator and an iPhone simulator, with no Cargo profile variable
+  and without the toolchain action's `CARGO_INCREMENTAL`, and reports the
+  time of each scan of the mixed QR/Code 128 fixture.
 - `distribution/releases/` records each public release in one manifest: its
   tag, its commit and the hash of every public file, read from the public
   addresses. `scripts/release-fanout.py` keeps every mention of a release

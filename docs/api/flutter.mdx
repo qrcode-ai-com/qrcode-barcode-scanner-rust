@@ -29,7 +29,9 @@ flutter pub add qr_barcode_scanner:0.11.0
 ```
 
 The public archive declares Dart `>=3.3.0 <4.0.0`, Flutter `>=3.19.0` and
-`flutter_rust_bridge` exactly `2.12.0`. These declarations are not evidence of
+`flutter_rust_bridge` exactly `2.12.0`. The working source moves to
+`flutter_rust_bridge` 2.13.0 for the next release, which requires Dart 3.9.2
+and Flutter 3.35.3 or later. These declarations are not evidence of
 installation on every SDK version. Android and iOS are the plugin's declared
 platforms. For an upcoming source candidate, follow the
 [separate packaging instructions](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#packaging-from-a-candidate-checkout);
@@ -131,6 +133,18 @@ semantics of `budget_ms` in the other bindings
 
 Calls written for 0.11.0 keep their meaning: without `budgetMs`, each profile
 keeps its default budget.
+
+The budget stops the scan from starting a stage or an attempt once its
+deadline has passed. It does not stop one that is running. So a `frame` scan
+can take longer than 80 ms and still be final: its last stage started in time,
+and `budgetExhausted` is `false`.
+
+Simulators and emulators run Flutter in debug mode, where cargokit builds the
+core with the package's dev profile. In the working source that profile is
+optimized (opt-level 3, 16 codegen units, no LTO). The
+[package README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#debug-builds-and-scan-time)
+gives the dated CI timings of the mixed QR/Code 128 fixture with it. They are
+CI observations, not device performance.
 
 ## Errors + license
 
