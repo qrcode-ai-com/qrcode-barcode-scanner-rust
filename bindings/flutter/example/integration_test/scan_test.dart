@@ -20,6 +20,14 @@ import 'package:qr_barcode_scanner/qr_barcode_scanner.dart';
 /// The two codes of assets/mixed-code128-qr.png, as `symbology:text`.
 const mixedContents = ['code128:STOCK-4827', 'qr_code:https://qrc-ai.com/76xMa'];
 
+/// `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes the `fast` and `frame`
+/// default budgets a test: run it so on a physical device. Without it, as in
+/// CI, a cut `fast` or `frame` scan is recorded (`QRSCAN_BUDGET_CUT`) and must
+/// be a valid partial report; `full` must be final either way. A simulator or
+/// an emulator on a shared hosted runner is not a device, so its timing alone
+/// does not fail the job.
+const strictBudgets = bool.fromEnvironment('QRSCAN_STRICT_BUDGETS');
+
 /// One `QRSCAN_TIMING` log line for [report], scanned in [wall].
 void logTiming(String name, String profile, int? budgetMs, ScanReport report,
     Stopwatch wall) {
@@ -74,11 +82,22 @@ void main() {
         // A cut report is partial: it may miss a code or leave the score
         // unjudged. So the budget is checked before the reads, and its
         // failure says what the cut report read.
+        final read = contents(report);
+        final recordOnly = !strictBudgets && profile != 'full';
+        if (report.trace.budgetExhausted && recordOnly) {
+          final ms = report.trace.totalMs.toStringAsFixed(1);
+          // ignore: avoid_print
+          print('QRSCAN_BUDGET_CUT profile=$profile total_ms=$ms '
+              'read=${read.join('|')}');
+          expect(read.every(mixedContents.contains), isTrue,
+              reason: 'a cut $profile scan read $read, outside the fixture');
+          return;
+        }
         expect(report.trace.budgetExhausted, isFalse,
             reason: 'the default $profile budget cut the scan after '
                 '${report.trace.totalMs.toStringAsFixed(1)} ms of ladder; '
-                'it read ${contents(report)}');
-        expect(contents(report), mixedContents);
+                'it read $read');
+        expect(read, mixedContents);
         if (profile == 'frame') {
           expect(report.score, isNull); // frame profile skips scoring
         } else {

@@ -23,8 +23,11 @@
   `qrcode-ai-com/qrcode-barcode-scanner-rust`: the pubspec `repository`, the
   podspec `homepage` and the Rust crate's `repository`.
 * The example app bundles the mixed QR/Code 128 fixture. Its integration tests
-  check that the three profiles read both codes and that their default
-  budgets do not cut the scan, log each scan's time, and exercise `budgetMs`.
+  check that the three profiles read both codes, log each scan's time, and
+  exercise `budgetMs`. The `full` default budget must not cut the scan. A cut
+  `fast` or `frame` scan is recorded and must be a valid partial report, unless
+  `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes those budgets a test too,
+  for a run on a physical device.
 
 ## 0.11.0
 

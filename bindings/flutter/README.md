@@ -210,6 +210,15 @@ emulator on Ubuntu and an iPhone simulator on macOS 15. They are not device
 performance, and they do not measure release builds, which use the release
 profile (thin LTO, one codegen unit).
 
+So in CI the integration tests require only the `full` default budget to hold.
+A `fast` or `frame` scan that its default budget cuts prints a
+`QRSCAN_BUDGET_CUT` line and must read nothing outside the fixture. On a
+physical device, make the `fast` and `frame` budgets a test too:
+
+```sh
+cd example && flutter test integration_test --dart-define=QRSCAN_STRICT_BUDGETS=true
+```
+
 ## Packaging from a candidate checkout
 
 The development binding uses the workspace core by relative path. A pub.dev
