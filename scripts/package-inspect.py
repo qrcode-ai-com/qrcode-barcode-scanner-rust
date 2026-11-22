@@ -3422,7 +3422,7 @@ PLANTED = (
     "plans/roadmap.md", "target/release/build.log", "node_modules/x/index.js", ".git/config", ".DS_Store",
     "lib.rs~",
 )
-REPO_URL = {"type": "git", "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner"}
+REPO_URL = {"type": "git", "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust"}
 
 
 def _tar(path: pathlib.Path, top: str, files: dict, members=None) -> pathlib.Path:
