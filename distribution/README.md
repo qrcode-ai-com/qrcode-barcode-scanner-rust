@@ -344,14 +344,14 @@ shows how to scan an image locally using the verified index digest. Both
 pulled anonymously and ran the exact-content regression checks. The public
 0.10 GHCR and Docker Hub images and 0.1 agent archives remain available below.
 
-To scan over HTTP, the [HTTP service](http/README.md) runs the engine's npm package 0.12.0 behind
+To scan over HTTP, the [HTTP service](http/README.md) runs the engine's npm package 0.11.0 behind
 `POST /scan` and answers with its report, unchanged. You build its image from that folder: no
 registry serves it yet. Its workflow builds the image on Linux AMD64 and ARM64 and judges each one
 fresh, read-only and with no route out, on the mixed sample in the three profiles.
 
 ## Recipes prepared for other package managers
 
-These recipes package the 0.12.0 CLI for other systems. Each one pins the v0.12.0 release by the
+These recipes package the 0.11.0 CLI for other systems. Each one pins the v0.11.0 release by the
 SHA-256 of its checksum list, and its checks run in this repository. The Glama container and the
 MCP Bundle hold the MCP server 0.3.1 instead, with the engine it was released on, each
 package pinned by its npm integrity. None of these destinations serves the scanner yet, except
@@ -380,8 +380,8 @@ still needs, usually an account or a review in that registry.
 No Rust build of these recipes ran here: each registry compiles the package in its own builders.
 
 The [Wasmer package](wasmer/README.md) is compiled here instead: `wasmer.yml` builds qrscan for
-WASI (`wasm32-wasip1`) from the source of tag v0.12.0, twice to the same module, and runs it under
-Wasmer on the shared truth set beside the native 0.12.0 command. It is prepared, not published;
+WASI (`wasm32-wasip1`) from the source of tag v0.11.0, twice to the same module, and runs it under
+Wasmer on the shared truth set beside the native 0.11.0 command. It is prepared, not published;
 publishing it on the Wasmer registry is the owner's step ([LISTING.md](wasmer/LISTING.md)).
 
 <details>

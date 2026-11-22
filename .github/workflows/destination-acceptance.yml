@@ -344,6 +344,10 @@ jobs:
       # The published module and the exact version a user gets.
       MODULE: github.com/qrcode-ai-com/qrcode-barcode-scanner-go
       MODULE_VERSION: v0.12.0
+      # The engine release that version supports, whose public CLI the consumer starts, and the
+      # sha256 of its checksum list. It moves with MODULE_VERSION, after the mirror's own tag.
+      MODULE_ENGINE_TAG: v0.12.0
+      MODULE_ENGINE_SUMS: f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691
       # Only through the public proxy, checked by the public checksum database, with the Go of
       # the host and no C code.
       GOPROXY: https://proxy.golang.org
@@ -359,12 +363,12 @@ jobs:
           python-version: "3.14"
       - name: Download the public CLI without a token and check it
         run: |
-          python scripts/packed-cli-consumer.py fetch --repository "$RELEASE_REPOSITORY" --tag "$RELEASE_TAG" \
-            --sums-sha256 "$SUMS_SHA256" --target "$TARGET" --out "$RUNNER_TEMP/download"
+          python scripts/packed-cli-consumer.py fetch --repository "$RELEASE_REPOSITORY" --tag "$MODULE_ENGINE_TAG" \
+            --sums-sha256 "$MODULE_ENGINE_SUMS" --target "$TARGET" --out "$RUNNER_TEMP/download"
       # The Windows archive is a zip and its command is qrscan.exe.
       - name: Unpack it outside the checkout
         run: |
-          asset="qrcode-barcode-scanner-cli-$RELEASE_VERSION-$TARGET"
+          asset="qrcode-barcode-scanner-cli-${MODULE_ENGINE_TAG#v}-$TARGET"
           mkdir "$RUNNER_TEMP/install" receipt
           if [ "$RUNNER_OS" = Windows ]; then
             python -m zipfile -e "$RUNNER_TEMP/download/$asset.zip" "$RUNNER_TEMP/install"
