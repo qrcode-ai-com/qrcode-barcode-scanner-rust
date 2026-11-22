@@ -91,7 +91,7 @@ Save the following complete program as `src/main.rs`, then run
 `https://qrc-ai.com/76xMa` and Code 128 `STOCK-4827`; compare the decoded
 values, rather than assuming a detection's array position.
 
-```rust
+```rust,no_run
 use qrcode_barcode_scanner::{ImageInput, ScanProfile, Scanner};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

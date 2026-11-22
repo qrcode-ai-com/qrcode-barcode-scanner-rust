@@ -1,4 +1,9 @@
-//! # QR Code & Barcode Scanner
+// The README opens the crate page, so docs.rs shows what crates.io and GitHub show. Only
+// rustdoc reads it, for the rendered page and the doctests it collects: a library build never
+// opens the file, and clippy's doc lints judge the Rust docs below, not the README's prose.
+#![cfg_attr(any(doc, doctest), doc = include_str!("../README.md"))]
+//!
+//! ## Library contract
 //!
 //! Decoding + scannability validation for artistic, AI-generated, and
 //! photo-captured QR codes — the codes that break standard scanners.
