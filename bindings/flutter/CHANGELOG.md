@@ -28,6 +28,16 @@
   `fast` or `frame` scan is recorded and must be a valid partial report, unless
   `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes those budgets a test too,
   for a run on a physical device.
+* The example app shows the report: it scans the mixed QR/Code 128 fixture or
+  a single QR code with the profile and the optional `budgetMs` you choose,
+  lists every detection with its format and text, shows the QR scannability
+  score and grade of the first one when the report has them, outlines each code
+  on the image, and shows `trace.totalMs` and `trace.budgetExhausted`.
+* The pubspec declares a pub.dev screenshot of the example,
+  `doc/screenshots/example-android.png`, captured after a scan on an Android
+  emulator in CI. Staging and `scripts/package-inspect.py` refuse a declared
+  screenshot that pub would not publish, that breaks pub.dev's limits or is not
+  the image its name says, and any undeclared file under `doc/screenshots`.
 
 ## 0.11.0
 

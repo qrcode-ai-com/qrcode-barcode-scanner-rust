@@ -35,7 +35,12 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a known payload for a Flutter example, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-Demonstrates how to use the qr_barcode_scanner plugin.
+The app scans one of two bundled images, the mixed QR/Code 128 fixture or a
+single QR code, with the profile (`fast`, `frame` or `full`) and the optional
+`budgetMs` you choose. It lists every detection with its format and text,
+shows the QR scannability score and grade of the first one when the report has
+them, outlines each code where the engine located it, and shows the report's
+`trace.totalMs` and `trace.budgetExhausted`.
 
 ## Getting Started
 

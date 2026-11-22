@@ -11,6 +11,13 @@ topics:
   - scanner
   - ffi
 
+# Captured by .github/workflows/flutter-qualification.yml after the example's
+# scan; scripts/stage-flutter-package.py checks each entry against pub.dev's
+# screenshot rules.
+screenshots:
+  - description: The example app on an Android emulator after scanning an image with a QR code and a Code 128, listing each detection, the QR score and the scan trace.
+    path: doc/screenshots/example-android.png
+
 # flutter_rust_bridge 2.13.0 requires Dart 3.9.2, first bundled with
 # Flutter 3.35.3: an older SDK cannot resolve this package.
 environment:
