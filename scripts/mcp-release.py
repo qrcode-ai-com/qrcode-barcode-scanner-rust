@@ -32,6 +32,8 @@ SCHEMA_SHA256 = "101f84b2888bea2ba617dd4a1d97593bd1a7c7e37e4bd57da6767e944e21fca
 FILES = ("LICENSE", "README.md", "package.json", "scan-report.schema.json", "server.json", "src/cli.mjs", "src/server.mjs")
 SEMVER = r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?"
 LIMIT = 2 * 1024 * 1024
+# How long a version npm accepted is read back while it answers 404.
+READBACK_SECONDS = 15 * 60
 
 
 def require(condition: bool, message: str) -> None:
@@ -217,7 +219,7 @@ def registry_probe(archive: Path, out: Path, uploaded: bool = False, get=fetch) 
         if error.code != 404:
             raise
         if uploaded:
-            raise RegistryManifestPending("successful publication is not publicly served yet") from error
+            raise RegistryManifestPending(f"{PACKAGE}@{version} is not served by npm yet") from error
         write_json(out, {**measured, "outcome": "MISSING", "oidcUploadExercised": False})
         return "missing"
     require(manifest.get("name") == PACKAGE and manifest.get("version") == version, "registry identity/version differs")
@@ -232,16 +234,27 @@ def registry_probe(archive: Path, out: Path, uploaded: bool = False, get=fetch) 
     return "present"
 
 
-def registry_after_upload(archive: Path, out: Path, *, get=fetch, clock=time.monotonic, sleep=time.sleep) -> str:
-    deadline = clock() + 7 * 60
+def progress(line: str) -> None:
+    print(line, file=sys.stderr, flush=True)
+
+
+def registry_after_upload(archive: Path, out: Path, *, get=fetch, clock=time.monotonic, sleep=time.sleep, say=progress) -> str:
+    # npm processes a version it accepted before serving it (staged publishing):
+    # an engine platform package answered 404 for 3.5 minutes on 22 November 2026.
+    deadline = clock() + READBACK_SECONDS
+    reported = None
     while clock() < deadline:
         try:
             return registry_probe(archive, out, uploaded=True, get=get)
-        except RegistryManifestPending:
+        except RegistryManifestPending as pending:
+            now = clock()
+            if reported is None or now - reported >= 60:
+                say(f"{pending}; read again every 10 s, {int((deadline - now + 59) // 60)} minute(s) left")
+                reported = now
             remaining = deadline - clock()
             if remaining > 0:
                 sleep(min(10, remaining))
-    raise ValueError("npm accepted the upload, but its version manifest still returned HTTP 404 after 7 minutes. Verify public bytes before rerunning.")
+    raise ValueError("npm accepted the upload, but its version manifest still returned HTTP 404 after 15 minutes. Verify public bytes before rerunning.")
 
 
 def consume(archive: Path, receipt: Path, expected: str, out: Path, registry: bool, cli: str | None) -> None:
