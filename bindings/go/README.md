@@ -69,20 +69,20 @@ report.
 ## Install
 
 ```sh
-go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.11.0
+go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.12.0
 ```
 
 ```go
 import qrscan "github.com/qrcode-ai-com/qrcode-barcode-scanner-go"
 ```
 
-The package follows the engine it drives: version 0.11.x of the package works with `qrscan`
-0.11.x. The first version is 0.11.0.
+The package follows the engine it drives: version 0.12.x of the package works with `qrscan`
+0.12.x. The first version is 0.11.0.
 
 ## What you need
 
 - Go 1.24 or later. `CGO_ENABLED=0` works: there is no C code.
-- The `qrscan` command, version 0.11.x, installed separately. The
+- The `qrscan` command, version 0.12.x, installed separately. The
   [distribution guide](../../distribution/README.md) lists the routes: Homebrew, Scoop, the
   Debian and RPM packages, the AUR, `cargo install`, the release archives and the container
   image. This package never downloads it.
@@ -190,7 +190,7 @@ The engine's [supported formats](https://github.com/qrcode-ai-com/qrcode-barcode
 | Error | When |
 | --- | --- |
 | `qrscan.ErrBinaryNotFound` (with `errors.Is`) | `qrscan` could not be started: not installed, not on `PATH`, not executable. It is not remembered: install the command and the same `Scanner` works. |
-| `*qrscan.UnsupportedVersionError` | The installed `qrscan` is not 0.11.x. The check runs before the first scan. |
+| `*qrscan.UnsupportedVersionError` | The installed `qrscan` is not 0.12.x. The check runs before the first scan. |
 | `*qrscan.ScanError` | The engine refused the file or the options. `EngineCode` holds its code when it gives one, such as `QRS-001` for a file that is not an image. |
 | the context's error | The context was cancelled or its deadline passed; the command was stopped. |
 

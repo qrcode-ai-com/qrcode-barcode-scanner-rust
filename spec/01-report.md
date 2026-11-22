@@ -584,7 +584,7 @@ A build descriptor, never part of a report: each runtime returns the
 readers compiled into the build it loaded — Rust
 `Capabilities::current()`, WASM, Node and Python `capabilities()`, UniFFI
 `capabilities()` as a JSON string, and `qrscan --capabilities`. The
-Flutter binding does not expose it in 0.11.
+Flutter binding does not expose it in 0.12.
 
 ```jsonc
 {

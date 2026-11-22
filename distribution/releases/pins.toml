@@ -15,7 +15,7 @@ schema = "qrscan-release-pins/1"
 
 # The public engine release that the engine mentions and the pinned values follow.
 [engine]
-manifest = "v0.11.0.json"
+manifest = "v0.12.0.json"
 
 # ------------------------------------------------------------------ whole files that never move
 
@@ -114,12 +114,7 @@ paths = [
   "distribution/README.md",
   "distribution/cli/README.md",
   "distribution/releases/README.md",
-  "distribution/appimage/*",
-  "distribution/aur/*",
   "distribution/chocolatey/*",
-  "distribution/debian/*",
-  "distribution/rpm/*",
-  ".github/workflows/appimage.yml",
   ".github/workflows/destination-acceptance.yml",
   ".github/workflows/go-adapter.yml",
   ".github/workflows/php-adapter.yml",
@@ -128,6 +123,16 @@ paths = [
   "bindings/php/**",
   "scripts/package-inspect.py",
   "scripts/packed-node-consumer.mjs",
+]
+
+[[file]]
+held = "the Linux packages and the AppImage: each recipe pins the release its channel publishes, with that release's licence, and moves when the channel is published again"
+paths = [
+  "distribution/appimage/*",
+  "distribution/aur/*",
+  "distribution/debian/*",
+  "distribution/rpm/*",
+  ".github/workflows/appimage.yml",
 ]
 
 [[file]]
@@ -259,7 +264,7 @@ match = 'appimage-v'
 [[line]]
 held = "the AppImage files, under their own tag"
 paths = ["distribution/appimage/README.md"]
-match = '^chmod \+x |\./qrcode-barcode-scanner-\S+\.AppImage'
+match = '^chmod \+x |\./qrcode-barcode-scanner-\S+\.AppImage|^The engine release `v\S+` and its files did not change'
 
 [[line]]
 held = "the AUR package"
@@ -283,7 +288,38 @@ match = 'demos-v|\[Vite example\]'
 
 [[line]]
 held = "the Go module, with its own versions"
-match = 'qrcode-barcode-scanner-go@v|MODULE_VERSION'
+paths = [".github/workflows/destination-acceptance.yml", "distribution/README.md"]
+match = 'qrcode-barcode-scanner-go@v|MODULE_VERSION|MODULE_ENGINE_'
+
+[[line]]
+held = "the agent integrations: they name the engine they were released on"
+paths = [".github/workflows/destination-acceptance.yml"]
+match = 'ADAPTER_ENGINE: '
+
+[[line]]
+held = "the container image, under its own tag"
+paths = [".github/workflows/destination-acceptance.yml"]
+match = 'IMAGE_ENGINE: '
+
+[[line]]
+held = "the HTTP service image, under its own tag http-v: it runs the published engine it pins"
+paths = ["distribution/README.md"]
+match = 'the \[HTTP service\]\(http/README\.md\) runs the engine'
+
+[[line]]
+held = "the packaging recipes of each channel, checked by scripts/check-packaging-recipes.py and moved when that channel is published again"
+paths = ["distribution/README.md"]
+match = '^These recipes package the \S+ CLI for other systems'
+
+[[line]]
+held = "the Wasmer package, built from the source of tag v0.11.0 and published by the owner: moved when a later source is packaged"
+paths = ["distribution/README.md"]
+match = '^WASI \(`wasm32-wasip1`\) from the source of tag|^Wasmer on the shared truth set beside the native'
+
+[[line]]
+held = "the PHP package on Packagist, with its own versions"
+paths = ["distribution/README.md"]
+match = 'packagist\.org/packages/qrcode-ai-com/qrcode-barcode-scanner#v'
 
 [[line]]
 held = "the agent integrations: they name the engine they were released on"
@@ -294,8 +330,8 @@ match = 'agent integrations are published|native engine\. Choose|with engine \d|
 # installs is the version of its own archive, as in the other package READMEs.
 [[line]]
 held = "The public Flutter archive and its dated consumer proof; refresh only after a separate publication."
-paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx"]
-match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`'
+paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx", "docs/quickstart.mdx"]
+match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`|^Published 0\.11\.0 cannot change the budget|^Calls written for 0\.11\.0 keep their meaning|published Flutter 0\.11\.0 facade'
 
 # ------------------------------------------------------------------ lines that follow another source than their file
 
@@ -308,7 +344,12 @@ match = '"a second tag line"'
 
 [[line]]
 keep = "What a version brought or ended."
-match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0'
+match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0|not part of the published 0\.11\.0 release'
+
+[[line]]
+keep = "The licence that published archives retain."
+paths = ["AGENTS.md"]
+match = 'engine 0\.11\.0 and MCP$'
 
 [[line]]
 keep = "The record of the 0.11 container image."
@@ -322,7 +363,7 @@ match = '0\.11\.0|Engine source remains'
 [[line]]
 keep = "A package with its own versions: its first one, and an example of a value."
 paths = ["bindings/go/**", "bindings/php/**", "distribution/README.md"]
-match = 'The first version is 0\.11\.0|such as `?0\.11\.0|Version 0\.11\.0 was installed through'
+match = 'The first version is 0\.11\.0|such as `?0\.11\.0|Version 0\.11\.0 was installed (through|from)|with PHP 8\.4 and the 0\.11\.0 `qrscan` release'
 
 [[line]]
 keep = "What the published 0.11.0 artifact needs, and the JitPack build that was judged."
@@ -380,55 +421,9 @@ paths = [
 match = 'SUMS_SHA256: ([0-9a-f]{64})'
 
 [[value]]
-fact = "release > checksums > sha256"
-paths = ["distribution/appimage/build.sh", "distribution/debian/build.sh"]
-match = 'checksums_sha256=([0-9a-f]{64})'
-
-[[value]]
-facts = [
-  "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > executable > sha256",
-  "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > executable > sha256",
-]
-paths = ["distribution/appimage/build.sh", "distribution/debian/build.sh"]
-match = 'binary_sha256=([0-9a-f]{64})'
-
-[[value]]
-facts = [
-  "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > executable > sha256",
-  "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > executable > sha256",
-]
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = '%global executable_sha256 ([0-9a-f]{64})'
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/aur/PKGBUILD", "distribution/aur/.SRCINFO"]
-match = "sha256sums ?= ?\\(?'?([0-9a-f]{64})"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE0\\}'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE1\\}'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE2\\}'"
-
-[[value]]
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
 paths = ["distribution/chocolatey/build.ps1"]
 match = "\\$sourceSha = '([0-9a-f]{64})'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
-paths = ["distribution/debian/README.md"]
-match = '^`([0-9a-f]{64})`\.'
 
 [[value]]
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-pc-windows-msvc.zip > sha256"
@@ -447,10 +442,5 @@ match = 'Build commit: ([0-9a-f]{40})'
 
 [[value]]
 fact = "commit"
-paths = ["distribution/chocolatey/test.ps1", "distribution/debian/README.md"]
+paths = ["distribution/chocolatey/test.ps1"]
 match = 'qrcode-barcode-scanner/([0-9a-f]{40})/fixtures/'
-
-[[value]]
-fact = "source_date_epoch"
-paths = ["distribution/appimage/build.sh"]
-match = 'source_date_epoch=([0-9]+)'

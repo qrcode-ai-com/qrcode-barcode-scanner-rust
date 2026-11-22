@@ -44,11 +44,11 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a known Windows test image, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-The `qrcode-barcode-scanner` package carries the released `qrscan` 0.11.0
+The `qrcode-barcode-scanner` package carries the released `qrscan` 0.12.0
 executable for x64 Windows. Chocolatey creates the command shim and removes it
 at uninstall. The build verifies the official ZIP and executable hashes, keeps
 the original source and license records, and adds Chocolatey's verification
-files. See the [original Windows release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.11.0)
+files. See the [original Windows release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.0)
 and the [CLI documentation](../cli/README.md).
 
 On a disposable x64 Windows host with Chocolatey CLI 2.x and PowerShell 7,
