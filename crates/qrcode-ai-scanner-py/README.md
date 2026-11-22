@@ -52,9 +52,9 @@ The distribution is `qrcode-barcode-scanner`; the import is
 `qrcode_barcode_scanner`. Python 3.8 or later is required. The PyO3 extension
 returns the same versioned `ScanReport` as the Rust, Node.js and browser bindings.
 
-[Python API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/python.mdx) ·
-[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0/spec) ·
-[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/SCORING.md)
+[Python API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/python.mdx) ·
+[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0/spec) ·
+[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/SCORING.md)
 
 The scanner used by [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/python) can also check batches of saved QR designs and
 barcode photos from a Python workflow.
@@ -82,12 +82,12 @@ Activate it with `source .venv/bin/activate` on macOS/Linux, or
 release as a prebuilt wheel:
 
 ```sh
-python -m pip install --only-binary=:all: qrcode-barcode-scanner==0.11.0
+python -m pip install --only-binary=:all: qrcode-barcode-scanner==0.12.0
 ```
 
 The binary-only option prevents an unexpected Rust source build. If pip cannot
 find a compatible wheel, stop and check your interpreter and platform against
-the release's [PyPI files](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/#files).
+the release's [PyPI files](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/#files).
 The release wheels cover macOS ARM64/x64, GNU/Linux ARM64/x64, musl Linux x64
 and Windows x64; wheel tags describe compatibility, not a test of every host.
 Reading working source does not establish that its version is on PyPI.
@@ -99,7 +99,7 @@ Download a sample image containing QR `https://qrc-ai.com/76xMa` and Code 128
 
 ```sh
 curl -fsSL -o label.png \
-  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png
+  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png
 ```
 
 In Windows PowerShell, use `curl.exe` in place of `curl` for the download.
@@ -240,11 +240,11 @@ Releases up to 0.9.0 were published as `qrcode-ai-scanner`.
 To migrate, uninstall the previous distribution, install this one and import
 `qrcode_barcode_scanner`. The rename itself changes no function name or report
 field. The
-[migration guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/guides/migrate-to-qrcode-barcode-scanner.mdx)
+[migration guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/guides/migrate-to-qrcode-barcode-scanner.mdx)
 covers the runtime-specific steps.
 
-[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx) ·
-[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/SECURITY.md) ·
+[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx) ·
+[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/SECURITY.md) ·
 [Source](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) ·
 [Report a bug](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues)
 

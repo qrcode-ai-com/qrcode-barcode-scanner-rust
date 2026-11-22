@@ -100,7 +100,7 @@ report = QrcodeBarcodeScanner.scan(image, profile: :fast, budget_ms: 0)
 | `alpha_background:`, `alpha_palette:` | What a transparent image is laid over, and the backgrounds a transparent code must scan over. |
 
 The values each option takes are those of the engine: see the
-[option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/spec/02-profiles.md).
+[option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/02-profiles.md).
 
 ## Read the report
 
@@ -112,7 +112,7 @@ back in the same report, each with its format and the place where the engine mea
 `report.json` is the exact text the engine returned. Nothing is renamed, rounded or
 recalculated. `report.to_h` is that text parsed into a Hash with string keys, for the payload,
 the measured places and the trace. It follows the engine's
-[report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/spec/01-report.md).
+[report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/01-report.md).
 The other methods read the most used parts:
 
 | Method | Meaning |
@@ -154,7 +154,7 @@ end
 
 A profile that is not one of the three raises `ArgumentError`, and an image that is not a String
 raises `TypeError`, before the engine is called. The codes are listed in the engine's
-[error catalog](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error catalog](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 

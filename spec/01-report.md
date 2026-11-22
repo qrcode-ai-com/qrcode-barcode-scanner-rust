@@ -575,7 +575,7 @@ establish; a confirmation decode's reads are counted nowhere
 // `scanner` is illustrative — it carries whatever workspace release produced
 // the report. `pipeline` and `score_contract` are the normative compatibility
 // anchors (bumped only on breaking / semantic change).
-{ "scanner": "0.11.0", "pipeline": 5, "score_contract": 5 }
+{ "scanner": "0.12.0", "pipeline": 5, "score_contract": 5 }
 ```
 
 ## Capabilities

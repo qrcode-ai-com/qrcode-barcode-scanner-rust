@@ -5380,7 +5380,7 @@ def cli_self_test():
                     ("another commit", _cli_source_md(version, "0" * 40, tag, f"refs/tags/{tag}"), "Commit:"),
                     ("no source archive line", re.sub(rb"- Corresponding source:[^\n]*\n", b"", facts),
                      "Corresponding source: no line"),
-                    ("a second tag line", facts + b"- Tag: v0.0.1\n", "Tag: ['- Tag: v0.11.0', '- Tag: v0.0.1']"),
+                    ("a second tag line", facts + b"- Tag: v0.0.1\n", "Tag: ['- Tag: v0.12.0', '- Tag: v0.0.1']"),
                     ("no tag on a tagged build", _cli_source_md(version, commit, None, f"refs/tags/{tag}"), "Tag:"),
                     ("another workflow run", _cli_source_md(version, commit, tag, f"refs/tags/{tag}",
                                                             "https://example.invalid/run/1"), "Workflow run:"),
