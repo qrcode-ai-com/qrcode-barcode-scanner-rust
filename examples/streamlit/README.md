@@ -40,17 +40,23 @@ Help me understand Scan images in a Streamlit app (examples/streamlit/README.md)
 
 A small Streamlit app that reads every QR code and barcode in an image. Take the sample or upload a picture, and the app lists each code beside the image, outlines it where the engine measured it, and shows the full report. The image is read on the server that runs the app, in memory, and the app stores nothing.
 
-The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) are [QR Code AI](https://qrcode-ai.com/)'s scanning pages in the browser; the app links all three under its introduction. The app uses the Python package, which has the [QR code scanner Python guide](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/python) and the [barcode scanner Python guide](https://qrcode-ai.com/en-US/barcode-scanner/sdk/python). If a page is not online yet, this README is the reference.
+The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) are [QR Code AI](https://qrcode-ai.com/)'s scanning pages in the browser; the app links all three under its introduction, and all six pages of this README below its results. The app uses the Python package, which has the [QR code scanner Python guide](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/python) and the [barcode scanner Python guide](https://qrcode-ai.com/en-US/barcode-scanner/sdk/python). If a page is not online yet, this README is the reference.
 
 To make a test image with a known value, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Upload the exported image and compare the text in the table with the value you encoded, leading zeroes included.
 
 [`streamlit_app.py`](streamlit_app.py) is the page. [`scan_view.py`](scan_view.py) holds what it
-shows: the scan with its limits, the table and the outlined image. They use the published Python
-package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0
-and Streamlit 1.67.0, pinned in [`requirements.txt`](requirements.txt).
+shows for an image: the scan with its limits, the table and the outlined image.
+[`page_content.py`](page_content.py) holds what it shows around the scanner, the same as this
+README: the banner above the title, then below the results the six QR Code AI links, the Ask AI
+links with their prompt, and the pictures of how it works, what it returns, what it reads and the
+other runtimes. The browser loads each picture from its address on GitHub.
+
+The app uses the published Python package
+[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0 and
+Streamlit 1.67.0, pinned in [`requirements.txt`](requirements.txt).
 
 <p align="center">
-  <img src="media/app-sample-scan.png" alt="The Streamlit app after scanning its sample image: a table lists the QR code https://qrc-ai.com/76xMa and the Code 128 STOCK-4827, and the image below shows each code outlined where the engine measured it" width="600">
+  <img src="media/app-sample-scan.png" alt="The Streamlit app after scanning its sample image: under its banner and its title, a table lists the QR code https://qrc-ai.com/76xMa and the Code 128 STOCK-4827, and the image below shows each code outlined where the engine measured it" width="600">
 </p>
 
 ## Status
@@ -137,7 +143,9 @@ The tests drive the app with Streamlit's own test runner, widget by widget:
 
 They check the first visit on the sample, an upload in the three profiles, the upload limits, an
 image with no code, a file that is not an image, an oversized image, a cut budget and the
-configuration beside the app. Each scan of the mixed image is held to the exact two codes by the
+configuration beside the app. On each view, the section below the scanner must hold the six links in
+sentences, the Ask AI links and the four pictures, and the banner, pictures, prompt and Ask AI links
+must be this README's own. Each scan of the mixed image is held to the exact two codes by the
 engine repository's [Python host kit](../../scripts/python_host_kit.py).
 
 [`tests/served_smoke.py`](tests/served_smoke.py) also serves the app as Community Cloud does,
