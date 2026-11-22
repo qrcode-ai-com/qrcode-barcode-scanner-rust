@@ -59,6 +59,8 @@ returns the same versioned `ScanReport` as the Rust, Node.js and browser binding
 The scanner used by [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/python) can also check batches of saved QR designs and
 barcode photos from a Python workflow.
 
+## How it works
+
 <p align="center">
   <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
     <picture>
@@ -67,6 +69,10 @@ barcode photos from a Python workflow.
     </picture>
   </a>
 </p>
+
+The picture shows the three steps of the package. The next sections follow them: install the
+package, pass the bytes of an image or the pixels of a camera frame to the engine inside your
+process, then read the report it returns.
 
 ## Install
 
