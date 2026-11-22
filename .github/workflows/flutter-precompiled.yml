@@ -197,10 +197,15 @@ jobs:
           cp "$RUNNER_TEMP/binaries/$lib" "$served/$lib"
           # Xcode can leave the failed build's incremental state half-written
           # (run 44998989145: FlutterFramework's emit-module .d file was
-          # missing), so the restored iOS build starts from new derived data,
-          # like an app's first build.
-          if [ "$PLATFORM" = ios ] && [ -d "$HOME/Library/Developer/Xcode/DerivedData" ]; then
-            find "$HOME/Library/Developer/Xcode/DerivedData" -mindepth 1 -maxdepth 1 -name 'Runner-*' -exec rm -r {} +
+          # missing), so the restored iOS build starts from new derived data
+          # and new Flutter build output, like an app's first build.
+          if [ "$PLATFORM" = ios ]; then
+            if [ -d "$HOME/Library/Developer/Xcode/DerivedData" ]; then
+              find "$HOME/Library/Developer/Xcode/DerivedData" -mindepth 1 -maxdepth 1 -name 'Runner-*' -exec rm -r {} +
+            fi
+            for dir in build/ios .dart_tool/flutter_build; do
+              if [ -d "$dir" ]; then rm -r "$dir"; fi
+            done
           fi
           if ! consumer > "$RUNNER_TEMP/restored.log" 2>&1; then
             tail -n 80 "$RUNNER_TEMP/restored.log"; exit 1
