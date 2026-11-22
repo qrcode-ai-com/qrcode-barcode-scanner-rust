@@ -11,6 +11,9 @@ name: Publish · Python plugins
 # tag only (napari-vX.Y.Z, jupyterlab-vX.Y.Z), in its protected environment, re-inspects the exact
 # files the build recorded, compares them with what PyPI already serves and uploads them through
 # OIDC: no token is stored anywhere. A dispatch builds and judges, and stops before PyPI.
+# Each build job runs on a branch ref (a dispatch) and on its own plugin's tag only: the gate
+# refuses any other tag, so a napari-v tag skips the JupyterLab jobs and a jupyterlab-v tag
+# skips the napari ones.
 # scripts/check-publish-guards.py holds every publishing job here to its row of PYPI_PLUGINS;
 # RELEASING.md § Python plugin packages lists the owner's steps.
 on:
@@ -33,6 +36,7 @@ env:
 jobs:
   napari-build:
     name: napari plugin · build and judge
+    if: github.ref_type != 'tag' || startsWith(github.ref, 'refs/tags/napari-v')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -125,6 +129,7 @@ jobs:
 
   jupyterlab-build:
     name: JupyterLab extension · build and judge
+    if: github.ref_type != 'tag' || startsWith(github.ref, 'refs/tags/jupyterlab-v')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
