@@ -14,6 +14,12 @@ name: Flutter precompiled binaries
 #            staged package into one artifact, flutter-precompiled-unsigned
 #   verify   a dispatch on the tag, after the owner publishes: every published
 #            binary verifies, and consumer builds without rustup use them
+#
+# release, collect and verify need the package's rust/cargokit.yaml, which the
+# owner's keygen writes once. A tag whose package ships none skips them, with
+# a notice: that release ships no precompiled binaries, and cargokit builds
+# the library from source as before. When the file is there, check-config
+# must pass.
 on:
   push:
     branches: ["claude/precompiled-*"]
@@ -42,6 +48,8 @@ jobs:
   stage:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      config: ${{ steps.config.outputs.shipped }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -59,6 +67,17 @@ jobs:
             --archive flutter-artifact/flutter-stage.tar.gz \
             --receipt flutter-artifact/flutter-stage.json
           (cd flutter-artifact && shasum -a 256 flutter-stage.tar.gz > flutter-stage.sha256)
+      - name: Whether the staged package ships rust/cargokit.yaml
+        id: config
+        run: |
+          if [ -f /tmp/flutter-validation/bindings/flutter/rust/cargokit.yaml ]; then shipped=true; else shipped=false; fi
+          echo "shipped=$shipped" >> "$GITHUB_OUTPUT"
+          echo "the staged package ships rust/cargokit.yaml: $shipped"
+          if [ "$shipped" = false ] && { [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || [[ "$GITHUB_REF" == refs/tags/v* ]]; }; then
+            message="no rust/cargokit.yaml: this release ships no precompiled binaries"
+            echo "::notice title=Flutter precompiled binaries::$message"
+            echo "$message" >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
         with:
           name: flutter-stage
@@ -124,6 +143,8 @@ jobs:
       - name: A throwaway key, a local config and the crate hash both ways
         run: |
           pkg=/tmp/flutter-validation/bindings/flutter
+          # A shipped rust/cargokit.yaml names the owner's key; this test uses its own.
+          rm -f "$pkg/rust/cargokit.yaml"
           python3 scripts/flutter-precompiled.py keygen --key-file "$RUNNER_TEMP/throwaway.key" \
             --config "$pkg/rust/cargokit.yaml" --url-prefix http://127.0.0.1:8765/precompiled_
           dart_hash=$(dart --packages="$pkg/cargokit/build_tool/.dart_tool/package_config.json" \
@@ -205,7 +226,7 @@ jobs:
   release:
     name: Unsigned ${{ matrix.platform }} binaries
     needs: stage
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.stage.outputs.config == 'true'
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -277,7 +298,7 @@ jobs:
 
   collect:
     needs: [stage, release]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.stage.outputs.config == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -314,7 +335,7 @@ jobs:
   verify:
     name: Published ${{ matrix.platform }} binaries
     needs: stage
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && needs.stage.outputs.config == 'true'
     timeout-minutes: 60
     strategy:
       fail-fast: false
