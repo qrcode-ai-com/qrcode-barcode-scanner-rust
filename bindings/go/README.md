@@ -50,6 +50,8 @@ command of the
 and returns its JSON report unchanged. It holds no decoder of its own, uses the standard library
 only and needs no cgo.
 
+## How it works
+
 <p align="center">
   <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#command-line">
     <picture>
@@ -58,6 +60,11 @@ only and needs no cgo.
     </picture>
   </a>
 </p>
+
+The picture shows the three steps. Your code passes the path of an image file, the installed
+`qrscan` command reads its codes, and your code reads the JSON report it returns. The next
+sections follow that order: install the package and `qrscan`, scan an image, then read the
+report.
 
 ## Install
 
