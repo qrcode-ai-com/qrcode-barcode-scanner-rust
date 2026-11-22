@@ -330,8 +330,19 @@ match = 'agent integrations are published|native engine\. Choose|with engine \d|
 # installs is the version of its own archive, as in the other package READMEs.
 [[line]]
 held = "The public Flutter archive and its dated consumer proof; refresh only after a separate publication."
-paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx", "docs/quickstart.mdx"]
-match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`|^Published 0\.11\.0 cannot change the budget|^Calls written for 0\.11\.0 keep their meaning|published Flutter 0\.11\.0 facade'
+paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx", "docs/quickstart.mdx"]
+match = 'qr_barcode_scanner.*0\.12\.0|published Flutter 0\.12\.0 facade'
+
+# The Flutter guide names no engine release: each 0.12.0 there is the current pub.dev archive.
+[[line]]
+held = "The public Flutter archive and its dated consumer proof; refresh only after a separate publication."
+paths = ["docs/api/flutter.mdx"]
+match = '0\.12\.0'
+
+[[line]]
+keep = "The published Flutter 0.11.0 archive: what it declares, its licence, its hash and its dated consumer run."
+paths = ["docs/api/flutter.mdx"]
+match = '0\.11\.0'
 
 # ------------------------------------------------------------------ lines that follow another source than their file
 

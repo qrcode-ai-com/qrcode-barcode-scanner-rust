@@ -182,8 +182,9 @@ jobs:
           mkdir "$RUNNER_TEMP/install"
           tar -xzf "$RUNNER_TEMP/download/qrcode-barcode-scanner-cli-$RELEASE_VERSION-$TARGET.tar.gz" -C "$RUNNER_TEMP/install"
           echo "QRSCAN=$RUNNER_TEMP/install/qrcode-barcode-scanner-cli-$RELEASE_VERSION-$TARGET/qrscan" >> "$GITHUB_ENV"
-      # The package is not on Packagist. Composer copies it from this checkout, and from nowhere
-      # else: the public registry is switched off for this project.
+      # This judges the package of this checkout, not the versions Packagist lists from the
+      # package's own repository: Composer copies it from this checkout, and from nowhere else,
+      # because the public registry is switched off for this project.
       - name: Install the package in an empty project through Composer
         run: |
           mkdir "$RUNNER_TEMP/consumer" receipt

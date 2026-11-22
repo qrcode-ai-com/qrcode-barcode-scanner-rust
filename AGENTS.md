@@ -32,10 +32,12 @@ browser/device qualification keep distinct evidence. PyPI's exercised OIDC
 publication does not establish npm provenance; the initial npm uploads were
 manual. A repository rename or documentation edit does not publish a future version.
 
-Public Flutter package `qr_barcode_scanner` 0.11.0 is on pub.dev under verified
-publisher `qrcode-ai.com`. It builds its bundled Rust core at app-build time.
-Its Android emulator consumer passes with native development optimization; the
-iOS simulator consumer still fails its fast-profile budget. Follow the dated
+Public Flutter package `qr_barcode_scanner` 0.12.0 is on pub.dev under verified
+publisher `qrcode-ai.com`. An app build links its signed precompiled native
+library by default on a machine without rustup, or when the app opts in, and
+otherwise compiles the bundled Rust core. Its tag runs built the example for
+Android and iOS with and without Rust; no scan of the published archive on an
+emulator, simulator or device is qualified. Follow the dated
 [Flutter installation and consumer evidence](docs/api/flutter.mdx), not a claim
 of general device qualification. Kotlin/JitPack remains unqualified and Swift
 uses a local source build. JSR, agent adapters and containers retain their own publication
@@ -88,7 +90,7 @@ transport the caller supplies.
 | `crates/qrcode-ai-scanner-node` | `@qrcode-ai-com/qrcode-barcode-scanner` (napi) and six automatic platform dependencies, 0.12.0 published | npm |
 | `crates/qrcode-ai-scanner-wasm` | `@qrcode-ai-com/qrcode-barcode-scanner-wasm`, 0.12.0 published | npm |
 | `crates/qrcode-ai-scanner-py` | `qrcode-barcode-scanner` (PyO3, workspace-excluded), 0.12.0 published | PyPI |
-| `bindings/flutter` | `qr_barcode_scanner`, Flutter plugin (FRB + cargokit), 0.11.0 public; separate native qualification limits | pub.dev |
+| `bindings/flutter` | `qr_barcode_scanner`, Flutter plugin (FRB + cargokit), 0.12.0 public with signed precompiled libraries; separate native qualification limits | pub.dev |
 | `bindings/kotlin` | com.github.qrcode-ai-com:qrcode-barcode-scanner, not yet qualified | JitPack |
 | `bindings/swift` | `QrcodeAiScanner` (xcframework), built from source: SwiftPM cannot add it by repository URL | SwiftPM (local package) |
 

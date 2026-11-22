@@ -22,10 +22,12 @@ Node parent, not six additional SDKs. The browser package ships one portable
 WASM module. No 0.12.0 package uses a former name or an alias/wrapper package;
 `qrscan` remains the CLI command.
 
-Public Flutter package [`qr_barcode_scanner` 0.11.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.11.0)
-is published under verified publisher `qrcode-ai.com`; its Rust core is compiled
-at app-build time. The [Flutter guide](docs/api/flutter.mdx) records the passing
-optimized Android emulator consumer and the iOS simulator fast-budget failure.
+Public Flutter package [`qr_barcode_scanner` 0.12.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.0)
+is published under verified publisher `qrcode-ai.com`; an app build links its
+signed precompiled native library when cargokit may use one and otherwise
+compiles its Rust core. The [Flutter guide](docs/api/flutter.mdx) records the
+Android and iOS builds of its tag, with and without Rust, and the earlier
+emulator and simulator consumer run of the previous archive.
 Publication does not establish general device qualification. Kotlin/JitPack is
 unqualified, and Swift requires a local source build. JSR has no qualified
 publication here. The public ClawHub
