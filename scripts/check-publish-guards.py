@@ -167,7 +167,10 @@ mint registry tokens). Every privileged job must:
                comparison with what PyPI serves (`python-plugin-release.py
                pypi-live`) and one pinned pypa/gh-action-pypi-publish step,
                packages-dir dist and skip-existing true. The build job reads
-               only, records sha256 from the step that runs
+               only, runs where its gate can pass and nowhere else (its `if:`
+               is exactly `github.ref_type != 'tag' || startsWith(github.ref,
+               'refs/tags/<tag family>')`: a dispatch from a branch, or the
+               plugin's own tag), records sha256 from the step that runs
                `python-plugin-release.py build`, runs the clean consumer
                `python-host-consumer.py run` on the wheel before uploading it,
                and is the only job uploading the artifact, once. A new plugin
@@ -400,6 +403,9 @@ def pypi_plugin(row: dict) -> dict:
     folder, build = row["folder"], row["build"]
     return {
         "guard": f"startsWith(github.ref, 'refs/tags/{row['tag']}')",
+        # The build job runs on a branch ref (a dispatch) and on its own tag family: the gate
+        # refuses any other tag, so another plugin's tag would only fail it.
+        "build_guard": f"github.ref_type != 'tag' || startsWith(github.ref, 'refs/tags/{row['tag']}')",
         "download": {"name": row["artifact"], "path": "dist", "digest-mismatch": "error"},
         "sha_env": {"DIST_SHA256": f"${{{{ needs.{build}.outputs.sha256 }}}}"},
         "inspect": f'python3 {PYPI_PLUGIN_RELEASE} inspect dist --folder {folder} --sha256 "$DIST_SHA256"',
@@ -2155,9 +2161,10 @@ def _pypi_plugin_contract_problems(wf: dict, job: dict, row: dict) -> list:
     outputs = build.get("outputs") if isinstance(build.get("outputs"), dict) else {}
     build_steps = _steps(build)
     built = next((i for i, s in enumerate(build_steps) if str(s.get("id")) == "build"), None)
-    if build.get("permissions") != {"contents": "read"} or build.get("if") is not None or \
-            "continue-on-error" in build:
-        fail(f"{row['build']} holds contents read and nothing else, with no `if:` or continue-on-error")
+    if build.get("permissions") != {"contents": "read"} or "continue-on-error" in build or \
+            re.sub(r"\s+", "", str(build.get("if", ""))) != re.sub(r"\s+", "", want["build_guard"]):
+        fail(f"{row['build']} holds contents read and nothing else, with no continue-on-error, and runs "
+             f"only where its gate can pass: `if: {want['build_guard']}`")
     if re.sub(r"\s+", "", str(outputs.get("sha256", ""))) != re.sub(r"\s+", "", PYPI_PLUGIN_OUTPUT) or \
             built is None or not any(re.search(want["build_run"], line)
                                      for line in _code_lines(build_steps[built].get("run"))):
@@ -2908,8 +2915,10 @@ P, T = "publish", "toolchains"
 PL_JOB = (PYPI_PLUGIN_WORKFLOW, "napari-publish")
 PL_WF, PL_ROW, PL = PYPI_PLUGIN_WORKFLOW, PYPI_PLUGINS[PL_JOB], " › ".join(PL_JOB)
 PL_GUARD, PL_GATE = pypi_plugin(PL_ROW)["guard"], PL_ROW["gate"]
+PL_BUILD_GUARD = pypi_plugin(PL_ROW)["build_guard"]
 JL_JOB = (PYPI_PLUGIN_WORKFLOW, "jupyterlab-publish")
 JL_ROW, JL = PYPI_PLUGINS[JL_JOB], " › ".join(JL_JOB)
+JL_BUILD_GUARD = pypi_plugin(JL_ROW)["build_guard"]
 MUTATIONS = (
     # The independently versioned MCP publisher gets one exact exception only.
     ("MCP uses an engine tag", P, [(MCP_JOB[0], MCP_GUARD, "startsWith(github.ref, 'refs/tags/v')")], {}, 1,
@@ -3146,6 +3155,16 @@ MUTATIONS = (
      {}, 1, PL + " [pypi-plugin-contract]"),
     ("plugin clean consumer omitted", P, [(PL_WF, "python scripts/python-host-consumer.py run \\",
                                            "echo python-host-consumer skipped \\")], {}, 1, PL + " [pypi-plugin-contract]"),
+    ("plugin build job without its tag guard", P, [(PL_WF, "    if: " + PL_BUILD_GUARD + "\n", "")], {}, 1,
+     PL + " [pypi-plugin-contract]"),
+    ("plugin build job on the other plugin's tags", P, [(PL_WF, "    if: " + PL_BUILD_GUARD,
+                                                        "    if: " + JL_BUILD_GUARD)], {}, 1,
+     PL + " [pypi-plugin-contract]"),
+    ("plugin build job on every tag", P, [(PL_WF, "    if: " + PL_BUILD_GUARD, "    if: always()")], {}, 1,
+     PL + " [pypi-plugin-contract]"),
+    ("plugin build job allowed to fail", P, [(PL_WF, "    if: " + PL_BUILD_GUARD + "\n",
+                                             "    if: " + PL_BUILD_GUARD + "\n    continue-on-error: true\n")],
+     {}, 1, PL + " [pypi-plugin-contract]"),
     ("plugin build job writes contents", P, [(PL_WF, "    permissions:\n      contents: read\n    outputs:",
                                               "    permissions:\n      contents: write\n    outputs:")], {}, 1,
      PL + " [pypi-plugin-contract]"),
@@ -3166,6 +3185,11 @@ MUTATIONS = (
      {}, 1, JL + " [pypi-plugin-contract]"),
     ("JupyterLab re-inspection of the napari folder", P, [(PL_WF, "        run: " + pypi_plugin(JL_ROW)["inspect"],
                                                            "        run: " + pypi_plugin(PL_ROW)["inspect"])], {}, 1,
+     JL + " [pypi-plugin-contract]"),
+    ("JupyterLab build job without its tag guard", P, [(PL_WF, "    if: " + JL_BUILD_GUARD + "\n", "")], {}, 1,
+     JL + " [pypi-plugin-contract]"),
+    ("JupyterLab build job on the napari tags", P, [(PL_WF, "    if: " + JL_BUILD_GUARD,
+                                                    "    if: " + PL_BUILD_GUARD)], {}, 1,
      JL + " [pypi-plugin-contract]"),
     ("JupyterLab clean consumer omitted", P, [(PL_WF, "python scripts/python-host-consumer.py run --kind page \\",
                                                "echo python-host-consumer skipped \\")], {}, 1,
