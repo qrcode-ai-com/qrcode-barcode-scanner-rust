@@ -290,9 +290,11 @@ held = "the agent integrations: they name the engine they were released on"
 paths = ["README.md", "distribution/README.md", "SOURCE-AND-EXTRACTION.md", "docs/guides/agents.mdx"]
 match = 'agent integrations are published|native engine\. Choose|with engine \d|^engine \S+ and returned|into a project-local runtime|among them engine|a fresh engine|on engine \S+ The MCP adapter|^\S+ See the \[distribution guide\]|reuse the published scanner'
 
+# The package README is not held: pub.dev shows the README of each archive, so the version it
+# installs is the version of its own archive, as in the other package READMEs.
 [[line]]
 held = "The public Flutter archive and its dated consumer proof; refresh only after a separate publication."
-paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "bindings/flutter/README.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx"]
+paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx"]
 match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`'
 
 # ------------------------------------------------------------------ lines that follow another source than their file
@@ -353,6 +355,11 @@ match = "scanner: '0\\.11\\.0'|\"scanner\":\"0\\.11\\.0\"|scanner@0\\.11\\.0\"\\
 keep = "An entry of the package changelog: a new version adds one above it."
 paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
 match = '^\* \w{3} \w{3} \d{2} \d{4} |^- Package the published'
+
+[[line]]
+keep = "A measurement of a published 0.11.0 artifact: a later version needs its own."
+paths = ["crates/qrcode-ai-scanner-wasm/README.md", "bindings/flutter/rust/Cargo.toml"]
+match = "the 0\\.11\\.0 module's code uses|of published 0\\.11\\.0 took"
 
 [[line]]
 keep = "The immutable AGPL grant of published CLI 0.11.0 archives."

@@ -98,7 +98,7 @@ V=X.Y.Z                       # the version to install
 T=x86_64-unknown-linux-gnu    # your target, from the table above
 A="qrcode-barcode-scanner-cli-$V-$T.tar.gz"
 S="qrcode-barcode-scanner-cli-$V-SHA256SUMS"
-U="https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v$V"
+U="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v$V"
 curl -fLO "$U/$A"
 curl -fLO "$U/$S"
 grep -F "  $A" "$S" | sha256sum -c -        # Linux
@@ -116,7 +116,7 @@ On Windows, in PowerShell:
 $V = 'X.Y.Z'
 $A = "qrcode-barcode-scanner-cli-$V-x86_64-pc-windows-msvc.zip"
 $S = "qrcode-barcode-scanner-cli-$V-SHA256SUMS"
-$U = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v$V"
+$U = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v$V"
 curl.exe -fLO "$U/$A"
 curl.exe -fLO "$U/$S"
 $Line = Get-Content -LiteralPath $S | Where-Object { $_.EndsWith("  $A") }
@@ -142,7 +142,7 @@ against that attestation:
 
 ```sh
 gh release verify-asset vX.Y.Z qrcode-barcode-scanner-cli-X.Y.Z-<target>.tar.gz \
-  --repo qrcode-ai-com/qrcode-barcode-scanner
+  --repo qrcode-ai-com/qrcode-barcode-scanner-rust
 ```
 
 Otherwise there is no signature or attestation to check.
@@ -298,7 +298,7 @@ gzip -dc qrcode-barcode-scanner-cli-X.Y.Z-source.tar.gz | git get-tar-commit-id
 ```
 
 The same tree is at
-`https://github.com/qrcode-ai-com/qrcode-barcode-scanner/tree/<commit>`.
+`https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/<commit>`.
 Third-party crates are not bundled: `SOURCE.md` gives the crates.io download
 address of each crate listed in `build-info.json`, whose checksum there and in
 `Cargo.lock` identifies it.

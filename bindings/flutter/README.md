@@ -72,10 +72,11 @@ the version explicitly:
 flutter pub add qr_barcode_scanner:0.11.0
 ```
 
-The package includes the Rust core sources, and 0.11.0 provides no prebuilt
-native library (a later release can ship
-[signed precompiled libraries](#signed-precompiled-libraries)). To evaluate an
-upcoming version from this checkout,
+The package includes the Rust core sources and `rust/cargokit.yaml`: your
+app's build can use a [signed precompiled library](#signed-precompiled-libraries)
+when the release has published one, and compiles the core otherwise.
+Up to 0.11.0 the package ships no such file and always compiles the core.
+To evaluate an upcoming version from this checkout,
 follow [Packaging from a candidate checkout](#packaging-from-a-candidate-checkout)
 below instead. Working source and the published archive are separate candidates.
 
@@ -93,10 +94,10 @@ below instead. Working source and the published archive are separate candidates.
 ### Signed precompiled libraries
 
 A release that ships `rust/cargokit.yaml` lets your app skip the Rust build.
-0.11.0 does not ship that file. cargokit, which builds the library inside your
-app, first looks for a library precompiled from the exact package sources, in
-the engine repository's GitHub release `precompiled_<crate hash>`. The crate
-hash covers the package's Rust sources, its manifest (which records the
+Up to 0.11.0 no release ships that file. cargokit, which builds the library
+inside your app, first looks for a library precompiled from the exact package
+sources, in the engine repository's GitHub release `precompiled_<crate hash>`.
+The crate hash covers the package's Rust sources, its manifest (which records the
 bundled core's digest), its lockfile and `cargokit.yaml`. cargokit downloads
 the library and its Ed25519 signature, and uses the library only if the
 signature verifies against the public key in `rust/cargokit.yaml`. If the file
@@ -178,8 +179,8 @@ Each profile has a default wall-clock budget: `full` 4000 ms, `fast` 800 ms,
 | above 4294967295 | refused: the scan throws a `String` ending with `[QRS-006]` before the image is read |
 | negative | refused: `RangeError`, before the native call |
 
-These are the semantics of `budget_ms` in the other bindings. Published 0.11.0
-has no `budgetMs`; it comes with the next release. When the budget cuts a scan,
+These are the semantics of `budget_ms` in the other bindings. Up to 0.11.0 the
+package has no `budgetMs`. When the budget cuts a scan,
 the report says so: `report.trace.budgetExhausted == true`. Empty detections
 are then not a final "no QR", and a null `score` beside a detection means "not
 judged", never 0.
@@ -201,8 +202,8 @@ Simulators and emulators run Flutter only in debug mode. In debug mode,
 cargokit builds the Rust core from source with Cargo's dev profile, which the
 package sets in `rust/Cargo.toml`: opt-level 3, no debug assertions, overflow
 checks on and no LTO. Incremental builds and codegen units keep Cargo's dev
-defaults. Published 0.11.0 has no such table, so its debug builds are not
-optimized. A [signed precompiled library](#signed-precompiled-libraries), when
+defaults. Up to 0.11.0 the package has no such table, so its debug builds are
+not optimized. A [signed precompiled library](#signed-precompiled-libraries), when
 one is used, is built with the release profile instead.
 
 The budget stops a scan from starting a stage or an attempt once its deadline
