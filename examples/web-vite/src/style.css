@@ -67,3 +67,13 @@ pre {
 }
 #report-details { margin-top: 1rem; }
 #report-json { max-height: 24rem; overflow: auto; font-size: 0.85rem; }
+.banner { margin: 0 0 1rem; }
+.banner img, .picture img { display: block; width: 100%; height: auto; }
+.picture { margin: 0.75rem 0; }
+.ask-ai h2 { margin-top: 1rem; }
+.ask-ai-links { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
+.ask-ai-links img { display: block; height: 2.25rem; width: auto; }
+.prompt { max-height: 16rem; overflow: auto; font-size: 0.85rem; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+th { background: var(--panel); }
