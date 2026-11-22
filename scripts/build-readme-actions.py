@@ -17,6 +17,9 @@ MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
 STAGED_AS_README = ('distribution/publisher/REPOSITORY.md',)
+# Notebooks a host opens as their page (Colab, Binder): the block goes in the first cell, which
+# shows the notebook's title. Their code cells and outputs are never touched.
+NOTEBOOKS = ('examples/notebooks/scan-images.ipynb',)
 
 
 def maintained_readmes():
@@ -28,21 +31,30 @@ def maintained_readmes():
     return [path for path in paths if '/cargokit/' not in path and not any(fnmatch(path, pattern) for pattern in frozen)]
 
 
+def prompt_of(path, text):
+    """The assistant prompt of a document: its title, its first sentence paragraph, its six links."""
+    clean = strip_actions(text)
+    title = re.search(r'^# (.+)$', clean, re.M)[1]
+    paragraphs = [part.replace('\n', ' ').strip() for part in clean.split('\n\n')]
+    context = next((part for part in paragraphs if len(part) > 60 and not part.startswith(('#', '[', '|', '<', '!', '```', '>'))), '')
+    context = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', context)
+    context = re.sub(r'[`<>*]', '', context)[:500]
+    return question(f'{title} ({path})', REPOSITORY + path, canonical_links(path), context=context)
+
+
 def outputs():
     config = json.loads((ROOT / 'distribution/readme-actions.json').read_text())['mcpLaunch']
     result = {}
     for path in maintained_readmes():
         text = (ROOT / path).read_text()
-        clean = strip_actions(text)
-        title = re.search(r'^# (.+)$', clean, re.M)[1]
-        urls = canonical_links(path)
-        paragraphs = [part.replace('\n', ' ').strip() for part in clean.split('\n\n')]
-        context = next((part for part in paragraphs if len(part) > 60 and not part.startswith(('#', '[', '|', '<', '!', '```', '>'))), '')
-        context = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', context)
-        context = re.sub(r'[`<>*]', '', context)[:500]
-        prompt = question(f'{title} ({path})', REPOSITORY + path, urls, context=context)
         installers = mcp_links(config) if path in ('README.md', 'integrations/mcp/README.md') else ()
-        result[path] = insert_actions(text, action_block(prompt, installers, markdown_only=path in MARKDOWN_ONLY))
+        result[path] = insert_actions(text, action_block(prompt_of(path, text), installers, markdown_only=path in MARKDOWN_ONLY))
+    for path in NOTEBOOKS:
+        notebook = json.loads((ROOT / path).read_text())
+        first = notebook['cells'][0]
+        text = ''.join(first['source'])
+        first['source'] = insert_actions(text, action_block(prompt_of(path, text))).splitlines(keepends=True)
+        result[path] = json.dumps(notebook, indent=1, ensure_ascii=False) + '\n'
     brand_root = ROOT / 'docs/assets/actions/brands'
     marks = {row['id']: row for row in json.loads((brand_root / 'provenance.json').read_text())['icons']}
     license_text = (brand_root / 'LICENSE-Lobe-Icons.txt').read_text()

@@ -22,24 +22,24 @@ pages below were read on 21 November 2026; read them again before relying on a p
 ## The values the form fills
 
 [`prefill.html`](prefill.html) holds them; [`build-prefill.py`](build-prefill.py)
-writes it from the three files, and the workflow fails when it differs from them.
+writes it from the three files and the description, and the workflow fails when it differs from
+them.
 
 | Field | Value |
 | --- | --- |
 | Title | `QR Code & Barcode Scanner: browser image demo` |
-| Description | The text below. |
+| Description | `DESCRIPTION.md`, without its final newline |
 | Visibility | public (`private` false) |
 | HTML | `index.html`, byte for byte |
 | CSS | `style.css`, byte for byte |
 | JS | `script.js`, byte for byte |
 
-```text
-Scan QR codes and barcodes in your browser with the open-source QR Code & Barcode Scanner. This Pen loads the published WebAssembly package @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.11.0 from jsDelivr at that exact version, checks the module's SHA-256, then scans a sample image that holds a QR code and a Code 128 barcode in the fast, frame and full profiles. Drop your own image to scan it: it is decoded on your device and never uploaded.
-
-Source of this Pen: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/codepen
-The engine 0.11.0 is licensed AGPL-3.0-or-later. Its source: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0
-QR Code AI: https://qrcode-ai.com/
-```
+The description is [`DESCRIPTION.md`](DESCRIPTION.md), in Markdown, which CodePen renders: the
+browser banner, the Ask AI links of the nine assistants with the prompt to copy, the six QR Code AI
+links in sentences, the three steps of the browser package, what the engine returns, the formats
+it reads and the same engine in the other runtimes, then the Pen's source and the engine's
+license, AGPL-3.0-or-later for 0.11.0, with the link to its source. It holds no HTML, so a
+renderer that removes HTML still shows all of it.
 
 The prefill API no longer takes tags. If the editor offers tags when saving, add these by hand:
 
@@ -63,7 +63,9 @@ qr-code, barcode, scanner, webassembly, wasm
    - **Runs in** reads `a module worker`. If it reads `the page (no worker)`, the scanner still
      works, on the page; note it for the record.
    - choosing a photo of a QR code shows its content under **Result**.
-5. Save the Pen as public. Add the tags if the editor offers them.
+5. Save the Pen as public. Add the tags if the editor offers them. Then open the Pen's details:
+   the description shows its five pictures and its links. If CodePen cuts it or drops the
+   pictures, note what it kept for the record; that rendering has not been seen yet.
 6. Record the Pen's address, such as `https://codepen.io/<username>/pen/<id>`, for the
    distribution record and for the check below.
 

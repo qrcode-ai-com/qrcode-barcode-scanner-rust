@@ -113,6 +113,24 @@ class ReadmeActions(unittest.TestCase):
             self.assertEqual(outputs[path].count('[![ChatGPT]'), 1)
             self.assertEqual('Add to Cursor' in outputs[path], path in ('README.md', 'integrations/mcp/README.md'))
 
+    def test_a_notebook_a_host_opens_carries_the_block_in_its_first_cell_only(self):
+        outputs = builder.outputs()
+        for path in builder.NOTEBOOKS:
+            with self.subTest(path=path):
+                committed = json.loads((ROOT / path).read_text())
+                rendered = json.loads(outputs[path])
+                cells = [''.join(cell['source']) for cell in rendered['cells']]
+                self.assertEqual(rendered['cells'][0]['cell_type'], 'markdown')
+                self.assertEqual(cells[0].count('### Ask AI'), 1)
+                self.assertEqual(cells[0].count('[![ChatGPT]'), 1)
+                self.assertFalse(any('qrcode-ai-readme-actions' in text for text in cells[1:]))
+                self.assertIn('/blob/main/' + path, cells[0])
+                self.assertEqual(set(canonical_links(path)) - prose_links(cells[0]), set())
+                self.assertTrue(all(link.endswith('/sdk/python') for link in canonical_links(path)[2:4]))
+                # The block is the only change: the cells around it and their outputs stay as committed.
+                self.assertEqual(strip_actions(cells[0]), strip_actions(''.join(committed['cells'][0]['source'])))
+                self.assertEqual(rendered['cells'][1:], committed['cells'][1:])
+
     def test_six_links_must_be_in_sentences_not_just_a_table_or_prompt(self):
         link = '[QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner)'
         self.assertEqual(prose_links('A sentence before the table.\n| Try it | ' + link + ' |'), set())
