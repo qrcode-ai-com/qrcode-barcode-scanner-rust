@@ -32,6 +32,18 @@ DEPENDENCY_KINDS = ("dependencies", "dev-dependencies", "build-dependencies")
 TARGET_KINDS = {"lib": ("autolib", "src"), "bin": ("autobins", "src/bin"),
                 "example": ("autoexamples", "examples"), "test": ("autotests", "tests"),
                 "bench": ("autobenches", "benches")}
+# The pubspec's pub.dev screenshots live here; every download of the package
+# carries them, so a file here that the pubspec does not declare is refused.
+SCREENSHOTS = "doc/screenshots"
+# pub.dev's screenshot rules (dart.dev/tools/pub/pubspec#screenshots, checked
+# by pana when pub.dev analyzes the upload): at most 10, a description of 1 to
+# 160 characters, a path inside the package without a colon, at most 4 MiB,
+# a PNG, JPEG, GIF or WebP image.
+MAX_SCREENSHOTS = 10
+MAX_SCREENSHOT_DESCRIPTION = 160
+MAX_SCREENSHOT_BYTES = 4 * 1024 * 1024
+SCREENSHOT_SIGNATURES = {".png": (b"\x89PNG\r\n\x1a\n",), ".jpg": (b"\xff\xd8\xff",), ".jpeg": (b"\xff\xd8\xff",),
+                         ".gif": (b"GIF87a", b"GIF89a"), ".webp": (b"RIFF",)}
 
 
 def require(condition, message):
@@ -159,6 +171,92 @@ def validate_paths(files):
                     parts.append(part)
             target = "/".join([*parts, "Cargo.toml"])
             require(target in files, f"missing path dependency: {name}: {dependency} -> {target}")
+
+
+def yaml_scalar(text):
+    """A one-line YAML scalar: plain, 'single' or "double" quoted; anything else is refused."""
+    if text.startswith("'"):
+        require(len(text) > 1 and text.endswith("'") and "'" not in text[1:-1].replace("''", ""),
+                f"unreadable scalar: {text}")
+        return text[1:-1].replace("''", "'")
+    if text.startswith('"'):
+        value = json.loads(text)
+        require(isinstance(value, str), f"unreadable scalar: {text}")
+        return value
+    require(not re.match(r"[-?:,\[\]{}#&*!|>%@`]", text) and ": " not in text and " #" not in text
+            and not text.endswith(":"), f"unreadable scalar: {text}")
+    return text
+
+
+def pubspec_screenshots(text):
+    """The pubspec's screenshots as (description, path) pairs, in order.
+
+    Reads the one block form this package writes: a top-level `screenshots:`
+    followed by entries of `  - description: TEXT` and `    path: PATH`, each
+    value a one-line scalar. Any other shape is refused rather than guessed.
+    """
+    lines = text.splitlines()
+    heads = [index for index, line in enumerate(lines) if re.match(r"screenshots\s*:", line)]
+    if not heads:
+        return []
+    require(len(heads) == 1 and re.fullmatch(r"screenshots:\s*", lines[heads[0]]),
+            "pubspec screenshots: one block list expected")
+    entries = []
+    for line in lines[heads[0] + 1:]:
+        if not line.strip() or re.match(r"\s*#", line):
+            continue
+        if not line[0].isspace():
+            break
+        found = re.fullmatch(r"  (- |  )(description|path): (\S.*?)\s*", line)
+        require(found, f"pubspec screenshots: unreadable line {line.strip()!r}")
+        start, key, value = found.groups()
+        if start == "- ":
+            entries.append({})
+        require(entries and key not in entries[-1], f"pubspec screenshots: misplaced {key}")
+        entries[-1][key] = yaml_scalar(value)
+    require(entries, "pubspec screenshots: empty list")
+    require(all(set(entry) == {"description", "path"} for entry in entries),
+            "pubspec screenshots: each entry needs a description and a path")
+    return [(entry["description"], entry["path"]) for entry in entries]
+
+
+def screenshot_problems(pubspec, files):
+    """Each way the PUBSPEC text's screenshots break pub.dev's rules, judged
+    against FILES (path -> bytes): the package's files, or those pub publishes.
+    A file under SCREENSHOTS that no entry declares is a problem too."""
+    try:
+        entries = pubspec_screenshots(pubspec)
+    except ValueError as error:
+        return [str(error)]
+    problems = []
+    if len(entries) > MAX_SCREENSHOTS:
+        problems.append(f"{len(entries)} screenshots, pub.dev shows at most {MAX_SCREENSHOTS}")
+    paths = [path for _, path in entries]
+    problems += [f"{path}: declared twice" for path in sorted({path for path in paths if paths.count(path) > 1})]
+    for description, path in entries:
+        if not 0 < len(description) <= MAX_SCREENSHOT_DESCRIPTION:
+            problems.append(f"{path}: a description of {len(description)} characters, "
+                            f"not 1 to {MAX_SCREENSHOT_DESCRIPTION}")
+        try:
+            safe_name(path)
+        except ValueError:
+            problems.append(f"{path}: not a relative path inside the package without a colon")
+            continue
+        suffix = pathlib.PurePosixPath(path).suffix.lower()
+        if suffix not in SCREENSHOT_SIGNATURES:
+            problems.append(f"{path}: not a PNG, JPEG, GIF or WebP file name")
+            continue
+        data = files.get(path)
+        if data is None:
+            problems.append(f"{path}: not in the package's files")
+            continue
+        if len(data) > MAX_SCREENSHOT_BYTES:
+            problems.append(f"{path}: {len(data)} bytes, above pub.dev's {MAX_SCREENSHOT_BYTES}")
+        if not (data.startswith(SCREENSHOT_SIGNATURES[suffix]) and (suffix != ".webp" or data[8:12] == b"WEBP")):
+            problems.append(f"{path}: its bytes are not a {suffix[1:].upper()} image")
+    problems += [f"{name}: a screenshot the pubspec does not declare"
+                 for name in sorted(files) if name.startswith(SCREENSHOTS + "/") and name not in paths]
+    return problems
 
 
 def normalized_dependencies(tables, workspace):
@@ -319,6 +417,8 @@ def bundle(core_archive, snapshot, revision):
     require(binding["package"]["version"] == version, "binding/core version mismatch")
     require(re.search(r"^version:\s*" + re.escape(version) + r"\s*$", files["pubspec.yaml"].decode(), re.M),
             "pubspec/core version mismatch")
+    problems = screenshot_problems(files["pubspec.yaml"].decode(), files)
+    require(not problems, "pubspec screenshots: " + "; ".join(problems))
     dependency = binding["dependencies"]["scanner-core"]
     require(dependency.get("package") == "qrcode-barcode-scanner"
             and dependency.get("path") == "../../../crates/qrcode-ai-scanner", "unexpected scanner-core dependency")
@@ -446,6 +546,62 @@ def self_test():
             self.assertIn('      path: ".."\n', entry)
             self.assertIn('    source: path\n', entry)
             self.assertIn(f'    version: "{version}"\n', entry)
+
+        def test_candidate_screenshots_follow_pub_rules(self):
+            root = ROOT / BINDING
+            pubspec = (root / "pubspec.yaml").read_text()
+            files = {path.relative_to(root).as_posix(): path.read_bytes()
+                     for path in (root / SCREENSHOTS).rglob("*") if path.is_file()}
+            files |= {path: (root / path).read_bytes()
+                      for _, path in pubspec_screenshots(pubspec) if (root / path).is_file()}
+            self.assertEqual(screenshot_problems(pubspec, files), [])
+
+        def test_screenshots_ship_and_follow_pub_rules(self):
+            png, path = b"\x89PNG\r\n\x1a\n" + bytes(16), "doc/screenshots/example.png"
+            webp = b"RIFF" + bytes(4) + b"WEBPVP8 "
+
+            def entry(where=path, description="The example after a scan."):
+                return f"  - description: {description}\n    path: {where}\n"
+
+            def pubspec(*entries):
+                return "version: 0.9.0\nscreenshots:\n" + "".join(entries) + "\nflutter:\n  plugin: {}\n"
+
+            staged, _ = bundle(self.pack(), self.snapshot | {
+                f"{BINDING}/pubspec.yaml": pubspec(entry()).encode(), f"{BINDING}/{path}": png}, self.revision)
+            self.assertEqual(staged[path], png)
+            quoted = ("  - description: 'It''s the example: after a scan.'\n"
+                      '    path: "doc/screenshots/example.webp"\n')
+            self.assertEqual(pubspec_screenshots(pubspec(quoted)),
+                             [("It's the example: after a scan.", "doc/screenshots/example.webp")])
+            self.assertEqual(screenshot_problems(pubspec(quoted), {"doc/screenshots/example.webp": webp}), [])
+            self.assertEqual(screenshot_problems("version: 0.9.0\n", {"README.md": b"readme\n"}), [])
+            for needle, text, files in (
+                    ("not in the package's files", pubspec(entry()), {}),
+                    ("a description of 161 characters", pubspec(entry(description="x" * 161)), {path: png}),
+                    ("a description of 0 characters", pubspec(entry(description="''")), {path: png}),
+                    ("without a colon", pubspec(entry("doc/screenshots/a:b.png")), {"doc/screenshots/a:b.png": png}),
+                    ("inside the package", pubspec(entry("../outside.png")), {}),
+                    ("inside the package", pubspec(entry("/doc/screenshots/example.png")), {path: png}),
+                    ("file name", pubspec(entry("doc/screenshots/example.bmp")), {"doc/screenshots/example.bmp": png}),
+                    ("not a PNG image", pubspec(entry()), {path: b"GIF89a" + bytes(16)}),
+                    ("not a WEBP image", pubspec(entry("doc/screenshots/a.webp")), {"doc/screenshots/a.webp": b"RIFF"}),
+                    ("above pub.dev's", pubspec(entry()), {path: png + bytes(MAX_SCREENSHOT_BYTES)}),
+                    ("at most 10", pubspec(*(entry(f"doc/screenshots/{i}.png") for i in range(11))),
+                     {f"doc/screenshots/{i}.png": png for i in range(11)}),
+                    ("declared twice", pubspec(entry(), entry()), {path: png}),
+                    ("does not declare", "version: 0.9.0\n", {"doc/screenshots/extra.png": png}),
+                    ("does not declare", pubspec(entry()), {path: png, "doc/screenshots/extra.png": png}),
+                    ("one block list", "screenshots: []\n", {}),
+                    ("unreadable scalar", pubspec("  - description: >\n      folded\n    path: x.png\n"), {}),
+                    ("unreadable line", pubspec("  - description: a\n    path: x.png\n    note: b\n"), {}),
+                    ("a description and a path", pubspec("  - path: x.png\n"), {}),
+                    ("empty list", "screenshots:\nflutter: {}\n", {})):
+                with self.subTest(needle=needle, text=text):
+                    problems = screenshot_problems(text, files)
+                    self.assertTrue(any(needle in problem for problem in problems), problems)
+            with self.assertRaisesRegex(ValueError, "pubspec screenshots: doc/screenshots/example.png: not in"):
+                bundle(self.pack(), self.snapshot | {f"{BINDING}/pubspec.yaml": pubspec(entry()).encode()},
+                       self.revision)
 
         def test_identity_mismatches(self):
             for name, value in (("src/lib.rs", b"old registry core"), ("LICENSE", b"other"),

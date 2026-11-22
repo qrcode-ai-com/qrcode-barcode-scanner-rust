@@ -46,28 +46,38 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 
 ## Status
 
-The plugin is ready for PyPI. On every change to it, the engine repository builds its sdist and
-wheel, checks them with `twine check --strict`, installs the wheel in a new environment and runs
-its tests on the sample in the three profiles, then removes it. It has also run in a napari window,
-from its dock widget, as the picture below shows. The steps that publish it run only on its own
-tag, after the owner's review.
+The plugin is on PyPI as
+[`napari-qrcode-barcode-scanner`](https://pypi.org/project/napari-qrcode-barcode-scanner/) 0.1.0.
+The engine repository published that version from its tag `napari-v0.1.0`, after the owner's
+review, through PyPI trusted publishing: no token is stored. The files on PyPI are the sdist and
+the wheel that the tag's run built, checked with `twine check --strict`, installed in a new
+environment and tested on the sample in the three profiles. The plugin has also run in a napari
+window, from its dock widget, as the picture below shows.
 
-It is not on PyPI yet, so napari's plugin manager and the napari hub do not list it yet. What
-its listing will show, and the owner's publication steps, are in
+napari's plugin manager and the
+[napari hub](https://napari-hub.org/plugins/napari-qrcode-barcode-scanner) read napari's plugin
+index, which is rebuilt once a day, so they can list the plugin a day or so after its PyPI release.
+What the listing shows, and where each value comes from, are in
 [LISTING.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/napari/LISTING.md).
 
 ## Install
 
-From this repository, install the folder in the environment that runs napari:
+Install the plugin from PyPI in the environment that runs napari:
 
 ```sh
-python -m pip install ./integrations/napari
+python -m pip install napari-qrcode-barcode-scanner
 ```
+
+Or, in napari, choose **Plugins**, **Install/Uninstall Plugins**, search for `qrcode`, install
+**QR Code & Barcode Scanner** and restart napari.
 
 Its dependencies are numpy, magicgui and the engine wheel
 [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0. As napari
-plugins do, it does not install napari or Qt: use the napari you have, or install the folder with
-its `all` extra, `python -m pip install "./integrations/napari[all]"`, to get both.
+plugins do, it does not install napari or Qt: use the napari you have, or install the plugin with
+its `all` extra, `python -m pip install "napari-qrcode-barcode-scanner[all]"`, to get both.
+
+To try a change to the plugin, install the folder from a checkout of this repository instead:
+`python -m pip install ./integrations/napari`.
 
 ## Use
 
