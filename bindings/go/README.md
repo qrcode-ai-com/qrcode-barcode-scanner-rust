@@ -69,7 +69,7 @@ report.
 ## Install
 
 ```sh
-go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.11.0
+go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.12.0
 ```
 
 ```go

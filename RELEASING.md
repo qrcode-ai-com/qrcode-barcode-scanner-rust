@@ -1605,11 +1605,14 @@ serves the tag and a consumer that ran `go get` from an empty module has
 passed.
 
 Version 0.11.0 was tagged on 11 November 2026, on the mirror commit staged
-from `e0d5b12`. After each new tag, move three things in one pull request
-here: `MODULE_VERSION` of the `go-module` job of
-`.github/workflows/destination-acceptance.yml`, the install line of
-`bindings/go/README.md`, and the row of `distribution/README.md`. The job
-then proves the new version from the proxy on three systems.
+from `e0d5b12`. The release fan-out moves the install line of
+`bindings/go/README.md` to the version being staged, so the README frozen at
+the tag names its own version. After each new tag, move the rest in one pull
+request here: `MODULE_VERSION` of the `go-module` job of
+`.github/workflows/destination-acceptance.yml` together with
+`MODULE_ENGINE_TAG` and `MODULE_ENGINE_SUMS`, the engine release that version
+supports, and the row of `distribution/README.md`. The job then proves the new
+version from the proxy on three systems.
 
 ## OCI 0.11 preparation — unchanged public CLI inputs
 
