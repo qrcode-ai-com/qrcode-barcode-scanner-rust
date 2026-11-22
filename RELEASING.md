@@ -407,6 +407,7 @@ nothing and names the state; the owner's step depends on it:
 | mobile › test + android | green (JitPack chain proven since v0.6.0) |
 | mobile › ios | **expected red** at the dev-mode guard until the one-time Xcode leg (`bindings/swift/release.sh`) runs; `ios-release` is then skipped. After that leg, `ios-release` finds the zip release.sh uploaded to the owner's draft, leaves it and checks it against the `Package.swift` pin; it never creates or publishes a release |
 | flutter › publish to pub.dev | **expected red** until the one-time manual first publish and owner step 6; the staged package must first pass real pub validation and native Android/iOS consumer builds |
+| flutter-precompiled › release + collect | green: the seven unsigned binaries in `flutter-precompiled-unsigned`, for the owner's `publish` (§ Flutter precompiled binaries). Skipped, with a notice, when the tag ships no `rust/cargokit.yaml` |
 | JitPack | builds on demand — trigger with a GET on the artifact URL |
 
 ## 7 · The steps no pipeline does
@@ -814,6 +815,9 @@ performs them):
    hashes. Inspect that same root and run the native example builds before
    claiming readiness; source-only checks are insufficient. See
    `bindings/flutter/README.md` for the staging and inspection commands.
+   When the package ships `rust/cargokit.yaml`, sign and publish its
+   precompiled binaries before this upload, from the same tag
+   (§ Flutter precompiled binaries).
 
    One recorded exception, decided by the owner on 10 November 2026: the
    first upload of `qr_barcode_scanner` 0.11.0 may use the `flutter-stage`
@@ -1044,6 +1048,76 @@ Server 2016 to 2022, and older Linux kernels (glibc 2.28 itself runs, in the
 AlmaLinux 8 containers). Every consumer receipt lists the cases it leaves
 out, among them exit 3, which depends on the budget and the machine, and a
 panic inside the engine, which no fixture triggers deterministically.
+
+## Flutter precompiled binaries — signed on the owner's machine
+
+cargokit can download a precompiled native library instead of building the
+Flutter package's Rust crate inside the consuming app
+(`bindings/flutter/README.md` § Signed precompiled libraries). It fetches
+`<url_prefix><crate hash>/<target>_libqrcode_ai_scanner.{so,a}` and the `.sig`
+beside it. It uses the file only if the Ed25519 signature verifies against the
+`public_key` in the package's `rust/cargokit.yaml`. No workflow holds the key
+or creates the release (`scripts/check-publish-guards.py`).
+`flutter-precompiled.yml` builds the binaries unsigned. The owner signs them
+and creates the release `precompiled_<crate hash>` from their own machine with
+`scripts/flutter-precompiled.py`, which needs OpenSSL 3 and gh.
+
+A tag whose package ships no `rust/cargokit.yaml` gets no precompiled
+binaries, and its run stays green. The stage job gives the notice "no
+rust/cargokit.yaml: this release ships no precompiled binaries". The tag push
+then skips the release and collect jobs, and a dispatch skips the verify jobs.
+cargokit builds from source, as for 0.11.0. Once the file is committed,
+`check-config` must accept it on every tag.
+
+Once, before the first release that ships them:
+
+1. Run `python3 scripts/flutter-precompiled.py keygen` on the owner's Mac. It
+   stores a new Ed25519 seed in the login Keychain item
+   `qrcode-barcode-scanner.flutter-precompiled`. The seed goes to
+   `security -i` on stdin and is never printed or written to disk. The command
+   also writes `bindings/flutter/rust/cargokit.yaml`, with this repository's
+   release URL prefix and the public key. It refuses to replace an existing
+   item or file.
+2. Commit `bindings/flutter/rust/cargokit.yaml` through a pull request. The
+   file is part of the crate hash and ships in the pub archive.
+
+For each release whose Flutter package ships, before the pub.dev upload
+(owner step 6):
+
+3. The tag's `Flutter precompiled binaries` run builds the seven targets (four
+   Android, three iOS) unsigned. Its collect job uploads
+   `flutter-precompiled-unsigned`: the staged archive, its receipt, and the
+   binaries with their manifest.
+4. Run `python3 scripts/flutter-precompiled.py publish --run <run id> --dry-run`,
+   then the same command without `--dry-run`. It checks:
+   - that the run is this workflow, on a v* tag push, and succeeded;
+   - the staged archive's digest and commit;
+   - every binary against the manifest;
+   - the crate hash, recomputed from the staged package;
+   - that the Keychain key matches the staged `public_key`.
+
+   It then signs with that key and creates `precompiled_<crate hash>` on the
+   tagged commit, never marked latest, with the fourteen files. Last, it
+   downloads each file from its public URL and verifies it as cargokit does.
+   An existing release is verified, never replaced.
+5. Run `gh workflow run flutter-precompiled.yml --ref v<version>`. Its verify
+   jobs re-stage the tag and verify every published binary. They then build
+   the Android and iOS examples with rustup and cargo out of reach.
+6. The archive uploaded to pub.dev must have the same crate hash.
+   `python3 scripts/flutter-precompiled.py hash --manifest-dir <extracted flutter-stage>/rust`
+   prints it: the release name without its `precompiled_` prefix.
+
+The key source and the release location are pluggable. `sign` and `publish`
+read the seed from the Keychain by default, or from `--key-file` or
+`--key-stdin`. The release repository and the tag prefix come from
+`url_prefix` in `rust/cargokit.yaml`. A later lane in
+`qrcode-ai-com/qrcode-barcode-scanner-distribution`, with the seed in a
+protected environment (the owner's decision 1 of 11 November 2026), can
+therefore run the same `publish` with no code change. No such lane exists
+yet.
+
+No tag ruleset covers the tags `precompiled_*`: both rulesets cover only `v*`
+and the distribution tags. Adding one is the owner's call.
 
 ## Release manifest — every public hash in one file
 
@@ -1770,7 +1844,10 @@ Named exceptions, each documented where it lives:
 - **Fuzzing** — one dated nightly (`FUZZ_TOOLCHAIN` in deep-checks.yml):
   cargo-fuzz needs nightly sanitizers.
 - **cargokit** — Flutter device builds (and every consuming app's build) can
-  only name the stable / beta / nightly channels; pub.dev ships sources.
+  only name the stable / beta / nightly channels; pub.dev ships sources. The
+  signed precompiled binaries are not in this exception:
+  `scripts/flutter-precompiled-build.dart` builds them with `$RUST_TOOLCHAIN`
+  and `--locked` (§ Flutter precompiled binaries).
 - **bindings/swift/release.sh** — builds with the caller's toolchain: run it
   as `RUSTUP_TOOLCHAIN=1.99.1 bindings/swift/release.sh vX.Y.Z`.
 

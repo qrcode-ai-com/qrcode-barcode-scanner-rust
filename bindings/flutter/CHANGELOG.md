@@ -28,6 +28,10 @@
   `fast` or `frame` scan is recorded and must be a valid partial report, unless
   `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes those budgets a test too,
   for a run on a physical device.
+* The package can use signed precompiled native libraries once a release ships
+  `rust/cargokit.yaml`: the app's build downloads and verifies the library
+  instead of compiling the Rust core, and compiles it as before when no valid
+  signed library is available (README, "Signed precompiled libraries").
 
 ## 0.11.0
 

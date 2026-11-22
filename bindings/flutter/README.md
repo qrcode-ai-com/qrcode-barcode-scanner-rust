@@ -72,20 +72,54 @@ the version explicitly:
 flutter pub add qr_barcode_scanner:0.11.0
 ```
 
-The package includes the Rust core sources; installation does not provide a
-prebuilt native library. To evaluate an upcoming version from this checkout,
+The package includes the Rust core sources, and 0.11.0 provides no prebuilt
+native library (a later release can ship
+[signed precompiled libraries](#signed-precompiled-libraries)). To evaluate an
+upcoming version from this checkout,
 follow [Packaging from a candidate checkout](#packaging-from-a-candidate-checkout)
 below instead. Working source and the published archive are separate candidates.
 
 > **Toolchain prerequisite.** This package compiles the Rust core at *your* app's
 > build time (via cargokit) — the building machine needs the **Rust toolchain
 > (≥1.88)** and, for Android, the **NDK (r28+)**. No Rust knowledge required;
-> it's a one-time `rustup` install. (A precompiled-binary distribution is a
-> future option if this friction is reported.)
+> it's a one-time `rustup` install. A release that ships signed precompiled
+> libraries lets the app skip this build: see
+> [Signed precompiled libraries](#signed-precompiled-libraries).
 >
 > NDK r28 aligns the native library for Android devices with 16 KB memory
 > pages. A build with NDK r27 is aligned to 4 KB and does not meet that
 > requirement.
+
+### Signed precompiled libraries
+
+A release that ships `rust/cargokit.yaml` lets your app skip the Rust build.
+0.11.0 does not ship that file. cargokit, which builds the library inside your
+app, first looks for a library precompiled from the exact package sources, in
+the engine repository's GitHub release `precompiled_<crate hash>`. The crate
+hash covers the package's Rust sources, its manifest (which records the
+bundled core's digest), its lockfile and `cargokit.yaml`. cargokit downloads
+the library and its Ed25519 signature, and uses the library only if the
+signature verifies against the public key in `rust/cargokit.yaml`. If the file
+is missing or the signature does not verify, cargokit builds from source,
+which needs the toolchain above.
+
+- On a machine without rustup, cargokit uses the precompiled library by
+  default.
+- With rustup installed, it builds from source unless the app opts in with a
+  `cargokit_options.yaml` next to the app's `pubspec.yaml`:
+
+  ```yaml
+  use_precompiled_binaries: true
+  ```
+
+The libraries cover Android (`armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) and
+iOS (devices, Apple silicon simulators and Intel simulators). They are built
+with the release profile, and debug app builds use them too. The dev profile
+described in [Debug builds and scan time](#debug-builds-and-scan-time) applies
+only when cargokit builds from source, and the timings there were measured on
+such builds. The signing key never reaches CI: the repository owner signs each
+set on their own machine
+([RELEASING.md § Flutter precompiled binaries](../../RELEASING.md#flutter-precompiled-binaries--signed-on-the-owners-machine)).
 
 ## Public native consumer evidence
 
@@ -164,10 +198,12 @@ symbology does not report it — not proof that the symbol declares none.
 ## Debug builds and scan time
 
 Simulators and emulators run Flutter only in debug mode. In debug mode,
-cargokit builds the Rust core with Cargo's dev profile, which the package sets
-in `rust/Cargo.toml`: opt-level 3, no debug assertions, overflow checks on and
-no LTO. Incremental builds and codegen units keep Cargo's dev defaults.
-Published 0.11.0 has no such table, so its debug builds are not optimized.
+cargokit builds the Rust core from source with Cargo's dev profile, which the
+package sets in `rust/Cargo.toml`: opt-level 3, no debug assertions, overflow
+checks on and no LTO. Incremental builds and codegen units keep Cargo's dev
+defaults. Published 0.11.0 has no such table, so its debug builds are not
+optimized. A [signed precompiled library](#signed-precompiled-libraries), when
+one is used, is built with the release profile instead.
 
 The budget stops a scan from starting a stage or an attempt once its deadline
 has passed. It does not stop one that is running. A scan can therefore take
