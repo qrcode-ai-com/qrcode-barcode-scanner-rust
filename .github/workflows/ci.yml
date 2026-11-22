@@ -97,6 +97,13 @@ jobs:
             --features engine-rqrr,serde --lib
           cargo clippy -p qrcode-barcode-scanner --locked --no-default-features \
             --features engine-rxing,serde --lib
+      # The page docs.rs builds for the core: its README (pictures, Ask AI block,
+      # absolute links) above the crate contract, with rustdoc's default lints
+      # (invalid HTML, bare URLs, broken links) as errors. The doctests run in test.
+      - name: rustdoc · the core crate page, warnings denied
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc -p qrcode-barcode-scanner --no-deps --locked
 
   test:
     needs: scope
