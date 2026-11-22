@@ -157,8 +157,19 @@ jobs:
         run: |
           python3 scripts/stage-swift-package.py stage --generated "$RUNNER_TEMP/generated" --out swift-satellite
           find swift-satellite -type f | sort
+      # Uploaded before the comparison: after a change of the pinned engine, the run on main fails
+      # the comparison until the published tree is replaced with this artifact (LISTING.md, step 2).
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
+        with:
+          name: swift-satellite
+          path: swift-satellite/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
       # The published satellite must be the stage of the commit its SOURCE.json names. Before the
-      # repository exists, a pull request may only say so; a tag or a manual run requires it.
+      # repository exists, a pull request may only say so; a tag or a manual run requires it. Its tree
+      # is compared with the Swift this run generated, so only when it is built from the same engine:
+      # a pull request that moves the pin to another engine says so and compares nothing.
       - name: Compare the published satellite
         env:
           EVENT: ${{ github.event_name }}
@@ -172,6 +183,16 @@ jobs:
             exit 1
           fi
           git clone --quiet --depth 1 "$SATELLITE" "$RUNNER_TEMP/published"
+          published=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1]))['package']['engine_commit'])" "$RUNNER_TEMP/published/SOURCE.json")
+          built=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1]))['engine']['commit'])" "$RUNNER_TEMP/generated/build.json")
+          if [ "$published" != "$built" ]; then
+            if [ "$EVENT" = pull_request ]; then
+              echo "::warning::the published satellite is built from engine $published and this commit pins $built: nothing to compare. Replace its tree with the swift-satellite artifact of the run on main after the merge."
+              exit 0
+            fi
+            echo "::error::the published satellite is built from engine $published, not the pinned $built: replace its tree with the swift-satellite artifact of this run, in one commit."
+            exit 1
+          fi
           python3 scripts/stage-swift-package.py verify "$RUNNER_TEMP/published" --generated "$RUNNER_TEMP/generated"
           python3 - <<'PY'
           import json, os, pathlib, sys
@@ -184,13 +205,6 @@ jobs:
           if os.environ['EVENT'] != 'pull_request' and not same:
               sys.exit(1)
           PY
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
-        with:
-          name: swift-satellite
-          path: swift-satellite/
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 90
 
   consumer:
     name: Clean Swift package · macOS, then an iOS build

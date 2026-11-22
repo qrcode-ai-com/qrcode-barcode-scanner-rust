@@ -20,10 +20,11 @@ release or sends a submission is the owner's; no workflow performs it.
 | Package version | `X.Y.Z`, a tag of the satellite repository |
 
 `satellite.json` pins the engine tag, the package version, the release tag `swift-vX.Y.Z` and the
-sha256 of the zip. The pinned engine today is the published engine tag, whose source was licensed
-AGPL-3.0-or-later, so the package is distributed under that license (decision 12, which is the
-owner's). Moving the pin to a later engine tag is one reviewed change of that file: a new zip, a
-new checksum, a new package version.
+sha256 of the zip. The pinned engine today is the published engine tag `v0.12.0`, whose source
+is licensed MIT, so the package 0.12.0 is distributed under the MIT License. Engine tags through
+`v0.11.0` were licensed AGPL-3.0-or-later, and a package built from one of them would carry that
+license (decision 12, which is the owner's). Moving the pin to a later engine tag is one reviewed
+change of that file: a new zip, a new checksum, a new package version.
 
 ## Where the built files are
 
@@ -53,15 +54,18 @@ The job `attach` holds `contents: write` only, in that environment, on a `swift-
    of `Swift package` on that commit is green with `build.json` reading `"reproduced": true`.
 2. Check that the satellite repository equals the stage of that commit: the job `satellite`
    compares it; to refresh it, replace its tree with the `swift-satellite` artifact of the run
-   on `main`, in one commit.
+   on `main`, in one commit. After a change of the pinned engine, that run fails its comparison
+   until then: re-run its failed jobs once the satellite holds the stage.
 3. Create the draft release of the tag, targeting that commit `SHA`:
-   `gh release create swift-vX.Y.Z --draft --target SHA --title swift-vX.Y.Z --notes-file notes.md`.
+   `gh release create swift-vX.Y.Z --draft --latest=false --target SHA --title swift-vX.Y.Z --notes-file notes.md`.
 4. Tag that commit and push the tag:
    `git tag -a swift-vX.Y.Z SHA -m 'Swift package X.Y.Z'`, then `git push origin swift-vX.Y.Z`.
 5. When the run on the tag reaches `attach`, open it, **Review deployments**, select **swift**,
    then **Approve and deploy**. The job uploads the zip and `checksum.txt` into the draft, only
    when the zip is the pinned one, and reads it back.
-6. Publish the draft once its readback is green: `gh release edit swift-vX.Y.Z --draft=false --verify-tag`.
+6. Publish the draft once its readback is green, without marking it as the latest release:
+   `gh release edit swift-vX.Y.Z --draft=false --latest=false --verify-tag`. GitHub marks a newly
+   published release as the latest unless told otherwise, and the latest release stays the engine's.
 7. In the satellite repository, tag the commit whose `Package.swift` pins that release:
    `git tag -a X.Y.Z <commit> -m 'QRCodeBarcodeScanner X.Y.Z'`, then `git push origin X.Y.Z`. A tag
    is never moved or reused.
