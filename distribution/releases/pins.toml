@@ -286,6 +286,16 @@ held = "the Go module, with its own versions"
 match = 'qrcode-barcode-scanner-go@v|MODULE_VERSION'
 
 [[line]]
+held = "the agent integrations: they name the engine they were released on"
+paths = [".github/workflows/destination-acceptance.yml"]
+match = 'ADAPTER_ENGINE: '
+
+[[line]]
+held = "the container image, under its own tag"
+paths = [".github/workflows/destination-acceptance.yml"]
+match = 'IMAGE_ENGINE: '
+
+[[line]]
 held = "the PHP package on Packagist, with its own versions"
 paths = ["distribution/README.md"]
 match = 'packagist\.org/packages/qrcode-ai-com/qrcode-barcode-scanner#v'

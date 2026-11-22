@@ -207,6 +207,9 @@ jobs:
       # version, no install script.
       ADAPTER: "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
       ADAPTER_VERSION: 0.3.1
+      # The engine that adapter runs, which its reports name: it moves with the adapter's own
+      # release, not with the engine release above.
+      ADAPTER_ENGINE: 0.11.0
       NAME: mcp-npx-node${{ matrix.node }}-${{ matrix.runner }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -235,7 +238,7 @@ jobs:
             --full "$RUNNER_TEMP/reports/full.json" \
             --destination "npm · MCP adapter started with npx" \
             --identifier "$ADAPTER@$ADAPTER_VERSION" \
-            --version "$RELEASE_VERSION" \
+            --version "$ADAPTER_ENGINE" \
             --url "https://www.npmjs.com/package/$ADAPTER/v/$ADAPTER_VERSION" \
             --install "npx --yes --ignore-scripts $ADAPTER@$ADAPTER_VERSION" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
@@ -442,6 +445,9 @@ jobs:
     env:
       # The verified multi-platform index of distribution/docker/v0.11/README.md.
       QRSCAN_IMAGE: ghcr.io/qrcode-ai-com/qrcode-barcode-scanner@sha256:fd0433f29b0dabd469ce6a8fdcfc7bf6554960301b5bc57b5fca97928fd7cb96
+      # The engine inside that image, which its reports name: it moves with the image's own tag,
+      # not with the engine release above.
+      IMAGE_ENGINE: 0.11.0
       MACHINE: ${{ matrix.machine }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -459,7 +465,7 @@ jobs:
             --qrscan distribution/acceptance/drivers/qrscan-in-container.sh \
             --destination "GitHub Container Registry" \
             --identifier "$QRSCAN_IMAGE" \
-            --version "$RELEASE_VERSION" \
+            --version "$IMAGE_ENGINE" \
             --url "https://github.com/$RELEASE_REPOSITORY/pkgs/container/qrcode-barcode-scanner" \
             --install "docker pull $QRSCAN_IMAGE" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
