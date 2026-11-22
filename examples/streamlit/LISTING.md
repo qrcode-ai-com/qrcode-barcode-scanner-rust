@@ -74,6 +74,11 @@ repository in it:
 - QR scanner usage page: `https://qrcode-ai.com/en-US/qr-code-scanner`
 - Barcode scanner usage page: `https://qrcode-ai.com/en-US/barcode-scanner`
 
+Below the results, the page also carries the six QR Code AI links in two sentences (the two
+scanners, the two Python guides and the two generators), the nine Ask AI links with their prompt,
+and the pictures of the README: the banner above the title, then how it works, what it returns,
+what it reads and the other runtimes.
+
 Where a form or a post has room for more:
 
 - Source: `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/streamlit`
@@ -90,13 +95,16 @@ planned; they are live after the owner's review, not before.
 - What the app stores: nothing. The image is read in memory for the session and never written to
   disk; the served smoke test checks that a scan leaves no file in the repository.
 - What the app sends elsewhere: nothing. Decoded links are shown as text and never opened.
+- What the page loads from elsewhere: its banner, its four pictures and the nine Ask AI badges,
+  which the visitor's browser fetches from `raw.githubusercontent.com` (GitHub). No image a visitor
+  uploads is sent there.
 - What the host records: Streamlit's own logs and usage statistics, under Streamlit's terms and
   privacy notice.
 
 ### Media
 
-- Screenshot: [`media/app-sample-scan.png`](media/app-sample-scan.png), 800 × 1420, the app served
-  locally from this folder after it scanned its sample image.
+- Screenshot: [`media/app-sample-scan.png`](media/app-sample-scan.png), 800 × 1714, the app served
+  locally from this folder after it scanned its sample image, from its banner to the download button.
 
 ## Click by click
 
@@ -129,7 +137,12 @@ In a browser that is signed out of Streamlit:
    `https://qrcode-ai.com/en-US/qr-code-scanner` and `barcode scanner` to
    `https://qrcode-ai.com/en-US/barcode-scanner`. Served locally, Streamlit 1.67 renders each with
    `target="_blank"` and `rel="noopener noreferrer"`.
-5. Record the app address, the repository, branch and commit it runs, the engine version and
+5. Below the results, check that the banner and the four pictures load, that the two sentences
+   under **Try it on QR Code AI** link the six pages (the two scanners, the two Python guides, the
+   two generators), and that the nine Ask AI badges open their assistant: ChatGPT, Claude, Grok
+   and Perplexity with the prompt filled in, the other five on their home page. The prompt is under
+   **Copy the plain-text prompt**.
+6. Record the app address, the repository, branch and commit it runs, the engine version and
    the Python version.
 
 Then add the badge of the README under its title, with the real address. When the app is no
