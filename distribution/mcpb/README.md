@@ -38,7 +38,7 @@ Help me understand QR Code & Barcode Scanner MCP Bundle (distribution/mcpb/READM
 
 <!-- /qrcode-ai-readme-actions:v2 -->
 
-This folder builds the MCP Bundle of the QR Code & Barcode Scanner MCP server, version 0.3.1: one `.mcpb` file that Claude for macOS and Windows, and other MCPB hosts, install in one step. The bundle holds the published npm package `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1`, the scanner engine 0.11.0 and its six native packages, so the server starts and scans with no network and no install command. Nothing is compiled: `scripts/build-mcpb-bundle.py` takes each package from its npm registry archive, which the lockfile pins by integrity. No release holds the bundle yet, and Smithery does not list it yet.
+This folder builds the MCP Bundle of the QR Code & Barcode Scanner MCP server, version 0.3.1: one `.mcpb` file that Claude for macOS and Windows, and other MCPB hosts, install in one step. The bundle holds the published npm package `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1`, the scanner engine 0.11.0 and its six native packages, so the server starts and scans with no network and no install command. Nothing is compiled: `scripts/build-mcpb-bundle.py` takes each package from its npm registry archive, which the lockfile pins by integrity. The release [`mcpb-v0.3.1`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.1), created on 22 November 2026, holds the attested bundle; Smithery does not list it.
 
 The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) let you try the engine in a browser first. To connect the server to a client, read the [QR code scanner MCP guide](https://qrcode-ai.com/en-US/qr-code-scanner/mcp) and the [barcode scanner MCP guide](https://qrcode-ai.com/en-US/barcode-scanner/mcp).
 
@@ -62,7 +62,18 @@ The builder adds the icon (`integrations/vscode/images/icon.png`), `LICENSE.md`,
 
 ## Install it
 
-No release holds the bundle yet: build it as below. Then open `qrcode-barcode-scanner-0.3.1.mcpb` with your MCPB host. Claude for macOS and Windows shows an installation dialog with the extension's setting, and Node.js ships with it. Another host needs Node.js 22.19 or later on line 22, or 24 or later: the range the server declares, which the manifest repeats in `compatibility.runtimes.node`.
+Download `qrcode-barcode-scanner-0.3.1.mcpb` and `qrcode-barcode-scanner-mcpb-0.3.1-SHA256SUMS` from the release [`mcpb-v0.3.1`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.1) into one folder, and check them there:
+
+```sh
+shasum -a 256 -c qrcode-barcode-scanner-mcpb-0.3.1-SHA256SUMS
+gh attestation verify qrcode-barcode-scanner-0.3.1.mcpb --repo qrcode-ai-com/qrcode-barcode-scanner-rust
+```
+
+The bundle's SHA-256 is `f635bab0320483aa592979f6772d3fd53f8cfe542ee59f48528804acb4d2158a`. The tag run [45015236558](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45015236558) built it from commit `1e1e33f4b3e3f711327b5d096e5a71161849cb40` and attested it. When the release was created, on 22 November 2026, a download without signing in had the same digest, `gh attestation verify` passed, and `python3 scripts/build-mcpb-bundle.py verify <file> --revision mcpb-v0.3.1` reported ok. The release is not marked as the latest: `v0.11.0`, the engine release, stays the repository's latest release.
+
+Then open `qrcode-barcode-scanner-0.3.1.mcpb` with your MCPB host. Claude for macOS and Windows shows an installation dialog with the extension's setting, and Node.js ships with it. Another host needs Node.js 22.19 or later on line 22, or 24 or later: the range the server declares, which the manifest repeats in `compatibility.runtimes.node`.
+
+To build the bundle yourself instead, follow [Build and check it](#build-and-check-it) below, then open the file you built the same way.
 
 ## Allowed folders
 
