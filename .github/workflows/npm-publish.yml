@@ -214,6 +214,10 @@ jobs:
     # refs/tags/v* only: no other ref reaches the registry.
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
+    # Above the publish step's worst case, about 55 minutes: the six platform
+    # uploads, each read back for up to 15 minutes after its upload, the pins
+    # for up to 15 more, then the main package's upload and its 15 minutes.
+    timeout-minutes: 75
     environment: npm
     # One publish per tag at a time: a dispatch on the tag waits for the
     # tag-push run instead of racing its registry probes.
@@ -267,9 +271,12 @@ jobs:
       - name: every addon about to be uploaded within Node 18's platform floor
         run: python3 scripts/native-floor.py --policy node --complete "$PWD"/npm-release/*/*.tgz
       # Every platform package missing at this version is uploaded, and one
-      # that cannot be stops the job before the main package. Then every pin
-      # must resolve on the registry; only then does the main package go up.
-      # A re-run uploads exactly what is still missing; a version the probe
+      # that cannot be stops the job before the main package. A version
+      # already live is compared with its tarball at once; the ones this job
+      # uploaded are compared after the last upload, while npm processes them
+      # together. Then every pin must resolve on the registry; only then does
+      # the main package go up. A re-run uploads exactly what is still
+      # missing and compares what is already served; a version the probe
       # still missed but npm calls "previously published" is live already.
       # The probes read the public registry: no credential involved.
       - name: publish the platform packages missing at this version, then the main package
@@ -289,36 +296,69 @@ jobs:
           }
           field() { tar -xzOf "$1" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).$2"; }
           status() { curl -sS -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/${1/\//%2f}/$2"; }
+          # npm processes a version it accepted before serving it (staged
+          # publishing): darwin-x64 0.12.0 answered 404 for 3.5 minutes on 22
+          # November 2026. Each version is read back for up to 15 minutes.
+          readback=900
+          # Sets live to the dist.integrity npm serves for name@version. A 404,
+          # or a manifest without dist.integrity yet, is read again every 10 s
+          # until the deadline (a value of SECONDS), with a progress line at
+          # most once a minute; live stays empty if the deadline passes. Any
+          # other answer stops the job.
+          served() {
+            local name=$1 version=$2 deadline=$3 body="$RUNNER_TEMP/npm-readback.json" code report=$SECONDS
+            live=""
+            while :; do
+              code=$(curl -sS --max-time 30 -o "$body" -w '%{http_code}' "https://registry.npmjs.org/${name/\//%2f}/$version" || true)
+              case "$code" in
+                200)
+                  live=$(node -p "(JSON.parse(require('fs').readFileSync(0, 'utf8')).dist || {}).integrity || ''" <"$body") || {
+                    echo "::error::npm answered 200 for $name@$version without a JSON manifest"
+                    exit 1
+                  }
+                  if [ -n "$live" ]; then return 0; fi
+                  ;;
+                404) ;;
+                *) echo "::error::registry readback of $name@$version answered HTTP $code"; exit 1 ;;
+              esac
+              if [ "$SECONDS" -ge "$deadline" ]; then return 0; fi
+              if [ "$SECONDS" -ge "$report" ]; then
+                echo "$name@$version not served by npm yet; read again every 10 s, $(((deadline - SECONDS + 59) / 60)) minute(s) left"
+                report=$((SECONDS + 60))
+              fi
+              sleep 10
+            done
+          }
           # The version on npm must be the very tarball inspected here, whether
           # it was live already or just uploaded: the registry's dist.integrity
-          # (sha512 of the published .tgz) against this tarball's. A version
-          # npm does not serve yet is read again, for up to two minutes; other
-          # bytes mean someone else published it.
+          # (sha512 of the published .tgz) against this tarball's, read until
+          # the deadline; other bytes mean someone else published it.
           verify_live() {
-            local tgz=$1 name=$2 version=$3 manifest live="" mine attempt
+            local tgz=$1 deadline=$2 name version mine
+            name=$(field "$tgz" name)
+            version=$(field "$tgz" version)
             mine="sha512-$(node -e 'const c=require("crypto"),f=require("fs");process.stdout.write(c.createHash("sha512").update(f.readFileSync(process.argv[1])).digest("base64"))' "$tgz")"
-            for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-              if manifest=$(curl -sSf "https://registry.npmjs.org/${name/\//%2f}/$version") &&
-                live=$(printf '%s' "$manifest" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).dist.integrity") &&
-                [ "$live" != undefined ]; then
-                break
-              fi
-              live=""
-              echo "$name@$version not served by npm yet (attempt $attempt)"
-              [ "$attempt" = 12 ] || sleep 10
-            done
+            served "$name" "$version" "$deadline"
             if [ "$live" != "$mine" ]; then
-              echo "::error::$name@$version on npm (${live:-not served}) is not the tarball inspected here ($mine)"
+              echo "::error::$name@$version on npm (${live:-not served after 15 minutes}) is not the tarball inspected here ($mine)"
               exit 1
             fi
             echo "$name@$version on npm matches the inspected tarball"
           }
+          # What this job uploaded, each with its readback deadline, compared
+          # by verify_uploaded.
+          uploaded=()
+          due=()
           publish_missing() {
             local tgz=$1 name version out
             name=$(field "$tgz" name)
             version=$(field "$tgz" version)
             case "$(status "$name" "$version")" in
-              200) echo "$name@$version already on npm - skipping" ;;
+              200)
+                echo "$name@$version already on npm - skipping"
+                verify_live "$tgz" "$((SECONDS + readback))"
+                return 0
+                ;;
               404)
                 echo "publishing $name@$version"
                 inspected "$tgz"
@@ -332,7 +372,14 @@ jobs:
                 ;;
               *) echo "::error::registry probe for $name@$version failed"; exit 1 ;;
             esac
-            verify_live "$tgz" "$name" "$version"
+            uploaded+=("$tgz")
+            due+=("$((SECONDS + readback))")
+          }
+          verify_uploaded() {
+            local i
+            for i in "${!uploaded[@]}"; do verify_live "${uploaded[$i]}" "${due[$i]}"; done
+            uploaded=()
+            due=()
           }
           # The main package by its name, never by its directory: exactly one.
           main=""
@@ -346,22 +393,23 @@ jobs:
           for tgz in "$PWD"/npm-release/*/*.tgz; do
             if [ "$tgz" != "$main" ]; then publish_missing "$tgz"; fi
           done
+          # Every platform package this job uploaded, its inspected bytes
+          # served, before the main package that pins them.
+          verify_uploaded
           pins=$(tar -xzOf "$main" package/package.json \
             | node -p "Object.entries(JSON.parse(require('fs').readFileSync(0, 'utf8')).optionalDependencies || {}).map(([n, v]) => n + '@' + v).join('\n')")
-          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            absent=""
-            for pin in $pins; do
-              if [ "$(status "${pin%@*}" "${pin##*@}")" != 200 ]; then absent="$absent $pin"; fi
-            done
-            if [ -z "$absent" ]; then break; fi
-            echo "not resolvable yet (attempt $attempt):$absent"
-            sleep 10
+          absent=""
+          pins_deadline=$((SECONDS + readback))
+          for pin in $pins; do
+            served "${pin%@*}" "${pin##*@}" "$pins_deadline"
+            if [ -z "$live" ]; then absent="$absent $pin"; fi
           done
           if [ -n "$absent" ]; then
             echo "::error::the main package would pin versions the registry does not serve:$absent"
             exit 1
           fi
           publish_missing "$main"
+          verify_uploaded
 
   build-wasm:
     runs-on: ubuntu-24.04
@@ -409,6 +457,9 @@ jobs:
     # refs/tags/v* only: no other ref reaches the registry.
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
+    # Above the publish step's worst case, about 17 minutes: the upload, then
+    # up to 15 minutes of readback.
+    timeout-minutes: 30
     environment: npm
     concurrency:
       group: publish-${{ github.workflow }}-${{ github.ref }}
@@ -478,26 +529,49 @@ jobs:
             echo "::error::$tgz is $name, not the wasm package"
             exit 1
           fi
+          # npm processes a version it accepted before serving it (staged
+          # publishing): darwin-x64 0.12.0 answered 404 for 3.5 minutes on 22
+          # November 2026. The version is read back for up to 15 minutes.
+          readback=900
+          # Sets live to the dist.integrity npm serves for this version. A 404,
+          # or a manifest without dist.integrity yet, is read again every 10 s
+          # until the deadline (a value of SECONDS), with a progress line at
+          # most once a minute; live stays empty if the deadline passes. Any
+          # other answer stops the job.
+          served() {
+            local deadline=$1 body="$RUNNER_TEMP/npm-readback.json" code report=$SECONDS
+            live=""
+            while :; do
+              code=$(curl -sS --max-time 30 -o "$body" -w '%{http_code}' "https://registry.npmjs.org/${name/\//%2f}/$version" || true)
+              case "$code" in
+                200)
+                  live=$(node -p "(JSON.parse(require('fs').readFileSync(0, 'utf8')).dist || {}).integrity || ''" <"$body") || {
+                    echo "::error::npm answered 200 for $name@$version without a JSON manifest"
+                    exit 1
+                  }
+                  if [ -n "$live" ]; then return 0; fi
+                  ;;
+                404) ;;
+                *) echo "::error::registry readback of $name@$version answered HTTP $code"; exit 1 ;;
+              esac
+              if [ "$SECONDS" -ge "$deadline" ]; then return 0; fi
+              if [ "$SECONDS" -ge "$report" ]; then
+                echo "$name@$version not served by npm yet; read again every 10 s, $(((deadline - SECONDS + 59) / 60)) minute(s) left"
+                report=$((SECONDS + 60))
+              fi
+              sleep 10
+            done
+          }
           # The version on npm must be this very tarball, whether it was live
           # already or just uploaded: the registry's dist.integrity (sha512)
-          # against the tarball inspected here. A version npm does not serve
-          # yet is read again, for up to two minutes; other bytes mean someone
-          # else published it.
+          # against the tarball inspected here, read for up to 15 minutes;
+          # other bytes mean someone else published it.
           verify_live() {
-            local manifest live="" mine attempt
+            local mine
             mine="sha512-$(node -e 'const c=require("crypto"),f=require("fs");process.stdout.write(c.createHash("sha512").update(f.readFileSync(process.argv[1])).digest("base64"))' "$tgz")"
-            for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-              if manifest=$(curl -sSf "https://registry.npmjs.org/${name/\//%2f}/$version") &&
-                live=$(printf '%s' "$manifest" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).dist.integrity") &&
-                [ "$live" != undefined ]; then
-                break
-              fi
-              live=""
-              echo "$name@$version not served by npm yet (attempt $attempt)"
-              [ "$attempt" = 12 ] || sleep 10
-            done
+            served "$((SECONDS + readback))"
             if [ "$live" != "$mine" ]; then
-              echo "::error::$name@$version on npm (${live:-not served}) is not the tarball inspected here ($mine)"
+              echo "::error::$name@$version on npm (${live:-not served after 15 minutes}) is not the tarball inspected here ($mine)"
               exit 1
             fi
             echo "$name@$version on npm matches the inspected tarball"

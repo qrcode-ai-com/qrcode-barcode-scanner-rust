@@ -355,7 +355,11 @@ failed jobs only. npm-publish › publish-native uploads each platform package
 missing at this version and the main package only once every one it pins
 resolves on the registry: a re-run uploads exactly what is still missing,
 and a version npm calls "previously published" (a probe that still answered
-404 after an earlier upload) counts as live. crates-publish compares each
+404 after an earlier upload) counts as live. npm can take several minutes to
+serve a version it accepted (staged processing: 3.5 minutes for one 0.12.0
+platform package), so every npm publish job reads each upload back for up to
+15 minutes, and publish-native uploads the other platform packages meanwhile;
+a re-run skips the packages already served. crates-publish compares each
 upload with the archive it inspected; a difference stops the job before the
 next crate, with that crate live (yank it if it must not stay). python ›
 release stops before uploading anything when a file PyPI already serves
@@ -1293,7 +1297,7 @@ On the reviewed independent tag `agents-v<adapter-version>`, the workflow:
    version records **`EXISTING_MATCH_NO_UPLOAD`**; different bytes or a failed
    registry probe stop the job. After npm accepts an upload, only an HTTP 404
    on that version's manifest triggers another read. The job polls for up to
-   seven minutes without sending another upload. If the deadline expires,
+   15 minutes without sending another upload. If the deadline expires,
    verify the public version and its archive before rerunning the immutable
    tag. A new successful upload requires provenance metadata and records
    **`PUBLISHED_OIDC_AND_PUBLIC_BYTES`**. The receipt checks that npm serves

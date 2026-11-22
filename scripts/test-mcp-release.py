@@ -280,11 +280,14 @@ class ReleaseBoundaries(unittest.TestCase):
             elapsed += seconds
 
         out = self.directory / "public.json"
+        said = []
         identity = {"ACTIONS_ID_TOKEN_REQUEST_URL": "fixture", "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "fixture"}
         with patch.dict(os.environ, identity, clear=True):
-            self.assertEqual(release.registry_after_upload(self.archive, out, get=get, clock=lambda: elapsed, sleep=sleep), "present")
+            self.assertEqual(release.registry_after_upload(self.archive, out, get=get, clock=lambda: elapsed, sleep=sleep, say=said.append), "present")
         self.assertEqual(attempts, list(range(0, 91, 10)))
         self.assertEqual(json.loads(out.read_text())["outcome"], "PUBLISHED_OIDC_AND_PUBLIC_BYTES")
+        version = json.loads((release.ROOT / "integrations/mcp/package.json").read_text())["version"]
+        self.assertEqual(said, [f"{release.PACKAGE}@{version} is not served by npm yet; read again every 10 s, {minutes} minute(s) left" for minutes in (15, 14)])
 
     def test_accepted_upload_grace_expires_without_a_success_receipt(self):
         elapsed = 0
@@ -299,11 +302,19 @@ class ReleaseBoundaries(unittest.TestCase):
             elapsed += seconds
 
         out = self.directory / "public.json"
+        said = []
+
+        def say(line):
+            said.append((elapsed, line))
+
         identity = {"ACTIONS_ID_TOKEN_REQUEST_URL": "fixture", "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "fixture"}
-        with patch.dict(os.environ, identity, clear=True), self.assertRaisesRegex(ValueError, "npm accepted.*7 minutes"):
-            release.registry_after_upload(self.archive, out, get=get, clock=lambda: elapsed, sleep=sleep)
-        self.assertEqual(attempts, list(range(0, 420, 10)))
-        self.assertEqual(elapsed, 420)
+        with patch.dict(os.environ, identity, clear=True), self.assertRaisesRegex(ValueError, "npm accepted.*15 minutes"):
+            release.registry_after_upload(self.archive, out, get=get, clock=lambda: elapsed, sleep=sleep, say=say)
+        self.assertEqual(attempts, list(range(0, 900, 10)))
+        self.assertEqual(elapsed, 900)
+        self.assertEqual(release.READBACK_SECONDS, 900)
+        self.assertEqual([at for at, _ in said], list(range(0, 900, 60)))
+        self.assertEqual([re.search(r", (\d+) minute\(s\) left$", line)[1] for _, line in said], [str(m) for m in range(15, 0, -1)])
         self.assertFalse(out.exists())
 
     def test_accepted_upload_readback_fails_immediately_on_inconsistent_evidence(self):
@@ -334,7 +345,7 @@ class ReleaseBoundaries(unittest.TestCase):
             (server_error, urllib.error.HTTPError, "503"),
         ):
             with self.subTest(message=message), patch.dict(os.environ, identity, clear=True), self.assertRaisesRegex(error, message):
-                release.registry_after_upload(self.archive, self.directory / "out", get=get, clock=lambda: 0, sleep=lambda _: self.fail("inconsistent evidence must fail without waiting"))
+                release.registry_after_upload(self.archive, self.directory / "out", get=get, clock=lambda: 0, sleep=lambda _: self.fail("inconsistent evidence must fail without waiting"), say=lambda _: self.fail("inconsistent evidence is not a pending version"))
 
 
 if __name__ == "__main__":
