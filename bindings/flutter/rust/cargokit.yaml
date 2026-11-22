@@ -1,0 +1,6 @@
+# Signed precompiled binaries (scripts/flutter-precompiled.py keygen): cargokit
+# downloads <url_prefix><crate hash>/<target>_<library> and its .sig, and uses
+# the file only if public_key verifies the signature.
+precompiled_binaries:
+  url_prefix: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/precompiled_
+  public_key: 8ea82880c3705d58f169159c4bb0d665d0a421cb1a84f94ef5178459e279695f
