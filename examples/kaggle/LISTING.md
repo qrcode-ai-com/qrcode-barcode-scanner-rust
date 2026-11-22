@@ -8,15 +8,17 @@ the same sample, and judges its three reports.
 
 ## Decisions for the owner
 
-1. **Terms fit.** Kaggle's terms limit the services to "your own internal, personal,
-   non-commercial use, and not on behalf of or for the benefit of any third party", and allow one
-   account per person, with no shared account. Options:
-   - **(a) Recommended.** Publish from the owner's one personal account as an open-source
-     tutorial. The notebook links only the source repository and the PyPI page, as committed; the
-     QR Code AI product links stay in this repository's README.
-   - (b) Add the QR Code AI product links to the notebook and accept the terms risk. The checker
-     (`tools/check_folder.py`) refuses a product link today, so this needs a change to the
-     checker first.
+1. **Terms fit. Decided on 22 November 2026: (b).** Kaggle's terms limit the services to "your
+   own internal, personal, non-commercial use, and not on behalf of or for the benefit of any
+   third party", and allow one account per person, with no shared account. Options:
+   - (a) Publish from the owner's one personal account as an open-source tutorial, the notebook
+     linking only the source repository and the PyPI page, and the QR Code AI product links
+     staying in this repository's README. This was the earlier recommendation.
+   - **(b) Chosen.** Add the QR Code AI product links to the notebook and accept the terms risk.
+     The owner chose it on 22 November 2026: the listing is worth having only with the links and
+     the pictures. The notebook's first cell now holds the six QR Code AI links and the Ask AI
+     links, and `tools/check_folder.py` refuses a notebook without them. The terms risk stays:
+     the notebook is published from one personal account and links a commercial product.
    - (c) Skip Kaggle. The only option with no terms risk.
 2. **Licence notice.** Kaggle shows a public notebook as released under Apache 2.0. The notebook's
    own cells are project-authored MIT source in this repository; the engine 0.11.0 it installs

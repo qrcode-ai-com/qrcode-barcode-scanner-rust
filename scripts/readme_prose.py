@@ -21,6 +21,7 @@ GUIDES = {
     'distribution/npm/README.md': ('sdk/nodejs', 'Node.js'),
     'examples/codepen/README.md': ('sdk/javascript', 'JavaScript'),
     'examples/kaggle/README.md': ('sdk/python', 'Python'),
+    'examples/kaggle/qrcode-barcode-scanner-demo.ipynb': ('sdk/python', 'Python'),
     'examples/notebooks/README.md': ('sdk/python', 'Python'),
     'examples/notebooks/scan-images.ipynb': ('sdk/python', 'Python'),
     'examples/streamlit/README.md': ('sdk/python', 'Python'),

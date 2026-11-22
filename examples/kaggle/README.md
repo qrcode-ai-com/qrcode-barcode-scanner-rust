@@ -97,11 +97,12 @@ sample, the original environment pinned, and four tags. Its `id` names `KAGGLE_U
 the owner replaces with the Kaggle account's username in the copy that is pushed. `kaggle kernels
 push` sends only the notebook and the metadata; this README and `LISTING.md` stay here.
 
-The notebook links the source repository and the PyPI page only. Kaggle's terms limit its
-services to personal, non-commercial use, so the QR Code AI product links stay out of the
-notebook until the owner decides otherwise; `LISTING.md` gives the options. Its first cells show
-the pictures of this README, which are images and not links, and leave out the Ask AI links,
-whose prompt names those product pages.
+The notebook's first cell links the source repository, the PyPI page and the six QR Code AI
+pages of this README, and holds the same Ask AI links, which
+[`scripts/build-readme-actions.py`](../../scripts/build-readme-actions.py) writes. Kaggle's terms
+limit its services to personal, non-commercial use: on 22 November 2026 the owner chose to publish
+the notebook with the product links and to accept that risk, as `LISTING.md` records. Its first
+cells also show the pictures of this README.
 
 ## Update it for a release
 
@@ -114,8 +115,9 @@ outputs. The owner then pushes it again from a shell that holds the Kaggle token
 The workflow [`demos.yml`](../../.github/workflows/demos.yml) checks the committed folder with
 [`tools/check_folder.py`](tools/check_folder.py): the metadata fields and values, the slug
 against the title, a notebook without stored output, the install pin equal to
-`binder/requirements.txt`, the sample read from the matching release tag and the links of the
-first cell. It then runs the notebook from top to bottom on Python 3.13, the Python of Kaggle's
+`binder/requirements.txt`, the sample read from the matching release tag, and the first cell's
+links to PyPI and the source, its six QR Code AI links in sentences and its one Ask AI block. It
+then runs the notebook from top to bottom on Python 3.13, the Python of Kaggle's
 image, in a new virtual environment with
 [`scripts/python-host-consumer.py`](../../scripts/python-host-consumer.py), which gives
 [`tools/run_notebook.py`](tools/run_notebook.py) as the scan command. The `tools/` folder is not

@@ -14,6 +14,8 @@ on:
       - scripts/destination-acceptance.py
       - scripts/check-demo-page.py
       - scripts/check-demo-notebook.py
+      - scripts/readme_actions.py
+      - scripts/readme_prose.py
       - scripts/python-host-consumer.py
       - scripts/python_host_kit.py
       - scripts/consumer_truth.py
