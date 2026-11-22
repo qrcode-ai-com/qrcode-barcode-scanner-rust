@@ -88,11 +88,11 @@ one process.
 
 | Language | Package | Version | Works with |
 | --- | --- | --- | --- |
-| Go | [`github.com/qrcode-ai-com/qrcode-barcode-scanner-go`](https://pkg.go.dev/github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.11.0) | 0.11.0 | `qrscan` 0.11.x |
-| PHP | [`qrcode-ai-com/qrcode-barcode-scanner`](https://packagist.org/packages/qrcode-ai-com/qrcode-barcode-scanner#v0.11.0) | 0.11.0 | `qrscan` 0.11.x |
+| Go | [`github.com/qrcode-ai-com/qrcode-barcode-scanner-go`](https://pkg.go.dev/github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.12.0) | 0.12.0 | `qrscan` 0.12.x |
+| PHP | [`qrcode-ai-com/qrcode-barcode-scanner`](https://packagist.org/packages/qrcode-ai-com/qrcode-barcode-scanner#v0.12.0) | 0.12.0 | `qrscan` 0.12.x |
 
 ```sh
-go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.11.0
+go get github.com/qrcode-ai-com/qrcode-barcode-scanner-go@v0.12.0
 ```
 
 The Go package needs Go 1.24 or later, uses the standard library only and has no C code. Its
@@ -103,7 +103,7 @@ the public Go proxy in an empty module, on Linux, macOS and Windows, and read th
 in the three profiles.
 
 ```sh
-composer require qrcode-ai-com/qrcode-barcode-scanner:^0.11
+composer require qrcode-ai-com/qrcode-barcode-scanner:^0.12
 ```
 
 The PHP package needs PHP 8.2 or later with `proc_open` enabled and the JSON extension, which
