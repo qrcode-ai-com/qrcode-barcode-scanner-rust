@@ -14,7 +14,7 @@ your code runs:
 | Browser | [`…-wasm`](/api/wasm) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0` |
 | Python | [`qrcode-barcode-scanner`](/api/python) | `python -m pip install qrcode-barcode-scanner==0.12.0` |
 | Native Android / iOS | [Kotlin / Swift](/api/mobile) | from source |
-| Cross-platform app | [Flutter](/api/flutter) | `flutter pub add qr_barcode_scanner:0.11.0`; Rust builds at app-build time |
+| Cross-platform app | [Flutter](/api/flutter) | `flutter pub add qr_barcode_scanner:0.12.0`; signed precompiled native library, or Rust built at app-build time |
 
 <Note>
 The five runtime packages are public in 0.12.0 under these names. Node selects
@@ -22,8 +22,9 @@ one matching native platform dependency automatically; the browser package
 contains one portable WASM plus its included camera and overlay modules.
 The [migration guide](/guides/migrate-to-qrcode-barcode-scanner) keeps old
 packages separate. Flutter is also public on pub.dev; its
-[dated native consumer evidence](/api/flutter#native-consumer-evidence) separates
-the passing optimized Android emulator from incomplete iOS qualification. Kotlin
+[dated native consumer evidence](/api/flutter#native-consumer-evidence) records
+Android and iOS builds with and without Rust, not yet a qualified scan on an
+emulator, simulator or device. Kotlin
 and Swift retain their source-build limits; a binding is not a mobile application.
 </Note>
 
@@ -39,9 +40,11 @@ and Swift retain their source-build limits; a binding is not a mobile applicatio
   Building needs Rust and the Android NDK.
 - **Swift/iOS** — source build of the `.xcframework`; the package cannot be
   added by repository URL. Rust and the platform SDK are needed to build it.
-- **Flutter** — install `qr_barcode_scanner` from pub.dev. Its bundled core
-  compiles at application build time through cargokit: Rust 1.88 or newer and
-  the platform toolchain are required, including Android NDK r28 or newer.
+- **Flutter** — install `qr_barcode_scanner` from pub.dev. At application build
+  time, cargokit links a signed precompiled native library, by default on a
+  machine without rustup or when the app opts in. Otherwise it compiles the
+  bundled core, which needs Rust 1.88 or newer and the platform toolchain,
+  including Android NDK r28 or newer.
   The [Flutter guide](/api/flutter) records the public consumer limits.
 
 Container and agent adapters reuse these runtimes but keep separate publication

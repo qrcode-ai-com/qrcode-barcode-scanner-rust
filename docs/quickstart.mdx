@@ -135,10 +135,11 @@ browser package uses one portable WASM. See the
 </Tabs>
 
 Mobile bindings use the same report contract. The public
-[Flutter package](/api/flutter) installs from pub.dev and compiles its bundled
-Rust core at app-build time. Its optimized Android emulator consumer passes;
-iOS simulator qualification remains incomplete because of the fast-profile
-budget check. Kotlin/JitPack is not qualified and Swift requires a local
+[Flutter package](/api/flutter) installs from pub.dev; an app build links its
+signed precompiled native library or compiles its bundled Rust core. Its tag
+runs built the example for Android and iOS with and without Rust; a scan with
+the published archive on an emulator, simulator or device is not yet
+qualified. Kotlin/JitPack is not qualified and Swift requires a local
 build; see the [native mobile API page](/api/mobile).
 
 ## Choosing a profile
@@ -152,9 +153,8 @@ build; see the [native mobile API page](/api/mobile).
 For APIs that expose a budget override (`budget_ms` / `budgetMs` /
 `--budget-ms`), `0` is unbounded and the only strictly reproducible mode.
 `trace.budget_exhausted` tells a final report (`false`) from one the budget
-cut (`true`). The published Flutter 0.11.0 facade exposes the three profiles
-but no budget override; the working source adds `budgetMs` for the next
-release, as its [API guide](/api/flutter) describes.
+cut (`true`). The published Flutter 0.12.0 facade takes `budgetMs` on `scan`
+and `scanFrame`, as its [API guide](/api/flutter) describes.
 
 <Tip>
 The report's `trace.stages` tells you exactly which stage decoded (or how
