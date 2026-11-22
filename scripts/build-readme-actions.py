@@ -14,6 +14,10 @@ REPOSITORY = 'https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/
 # nuget.org renders a README with HTML disabled and removes its comments: a tag would be shown as text.
 # The README packed for it gets its prompt unfolded, and holds no HTML of its own.
 MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
+# Glama shows a README with its HTML removed, its comments stripped and the link around an image
+# dropped. The README staged for it (scripts/stage-glama-package.py) gets its assistants as text
+# links and its prompt unfolded; its pictures are plain Markdown images.
+TEXT_LINKS = {'distribution/glama/README.md'}
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
 STAGED_AS_README = ('distribution/publisher/REPOSITORY.md',)
@@ -48,7 +52,9 @@ def outputs():
     for path in maintained_readmes():
         text = (ROOT / path).read_text()
         installers = mcp_links(config) if path in ('README.md', 'integrations/mcp/README.md') else ()
-        result[path] = insert_actions(text, action_block(prompt_of(path, text), installers, markdown_only=path in MARKDOWN_ONLY))
+        block = action_block(prompt_of(path, text), installers, markdown_only=path in MARKDOWN_ONLY | TEXT_LINKS,
+                             text_links=path in TEXT_LINKS)
+        result[path] = insert_actions(text, block)
     for path in NOTEBOOKS:
         notebook = json.loads((ROOT / path).read_text())
         first = notebook['cells'][0]
