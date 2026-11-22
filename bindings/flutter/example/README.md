@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://pub.dev/packages/qr_barcode_scanner">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-flutter-dark.gif?v=5953b19448b8">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-flutter-light.gif?v=ad8cc9b74175" alt="QR Code &amp; Barcode Scanner for Flutter: the Flutter logo, the quick start in Dart, and a QR code and a barcode being read by a camera" width="100%">
+    </picture>
+  </a>
+</p>
+
 # qrcode_ai_scanner_example
 
 <!-- qrcode-ai-readme-actions:v2 -->
