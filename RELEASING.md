@@ -356,10 +356,11 @@ missing at this version and the main package only once every one it pins
 resolves on the registry: a re-run uploads exactly what is still missing,
 and a version npm calls "previously published" (a probe that still answered
 404 after an earlier upload) counts as live. npm can take several minutes to
-serve a version it accepted (staged processing: 3.5 minutes for one 0.12.0
-platform package), so every npm publish job reads each upload back for up to
-15 minutes, and publish-native uploads the other platform packages meanwhile;
-a re-run skips the packages already served. crates-publish compares each
+serve a version it accepted (staged processing: 3.5 minutes for one platform
+package on 22 November 2026), so every npm publish job reads each upload
+back for up to 15 minutes, and publish-native uploads the other platform
+packages meanwhile; a re-run skips the packages already served.
+crates-publish compares each
 upload with the archive it inspected; a difference stops the job before the
 next crate, with that crate live (yank it if it must not stay). python ›
 release stops before uploading anything when a file PyPI already serves

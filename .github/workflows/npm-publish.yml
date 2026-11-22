@@ -297,7 +297,7 @@ jobs:
           field() { tar -xzOf "$1" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).$2"; }
           status() { curl -sS -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/${1/\//%2f}/$2"; }
           # npm processes a version it accepted before serving it (staged
-          # publishing): darwin-x64 0.12.0 answered 404 for 3.5 minutes on 22
+          # publishing): a platform package answered 404 for 3.5 minutes on 22
           # November 2026. Each version is read back for up to 15 minutes.
           readback=900
           # Sets live to the dist.integrity npm serves for name@version. A 404,
@@ -530,7 +530,7 @@ jobs:
             exit 1
           fi
           # npm processes a version it accepted before serving it (staged
-          # publishing): darwin-x64 0.12.0 answered 404 for 3.5 minutes on 22
+          # publishing): a platform package answered 404 for 3.5 minutes on 22
           # November 2026. The version is read back for up to 15 minutes.
           readback=900
           # Sets live to the dist.integrity npm serves for this version. A 404,

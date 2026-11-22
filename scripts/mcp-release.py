@@ -240,7 +240,7 @@ def progress(line: str) -> None:
 
 def registry_after_upload(archive: Path, out: Path, *, get=fetch, clock=time.monotonic, sleep=time.sleep, say=progress) -> str:
     # npm processes a version it accepted before serving it (staged publishing):
-    # engine package darwin-x64 0.12.0 answered 404 for 3.5 minutes on 22 November 2026.
+    # an engine platform package answered 404 for 3.5 minutes on 22 November 2026.
     deadline = clock() + READBACK_SECONDS
     reported = None
     while clock() < deadline:
