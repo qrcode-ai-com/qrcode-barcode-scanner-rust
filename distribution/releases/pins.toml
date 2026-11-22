@@ -114,12 +114,7 @@ paths = [
   "distribution/README.md",
   "distribution/cli/README.md",
   "distribution/releases/README.md",
-  "distribution/appimage/*",
-  "distribution/aur/*",
   "distribution/chocolatey/*",
-  "distribution/debian/*",
-  "distribution/rpm/*",
-  ".github/workflows/appimage.yml",
   ".github/workflows/destination-acceptance.yml",
   ".github/workflows/go-adapter.yml",
   ".github/workflows/php-adapter.yml",
@@ -128,6 +123,16 @@ paths = [
   "bindings/php/**",
   "scripts/package-inspect.py",
   "scripts/packed-node-consumer.mjs",
+]
+
+[[file]]
+held = "the Linux packages and the AppImage: each recipe pins the release its channel publishes, with that release's licence, and moves when the channel is published again"
+paths = [
+  "distribution/appimage/*",
+  "distribution/aur/*",
+  "distribution/debian/*",
+  "distribution/rpm/*",
+  ".github/workflows/appimage.yml",
 ]
 
 [[file]]
@@ -416,55 +421,9 @@ paths = [
 match = 'SUMS_SHA256: ([0-9a-f]{64})'
 
 [[value]]
-fact = "release > checksums > sha256"
-paths = ["distribution/appimage/build.sh", "distribution/debian/build.sh"]
-match = 'checksums_sha256=([0-9a-f]{64})'
-
-[[value]]
-facts = [
-  "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > executable > sha256",
-  "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > executable > sha256",
-]
-paths = ["distribution/appimage/build.sh", "distribution/debian/build.sh"]
-match = 'binary_sha256=([0-9a-f]{64})'
-
-[[value]]
-facts = [
-  "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > executable > sha256",
-  "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > executable > sha256",
-]
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = '%global executable_sha256 ([0-9a-f]{64})'
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/aur/PKGBUILD", "distribution/aur/.SRCINFO"]
-match = "sha256sums ?= ?\\(?'?([0-9a-f]{64})"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE0\\}'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-aarch64-unknown-linux-gnu.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE1\\}'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
-paths = ["distribution/rpm/qrcode-barcode-scanner.spec"]
-match = "([0-9a-f]{64}) '%\\{SOURCE2\\}'"
-
-[[value]]
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
 paths = ["distribution/chocolatey/build.ps1"]
 match = "\\$sourceSha = '([0-9a-f]{64})'"
-
-[[value]]
-fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
-paths = ["distribution/debian/README.md"]
-match = '^`([0-9a-f]{64})`\.'
 
 [[value]]
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-pc-windows-msvc.zip > sha256"
@@ -483,10 +442,5 @@ match = 'Build commit: ([0-9a-f]{40})'
 
 [[value]]
 fact = "commit"
-paths = ["distribution/chocolatey/test.ps1", "distribution/debian/README.md"]
+paths = ["distribution/chocolatey/test.ps1"]
 match = 'qrcode-barcode-scanner/([0-9a-f]{40})/fixtures/'
-
-[[value]]
-fact = "source_date_epoch"
-paths = ["distribution/appimage/build.sh"]
-match = 'source_date_epoch=([0-9]+)'
