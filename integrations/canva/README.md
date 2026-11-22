@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-canva-dark.gif?v=a10da3b348d4">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-canva-light.gif?v=3bb749ff0e85" alt="QR Code &amp; Barcode Scanner for Canva: the Canva logo, the Apps panel and the Scan selected image button of the app, and a QR code and a barcode being read" width="100%">
+    </picture>
+  </a>
+</p>
+
 # QR Code & Barcode Scanner · Canva app 0.1.0
 
 <!-- qrcode-ai-readme-actions:v2 -->
