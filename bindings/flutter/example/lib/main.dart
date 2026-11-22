@@ -186,6 +186,8 @@ class _ScanPageState extends State<ScanPage> {
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     hintText: 'default, ${defaultBudgets[_profile]} ms',
                     helperText: 'Empty: the profile default. 0: unbounded.',
+                    // Wraps instead of truncating on a narrow phone.
+                    helperMaxLines: 2,
                     counterText: '',
                   ),
                 ),
