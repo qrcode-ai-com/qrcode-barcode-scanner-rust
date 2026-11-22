@@ -36,6 +36,8 @@ An archive README carries at most its one previous-name sentence
 availability (pending publication, not yet published, coming soon); the
 Flutter README is held to that last rule only with --release-set.
 Directories kept their old names, so no check scans raw bytes for a name.
+The Flutter package publishes each pubspec screenshot as a valid image under
+pub.dev's limits, and no other file under doc/screenshots.
 
   package-inspect.py all [--no-build]          every target this host can run
   package-inspect.py crates [--verify]         the .crate of each published crate
@@ -2213,6 +2215,20 @@ def check_flutter_sources(art: Artifact, root: pathlib.Path, listing: list, snap
     return published
 
 
+def check_flutter_screenshots(art: Artifact, published: dict) -> None:
+    """pub.dev's screenshot rules, held against the files pub publishes: every
+    pubspec screenshot ships as a valid image, and pub ships no other file
+    under the screenshot directory."""
+    staging = flutter_staging()
+    pubspec = published.get("pubspec.yaml", b"").decode()
+    problems = staging.screenshot_problems(pubspec, published)
+    art.check("pubspec screenshots follow pub.dev's rules and pub publishes exactly them", not problems,
+              "; ".join(problems))
+    if not problems:
+        for _, path in staging.pubspec_screenshots(pubspec):
+            art.notes.append(f"screenshot {path}: {len(published[path])} bytes, sha256 {sha256(published[path])}")
+
+
 def cmd_flutter(host: Host) -> None:
     package_root = pathlib.Path(host.args.package_root).resolve() if host.args.package_root else FLUTTER_DIR
     pubspec = (package_root / "pubspec.yaml").read_text()
@@ -2281,6 +2297,7 @@ def cmd_flutter(host: Host) -> None:
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
         published = check_flutter_sources(art, package_root, listing, staging.candidate_snapshot(ROOT, revision), revision)
         art.check("published sources, bundled core, versions, LICENSE and cargokit cache identity match this candidate", True)
+        check_flutter_screenshots(art, published)
         host.recorded.extend((sha256(data), str(package_root / name)) for name, data in sorted(published.items()))
     except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:
         art.check("published sources, bundled core, versions, LICENSE and cargokit cache identity match this candidate", False, str(error))
@@ -4793,6 +4810,14 @@ def flutter_self_test():
              flutter_precompiled().CONFIG_TEXT.format(url="http://127.0.0.1:8765/precompiled_", key="ab" * 32).encode())):
         variant = snapshot | {name: data}
         variants[key] = (staging.bundle(packed, variant, revision)[0], variant)
+    # A candidate whose pubspec declares one pub.dev screenshot, and one that
+    # carries a screenshot its pubspec does not declare (staging refuses that
+    # one, so its files are the clean stage plus the image).
+    shot, extra_shot, png = "doc/screenshots/example.png", "doc/screenshots/extra.png", b"\x89PNG\r\n\x1a\n" + bytes(24)
+    declared = snapshot | {f"{staging.BINDING}/{shot}": png, pubspec: snapshot[pubspec] + (
+        f"screenshots:\n  - description: The example app after a scan.\n    path: {shot}\n").encode()}
+    variants["declared screenshot"] = (staging.bundle(packed, declared, revision)[0], declared)
+    undeclared = snapshot | {f"{staging.BINDING}/{extra_shot}": png}
 
     def tree(names):
         rows, seen = [], set()
@@ -4846,6 +4871,12 @@ def flutter_self_test():
          pending_snapshot, False, "README.md states availability (Not yet published): refused with --release-set"),
         ("a README naming a previous name", previous, names, 0, "", FAIL, previous_snapshot, False,
          "README.md names no previous name"),
+        ("a declared screenshot pub publishes", variants["declared screenshot"][0], names + [shot], 0, "", PASS,
+         declared, True, f"screenshot {shot}: {len(png)} bytes, sha256 {sha256(png)}"),
+        ("a declared screenshot pub leaves out", variants["declared screenshot"][0], names, 0, "", FAIL, declared,
+         True, f"{shot}: not in the package's files"),
+        ("a screenshot the pubspec does not declare", clean | {extra_shot: png}, names + [extra_shot], 0, "", FAIL,
+         undeclared, True, f"{extra_shot}: a screenshot the pubspec does not declare"),
     ]
     for key, expected, needle in (("precompiled config", PASS, "public key " + "ab" * 32),
                                   ("local precompiled config", FAIL, "GitHub release download prefix")):
