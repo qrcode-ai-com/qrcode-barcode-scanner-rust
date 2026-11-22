@@ -58,6 +58,8 @@ It runs locally, with no network requests.
 
 For a one-off image check, the [browser image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml) uses the same engine.
 
+## How it works
+
 <p align="center">
   <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
     <picture>
@@ -66,6 +68,10 @@ For a one-off image check, the [browser image example](https://github.com/qrcode
     </picture>
   </a>
 </p>
+
+The picture shows the three steps of the crate. They are the next three sections: add the
+crate to a project, pass the bytes of an image to the engine inside your program, then read
+the report it returns.
 
 ## Install
 
