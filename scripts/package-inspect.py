@@ -2151,6 +2151,32 @@ def flutter_staging():
     return module
 
 
+@functools.cache
+def flutter_precompiled():
+    spec = importlib.util.spec_from_file_location("flutter_precompiled", ROOT / "scripts" / "flutter-precompiled.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_flutter_precompiled(art: Artifact, package_root: pathlib.Path) -> None:
+    """rust/cargokit.yaml, when the package ships one, sends cargokit to GitHub release downloads."""
+    config = package_root / "rust" / "cargokit.yaml"
+    if not config.is_file():
+        art.notes.append("no rust/cargokit.yaml: cargokit builds the library from source, which needs rustup")
+        return
+    precompiled = flutter_precompiled()
+    try:
+        key = precompiled.read_config(config)
+    except (OSError, precompiled.Refused) as error:
+        art.check("rust/cargokit.yaml names a GitHub release download prefix and a 32-byte public key", False,
+                  str(error))
+        return
+    art.check("rust/cargokit.yaml names a GitHub release download prefix and a 32-byte public key", True)
+    url, _ = precompiled.config_values(config)
+    art.notes.append(f"precompiled binaries: {url}<crate hash> · public key {key}")
+
+
 def read_flutter_file(root: pathlib.Path, name: str) -> bytes:
     flutter_staging().safe_name(name)
     path = root
@@ -2262,6 +2288,7 @@ def cmd_flutter(host: Host) -> None:
     for required in ("README.md", "CHANGELOG.md", "pubspec.yaml", "rust/Cargo.toml"):
         art.check(f"{required} in the package", required in listing)
     check_stray(art, listing)
+    check_flutter_precompiled(art, package_root)
     crate = tomllib.loads((package_root / "rust" / "Cargo.toml").read_text())
     rxing = crate.get("profile", {}).get("release", {}).get("package", {}).get("rxing", {})
     art.check("rust/Cargo.toml keeps rxing overflow-checks (cargokit builds it as its own root)",
@@ -4776,7 +4803,11 @@ def flutter_self_test():
             ("retired name", pubspec, snapshot[pubspec].replace(FLUTTER_NAME.encode(), RETIRED_MODULE.encode())),
             ("pending README", f"{staging.BINDING}/README.md", b"readme\n\nNot yet published on pub.dev.\n"),
             ("previous-name README", f"{staging.BINDING}/README.md",
-             f"readme\n\nReleases up to 0.10.1 were published as `{RETIRED_MODULE}`.\n".encode())):
+             f"readme\n\nReleases up to 0.10.1 were published as `{RETIRED_MODULE}`.\n".encode()),
+            ("precompiled config", f"{staging.BINDING}/rust/cargokit.yaml",
+             flutter_precompiled().CONFIG_TEXT.format(url=flutter_precompiled().URL_PREFIX, key="ab" * 32).encode()),
+            ("local precompiled config", f"{staging.BINDING}/rust/cargokit.yaml",
+             flutter_precompiled().CONFIG_TEXT.format(url="http://127.0.0.1:8765/precompiled_", key="ab" * 32).encode())):
         variant = snapshot | {name: data}
         variants[key] = (staging.bundle(packed, variant, revision)[0], variant)
     # A candidate whose pubspec declares one pub.dev screenshot, and one that
@@ -4847,6 +4878,11 @@ def flutter_self_test():
         ("a screenshot the pubspec does not declare", clean | {extra_shot: png}, names + [extra_shot], 0, "", FAIL,
          undeclared, True, f"{extra_shot}: a screenshot the pubspec does not declare"),
     ]
+    for key, expected, needle in (("precompiled config", PASS, "public key " + "ab" * 32),
+                                  ("local precompiled config", FAIL, "GitHub release download prefix")):
+        files, staged_from = variants[key]
+        scenarios.append((f"release set with a {key}", files, sorted(names + ["rust/cargokit.yaml"]), 0, "", expected,
+                          staged_from, True, needle))
     current = {"snapshot": snapshot}
     original_snapshot = staging.candidate_snapshot
     staging.candidate_snapshot = lambda root, candidate: current["snapshot"]

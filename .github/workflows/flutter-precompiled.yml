@@ -1,0 +1,411 @@
+name: Flutter precompiled binaries
+
+# cargokit builds the Flutter package's Rust library inside a consuming app,
+# or downloads a signed precompiled one (scripts/flutter-precompiled.py has
+# the details). No job here holds a key or creates a release: the owner signs
+# the unsigned set on their own machine and publishes it
+# (RELEASING.md § Flutter precompiled binaries).
+#
+#   e2e      a pull request or a claude/precompiled-* push: a throwaway key,
+#            a local server and consumer builds with rustup and cargo out of
+#            reach prove that cargokit downloads, verifies and links the
+#            binary, and that it refuses a tampered one
+#   release  a v* tag: the seven release targets, built unsigned from the
+#            staged package into one artifact, flutter-precompiled-unsigned
+#   verify   a dispatch on the tag, after the owner publishes: every published
+#            binary verifies, and consumer builds without rustup use them
+#
+# release, collect and verify need the package's rust/cargokit.yaml, which the
+# owner's keygen writes once. A tag whose package ships none skips them, with
+# a notice: that release ships no precompiled binaries, and cargokit builds
+# the library from source as before. When the file is there, check-config
+# must pass.
+on:
+  push:
+    branches: ["claude/precompiled-*"]
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - "bindings/flutter/android/**"
+      - "bindings/flutter/cargokit/**"
+      - "bindings/flutter/ios/**"
+      - "bindings/flutter/rust/**"
+      - "scripts/flutter-precompiled-build.dart"
+      - "scripts/flutter-precompiled.py"
+      - "scripts/stage-flutter-package.py"
+      - ".github/workflows/flutter-precompiled.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RUST_TOOLCHAIN: "1.99.1"
+  FLUTTER_VERSION: "3.47.9"
+  NDK_VERSION: "28.2.13676358"
+
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      config: ${{ steps.config.outputs.shipped }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # master, 2026-10-10
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Self-test the signing tool
+        run: python3 scripts/flutter-precompiled.py --self-test
+      - name: Stage the portable Flutter package
+        run: |
+          mkdir flutter-artifact
+          python3 scripts/stage-flutter-package.py \
+            --output /tmp/flutter-validation/bindings/flutter \
+            --archive flutter-artifact/flutter-stage.tar.gz \
+            --receipt flutter-artifact/flutter-stage.json
+          (cd flutter-artifact && shasum -a 256 flutter-stage.tar.gz > flutter-stage.sha256)
+      - name: Whether the staged package ships rust/cargokit.yaml
+        id: config
+        run: |
+          if [ -f /tmp/flutter-validation/bindings/flutter/rust/cargokit.yaml ]; then shipped=true; else shipped=false; fi
+          echo "shipped=$shipped" >> "$GITHUB_OUTPUT"
+          echo "the staged package ships rust/cargokit.yaml: $shipped"
+          if [ "$shipped" = false ] && { [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || [[ "$GITHUB_REF" == refs/tags/v* ]]; }; then
+            message="no rust/cargokit.yaml: this release ships no precompiled binaries"
+            echo "::notice title=Flutter precompiled binaries::$message"
+            echo "$message" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
+        with:
+          name: flutter-stage
+          path: flutter-artifact/
+          if-no-files-found: error
+          retention-days: 14
+
+  e2e:
+    name: ${{ matrix.check }}
+    needs: stage
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - check: Android consumer of a signed binary
+            platform: android
+            runner: ubuntu-24.04
+            target: aarch64-linux-android
+          - check: iOS consumer of a signed binary
+            platform: ios
+            runner: macos-15
+            target: aarch64-apple-ios
+    runs-on: ${{ matrix.runner }}
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # master, 2026-10-10
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          targets: ${{ matrix.target }}
+      - uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046 # v2.19.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-stage
+          path: flutter-artifact
+      - name: Verify and extract the staged archive
+        run: |
+          (cd flutter-artifact && shasum -a 256 -c flutter-stage.sha256)
+          python3 scripts/stage-flutter-package.py \
+            --extract flutter-artifact/flutter-stage.tar.gz \
+            --output /tmp/flutter-validation/bindings/flutter
+      - name: Install the NDK
+        if: matrix.platform == 'android'
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK_VERSION"
+      - name: Resolve cargokit's build tool from its lockfile
+        working-directory: /tmp/flutter-validation/bindings/flutter/cargokit/build_tool
+        run: dart pub get --enforce-lockfile
+      - name: A throwaway key, a local config and the crate hash both ways
+        run: |
+          pkg=/tmp/flutter-validation/bindings/flutter
+          # A shipped rust/cargokit.yaml names the owner's key; this test uses its own.
+          rm -f "$pkg/rust/cargokit.yaml"
+          python3 scripts/flutter-precompiled.py keygen --key-file "$RUNNER_TEMP/throwaway.key" \
+            --config "$pkg/rust/cargokit.yaml" --url-prefix http://127.0.0.1:8765/precompiled_
+          dart_hash=$(dart --packages="$pkg/cargokit/build_tool/.dart_tool/package_config.json" \
+            scripts/flutter-precompiled-build.dart hash --manifest-dir "$pkg/rust")
+          python_hash=$(python3 scripts/flutter-precompiled.py hash --manifest-dir "$pkg/rust")
+          echo "crate hash: cargokit (Dart) $dart_hash · flutter-precompiled.py $python_hash"
+          test "$dart_hash" = "$python_hash"
+          echo "CRATE_HASH=$dart_hash" >> "$GITHUB_ENV"
+      - name: Build the binary unsigned
+        run: |
+          pkg=/tmp/flutter-validation/bindings/flutter
+          args=(build --manifest-dir "$pkg/rust" --out "$RUNNER_TEMP/binaries" --toolchain "$RUST_TOOLCHAIN" --target "$TARGET")
+          if [ "$PLATFORM" = android ]; then
+            args+=(--android-sdk "$ANDROID_HOME" --android-ndk "$NDK_VERSION" --android-min-sdk 21)
+          fi
+          dart --packages="$pkg/cargokit/build_tool/.dart_tool/package_config.json" \
+            scripts/flutter-precompiled-build.dart "${args[@]}"
+      - name: Sign it with the throwaway key
+        run: |
+          pkg=/tmp/flutter-validation/bindings/flutter
+          python3 scripts/flutter-precompiled.py sign --dir "$RUNNER_TEMP/binaries" \
+            --key-file "$RUNNER_TEMP/throwaway.key" --config "$pkg/rust/cargokit.yaml" --manifest-dir "$pkg/rust"
+      - name: Consumer builds with rustup and cargo out of reach
+        run: |
+          set -euo pipefail
+          pkg=/tmp/flutter-validation/bindings/flutter
+          served="$RUNNER_TEMP/serve/precompiled_$CRATE_HASH"
+          mkdir -p "$served"
+          lib=$(python3 -c 'import json, sys; print(*json.load(open(sys.argv[1]))["files"])' "$RUNNER_TEMP/binaries/manifest.json")
+          cp "$RUNNER_TEMP/binaries/$lib" "$RUNNER_TEMP/binaries/$lib.sig" "$served/"
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/serve" > "$RUNNER_TEMP/http.log" 2>&1 &
+          if [ -d "$HOME/.cargo/bin" ]; then mv "$HOME/.cargo/bin" "$HOME/.cargo/bin.hidden"; fi
+          PATH=$(python3 scripts/flutter-precompiled.py path-without-rust --shadow "$RUNNER_TEMP/path-without-rust")
+          export PATH
+          if command -v rustup || command -v cargo || command -v rustc; then echo "a Rust tool is still reachable"; exit 1; fi
+          consumer() {
+            if [ "$PLATFORM" = android ]; then
+              flutter build apk --verbose --release --target-platform android-arm64
+            else
+              flutter build ios --verbose --debug --no-codesign
+            fi
+          }
+          cd "$pkg/example"
+          python3 -c 'import pathlib, sys; p = pathlib.Path(sys.argv[1]); d = bytearray(p.read_bytes()); d[len(d) // 2] ^= 1; p.write_bytes(d)' "$served/$lib"
+          if consumer > "$RUNNER_TEMP/tampered.log" 2>&1; then
+            echo "the consumer build accepted a tampered binary"; exit 1
+          fi
+          echo "tampered binary: the consumer build failed, as it must:"
+          grep -F "Signature verification failed" "$RUNNER_TEMP/tampered.log"
+          cp "$RUNNER_TEMP/binaries/$lib" "$served/$lib"
+          # Xcode can leave the failed build's incremental state half-written
+          # (run 44998989145: FlutterFramework's emit-module .d file was
+          # missing), so the restored iOS build starts from new derived data
+          # and new Flutter build output, like an app's first build.
+          if [ "$PLATFORM" = ios ]; then
+            if [ -d "$HOME/Library/Developer/Xcode/DerivedData" ]; then
+              find "$HOME/Library/Developer/Xcode/DerivedData" -mindepth 1 -maxdepth 1 -name 'Runner-*' -exec rm -r {} +
+            fi
+            for dir in build/ios .dart_tool/flutter_build; do
+              if [ -d "$dir" ]; then rm -r "$dir"; fi
+            done
+          fi
+          if ! consumer > "$RUNNER_TEMP/restored.log" 2>&1; then
+            tail -n 80 "$RUNNER_TEMP/restored.log"; exit 1
+          fi
+          echo "signed binary: the consumer build succeeded; requests served:"
+          grep -F "\"GET /precompiled_$CRATE_HASH/$lib.sig HTTP/1.1\" 200" "$RUNNER_TEMP/http.log"
+          grep -F "\"GET /precompiled_$CRATE_HASH/$lib HTTP/1.1\" 200" "$RUNNER_TEMP/http.log"
+          downloaded=$( (find "$pkg/example/build" "$HOME/Library/Developer/Xcode/DerivedData" \
+            -path "*/precompiled/$CRATE_HASH/$lib" -type f 2>/dev/null || true) | head -n 1)
+          test -n "$downloaded"
+          cmp "$downloaded" "$RUNNER_TEMP/binaries/$lib"
+          echo "cargokit kept $downloaded, byte-identical to the signed binary"
+          if [ "$PLATFORM" = android ]; then
+            unzip -l build/app/outputs/flutter-apk/app-release.apk | grep -F lib/arm64-v8a/libqrcode_ai_scanner.so
+          else
+            find build/ios -name libqrcode_ai_scanner.a -type f | grep .
+            test -d build/ios/iphoneos/Runner.app
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
+        if: always()
+        with:
+          name: flutter-precompiled-e2e-${{ matrix.platform }}
+          path: |
+            ${{ runner.temp }}/http.log
+            ${{ runner.temp }}/tampered.log
+            ${{ runner.temp }}/restored.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  release:
+    name: Unsigned ${{ matrix.platform }} binaries
+    needs: stage
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.stage.outputs.config == 'true'
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            runner: ubuntu-24.04
+            targets: armv7-linux-androideabi,aarch64-linux-android,i686-linux-android,x86_64-linux-android
+          - platform: ios
+            runner: macos-15
+            targets: aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+    runs-on: ${{ matrix.runner }}
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TARGETS: ${{ matrix.targets }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # master, 2026-10-10
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          targets: ${{ matrix.targets }}
+      - uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046 # v2.19.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-stage
+          path: flutter-artifact
+      - name: Verify and extract the staged archive
+        run: |
+          (cd flutter-artifact && shasum -a 256 -c flutter-stage.sha256)
+          python3 scripts/stage-flutter-package.py \
+            --extract flutter-artifact/flutter-stage.tar.gz \
+            --output /tmp/flutter-validation/bindings/flutter
+          python3 scripts/flutter-precompiled.py check-config --config /tmp/flutter-validation/bindings/flutter/rust/cargokit.yaml
+      - name: Install the NDK
+        if: matrix.platform == 'android'
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK_VERSION"
+      - name: Resolve cargokit's build tool from its lockfile
+        working-directory: /tmp/flutter-validation/bindings/flutter/cargokit/build_tool
+        run: dart pub get --enforce-lockfile
+      - name: Build the release targets unsigned
+        run: |
+          pkg=/tmp/flutter-validation/bindings/flutter
+          args=(build --toolchain "$RUST_TOOLCHAIN" --manifest-dir "$pkg/rust" --out "$RUNNER_TEMP/binaries")
+          for target in ${TARGETS//,/ }; do args+=(--target "$target"); done
+          if [ "$PLATFORM" = android ]; then
+            args+=(--android-sdk "$ANDROID_HOME" --android-ndk "$NDK_VERSION" --android-min-sdk 21)
+          fi
+          dart --packages="$pkg/cargokit/build_tool/.dart_tool/package_config.json" \
+            scripts/flutter-precompiled-build.dart "${args[@]}"
+          test "$(python3 scripts/flutter-precompiled.py hash --manifest-dir "$pkg/rust")" = \
+            "$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["crate_hash"])' "$RUNNER_TEMP/binaries/manifest.json")"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
+        with:
+          name: flutter-precompiled-${{ matrix.platform }}
+          path: ${{ runner.temp }}/binaries/
+          if-no-files-found: error
+          retention-days: 30
+
+  collect:
+    needs: [stage, release]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.stage.outputs.config == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-stage
+          path: unsigned
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-precompiled-android
+          path: built/android
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-precompiled-ios
+          path: built/ios
+      - name: One unsigned set for the owner to sign
+        run: |
+          (cd unsigned && shasum -a 256 -c flutter-stage.sha256)
+          python3 scripts/flutter-precompiled.py merge --out unsigned/binaries built/android built/ios
+          python3 scripts/stage-flutter-package.py --extract unsigned/flutter-stage.tar.gz --output "$RUNNER_TEMP/package"
+          test "$(python3 scripts/flutter-precompiled.py hash --manifest-dir "$RUNNER_TEMP/package/rust")" = \
+            "$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["crate_hash"])' unsigned/binaries/manifest.json)"
+          cat unsigned/binaries/manifest.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
+        with:
+          name: flutter-precompiled-unsigned
+          path: unsigned/
+          if-no-files-found: error
+          retention-days: 30
+
+  verify:
+    name: Published ${{ matrix.platform }} binaries
+    needs: stage
+    if: github.event_name == 'workflow_dispatch' && needs.stage.outputs.config == 'true'
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            runner: ubuntu-24.04
+            targets: armv7-linux-androideabi,aarch64-linux-android,i686-linux-android,x86_64-linux-android
+          - platform: ios
+            runner: macos-15
+            targets: aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+    runs-on: ${{ matrix.runner }}
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TARGETS: ${{ matrix.targets }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046 # v2.19.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: flutter-stage
+          path: flutter-artifact
+      - name: Verify and extract the staged archive
+        run: |
+          (cd flutter-artifact && shasum -a 256 -c flutter-stage.sha256)
+          python3 scripts/stage-flutter-package.py \
+            --extract flutter-artifact/flutter-stage.tar.gz \
+            --output /tmp/flutter-validation/bindings/flutter
+      - name: Every published binary verifies
+        run: |
+          python3 scripts/flutter-precompiled.py verify-remote \
+            --manifest-dir /tmp/flutter-validation/bindings/flutter/rust --targets "$TARGETS"
+      - name: Install the NDK
+        if: matrix.platform == 'android'
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK_VERSION"
+      - name: A consumer build without rustup or cargo
+        working-directory: /tmp/flutter-validation/bindings/flutter/example
+        run: |
+          set -euo pipefail
+          if [ -d "$HOME/.cargo/bin" ]; then mv "$HOME/.cargo/bin" "$HOME/.cargo/bin.hidden"; fi
+          PATH=$(python3 "$GITHUB_WORKSPACE/scripts/flutter-precompiled.py" path-without-rust --shadow "$RUNNER_TEMP/path-without-rust")
+          export PATH
+          if command -v rustup || command -v cargo || command -v rustc; then echo "a Rust tool is still reachable"; exit 1; fi
+          if [ "$PLATFORM" = android ]; then
+            flutter build apk --debug
+            unzip -l build/app/outputs/flutter-apk/app-debug.apk | grep -F libqrcode_ai_scanner.so
+          else
+            flutter build ios --debug --no-codesign
+            find build/ios -name libqrcode_ai_scanner.a -type f | grep .
+          fi

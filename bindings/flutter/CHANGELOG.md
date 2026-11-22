@@ -28,6 +28,10 @@
   `fast` or `frame` scan is recorded and must be a valid partial report, unless
   `--dart-define=QRSCAN_STRICT_BUDGETS=true` makes those budgets a test too,
   for a run on a physical device.
+* The package can use signed precompiled native libraries once a release ships
+  `rust/cargokit.yaml`: the app's build downloads and verifies the library
+  instead of compiling the Rust core, and compiles it as before when no valid
+  signed library is available (README, "Signed precompiled libraries").
 * The example app shows the report: it scans the mixed QR/Code 128 fixture or
   a single QR code with the profile and the optional `budgetMs` you choose,
   lists every detection with its format and text, shows the QR scannability
