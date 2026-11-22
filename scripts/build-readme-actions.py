@@ -14,10 +14,14 @@ REPOSITORY = 'https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/
 # nuget.org renders a README with HTML disabled and removes its comments: a tag would be shown as text.
 # The README packed for it gets its prompt unfolded, and holds no HTML of its own.
 MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
+# Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
+# writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
+STAGED_AS_README = ('distribution/publisher/REPOSITORY.md',)
 
 
 def maintained_readmes():
-    paths = subprocess.check_output(['git', 'ls-files', '*README.md', 'README.md'], cwd=ROOT, text=True).splitlines()
+    paths = subprocess.check_output(['git', 'ls-files', '*README.md', 'README.md', *STAGED_AS_README],
+                                    cwd=ROOT, text=True).splitlines()
     rules = tomllib.loads((ROOT / 'distribution/releases/pins.toml').read_text())
     frozen = [pattern for rule in rules['frozen'] for pattern in rule['paths']]
     from fnmatch import fnmatch

@@ -68,6 +68,8 @@ GUIDES['distribution/glama/README.md'] = ('mcp', 'MCP')
 GUIDES['distribution/http/README.md'] = ('docker', 'Docker')
 GUIDES['distribution/jsr/README.md'] = ('sdk/javascript', 'JavaScript')
 GUIDES['distribution/mcpb/README.md'] = ('mcp', 'MCP')
+# The publisher site holds the privacy and terms pages of the browser extension's store listings.
+GUIDES['distribution/publisher/REPOSITORY.md'] = ('integrations/browser-extension', 'browser extension')
 
 
 def canonical_links(path):
