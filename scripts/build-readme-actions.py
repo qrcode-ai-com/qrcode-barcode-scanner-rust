@@ -17,9 +17,9 @@ MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
 STAGED_AS_README = ('distribution/publisher/REPOSITORY.md',)
-# Notebooks a host opens as their page (Colab, Binder): the block goes in the first cell, which
-# shows the notebook's title. Their code cells and outputs are never touched.
-NOTEBOOKS = ('examples/notebooks/scan-images.ipynb',)
+# Notebooks a host opens as their page (Colab, Binder, Kaggle): the block goes in the first cell,
+# which shows the notebook's title. Their code cells and outputs are never touched.
+NOTEBOOKS = ('examples/notebooks/scan-images.ipynb', 'examples/kaggle/qrcode-barcode-scanner-demo.ipynb')
 
 
 def maintained_readmes():

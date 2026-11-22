@@ -9,11 +9,16 @@
             pinned, distinct tags; its id is <username>/<slug>, the slug Kaggle derives from the
             title, and code_file is a notebook beside it
   notebook  committed without outputs; its install cell pins the one version FILE pins with
-            hashes (scripts/check-demo-notebook.py `source`, whose six product links are left
-            out); its first cell links the PyPI page of that version and the source repository,
-            and no cell links a QR Code AI product page (the owner's Kaggle terms decision,
-            examples/kaggle/LISTING.md); a code cell reads the sample from the release tag of
-            that version and one writes scan-reports/
+            hashes (scripts/check-demo-notebook.py `source`); its first cell links the PyPI page
+            of that version, the source repository and the six QR Code AI pages (the two scanner
+            pages, their two Python guides, the two generators), each of the six in a sentence
+            (scripts/readme_prose.py), and holds the one Ask AI block, with a link to each of the
+            nine assistants, that no other cell holds; a code cell reads the sample from the
+            release tag of that version and one writes scan-reports/
+
+The six links and the Ask AI block follow the owner's Kaggle terms decision of 22 November 2026
+(examples/kaggle/LISTING.md). scripts/build-readme-actions.py writes the block, and its --check
+holds the block's exact text; this checker holds that the notebook has one.
 
 Stdlib only. Exit 0 when the folder passes, 1 when it does not, 2 when it cannot be read.
 """
@@ -28,6 +33,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 _SPEC = importlib.util.spec_from_file_location("check_demo_notebook", ROOT / "scripts" / "check-demo-notebook.py")
 demo = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(demo)
+# The README contracts of the repository: the Ask AI block format and the six links in sentences.
+sys.path.insert(0, str(ROOT / "scripts"))
+import readme_actions as actions  # noqa: E402
+from readme_prose import prose_links  # noqa: E402
 
 FIELDS = {"id", "id_no", "title", "code_file", "language", "kernel_type", "is_private", "enable_gpu",
           "enable_tpu", "enable_internet", "machine_shape", "dataset_sources", "competition_sources",
@@ -38,6 +47,8 @@ KERNEL_ID = re.compile(r"^([A-Za-z0-9_-]+)/([a-z0-9-]+)$")
 PYPI_PAGE = "https://pypi.org/project/{package}/{version}/"
 SOURCE = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust"
 SAMPLE_PATH = "/fixtures/symbology/mixed-code128-qr.png"
+# The notebook's guides on the site: the Python package it installs.
+PAGE_KEY = "sdk/python"
 
 
 def slug(title):
@@ -47,10 +58,38 @@ def slug(title):
 
 
 def judge_source(notebook, requirements):
-    """The `source` problems of scripts/check-demo-notebook.py, without its six product links,
-    which this notebook does not show."""
-    product = {f"links: the first cell has no link to {address}" for address in demo.links_of("sdk/python")}
-    return [problem for problem in demo.judge_source(notebook, requirements, "sdk/python") if problem not in product]
+    """The `source` problems of scripts/check-demo-notebook.py, its six product links included."""
+    return demo.judge_source(notebook, requirements, PAGE_KEY)
+
+
+def judge_product(cells):
+    """The six QR Code AI links in sentences of the first cell, and its one Ask AI block. A link
+    the first cell does not show at all is judge_source's problem."""
+    problems = []
+    first = demo.text(cells[0]) if cells and cells[0].get("cell_type") == "markdown" else ""
+    shown = set(demo.MARKDOWN_LINK.findall(first))
+    try:
+        in_sentences = prose_links(first)
+    except ValueError as error:
+        in_sentences = set()
+        problems.append(f"ask-ai: the first cell's Ask AI block is malformed ({error})")
+    for address in demo.links_of(PAGE_KEY):
+        if address in shown and address not in in_sentences:
+            problems.append(f"links: the first cell shows {address} outside a sentence")
+    start, end = first.find(actions.START), first.find(actions.END)
+    if first.count(actions.START) != 1 or first.count(actions.END) != 1 or end < start:
+        problems.append("ask-ai: the first cell does not hold exactly one Ask AI block "
+                        "(python3 scripts/build-readme-actions.py writes it)")
+    else:
+        linked = demo.MARKDOWN_LINK.findall(first[start:end])
+        for _, label, base, param in actions.PROVIDERS:
+            # An assistant that takes the prompt in its address gets it there; the others open bare.
+            if not any(link.startswith(f"{base}?{param}=") if param else link == base for link in linked):
+                problems.append(f"ask-ai: the block has no {label} link ({base})")
+    for index, cell in enumerate(cells[1:], 2):
+        if "qrcode-ai-readme-actions" in demo.text(cell):
+            problems.append(f"ask-ai: cell {index} holds an Ask AI block; only the first cell holds it")
+    return problems
 
 
 def judge(metadata, notebook, requirements, code_file_present=True):
@@ -94,10 +133,7 @@ def judge(metadata, notebook, requirements, code_file_present=True):
             problems.append(f"sample: no code cell reads the sample from tag v{pinned[0]}")
     if not any(address == SOURCE or address.startswith(SOURCE + "/") for address in shown):
         problems.append(f"links: the first cell has no link to the source repository {SOURCE}")
-    every = [address for cell in cells for address in demo.MARKDOWN_LINK.findall(demo.text(cell))]
-    if any("qrcode-ai.com" in address for address in every):
-        problems.append("links: a QR Code AI product link is shown; the Kaggle notebook links the source and PyPI "
-                        "only until the owner settles the terms decision (examples/kaggle/LISTING.md)")
+    problems += judge_product(cells)
     if not any("scan-reports" in demo.text(cell) for cell in code):
         problems.append("reports: no code cell writes the three reports to scan-reports/")
     return problems
@@ -117,8 +153,14 @@ def self_test():
     package = demo.PACKAGE
     requirements = f"{package}==9.9.9 \\\n    --hash=sha256:{'ab' * 32}\n"
     sample_url = SOURCE.replace("https://github.com/", "https://raw.githubusercontent.com/") + "/v9.9.9" + SAMPLE_PATH
-    intro = (f"# Demo\n\n[`{package}`]({PYPI_PAGE.format(package=package, version='9.9.9')}) "
-             f"from [the source]({SOURCE}/tree/main/examples/kaggle).")
+    six = demo.links_of(PAGE_KEY)
+    sentence = (f"Try the [QR code scanner]({six[0]}) or the [barcode scanner]({six[1]}) in the browser, read "
+                f"the [QR code Python guide]({six[2]}) and the [barcode Python guide]({six[3]}), and make a "
+                f"test image with the [QR code generator]({six[4]}) or the [barcode generator]({six[5]}).")
+    bare = (f"# Demo\n\n[`{package}`]({PYPI_PAGE.format(package=package, version='9.9.9')}) "
+            f"from [the source]({SOURCE}/tree/main/examples/kaggle).\n\n{sentence}\n")
+    block = actions.action_block("Explain the demo.")
+    intro = actions.insert_actions(bare, block)
     good = {"cells": [
         {"cell_type": "markdown", "source": intro},
         {"cell_type": "code", "source": f"%pip install --quiet {package}==9.9.9", "outputs": [], "execution_count": None},
@@ -129,9 +171,10 @@ def self_test():
             "code_file": "demo.ipynb", "language": "python", "kernel_type": "notebook", "is_private": False,
             "enable_gpu": False, "enable_internet": True, "docker_image_pinning_type": "original",
             "keywords": ["image", "python"]}
-    failures = []
+    failures, cases = [], []
 
     def case(name, change, needle, present=True):
+        cases.append(name)
         metadata, notebook = json.loads(json.dumps(meta)), json.loads(json.dumps(good))
         change(metadata, notebook)
         problems = judge(metadata, notebook, requirements, present)
@@ -158,8 +201,27 @@ def self_test():
     case("no-pypi", cell(0, source=intro.replace("pypi.org", "example.com")), "no link to the PyPI page")
     case("no-source", cell(0, source=intro.replace(f"({SOURCE}/", "(https://example.com/")),
          "no link to the source repository")
-    case("product-link", lambda m, nb: nb["cells"].append(
-        {"cell_type": "markdown", "source": "[scanner](https://qrcode-ai.com/en-US/qr-code-scanner)"}), "product link")
+    case("no-product-links", cell(0, source=intro.replace(sentence, "Run it.")),
+         "no link to https://qrcode-ai.com/en-US/qr-code-scanner")
+    case("no-guide", cell(0, source=intro.replace(f"({six[3]})", "(https://example.com/)")),
+         "no link to https://qrcode-ai.com/en-US/barcode-scanner/sdk/python")
+    case("no-generator", cell(0, source=intro.replace(f"({six[4]})", "(https://example.com/)")),
+         "no link to https://qrcode-ai.com/en-US/qr-code-generator")
+    listed = "\n".join(f"- [page {index}]({address})" for index, address in enumerate(six))
+    case("links-in-a-list", cell(0, source=intro.replace(sentence, listed)), f"shows {six[0]} outside a sentence")
+    case("links-in-a-later-cell", lambda m, nb: (nb["cells"][0].update(source=intro.replace(sentence, "Run it.")),
+                                                 nb["cells"].append({"cell_type": "markdown", "source": sentence})),
+         "no link to https://qrcode-ai.com/en-US/barcode-generator")
+    case("no-ask-ai", cell(0, source=bare), "does not hold exactly one Ask AI block")
+    case("ask-ai-twice", cell(0, source=intro.replace(block, block + block)), "Ask AI block is malformed")
+    qwen = next(line for line in block.splitlines() if line.startswith("[![Qwen]"))
+    case("ask-ai-without-qwen", cell(0, source=intro.replace(qwen + "\n", "")), "no Qwen link (https://qwen.ai/)")
+    chatgpt = next(line for line in block.splitlines() if line.startswith("[![ChatGPT]"))
+    case("ask-ai-without-prompt", cell(0, source=intro.replace(chatgpt, chatgpt.split("?q=")[0] + ")")),
+         "no ChatGPT link")
+    case("ask-ai-in-a-later-cell", lambda m, nb: nb["cells"].append(
+        {"cell_type": "markdown", "source": actions.insert_actions("# More\n\nText.\n", block)}),
+         "cell 4 holds an Ask AI block")
     case("other-tag", cell(2, source=third.replace("v9.9.9", "v9.9.8")), "reads the sample from tag v9.9.9")
     case("split-url", cell(2, source=third.replace("/v9.9.9/", '/"\n    "v9.9.9/')), None)
     case("no-reports", cell(2, source=f'URL = "{sample_url}"'), "scan-reports")
@@ -168,7 +230,7 @@ def self_test():
         failures.append(f"no-hash requirements: {unhashed}")
     for failure in failures:
         print(f"SELF-TEST FAILED · {failure}", file=sys.stderr)
-    print(f"self-test: {'FAILED' if failures else 'ok'} (20 folders)")
+    print(f"self-test: {'FAILED' if failures else 'ok'} ({len(cases) + 1} folders)")
     return 1 if failures else 0
 
 
