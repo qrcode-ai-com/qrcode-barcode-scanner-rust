@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-adobe-express-dark.gif?v=6c6272251faf">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-adobe-express-light.gif?v=4047852468d8" alt="QR Code &amp; Barcode Scanner for Adobe Express: the Adobe Express logo, the Add-ons rail and the Scan this page, Scan all pages and Scan an image file buttons of the add-on panel, and a QR code and a barcode being read" width="100%">
+    </picture>
+  </a>
+</p>
+
 # QR Code & Barcode Scanner · Adobe Express add-on 0.1.0
 
 <!-- qrcode-ai-readme-actions:v2 -->

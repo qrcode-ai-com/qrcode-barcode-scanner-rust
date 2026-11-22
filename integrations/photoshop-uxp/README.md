@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-photoshop-dark.gif?v=85cfe26ec91a">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-photoshop-light.gif?v=3ebc8947b750" alt="QR Code &amp; Barcode Scanner for Photoshop: the Photoshop logo, the Plugins menu and the Scan the document, Scan the selection and Scan an image file buttons of the panel, and a QR code and a barcode being read" width="100%">
+    </picture>
+  </a>
+</p>
+
 # QR Code & Barcode Scanner · Photoshop plugin 0.1.0
 
 <!-- qrcode-ai-readme-actions:v2 -->
