@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import re
+import re
 import unittest
 from urllib.parse import parse_qs, urlsplit, unquote
 from readme_prose import canonical_links, prose_links
@@ -74,6 +75,29 @@ class ReadmeActions(unittest.TestCase):
         self.assertEqual(strip_actions(rendered), original)
         self.assertEqual(insert_actions(insert_actions(original, action_block('Explain this destination.')), block), rendered)
 
+    def test_a_page_that_drops_image_links_gets_text_links_and_plain_pictures(self):
+        prompt = 'Explain this destination.'
+        block = action_block(prompt, markdown_only=True, text_links=True)
+        self.assertEqual(html_tags(block), [])
+        self.assertNotIn('![', block)
+        self.assertEqual([line.removesuffix(' ·') for line in block.split('### Ask AI\n\n')[1].split('\n\n')[0].splitlines()],
+                         [f'[Ask {label}]({url})' for _, label, url in ai_links(prompt)])
+        self.assertEqual(strip_actions(insert_actions('# Glama\n\nNatural description.\n', block)),
+                         '# Glama\n\nNatural description.\n')
+        outputs = builder.outputs()
+        self.assertIn('distribution/glama/README.md', builder.TEXT_LINKS)
+        for path in builder.TEXT_LINKS:
+            with self.subTest(path=path):
+                text = outputs[path]
+                # Glama removes HTML and the link around an image: neither may carry content here.
+                self.assertEqual(html_tags(text), [])
+                self.assertNotRegex(text, r'\[!\[')
+                self.assertEqual(text.count('### Ask AI'), 1)
+                self.assertEqual(text.count('[Ask ChatGPT](https://chatgpt.com/?q='), 1)
+                pictures = re.findall(r'!\[[^\]]+\]\(([^)\s]+)\)', text)
+                self.assertEqual(len(pictures), 5)
+                self.assertTrue(all(url.startswith('https://raw.githubusercontent.com/qrcode-ai-com/') for url in pictures))
+
     def test_html_tags_are_found_outside_code_and_comments_only(self):
         self.assertEqual(html_tags('<details>\n<summary>Copy</summary>\n\n</details>'),
                          ['<details>', '<summary>', '</summary>', '</details>'])
@@ -111,7 +135,8 @@ class ReadmeActions(unittest.TestCase):
         outputs = builder.outputs()
         for path in paths:
             self.assertEqual(outputs[path].count('### Ask AI'), 1)
-            self.assertEqual(outputs[path].count('[![ChatGPT]'), 1)
+            ask = '[Ask ChatGPT](https://chatgpt.com/?q=' if path in builder.TEXT_LINKS else '[![ChatGPT]'
+            self.assertEqual(outputs[path].count(ask), 1)
             self.assertEqual('Add to Cursor' in outputs[path], path in ('README.md', 'integrations/mcp/README.md'))
 
     def test_a_notebook_a_host_opens_carries_the_block_in_its_first_cell_only(self):
@@ -214,7 +239,7 @@ class ReadmeActions(unittest.TestCase):
         from readme_actions import badge_svg
         for key, label, *_ in builder.PROVIDERS:
             self.assertEqual((ROOT / f'docs/assets/actions/{key}-v1.svg').read_text(), badge_svg('Ask ' + label))
-        for path in builder.maintained_readmes():
+        for path in sorted(set(builder.maintained_readmes()) - builder.TEXT_LINKS):
             for key, *_ in builder.PROVIDERS:
                 self.assertTrue(f'/{key}-v2.svg' in outputs[path], path + ': missing colored ' + key)
 

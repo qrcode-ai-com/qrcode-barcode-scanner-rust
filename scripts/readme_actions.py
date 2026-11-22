@@ -85,14 +85,18 @@ def strip_actions(text):
     return before + after[2:]
 
 
-def action_block(prompt, installers=(), markdown_only=False):
+def action_block(prompt, installers=(), markdown_only=False, text_links=False):
+    """The Ask AI block. markdown_only unfolds the prompt (no HTML); text_links writes each assistant
+    as a text link instead of a linked badge, for a page that drops the link around an image."""
     badges = lambda rows: '\n'.join(f'[![{label}]({ASSETS}{key}-v{2 if key in {p[0] for p in PROVIDERS} else 1}.svg)]({url})' for key, label, url in rows)
+    texts = lambda rows, prefix='': ' ·\n'.join(f'[{prefix}{label}]({url})' for _, label, url in rows)
+    assistants = texts(ai_links(prompt), 'Ask ') if text_links else badges(ai_links(prompt))
     installation = ''
     if installers:
-        installation = ('\n\n' + badges(installers) + '\n\n'
+        installation = ('\n\n' + (texts(installers) if text_links else badges(installers)) + '\n\n'
                         'Open your editor to review the pinned MCP configuration before adding it. '
                         'Node.js must already be installed; local file access remains disabled by default.')
-    return (START + '\n\n### Ask AI\n\n' + badges(ai_links(prompt)) + '\n\n'
+    return (START + '\n\n### Ask AI\n\n' + assistants + '\n\n'
             'Choose an AI assistant to explain this destination using its public sources. '
             'Gemini opens gemini.google.com. Gemini, Copilot, DeepSeek, Meta AI and Qwen require '
             'pasting the prompt below; the other links include it in their URL. Sign-in or a manual '
