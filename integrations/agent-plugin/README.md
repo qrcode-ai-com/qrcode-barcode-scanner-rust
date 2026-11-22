@@ -284,7 +284,7 @@ amp mcp add qrscan -- npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-s
 }
 ```
 
-To remove it, run `amp mcp remove qrscan`, then delete the folder `~/.config/agents/skills/qrcode-barcode-scanner`.
+To remove it, run `amp mcp remove qrscan`, then delete the folder `~/.config/agents/skills/qrcode-barcode-scanner`. The [Amp QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/amp) and the [Amp barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/amp) cover the skill and the server.
 
 ### Continue
 
@@ -305,7 +305,7 @@ mcpServers:
     connectionTimeout: 60000
 ```
 
-`connectionTimeout` is in milliseconds. It gives the first start, which downloads the server, one minute instead of Continue's default of 20 seconds. Continue calls MCP tools in agent mode only. To use the server in every workspace, add the same `mcpServers` item to `~/.continue/config.yaml` instead. To remove it, delete the file or the item.
+`connectionTimeout` is in milliseconds. It gives the first start, which downloads the server, one minute instead of Continue's default of 20 seconds. Continue calls MCP tools in agent mode only. To use the server in every workspace, add the same `mcpServers` item to `~/.continue/config.yaml` instead. To remove it, delete the file or the item. The [Continue QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/continue) and the [Continue barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/continue) show the same configuration.
 
 ### Zed
 
@@ -330,7 +330,7 @@ Then add the server to `~/.config/zed/settings.json`, which the `zed: open setti
 }
 ```
 
-The skill serves Zed's own agent. Zed also passes the server to external agents. To remove them, delete the `qrscan` entry and the folder `~/.agents/skills/qrcode-barcode-scanner`.
+The skill serves Zed's own agent. Zed also passes the server to external agents. To remove them, delete the `qrscan` entry and the folder `~/.agents/skills/qrcode-barcode-scanner`. The [Zed QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/zed) and the [Zed barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/zed) walk through both halves.
 
 ## Privacy and support
 

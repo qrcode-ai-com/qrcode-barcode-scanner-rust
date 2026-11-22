@@ -4,6 +4,7 @@ import base64
 import importlib.util
 import json
 from pathlib import Path
+import re
 import unittest
 from urllib.parse import parse_qs, urlsplit, unquote
 from readme_prose import canonical_links, prose_links
@@ -144,6 +145,25 @@ class ReadmeActions(unittest.TestCase):
             with self.subTest(path=path):
                 body = (ROOT / path).read_text()
                 self.assertEqual(set(canonical_links(path)) - prose_links(body), set())
+
+    def test_the_chocolatey_description_keeps_to_what_its_gallery_renders_and_accepts(self):
+        # community.chocolatey.org renders <description> with Markdig, shows raw HTML (comments
+        # included) as text and turns each line break into <br>. Its validator refuses more than
+        # 4000 characters (CPMR0026) and a heading without its space (CPMR0030).
+        import xml.etree.ElementTree as ET
+        nuspec = ET.parse(ROOT / 'distribution/chocolatey/qrcode-barcode-scanner.nuspec').getroot()
+        text = nuspec.find('{*}metadata/{*}description').text
+        self.assertLessEqual(len(text), 4000)
+        self.assertEqual(html_tags(text), [])
+        self.assertNotIn('<!--', text)
+        self.assertEqual(re.findall(r'^#+[^#\s].*', text, re.M), [])
+        paragraphs = [part for part in text.strip().split('\n\n') if not re.match(r'\d+\. ', part)]
+        self.assertEqual([part for part in paragraphs if '\n' in part], [])
+        self.assertEqual(set(canonical_links('distribution/chocolatey/README.md')) - prose_links(text), set())
+        # The assistants that take a prompt in their URL carry the same request the page asks to paste.
+        prompt = re.search(r'paste `([^`]+)`', text)[1]
+        for _, label, link in ai_links(prompt):
+            self.assertIn(f'[{label}]({link})', text)
 
     def test_every_assistant_badge_embeds_its_colored_retained_logo_and_license(self):
         import hashlib

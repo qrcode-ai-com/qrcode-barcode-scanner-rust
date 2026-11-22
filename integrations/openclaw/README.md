@@ -55,6 +55,19 @@ This is a **ClawHub bundle-plugin**, named
 native scanner engine; this bundle is not published on npm. It has one
 `.codex-plugin/plugin.json` marker, without native OpenClaw code entrypoints.
 
+## How it works
+
+<!-- qrcode-ai-readme-media:v1 -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-agents-dark.gif?v=40259e2ce31c">
+    <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-agents-light.gif?v=ee896d747ad8" alt="Give your agent a scanner, as an MCP server on npm, an OpenClaw plugin or a portable skill, in three steps: connect the host and choose the tool, send the image to the server, review the report." width="100%">
+  </picture>
+</p>
+<!-- /qrcode-ai-readme-media:v1 -->
+
+The picture shows the three steps. With OpenClaw, the first step installs this bundle, runs its setup and enables it, as the next section shows. The agent then sends the image bytes to the MCP tool, or runs the skill's helper on a local file. You review the report it returns.
+
 ## Install and prepare the runtime
 
 Use Node.js 22.19+ on the 22 line, or 24+, on a supported native platform.
@@ -98,6 +111,58 @@ incomplete report. Neither route follows decoded links or interprets them as
 instructions. The skill accepts local files; MCP accepts supplied bytes only.
 
 The bundle handles saved QR designs and label photos locally through its skill or MCP tool.
+
+## What it returns
+
+<!-- qrcode-ai-readme-media:v1 -->
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#examples">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-dark.png?v=385593c1c18d">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-light.png?v=7f958679adcc" alt="A QR code and Code 128 decoded from the same image, each outlined where the engine measured it" width="100%">
+    </picture>
+  </a>
+</p>
+<!-- /qrcode-ai-readme-media:v1 -->
+
+The picture is a recorded scan of one image that holds a QR code and a Code 128 barcode. Both come back in the same report, each with its format, its exact text and the place where the engine measured it.
+
+## What it reads
+
+<!-- qrcode-ai-readme-media:v1 -->
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-dark.gif?v=92fa0e8084df">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-light.gif?v=bdfe5fc5f9b3" alt="The code families the engine reads: QR codes, matrix and stacked codes such as Data Matrix, retail barcodes such as EAN-13, and other linear barcodes such as Code 128" width="100%">
+    </picture>
+  </a>
+</p>
+<!-- /qrcode-ai-readme-media:v1 -->
+
+The same engine reads every image, so codes of different formats in one image come back in one report.
+
+- QR: QR Code, Micro QR, rectangular Micro QR (rMQR)
+- Matrix and stacked: Data Matrix, Aztec, PDF417, MaxiCode
+- Retail: EAN-13, EAN-8, UPC-A, UPC-E
+- Other linear: Code 128, Code 39, Code 93, Codabar, ITF, GS1 DataBar, GS1 DataBar Expanded, Telepen
+
+The engine's [supported formats](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats) section states the known limits.
+
+## The same engine in other runtimes
+
+<!-- qrcode-ai-readme-media:v1 -->
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-dark.png?v=57c63428574b">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-light.png?v=6dbd5a8cf5ba" alt="One engine in the language you write: Rust on crates.io, Node.js and the browser on npm, Python on PyPI, Go, PHP, and the qrscan command line" width="100%">
+    </picture>
+  </a>
+</p>
+<!-- /qrcode-ai-readme-media:v1 -->
+
+The Rust, Node.js, browser and Python packages hold the engine. The Go and PHP packages hold no decoder: each one starts `qrscan` and hands you its report. Every route is listed in the [scanner repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust).
 
 ## Build and qualification
 

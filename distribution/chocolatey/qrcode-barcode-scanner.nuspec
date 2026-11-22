@@ -15,19 +15,41 @@
     <tags>qr-code barcode code128 data-matrix scanner cli portable windows x64</tags>
     <summary>Read QR codes and barcodes from local images with the qrscan CLI.</summary>
     <description><![CDATA[
-qrscan reads QR codes, linear barcodes, and supported 2D codes from PNG,
-JPEG, WebP, and GIF files. It returns a structured JSON report with decoded
-content, format, and available QR quality diagnostics. Scans run locally.
+![QR Code & Barcode Scanner on Chocolatey](https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-chocolatey-light.gif?v=9fff66062c89)
 
-This portable package contains the official Windows x64 executable, source
-references, and licenses. Chocolatey puts qrscan on PATH.
+## Ask AI
 
-    qrscan .\label.png --profile full
+Ask an assistant about this package: [ChatGPT](https://chatgpt.com/?q=How%20do%20I%20install%20and%20use%20https%3A%2F%2Fcommunity.chocolatey.org%2Fpackages%2Fqrcode-barcode-scanner%3F) · [Claude](https://claude.ai/new?q=How%20do%20I%20install%20and%20use%20https%3A%2F%2Fcommunity.chocolatey.org%2Fpackages%2Fqrcode-barcode-scanner%3F) · [Gemini](https://gemini.google.com/) · [Grok](https://grok.com/?q=How%20do%20I%20install%20and%20use%20https%3A%2F%2Fcommunity.chocolatey.org%2Fpackages%2Fqrcode-barcode-scanner%3F) · [Perplexity](https://www.perplexity.ai/?q=How%20do%20I%20install%20and%20use%20https%3A%2F%2Fcommunity.chocolatey.org%2Fpackages%2Fqrcode-barcode-scanner%3F) · [Copilot](https://copilot.com/) · [DeepSeek](https://chat.deepseek.com/) · [Meta AI](https://www.meta.ai/) · [Qwen](https://qwen.ai/). Gemini, Copilot, DeepSeek, Meta AI and Qwen open empty: paste `How do I install and use https://community.chocolatey.org/packages/qrcode-barcode-scanner?` there. Check each answer against this page.
 
-Use the CLI for scripts and repeatable checks. [QR Code AI](https://qrcode-ai.com/)
-makes the same scanner engine available to web and application developers.
-Dedicated [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and
-[barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) web pages are planned.
+`qrscan` reads QR codes, barcodes and 2D codes such as Data Matrix in PNG, JPEG, WebP and GIF files on your machine and prints one JSON report. This portable package holds the official Windows x64 executable and its licenses; Chocolatey puts `qrscan` on PATH.
+
+The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) read a code in the browser, and the [QR code scanner command line guide](https://qrcode-ai.com/en-US/qr-code-scanner/cli) and [barcode scanner command line guide](https://qrcode-ai.com/en-US/barcode-scanner/cli) cover this command; some of these QR Code AI pages are still being prepared. To make a test image, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or [barcode generator](https://qrcode-ai.com/en-US/barcode-generator) and compare the decoded text with what you encoded.
+
+## How it works
+
+![How qrscan works: install it, pass an image file, read the JSON report](https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/how-cli-light.gif?v=a700b1da82fb)
+
+1. Install the package: `choco install qrcode-barcode-scanner`
+2. Pass an image file: `qrscan .\label.png --profile full`
+3. Read the JSON report: each code comes with its format, its exact text and where the engine measured it.
+
+## What it returns
+
+![A QR code and a Code 128 decoded from one image](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-light.png?v=7f958679adcc)
+
+The picture is a recorded scan of one image with a QR code and a Code 128 barcode. Both come back in one report, each with its format, its exact text and the place where the engine measured it.
+
+## What it reads
+
+![The code families the engine reads](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-light.gif?v=bdfe5fc5f9b3)
+
+QR Code, Micro QR, rMQR, Data Matrix, Aztec, PDF417, MaxiCode, EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, Code 93, Codabar, ITF, GS1 DataBar, GS1 DataBar Expanded and Telepen, several at once in one image.
+
+## The same engine in other runtimes
+
+![The same engine in Rust, Node.js, the browser, Python, Go, PHP and qrscan](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-light.png?v=6dbd5a8cf5ba)
+
+The Rust, Node.js, browser and Python packages hold the engine; Go and PHP run `qrscan`. The [scanner repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) lists every route.
 ]]></description>
     <releaseNotes>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/tag/v0.11.0</releaseNotes>
   </metadata>
