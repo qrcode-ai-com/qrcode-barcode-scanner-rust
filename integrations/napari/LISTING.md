@@ -1,8 +1,8 @@
 # napari hub listing: napari-qrcode-barcode-scanner
 
 What the napari hub and napari's plugin manager will show for this plugin, where each value comes
-from, and the owner's steps to publish it. The plugin is ready for PyPI. It is not on PyPI yet, so
-neither lists it.
+from, and the owner's steps to publish it. Version 0.1.0 goes to PyPI from the tag
+`napari-v0.1.0`; neither lists the plugin before PyPI serves it.
 
 The napari hub lists a plugin that has a release on PyPI with the `Framework :: napari` classifier,
 a valid npe2 manifest declared by the `napari.manifest` entry point and `visibility: public`. It
@@ -74,7 +74,11 @@ pixels, sha256 `a047712e60529ebded32f47d336c8836b960952ae3e2970f258848628b146f9f
 
 ## The owner's steps
 
-Nothing here has been done: no environment, rule, tag or PyPI project exists for this plugin yet.
+Steps 1 to 3 were done on 22 November 2026. The pending publisher was added under the PyPI
+organization `qrcode-ai`, so the project the first upload creates belongs to that organization.
+The environment `pypi-napari` has the owner as its required reviewer, no administrator bypass, no
+secret, no variable and the one deployment rule `napari-v*` (tag), and `refs/tags/napari-v*` is in
+the ruleset `distribution-tags-maintainer-only`.
 
 ### Once
 
@@ -107,8 +111,10 @@ Nothing here has been done: no environment, rule, tag or PyPI project exists for
 4. **The release commit.** Before the tag, merge a change to `main` that turns the README's
    **Status** into the published wording and adds to **Install** the two ways a published plugin
    installs: pip with the project name, and napari's **Plugins**, **Install/Uninstall Plugins**.
-   The README is the PyPI description of the version: it cannot change once uploaded. Check that the Homepage page answers: it answered 404 on 21 November 2026. Wait for
-   `integration-python-hosts` to pass on that pull request.
+   The README is the PyPI description of the version: it cannot change once uploaded. Check that
+   the Homepage page answers. It answered 404 on 21 and 22 November 2026; on 22 November the owner
+   chose to release 0.1.0 with that Homepage, the definitive address, which goes live with the
+   website's napari pages. Wait for `integration-python-hosts` to pass on that pull request.
 
 5. **The tag.** Tag the merged commit and push the tag:
    `git tag -a napari-v0.1.0 <commit> -m 'napari plugin 0.1.0'`, then
