@@ -378,6 +378,35 @@ for detection in report["detections"]:
 
 </details>
 
+### Container
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-container-dark.gif?v=5edc12041125">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-container-light.gif?v=ae09c23a53de" alt="QR Code &amp; Barcode Scanner CLI in a container: the Docker logo, the commands that pull and run the image, and a QR code and a barcode being read" width="100%">
+    </picture>
+  </a>
+</p>
+
+The [public GHCR image](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
+runs `qrscan` on Linux AMD64 and ARM64 without installing it on the host. Choose the version and
+the architecture, mount the folder that holds your image read-only, then read the JSON report on
+the host. The [QR code scanner Docker guide](https://qrcode-ai.com/en-US/qr-code-scanner/docker)
+and the [barcode scanner Docker guide](https://qrcode-ai.com/en-US/barcode-scanner/docker) follow
+this route, and the
+[offline container example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/docker/v0.11/README.md#run-the-public-image)
+gives the pinned command.
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-containers-dark.gif?v=d2a1fed91c26">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-containers-light.gif?v=87909de2a95f" alt="Run the scanner in a container from GitHub Container Registry, on Linux AMD64 or ARM64, in three steps: choose the version and architecture, mount the image file, read the result on the host." width="100%">
+    </picture>
+  </a>
+</p>
+
 ### Upgrading from the previous package names
 
 The new packages use the `qrcode-barcode-scanner` family. Existing releases

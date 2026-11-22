@@ -55,6 +55,21 @@ SwiftPM package for `qrcode-barcode-scanner`, generated from the shared UniFFI c
 > you build it locally, below), or the package is switched to the release
 > `url + checksum` binaryTarget form.
 
+## How it works
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-packages-dark.gif?v=50f76ea0d290">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-packages-light.gif?v=4ec5c6f31076" alt="Scan inside your application, in Rust, Node.js, browser WASM or Python, in three steps: install and initialize, pass an image or a camera frame, read the result." width="100%">
+    </picture>
+  </a>
+</p>
+
+The picture shows the three steps of the package route. In Swift they are the sections
+below: build the xcframework and add this local package to your app, pass the bytes of an
+image to `scan(image:profile:)` off the main thread, then decode the JSON report it returns.
+
 ## License
 
 Project-authored source in this checkout is **MIT**. See the [source license](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSE) and

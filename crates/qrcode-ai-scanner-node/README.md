@@ -58,6 +58,21 @@ thread. Node.js 18 or later is required.
 The scanner grew out of QR verification workflows at [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/nodejs).
 Use the Node package for images already in your server or worker.
 
+## How it works
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-packages-dark.gif?v=50f76ea0d290">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-packages-light.gif?v=4ec5c6f31076" alt="Scan inside your application, in Rust, Node.js, browser WASM or Python, in three steps: install and initialize, pass an image or a camera frame, read the result." width="100%">
+    </picture>
+  </a>
+</p>
+
+The picture shows the three steps of the package route. For Node.js they are the next two
+sections: install the package, pass the bytes of an image to `scan()`, then read the report
+it resolves with.
+
 ## Install
 
 Use Node.js 18 or later with npm. From an empty project directory:
