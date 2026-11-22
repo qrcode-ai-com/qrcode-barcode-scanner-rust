@@ -38,9 +38,14 @@ Since 19 November 2026 the links and pictures of the maintained documents name
 (`scripts/build-readme-actions.py`, `scripts/readme_actions.py`,
 `scripts/readme_licensing.py`) write that address. A command that was run against a
 published artifact (an archive download, a pinned fixture, a pinned skill tree) keeps
-the address it was run with, which still resolves. The package manifests, the packaging
-recipes and the release tooling still name the former repository: they change with
-the two requirements above, in the release that follows.
+the address it was run with, which still resolves. The `repository` of the package
+manifests (the workspace `Cargo.toml`, the Node, browser, Python and UniFFI manifests) and
+the repository that `scripts/release-manifest.py` reads name `qrcode-barcode-scanner-rust`
+for the next release; the CLI archives' `build-info.json` and `SOURCE.md` take it from the workspace.
+The packaging recipes keep the former address until each is published again. The second
+requirement, the trusted publishers, is the owner's: a publisher configured before the
+rename names repository `qrcode-barcode-scanner` and no longer matches the token, so steps
+2, 3, 5 and 6 below name the current repository.
 
 From 0.11.0 the packages carry new names, and each new name needs a trusted
 publisher of its own: crates.io and npm can bind one only after the package's
@@ -754,7 +759,7 @@ performs them):
    `qrcode-barcode-scanner-cli`, each once its first version is uploaded
    ([First publication of a new name](#first-publication-of-a-new-name)):
    Settings › Trusted Publishing › add GitHub: owner `qrcode-ai-com`,
-   repository `qrcode-barcode-scanner`, workflow `crates-publish.yml`,
+   repository `qrcode-barcode-scanner-rust`, workflow `crates-publish.yml`,
    environment `crates-io`; then restrict the crate to trusted publishing,
    revoke the API token that made the first upload, and read all three back
    in the crate's settings. The 0.10.x crates `qrcode-ai-scanner` and
@@ -768,7 +773,7 @@ performs them):
    Settings › Publishing access › *Require two-factor authentication and
    disallow tokens* (it does not block trusted publishing); then Settings ›
    Trusted Publisher › GitHub Actions: organization or user `qrcode-ai-com`,
-   repository `qrcode-barcode-scanner`, workflow `npm-publish.yml`,
+   repository `qrcode-barcode-scanner-rust`, workflow `npm-publish.yml`,
    environment `npm`, with `npm publish` allowed and not only staged
    publishing. Create each publisher at most two days before the tag run that
    first publishes through it: npm drops a new configuration that has not
@@ -785,7 +790,7 @@ performs them):
    then wait for that approval too.
 5. PyPI: add a pending trusted publisher for the new project
    `qrcode-barcode-scanner` in the account's Publishing settings: owner
-   `qrcode-ai-com`, repository `qrcode-barcode-scanner`, workflow
+   `qrcode-ai-com`, repository `qrcode-barcode-scanner-rust`, workflow
    `python.yml`, environment `release`. The project is created by the first
    upload through it, and a pending publisher reserves nothing: check that the
    name is still free just before the tag. The publisher of the former

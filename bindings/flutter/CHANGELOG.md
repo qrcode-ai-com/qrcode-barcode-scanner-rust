@@ -1,4 +1,4 @@
-## Unreleased
+## 0.12.0
 
 * `QrcodeAiScanner.scan` and `scanFrame` take an optional `budgetMs`, the
   wall-clock budget in milliseconds, with the semantics of `budget_ms` in the

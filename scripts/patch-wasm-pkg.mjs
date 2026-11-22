@@ -23,7 +23,7 @@ pkg.license = "MIT";
 pkg.homepage = "https://qrcode-ai.com/en-US/qr-code-scanner/sdk/javascript";
 pkg.repository = {
   type: "git",
-  url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner",
+  url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
 };
 pkg.keywords = ["qrcode", "qr", "scanner", "wasm", "browser", "artistic-qr", "ai-qr"];
 // wasm-pack regenerates package.json each build — re-add the shared types

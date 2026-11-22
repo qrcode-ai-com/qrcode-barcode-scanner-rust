@@ -160,7 +160,13 @@ jobs:
       # non-open-source terms of use (accepted by upgrading) — a licensing
       # decision for the owner, not a maintenance bump. v5's only breaking
       # change is the Node 24 runtime.
+      # Without gradle-version the action installs the newest Gradle: 9.9.1
+      # finds no Kotlin Android plugin 2.0.20 and the AAR build fails. 8.9 is
+      # the Gradle of jitpack.yml, of the committed wrapper and of the other
+      # Kotlin workflows.
       - uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+        with:
+          gradle-version: "8.9"
       - name: assemble AAR
         working-directory: bindings/kotlin
         run: gradle :qrcodeaiscanner:assembleRelease

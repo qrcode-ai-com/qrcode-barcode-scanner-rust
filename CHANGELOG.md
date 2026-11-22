@@ -4,7 +4,7 @@ All notable changes to this workspace. Every surface versions together — the R
 crate + CLI, the npm node + wasm packages, the Python wheel, and the
 Kotlin/Android · Swift/iOS · Flutter bindings.
 
-## Unreleased
+## 0.12.0 — 2026-11-22
 
 ### Added
 
@@ -15,6 +15,12 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
 - Flutter: `scan` and `scanFrame` take an optional `budgetMs`, with the
   semantics of `budget_ms` in the other bindings (`0` is unbounded, a value
   above 4294967295 is `QRS-006`). A negative value throws a `RangeError`.
+- Flutter: the package ships `rust/cargokit.yaml` with an Ed25519 public key.
+  An app's build can then download a precompiled native library from the
+  engine's release `precompiled_<crate hash>` and use it only when its
+  signature verifies against that key; otherwise it compiles the Rust core as
+  before. `flutter-precompiled.yml` builds the libraries unsigned on the tag,
+  and the owner signs and publishes them from his own machine.
 
 ### Changed
 
@@ -44,6 +50,12 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
 - Flutter: the pubspec `repository`, the podspec `homepage` and the Rust
   crate's `repository` name `qrcode-ai-com/qrcode-barcode-scanner-rust`, the
   repository's current address.
+- The `repository` of the two crates, the Node, browser and Python packages
+  and the UniFFI crate names `qrcode-ai-com/qrcode-barcode-scanner-rust`, the
+  repository's address since its rename on 18 November 2026. npm compares that
+  field with the repository that built a package before it accepts its
+  provenance. The prebuilt CLI archives name the same address in
+  `build-info.json`, `SOURCE.md` and their README.
 - Flutter: `flutter_rust_bridge` moves from 2.12.0 to 2.13.0, in the Dart
   runtime, the Rust crate and the generated bindings. Its Dart package
   requires Dart 3.9.2, so the package declares Dart `>=3.9.2` and Flutter
@@ -69,6 +81,9 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   simulator. `bindings/flutter/rust/Cargo.toml` gives Cargo's dev profile
   opt-level 3 without debug assertions; overflow checks stay on and there is
   no LTO.
+- Swift: the release xcframework carries a plain module map, the module the
+  generated Swift imports. UniFFI's `--xcframework` flag wrote a framework
+  module, whose headers SwiftPM does not find for a static-library slice.
 
 ### CI
 

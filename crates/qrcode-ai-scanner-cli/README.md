@@ -48,9 +48,9 @@ To prepare a known label to pass to qrscan, use the [QR code generator](https://
 linear barcodes and other 2D formats, including Data Matrix**, inspect measured
 symbol positions, and assess QR scannability from a terminal or script.
 
-[CLI reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/cli.mdx) ·
-[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/spec/01-report.md) ·
-[Prebuilt archive guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/distribution/cli/README.md)
+[CLI reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/cli.mdx) ·
+[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/01-report.md) ·
+[Prebuilt archive guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/distribution/cli/README.md)
 
 Use `qrscan` to check a QR design from [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/cli) or decode a barcode from
 a saved image.
@@ -74,7 +74,7 @@ also lists package-manager options and their individual delivery status.
 To compile the CLI with Rust 1.88 or later, install the exact crate version:
 
 ```sh
-cargo install qrcode-barcode-scanner-cli@0.11.0 --locked
+cargo install qrcode-barcode-scanner-cli@0.12.0 --locked
 qrscan --version
 ```
 
@@ -90,7 +90,7 @@ Download a sample containing QR `https://qrc-ai.com/76xMa` and Code 128
 
 ```sh
 curl -fsSL -o label.png \
-  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png
+  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png
 qrscan label.png --profile fast --budget-ms 0
 ```
 
@@ -202,13 +202,13 @@ each one starts `qrscan` and hands you its report.
 ## Documentation and licensing
 
 Powered by the [Rust core](https://crates.io/crates/qrcode-barcode-scanner).
-The [prebuilt archive guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/distribution/cli/README.md)
+The [prebuilt archive guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/distribution/cli/README.md)
 covers supported platforms, checksums and signing limits separately from Cargo
 installation.
 
-[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/SCORING.md) ·
-[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx) ·
-[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/SECURITY.md) ·
+[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/SCORING.md) ·
+[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx) ·
+[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/SECURITY.md) ·
 [Report a bug](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues)
 
 Releases up to 0.10.1 were published as `qrcode-ai-scanner-cli`; both install `qrscan`.

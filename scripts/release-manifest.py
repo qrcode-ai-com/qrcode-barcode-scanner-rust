@@ -47,7 +47,7 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCHEMA = "qrscan-release-manifest/1"
 BUILD_INFO = "qrscan-build-info/1"
-REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner"
+REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust"
 CLI = "qrcode-barcode-scanner-cli"
 CRATES = ("qrcode-barcode-scanner", "qrcode-barcode-scanner-cli")
 NPM_NODE = "@qrcode-ai-com/qrcode-barcode-scanner"
