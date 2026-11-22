@@ -15,7 +15,7 @@ schema = "qrscan-release-pins/1"
 
 # The public engine release that the engine mentions and the pinned values follow.
 [engine]
-manifest = "v0.11.0.json"
+manifest = "v0.12.0.json"
 
 # ------------------------------------------------------------------ whole files that never move
 
@@ -259,7 +259,7 @@ match = 'appimage-v'
 [[line]]
 held = "the AppImage files, under their own tag"
 paths = ["distribution/appimage/README.md"]
-match = '^chmod \+x |\./qrcode-barcode-scanner-\S+\.AppImage'
+match = '^chmod \+x |\./qrcode-barcode-scanner-\S+\.AppImage|^The engine release `v\S+` and its files did not change'
 
 [[line]]
 held = "the AUR package"
@@ -286,6 +286,11 @@ held = "the Go module, with its own versions"
 match = 'qrcode-barcode-scanner-go@v|MODULE_VERSION'
 
 [[line]]
+held = "the PHP package on Packagist, with its own versions"
+paths = ["distribution/README.md"]
+match = 'packagist\.org/packages/qrcode-ai-com/qrcode-barcode-scanner#v'
+
+[[line]]
 held = "the agent integrations: they name the engine they were released on"
 paths = ["README.md", "distribution/README.md", "SOURCE-AND-EXTRACTION.md", "docs/guides/agents.mdx"]
 match = 'agent integrations are published|native engine\. Choose|with engine \d|^engine \S+ and returned|into a project-local runtime|among them engine|a fresh engine|on engine \S+ The MCP adapter|^\S+ See the \[distribution guide\]|reuse the published scanner'
@@ -294,8 +299,8 @@ match = 'agent integrations are published|native engine\. Choose|with engine \d|
 # installs is the version of its own archive, as in the other package READMEs.
 [[line]]
 held = "The public Flutter archive and its dated consumer proof; refresh only after a separate publication."
-paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx"]
-match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`'
+paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/api/flutter.mdx", "docs/introduction.mdx", "docs/guides/choosing-a-surface.mdx", "docs/quickstart.mdx"]
+match = 'qr_barcode_scanner.*0\.11\.0|^`460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`|^Published 0\.11\.0 cannot change the budget|^Calls written for 0\.11\.0 keep their meaning|published Flutter 0\.11\.0 facade'
 
 # ------------------------------------------------------------------ lines that follow another source than their file
 
@@ -308,7 +313,12 @@ match = '"a second tag line"'
 
 [[line]]
 keep = "What a version brought or ended."
-match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0'
+match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0|not part of the published 0\.11\.0 release'
+
+[[line]]
+keep = "The licence that published archives retain."
+paths = ["AGENTS.md"]
+match = 'engine 0\.11\.0 and MCP$'
 
 [[line]]
 keep = "The record of the 0.11 container image."
@@ -322,7 +332,7 @@ match = '0\.11\.0|Engine source remains'
 [[line]]
 keep = "A package with its own versions: its first one, and an example of a value."
 paths = ["bindings/go/**", "bindings/php/**", "distribution/README.md"]
-match = 'The first version is 0\.11\.0|such as `?0\.11\.0|Version 0\.11\.0 was installed through'
+match = 'The first version is 0\.11\.0|such as `?0\.11\.0|Version 0\.11\.0 was installed (through|from)|with PHP 8\.4 and the 0\.11\.0 `qrscan` release'
 
 [[line]]
 keep = "What the published 0.11.0 artifact needs, and the JitPack build that was judged."

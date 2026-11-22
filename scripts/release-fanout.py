@@ -600,9 +600,17 @@ def self_test():
     check(f"a rehearsal of {nxt} settles in one render", not again and not left, "; ".join(left[:5]))
     check("the rehearsal moves every tree and engine mention",
           all(nxt in row for kind, _, _, _, row in after if kind in ("tree", "engine")))
+    still = [found for found in mentions if found[0] in ("held", "keep")]
+
+    def unchanged(found):
+        _, _, path, number, _ = found
+        return rehearsal[path].split("\n")[number - 1] == real[path].split("\n")[number - 1]
+
+    # The rehearsed version can also be another product's version, such as a crate of a held
+    # recipe that has the same number: its line becomes a mention in the rehearsal unchanged.
     check("the rehearsal leaves every held and kept mention as it was",
-          [found for found in after if found[0] in ("held", "keep")]
-          == [found for found in mentions if found[0] in ("held", "keep")])
+          [found for found in after if found[0] in ("held", "keep")
+           and (found in still or not unchanged(found))] == still)
     frozen = [path for path in real if any(rule["kind"] == "frozen" for rule, _ in rules.of_file(path))]
     check("the rehearsal changes no frozen file", frozen and not any(path in changed for path in frozen))
     check("the rehearsal writes hashes of the new manifest",

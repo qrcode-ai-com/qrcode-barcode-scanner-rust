@@ -1,7 +1,7 @@
 name: AppImage
 
 # The AppImage recipe of distribution/appimage/, built and judged on each change. The build wraps
-# the public 0.11.0 CLI archive: nothing is compiled from this repository's Rust source. The file
+# the public 0.12.0 CLI archive: nothing is compiled from this repository's Rust source. The file
 # is then inspected, run as a user who just downloaded it, and judged with the destination
 # acceptance contract on this runner and on three clean hosts without network. The result is a
 # workflow artifact. Nothing is attached to a release and nothing is published.
@@ -34,8 +34,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  RELEASE: https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.11.0
-  VERSION: 0.11.0
+  RELEASE: https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.12.0
+  VERSION: 0.12.0
   APPIMAGETOOL: https://github.com/AppImage/appimagetool/releases/download/1.9.1
   RUNTIME: https://github.com/AppImage/type2-runtime/releases/download/20251108
 

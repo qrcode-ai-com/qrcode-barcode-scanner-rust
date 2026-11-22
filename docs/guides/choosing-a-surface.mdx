@@ -8,16 +8,16 @@ your code runs:
 
 | Your context | Surface | Install |
 |---|---|---|
-| Rust app / service | [`qrcode-barcode-scanner`](/api/rust) | `cargo add qrcode-barcode-scanner@=0.11.0` |
-| Shell scripts, CI gates | [CLI `qrscan`](/api/cli) | `cargo install qrcode-barcode-scanner-cli --version 0.11.0 --locked` |
-| Node server (Nuxt/Next/worker) | [`@qrcode-ai-com/qrcode-barcode-scanner`](/api/node) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.11.0` |
-| Browser | [`…-wasm`](/api/wasm) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0` |
-| Python | [`qrcode-barcode-scanner`](/api/python) | `python -m pip install qrcode-barcode-scanner==0.11.0` |
+| Rust app / service | [`qrcode-barcode-scanner`](/api/rust) | `cargo add qrcode-barcode-scanner@=0.12.0` |
+| Shell scripts, CI gates | [CLI `qrscan`](/api/cli) | `cargo install qrcode-barcode-scanner-cli --version 0.12.0 --locked` |
+| Node server (Nuxt/Next/worker) | [`@qrcode-ai-com/qrcode-barcode-scanner`](/api/node) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0` |
+| Browser | [`…-wasm`](/api/wasm) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0` |
+| Python | [`qrcode-barcode-scanner`](/api/python) | `python -m pip install qrcode-barcode-scanner==0.12.0` |
 | Native Android / iOS | [Kotlin / Swift](/api/mobile) | from source |
 | Cross-platform app | [Flutter](/api/flutter) | `flutter pub add qr_barcode_scanner:0.11.0`; Rust builds at app-build time |
 
 <Note>
-The five runtime packages are public in 0.11.0 under these names. Node selects
+The five runtime packages are public in 0.12.0 under these names. Node selects
 one matching native platform dependency automatically; the browser package
 contains one portable WASM plus its included camera and overlay modules.
 The [migration guide](/guides/migrate-to-qrcode-barcode-scanner) keeps old
