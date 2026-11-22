@@ -1,10 +1,10 @@
 Name:           qrcode-barcode-scanner
-Version:        0.11.0
+Version:        0.12.0
 Release:        1%{?dist}
 Summary:        Offline QR code and barcode scanner
 # Both release archives retain the complete upstream license expressions.
 # Apache-2.0 and MIT satisfy the dual-licensed alternatives in the payload.
-License:        AGPL-3.0-or-later AND Apache-2.0 AND BSD-3-Clause AND ISC AND MIT AND Zlib
+License:        MIT AND Apache-2.0 AND BSD-3-Clause AND ISC AND Zlib
 URL:            https://qrcode-ai.com/
 ExclusiveArch:  x86_64 aarch64
 
@@ -35,18 +35,18 @@ https://qrcode-ai.com/en-US/barcode-scanner
 
 %prep
 printf '%s  %s\n' \
-  b7c6669e332c7cc688228077b70d87f52154052e345992bd358aad6d6c7d3298 '%{SOURCE0}' \
-  d5b5eff8ed336ef82a76865fd16e9a087afd5b1574b537747aea6d105ae7c5aa '%{SOURCE1}' \
-  8e5e09f0ec8d93ae49ca35615c05bb1d326448b6de9757cef86ef48d7bf3a96d '%{SOURCE2}' \
+  1e6aea17507d22b13a370de3531697264dc748f34a1039425e892c3ee008217c '%{SOURCE0}' \
+  17512dea779823b0ab26e1556966c9ac6d8be0d544a99dbbb43edc4b47d57d6a '%{SOURCE1}' \
+  642f1cd4abcf16c2100eb8fdc2a84691a2af3d78549af4efce7398c2c6a78e17 '%{SOURCE2}' \
   | sha256sum --strict --check
 
 %ifarch x86_64
 %global cli_input %{SOURCE0}
-%global executable_sha256 77965589784699138d2b512f94067528eba552536160560daed191de824ea01c
+%global executable_sha256 cbc1ac6456a0a791ae636da55388f981dcbd740081af79abb680c3a876be5357
 %endif
 %ifarch aarch64
 %global cli_input %{SOURCE1}
-%global executable_sha256 d010a03064011f8775fc6f0add357cbbc634366d4b96dc0b892ab2c6047b271a
+%global executable_sha256 e400b7464357f35d43bae7172d5408a5e412fbd90a371577baca9473746fbe55
 %endif
 %global cli_archive %{archive}-%{_arch}-unknown-linux-gnu
 
@@ -72,5 +72,8 @@ install -m0644 README.md build-info.json '%{buildroot}%{_docdir}/%{name}/'
 %doc %{_docdir}/%{name}
 
 %changelog
+* Sun Nov 22 2026 QR Code AI <contact@qrcode-ai.com> - 0.12.0-1
+- Package the published 0.12.0 CLI for Fedora.
+
 * Mon Nov 09 2026 QR Code AI <contact@qrcode-ai.com> - 0.11.0-1
 - Package the published 0.11.0 CLI for Fedora.
