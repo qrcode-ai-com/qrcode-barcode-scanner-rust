@@ -67,6 +67,19 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 Open <http://127.0.0.1:8000/>. The page needs the network for jsDelivr and for the sample.
 
+## How it works
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/how-browser-dark.gif?v=32206e525b2c">
+    <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/how-browser-light.gif?v=248e5382e6cc" alt="How the browser package works, in three steps: install and initialize, pass an image or a camera frame to the engine in the page, and read the report" width="100%">
+  </picture>
+</p>
+
+The Pen follows the three steps of the browser package. It loads the published WebAssembly module
+from jsDelivr and checks it, passes the bytes of an image to the engine in a worker, and reads the
+report it gets back.
+
 ## What the page does
 
 1. It reads the package's `package.json` from jsDelivr and shows the package name and version.
@@ -85,6 +98,79 @@ Every scan runs to its end, without a time budget (`budget_ms` 0). The sample ho
 the QR code `https://qrc-ai.com/76xMa` and the Code 128 `STOCK-4827`. A file that is not an image
 gives an input error, `QRS-001`.
 
+## What it returns
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#examples">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-dark.png?v=385593c1c18d">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-light.png?v=7f958679adcc" alt="A QR code and Code 128 decoded from the same image, each outlined where the engine measured it" width="100%">
+    </picture>
+  </a>
+</p>
+
+The picture is a recorded scan of the Pen's sample image, which holds a QR code and a Code 128
+barcode. Both come back in one report, each with its format, its exact text and the place where the
+engine measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
+
+The Pen lists each code with its symbology, the kind of payload and the decoded text, and
+**Full report (JSON)** shows the whole report the engine returned.
+
+The report itself is described field by field in the
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+An empty list of detections means the image holds no code the engine could read. A refused file
+is an error with a `QRS-` code instead, listed in the
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+
+## What it reads
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-dark.gif?v=92fa0e8084df">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-light.gif?v=bdfe5fc5f9b3" alt="The code families the engine reads: QR codes, matrix and stacked codes such as Data Matrix, retail barcodes such as EAN-13, and other linear barcodes such as Code 128" width="100%">
+    </picture>
+  </a>
+</p>
+
+| Family | Formats |
+|---|---|
+| QR | QR Code, Micro QR, rectangular Micro QR (rMQR) |
+| Matrix and stacked | Data Matrix, Aztec, PDF417, MaxiCode |
+| Retail | EAN-13, EAN-8, UPC-A, UPC-E |
+| Other linear | Code 128, Code 39, Code 93, Codabar, ITF, GS1 DataBar, GS1 DataBar Expanded, Telepen |
+
+The Pen reads what the engine reads, from a PNG, JPEG, WebP or GIF image. Codes of different
+formats in one image come back in one report. The engine's
+[supported formats](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats)
+section states the known limits.
+
+## The same engine in other runtimes
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-dark.png?v=57c63428574b">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-light.png?v=6dbd5a8cf5ba" alt="One engine in the language you write: Rust on crates.io, Node.js and the browser on npm, Python on PyPI, Go, PHP, and the qrscan command line" width="100%">
+    </picture>
+  </a>
+</p>
+
+| Runtime | Package | How it scans |
+|---|---|---|
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-rust-dark.png?v=31b5deebc32e"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-rust-light.png?v=c5207721973f" alt="" width="24" height="24" align="absmiddle"></picture> Rust | [`qrcode-barcode-scanner`](https://crates.io/crates/qrcode-barcode-scanner) on crates.io | In process |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-nodejs-dark.png?v=cf2159524fc6"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-nodejs-light.png?v=6dd098480218" alt="" width="24" height="24" align="absmiddle"></picture> Node.js | [`@qrcode-ai-com/qrcode-barcode-scanner`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner) on npm | In process, native |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-browser-dark.png?v=bbe2f3560a6d"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-browser-light.png?v=591e304cf9e9" alt="" width="24" height="24" align="absmiddle"></picture> Browser | [`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm) on npm | In the page, WebAssembly |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-python-dark.png?v=7469c3e0b4fb"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-python-light.png?v=308121255ab7" alt="" width="24" height="24" align="absmiddle"></picture> Python | [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/) on PyPI | In process |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-go-dark.png?v=b6dbac901176"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-go-light.png?v=1983a9eb7344" alt="" width="24" height="24" align="absmiddle"></picture> Go | [`qrcode-barcode-scanner-go`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-go) | Through the installed `qrscan` |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-php-dark.png?v=3800932934c8"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-lang-php-light.png?v=7bdd6884b3a4" alt="" width="24" height="24" align="absmiddle"></picture> PHP | [`qrcode-barcode-scanner-php`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-php) | Through the installed `qrscan` |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-terminal-dark.png?v=1e987f0ab278"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-terminal-light.png?v=2262d66bee6b" alt="" width="24" height="24" align="absmiddle"></picture> Command line | [`qrscan`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#command-line) | One command, one JSON report |
+
+The Rust, Node.js, browser and Python packages hold the engine. The Go and PHP packages hold no decoder:
+each one starts `qrscan` and hands you its report.
+
+<sub>Language and platform names and logos belong to their owners. They identify a runtime or a destination and imply no endorsement.</sub>
+
 ## Files
 
 | File | Role |
@@ -92,8 +178,9 @@ gives an input error, `QRS-001`.
 | `index.html` | The page, a complete HTML document. CodePen's HTML panel takes it as it is. |
 | `style.css` | The style sheet, light and dark. |
 | `script.js` | The page script. A classic script with no `import`, so it runs whether the Pen loads it as a script or as a module. |
-| `prefill.html` | Two forms that create the Pen from the three files above, through CodePen's prefill API. Generated by `build-prefill.py`. |
-| `build-prefill.py` | Writes `prefill.html` from the three files, or checks it with `--check`. Python standard library only. |
+| `DESCRIPTION.md` | The Pen's description, in Markdown: the pictures, the assistant links and the six QR Code AI links of this README, with the Pen's source and license. Not part of the Pen's code. |
+| `prefill.html` | Two forms that create the Pen from the three files above and its description, through CodePen's prefill API. Generated by `build-prefill.py`. |
+| `build-prefill.py` | Writes `prefill.html` from the three files and `DESCRIPTION.md`, or checks it with `--check`. Python standard library only. |
 | `LISTING.md` | The owner's steps to create and record the public Pen. |
 | `test/pen.mjs`, `test/prefill.mjs` | The browser checks the workflow runs. |
 | `screenshot.png` | The page as the workflow captured it. Not part of the Pen. |
@@ -113,8 +200,8 @@ a module it imports. The WebAssembly module, which holds the engine, is checked 
 its digest is the `wasm.sha256` that the package's `build-info.json` records.
 
 To move the demo to another version, change the version, the tag and the two digests in
-`script.js`, the version and the tag in the footer of `index.html`, in the description of
-`build-prefill.py`, in `test/pen.mjs` and in
+`script.js`, the version and the tag in the footer of `index.html`, in `DESCRIPTION.md`, in
+`test/pen.mjs` and in
 the workflow. Then run `python3 examples/codepen/build-prefill.py` from the repository root so
 that `prefill.html` carries the new files. The public Pen keeps its files until the owner pastes
 the new ones into its three panels; a fork someone saved keeps the version it was made from.
@@ -134,7 +221,8 @@ files it carries must equal the files of this folder byte for byte.
 
 The page sends nothing about your image anywhere. Its only requests are the five addresses above.
 All five are on jsDelivr, which sees those requests as it sees any visitor's; CodePen hosts the page
-itself.
+itself. The Pen's description, on CodePen's page around the Pen, shows five pictures served by
+`raw.githubusercontent.com`; the Pen itself does not load them.
 
 ## License
 

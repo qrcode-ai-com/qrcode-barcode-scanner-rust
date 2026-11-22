@@ -99,7 +99,9 @@ push` sends only the notebook and the metadata; this README and `LISTING.md` sta
 
 The notebook links the source repository and the PyPI page only. Kaggle's terms limit its
 services to personal, non-commercial use, so the QR Code AI product links stay out of the
-notebook until the owner decides otherwise; `LISTING.md` gives the options.
+notebook until the owner decides otherwise; `LISTING.md` gives the options. Its first cells show
+the pictures of this README, which are images and not links, and leave out the Ask AI links,
+whose prompt names those product pages.
 
 ## Update it for a release
 

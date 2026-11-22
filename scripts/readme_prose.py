@@ -22,6 +22,7 @@ GUIDES = {
     'examples/codepen/README.md': ('sdk/javascript', 'JavaScript'),
     'examples/kaggle/README.md': ('sdk/python', 'Python'),
     'examples/notebooks/README.md': ('sdk/python', 'Python'),
+    'examples/notebooks/scan-images.ipynb': ('sdk/python', 'Python'),
     'examples/streamlit/README.md': ('sdk/python', 'Python'),
     'examples/web-vite/README.md': ('sdk/javascript', 'JavaScript'),
     'playground/README.md': ('sdk/javascript', 'JavaScript'),
