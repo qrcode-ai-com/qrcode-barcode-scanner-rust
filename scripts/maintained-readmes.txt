@@ -44,6 +44,7 @@ distribution/nix/README.md
 distribution/npm/README.md
 distribution/obs/README.md
 distribution/ppa/README.md
+distribution/publisher/REPOSITORY.md
 distribution/releases/README.md
 distribution/rpm/README.md
 distribution/snap/README.md
