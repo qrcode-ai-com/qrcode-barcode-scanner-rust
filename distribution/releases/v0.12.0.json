@@ -1,0 +1,229 @@
+{
+  "commit": "897dd50cdf27cbde54d408bf65e1ca4622035d42",
+  "crates": {
+    "qrcode-barcode-scanner": {
+      "sha256": "ea7a38df475e1fa1904e9c371983d288d095ffbfeeb093447ff68affe6403819",
+      "size": 502216,
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner/qrcode-barcode-scanner-0.12.0.crate",
+      "version": "0.12.0"
+    },
+    "qrcode-barcode-scanner-cli": {
+      "sha256": "e800eb7209f7b41dc72b8f50e8b9715a162af845871d094d93506b2ff2374f7a",
+      "size": 36311,
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner-cli/qrcode-barcode-scanner-cli-0.12.0.crate",
+      "version": "0.12.0"
+    }
+  },
+  "npm": {
+    "@qrcode-ai-com/qrcode-barcode-scanner": {
+      "integrity": "sha512-RVDDFGVxjIoY66jDps/1u9b13CL9K/eXtLe0zIYL+ekamt8RFNCuD8kicZorPXyMivv9GduRbrC++SohtQ3ayw==",
+      "platforms": [
+        "@qrcode-ai-com/qrcode-barcode-scanner-darwin-arm64",
+        "@qrcode-ai-com/qrcode-barcode-scanner-darwin-x64",
+        "@qrcode-ai-com/qrcode-barcode-scanner-linux-arm64-gnu",
+        "@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-gnu",
+        "@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-musl",
+        "@qrcode-ai-com/qrcode-barcode-scanner-win32-x64-msvc"
+      ],
+      "shasum": "2f203a17be9fe68f4514efded22bc7be06f20903",
+      "size": 20356,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner/-/qrcode-barcode-scanner-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-darwin-arm64": {
+      "integrity": "sha512-BJ51w1uHIK0TCDiiiXQcH6bpxtCRVVyJJ/upUEiY+tqMroShP5FS4nWeBvgmBPHC7rZrh1zty3wFHvvVI7Oecw==",
+      "shasum": "6069f917cdd7ebedb1504dc6e760b48372fdf190",
+      "size": 1696960,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-darwin-arm64/-/qrcode-barcode-scanner-darwin-arm64-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-darwin-x64": {
+      "integrity": "sha512-3Xbi69pAKpjUeO3VDXB9UlqTwk8B/SG7KZ5MdaOLJebnIM3qrJ8rn0HIOcOlBkck3quAlIbxuXgS896Avczzwg==",
+      "shasum": "2b9e5bf4224f31cac90c581ae9dd8e2eed5f92d5",
+      "size": 1746295,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-darwin-x64/-/qrcode-barcode-scanner-darwin-x64-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-linux-arm64-gnu": {
+      "integrity": "sha512-SqFNfQ/+VJwzI2CFhN93irpUUXks5M+fhZ0uWGUV34An3rTL3tD3B9vCb9CTvfUioIn5JtJchM1COI7jCNOXVQ==",
+      "shasum": "c6a300884bcd276a1db162fffbc7f03b06651d98",
+      "size": 1737529,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-linux-arm64-gnu/-/qrcode-barcode-scanner-linux-arm64-gnu-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-gnu": {
+      "integrity": "sha512-jM4K0cKIVQzyWuoKhL8LXz8n4ysmFXQUwnTxj2+ez18H1fGalutyogiP7+aiwpqvcT9M2t3q7vb2z1Jgzs4ecQ==",
+      "shasum": "427848427344519978e3f39e1989d1fd998a2b73",
+      "size": 1810579,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-gnu/-/qrcode-barcode-scanner-linux-x64-gnu-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-musl": {
+      "integrity": "sha512-hUtfr4umjA4Cc9qI4sEiOVwHmyS2OqNaiKv5DgC59npmajjUkn1dguRSE9F9d47Xqmdi+8wxEkQ8B1CpjVXmKA==",
+      "shasum": "59fa011e9612e47f71baadb68b8de02a45a66597",
+      "size": 1812404,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-musl/-/qrcode-barcode-scanner-linux-x64-musl-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-wasm": {
+      "files": {
+        "qrcode-barcode-scanner_bg.wasm": {
+          "sha256": "298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868",
+          "size": 2220631
+        }
+      },
+      "integrity": "sha512-Pdj5RG/tpdhOGAMgl7ZUPEqsJtYVFT/DIKIuUhhool1jndDDl4gCdshgSOq522kfdxKC99D9/lxypAlv3zQXEg==",
+      "shasum": "97c4158220025b22a23e46bff3454898eb445155",
+      "size": 1191255,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-wasm/-/qrcode-barcode-scanner-wasm-0.12.0.tgz",
+      "version": "0.12.0"
+    },
+    "@qrcode-ai-com/qrcode-barcode-scanner-win32-x64-msvc": {
+      "integrity": "sha512-JMavnhMfxhVb8zLGeifDgr/FgpuAfbsaPh2VHZk/VGuPvJ+08wAFxOvReD6Rr7AQvHrno3suz5ZGt1YNNLlEEw==",
+      "shasum": "9dd002162f1cf49c46a94e7e27a9dfb95dfb7569",
+      "size": 1844446,
+      "tarball": "https://registry.npmjs.org/@qrcode-ai-com/qrcode-barcode-scanner-win32-x64-msvc/-/qrcode-barcode-scanner-win32-x64-msvc-0.12.0.tgz",
+      "version": "0.12.0"
+    }
+  },
+  "pypi": {
+    "qrcode-barcode-scanner": {
+      "files": {
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-macosx_10_12_x86_64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "b64319c2272e230732a98f6ea2668b207853537e38cc76bc543a0db0c02d7a13",
+          "size": 1950107,
+          "url": "https://files.pythonhosted.org/packages/ae/54/a125f8c53845daa17bbe5b146e0b59c234a0127c82a6b10ce3dfc8c1a97c/qrcode_barcode_scanner-0.12.0-cp38-abi3-macosx_10_12_x86_64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-macosx_11_0_arm64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "fb39ba637882eb42b142018e9df9405d94c7a2a26bbb1e0377643b625e07b085",
+          "size": 1902542,
+          "url": "https://files.pythonhosted.org/packages/cc/f1/df22317cadbdab6fb902a42f5aebb9ec7f7837a2f49f7dee117d379b6ff6/qrcode_barcode_scanner-0.12.0-cp38-abi3-macosx_11_0_arm64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "b023cb005694abe64b0707cfc74c0988d00d7dff088f71c8dabc3a4b12af5886",
+          "size": 2029215,
+          "url": "https://files.pythonhosted.org/packages/15/b4/62214ca0ef14d82fd21403512408a4d644cadfeef27647743c86e58d9d65/qrcode_barcode_scanner-0.12.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "70f2827a62fcd7a5128363dc2387ec09d958b92c82238420e7e2c900fc6b1bcc",
+          "size": 2102067,
+          "url": "https://files.pythonhosted.org/packages/39/6d/b8b08b8217824b0cc5099883de5e9042da7f93dd2b3bf7672c9fd0e15c8c/qrcode_barcode_scanner-0.12.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-musllinux_1_2_x86_64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "3baef0487b1eb837bd9deaf412b00bd40ebc5386c1ea26bcbd2b17a5305e5d8b",
+          "size": 2300705,
+          "url": "https://files.pythonhosted.org/packages/51/09/731c69aa9c2c9fa6a1fc184a83d78afd9b688074fb8946a7a39623999d60/qrcode_barcode_scanner-0.12.0-cp38-abi3-musllinux_1_2_x86_64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0-cp38-abi3-win_amd64.whl": {
+          "kind": "bdist_wheel",
+          "sha256": "f5f2b0a6eb6092d330bc53a3697140557d16494a352e94966a87f5a927cdca40",
+          "size": 1821510,
+          "url": "https://files.pythonhosted.org/packages/34/2c/87a7c47b7b96c5699b6421911c6d3d24fc40ca7fd9e0e31e05a2ff59d640/qrcode_barcode_scanner-0.12.0-cp38-abi3-win_amd64.whl"
+        },
+        "qrcode_barcode_scanner-0.12.0.tar.gz": {
+          "kind": "sdist",
+          "sha256": "a95bde15f2cf5641d7c2c147ace2d05daf04e4216dee33e10efd43bf32c83348",
+          "size": 527184,
+          "url": "https://files.pythonhosted.org/packages/1a/93/f3f78e7e275e51b3a9ec627e14d932428286091b898fbc4ebd25f4f0715c/qrcode_barcode_scanner-0.12.0.tar.gz"
+        }
+      },
+      "version": "0.12.0"
+    }
+  },
+  "release": {
+    "assets": {
+      "qrcode-barcode-scanner-cli-0.12.0-aarch64-apple-darwin.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "373b4247c8333b1f56e5c2ac065a60631dde7806a59145e866bf854c8f43e437",
+          "size": 3651696
+        },
+        "sha256": "b241f7bc982079971de99213dea2c06a7a7e5d5eac60d3a6d20faf2719a9a2d5",
+        "size": 1888909,
+        "target": "aarch64-apple-darwin"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-aarch64-unknown-linux-gnu.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "e400b7464357f35d43bae7172d5408a5e412fbd90a371577baca9473746fbe55",
+          "size": 3666056
+        },
+        "sha256": "17512dea779823b0ab26e1556966c9ac6d8be0d544a99dbbb43edc4b47d57d6a",
+        "size": 1907792,
+        "target": "aarch64-unknown-linux-gnu"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-aarch64-unknown-linux-musl.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "acb565fd3a785852fc9b345bce1e766dbdbc6ff7c788711ae71ed6505873aab4",
+          "size": 3676728
+        },
+        "sha256": "ab110deb5861ed4350cea38f29c0649ca219495b99b67913590d5d732c105ab8",
+        "size": 1943080,
+        "target": "aarch64-unknown-linux-musl"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-source.tar.gz": {
+        "sha256": "642f1cd4abcf16c2100eb8fdc2a84691a2af3d78549af4efce7398c2c6a78e17",
+        "size": 34325932
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-x86_64-apple-darwin.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "539c50979ba436eade9de7cc79e821bbbfc563950c5025b5ea556ac7eb2017c0",
+          "size": 3914096
+        },
+        "sha256": "d55212871b5f08eb039c6c82280287e833b7662c3ec5227d4357f623014b8a74",
+        "size": 1978614,
+        "target": "x86_64-apple-darwin"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-x86_64-pc-windows-msvc.zip": {
+        "executable": {
+          "path": "qrscan.exe",
+          "sha256": "03f673307c3a399c30fecbcaa1047b00ed755d4d29b62dda73c559b5d688207d",
+          "size": 4399104
+        },
+        "sha256": "f3013cd6722bdcd3c2df6a58acd4e3801af2b34e877e132a1242dc3816021886",
+        "size": 2030410,
+        "target": "x86_64-pc-windows-msvc"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-x86_64-unknown-linux-gnu.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "cbc1ac6456a0a791ae636da55388f981dcbd740081af79abb680c3a876be5357",
+          "size": 4175384
+        },
+        "sha256": "1e6aea17507d22b13a370de3531697264dc748f34a1039425e892c3ee008217c",
+        "size": 2021428,
+        "target": "x86_64-unknown-linux-gnu"
+      },
+      "qrcode-barcode-scanner-cli-0.12.0-x86_64-unknown-linux-musl.tar.gz": {
+        "executable": {
+          "path": "qrscan",
+          "sha256": "f700f37a92dd03384e24aeb4b232f01388a7f75b1547a11c88bb3215c01897da",
+          "size": 4262968
+        },
+        "sha256": "a3d0c5c8b29e951a2294b96650af7e711db7e73b43d481d1e3e38d5323576f3a",
+        "size": 2075749,
+        "target": "x86_64-unknown-linux-musl"
+      }
+    },
+    "checksums": {
+      "name": "qrcode-barcode-scanner-cli-0.12.0-SHA256SUMS",
+      "sha256": "f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691",
+      "size": 1028
+    },
+    "download": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.0/",
+    "page": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.0"
+  },
+  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+  "schema": "qrscan-release-manifest/1",
+  "source_date_epoch": 1795355359,
+  "tag": "v0.12.0",
+  "tag_object": "83398ca5f71518551954ca3357c3bdc1c763064d",
+  "version": "0.12.0"
+}
