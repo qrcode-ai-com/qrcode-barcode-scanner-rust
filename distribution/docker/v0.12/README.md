@@ -6,13 +6,27 @@ codes, linear barcodes and matrix codes, with the mixed QR + Code 128
 regression, physical-occurrence geometry and pipeline 5 reports. There is no
 scanner HTTP service and no runtime download.
 
-## Run the image
+## Run the public image
 
-The image target is `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner`, tag `0.12.0`,
-for Linux AMD64 and ARM64. This recipe is prepared; the image is not published
-until the release boundary below is complete, and this section then names the
-verified multi-platform index digest. Until then, the published image is
-[0.11.0](../v0.11/README.md#run-the-public-image).
+The [GHCR image 0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
+supports Linux AMD64 and ARM64. The digest below names the verified multi-platform
+index. Put an input image named `label.png` in the current directory before
+running the command.
+
+```sh
+image=ghcr.io/qrcode-ai-com/qrcode-barcode-scanner@sha256:2fecdb3eb42c436c8e6cbecf6d74a53412821563808dae9cd4e4e62af24388fc
+docker pull "$image"
+docker run --rm --network none --read-only --cap-drop ALL \
+  --mount type=bind,src="$PWD",dst=/input,readonly "$image" /input/label.png --pretty
+```
+
+The index names the AMD64 manifest `sha256:e3bd1cec865b1cc9cdb2b94507860c91cfd234174b0e46d7db617af76a91a3d4`
+and the ARM64 manifest `sha256:d9549d1aef921e6b915a06d1b009783f5a5d35a630923b26473c697f2fd2124a`.
+The [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45192905591) pushed `0.12.0-amd64`, `0.12.0-arm64` and then
+the index `0.12.0`, so the newest package version is the version tag.
+[Anonymous public pulls](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45229648921) and exact scans passed on both
+native architectures. The 0.11.0 image and its tags stay published under the
+AGPL; see the [0.11 recipe](../v0.11/README.md#run-the-public-image).
 
 ## Build and verify
 

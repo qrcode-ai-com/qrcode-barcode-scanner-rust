@@ -1655,6 +1655,14 @@ claimed. Then add the tag `0.12.0` to the repository in the Artifact Hub control
 panel. Producer artifacts have 14-day retention; expiry is not authority to
 substitute a rebuild.
 
+Published on 23 November 2026: the `oci-v0.12.0` [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45192905591)
+pushed index `sha256:2fecdb3eb42c436c8e6cbecf6d74a53412821563808dae9cd4e4e62af24388fc`
+(AMD64 manifest `sha256:e3bd1cec865b1cc9cdb2b94507860c91cfd234174b0e46d7db617af76a91a3d4`, ARM64 manifest
+`sha256:d9549d1aef921e6b915a06d1b009783f5a5d35a630923b26473c697f2fd2124a`) under the tag `0.12.0`, after
+`0.12.0-amd64` and `0.12.0-arm64`. Its receipt is the `qrscan-oci-published`
+artifact of that run. The **public-pull** [dispatch](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45229648921) passed
+on both native architectures; its receipts are `qrscan-oci-public-<architecture>`.
+
 ### OCI 0.11 — the AGPL image, retained
 
 The separate [0.11 recipe](distribution/docker/v0.11/README.md) repackages the
