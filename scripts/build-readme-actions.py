@@ -22,9 +22,9 @@ TEXT_LINKS = {'distribution/glama/README.md'}
 # renders the page of a container image (distribution/artifacthub/LISTING.md, pinned to a commit
 # by the image's readme-url) with react-markdown and skipHtml: every HTML tag and comment is
 # dropped, while a Markdown image and an image inside a link are kept. The page gets its
-# assistants as linked badges and its prompt unfolded. It describes an image whose archive is
-# AGPL, so it gets no MIT source-license section (scripts/build-readme-licensing.py reads the
-# READMEs only).
+# assistants as linked badges and its prompt unfolded. It states the license of the program its
+# image runs in its own License section, so it gets no source-license section
+# (scripts/build-readme-licensing.py reads the READMEs only).
 LISTINGS = ('distribution/artifacthub/LISTING.md',)
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.

@@ -124,11 +124,15 @@ class ReadmeActions(unittest.TestCase):
             self.assertTrue(f'<img src="{url}"' in readme, url + ' is not the light picture of the folder README')
         self.assertEqual(set(canonical_links(path)) - prose_links(text), set())
         self.assertTrue(all(link.endswith('/docker') for link in canonical_links(path)[2:4]))
-        # The page of an AGPL image gets no MIT source-license section, and names one version.
+        # The page states the license of the program its image runs in its own License section, not
+        # the source-license section of the READMEs, and names one version: the 0.11 releases and earlier
+        # were AGPL-3.0-or-later, the 0.12 releases and later are MIT (docs/guides/license-history.mdx).
         self.assertNotIn('qrscan-source-license', text)
         runs = re.search(r'This image runs `qrscan` (\d+\.\d+\.\d+)', text)[1]
-        licensed = re.search(r'The (\d+\.\d+\.\d+) program in this image is licensed AGPL-3\.0-or-later\.', text)[1]
+        licensed, terms = re.search(r'The (\d+\.\d+\.\d+) program in this image is licensed ([A-Za-z0-9.-]+)\.', text).groups()
         self.assertEqual(runs, licensed)
+        major, minor, _ = map(int, licensed.split('.'))
+        self.assertEqual(terms, 'MIT' if (major, minor) >= (0, 12) else 'AGPL-3.0-or-later')
 
     def test_html_tags_are_found_outside_code_and_comments_only(self):
         self.assertEqual(html_tags('<details>\n<summary>Copy</summary>\n\n</details>'),
