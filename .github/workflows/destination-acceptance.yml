@@ -447,11 +447,11 @@ jobs:
             platform: linux/arm64
             machine: arm64
     env:
-      # The verified multi-platform index of distribution/docker/v0.11/README.md.
-      QRSCAN_IMAGE: ghcr.io/qrcode-ai-com/qrcode-barcode-scanner@sha256:fd0433f29b0dabd469ce6a8fdcfc7bf6554960301b5bc57b5fca97928fd7cb96
+      # The verified multi-platform index of distribution/docker/v0.12/README.md.
+      QRSCAN_IMAGE: ghcr.io/qrcode-ai-com/qrcode-barcode-scanner@sha256:2fecdb3eb42c436c8e6cbecf6d74a53412821563808dae9cd4e4e62af24388fc
       # The engine inside that image, which its reports name: it moves with the image's own tag,
       # not with the engine release above.
-      IMAGE_ENGINE: 0.11.0
+      IMAGE_ENGINE: 0.12.0
       MACHINE: ${{ matrix.machine }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
