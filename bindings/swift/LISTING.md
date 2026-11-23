@@ -10,9 +10,11 @@ on the commit `f37477c0`, whose `Package.swift` pins that zip and checksum. A cl
 consumer on macOS that depends on
 `.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", exact: "0.12.0")`
 resolved it, built it and scanned a QR code (report `versions.scanner` 0.12.0). The Swift
-Package Index submission is
-[PackageList issue 16347](https://github.com/SwiftPackageIndex/PackageList/issues/16347), open:
-the package is not listed yet. Applications add the package with
+Package Index submission,
+[PackageList issue 16347](https://github.com/SwiftPackageIndex/PackageList/issues/16347), was
+accepted the same day by
+[PackageList pull request 16348](https://github.com/SwiftPackageIndex/PackageList/pull/16348):
+the package is listed at <https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift>. Applications add the package with
 `.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0")`.
 
 Each step below that creates an environment or a tag, approves a deployment, publishes a
@@ -104,12 +106,12 @@ after step 7 above.
 4. Click **Create** (sending it is the owner's step). The index's own automation validates the
    package and opens the change that adds it.
 
-The "Not published yet" note of the satellite README is replaced by an install section in
-`bindings/swift/package/README.md` here. The tag `0.12.0` keeps the old note, since a tag is
-never moved; the satellite's default branch shows the new text once its tree is replaced with
-a new stage (step 2 above). Once the package page exists, its sidebar link
-**Do you maintain this package?** gives the platform and Swift version badges; adding them is
-one more change of that README here, then a new stage.
+The satellite README carries an install section and the index's Swift version and platform
+badges, given by the package page's sidebar link **Do you maintain this package?**; both are
+written in `bindings/swift/package/README.md` here. The tag `0.12.0` keeps its old "Not
+published yet" note, since a tag is never moved. The index shows the README of the
+satellite's default branch, which takes the new text when its tree is replaced with a new
+stage (step 2 above): only `README.md` and `SOURCE.json` change, and no tag or release follows.
 
 Sources: [Add a Package](https://swiftpackageindex.com/add-a-package),
 [GitHub environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments).

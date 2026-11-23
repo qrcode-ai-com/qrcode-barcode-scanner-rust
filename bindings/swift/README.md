@@ -117,9 +117,8 @@ by its sha256. Nothing in it is edited by hand:
 with its stage and installs it in a clean Swift package on macOS, where it reads both codes of
 the mixed fixture in the fast, full and frame profiles. On 23 November 2026 a clean SwiftPM
 consumer on macOS resolved the tag `0.12.0` by its URL, built it and scanned a QR code; a scan
-on an iOS simulator or device is not yet qualified. The Swift Package Index submission
-([PackageList issue 16347](https://github.com/SwiftPackageIndex/PackageList/issues/16347)) is
-open; the package is not listed there yet. The release steps and the index submission are the
+on an iOS simulator or device is not yet qualified. The package is listed on the
+[Swift Package Index](https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift). The release steps and the index submission are the
 owner's, in [LISTING.md](LISTING.md).
 
 ## Usage
