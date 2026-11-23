@@ -1,11 +1,12 @@
 # Dify Marketplace template: Uploaded Image QR and Barcode Reader
 
-Destination `expansion-26`. This folder prepares the template. Nothing here is published.
+Destination `expansion-26`. This folder prepares the template. The template is not submitted yet.
 
 The Marketplace accepts a template only when every plugin it uses is installed from the
-Marketplace. So the template waits for the plugin of this folder's parent to be listed there
-(destination `expansion-25`, [pull request 3862](https://github.com/langgenius/dify-plugins/pull/3862)
-of `langgenius/dify-plugins`, open). [LISTING.md](LISTING.md) holds the listing fields and the
+Marketplace. The plugin of this folder's parent (destination `expansion-25`) has been on the
+[Dify Marketplace](https://marketplace.dify.ai/plugins/qrcode-ai-com/qrcode-barcode-scanner) since
+22 November 2026, when [pull request 3862](https://github.com/langgenius/dify-plugins/pull/3862) of
+`langgenius/dify-plugins` was merged. [LISTING.md](LISTING.md) holds the listing fields and the
 owner's steps.
 
 ## What the workflow holds
@@ -37,8 +38,8 @@ then runs it in Dify itself, with [template_in_dify.py](../tests/template_in_dif
    imports this file's 0.3.1 with a version warning (`completed-with-warnings`), with no missing
    dependency. Two copies set the scan profile to `frame` and `full`.
 4. It runs the draft workflow on the mixed fixture with each profile: the run ends in **Codes**
-   with `texts` equal to `https://qrc-ai.com/76xMa` and `STOCK-4827`, `count` 2 and the engine's
-   0.11.0 report. A blank image ends in **No code found** with `complete` true. A file that is not
+   with `texts` equal to `https://qrc-ai.com/76xMa` and `STOCK-4827`, `count` 2 and the report of
+   the engine version the plugin pins. A blank image ends in **No code found** with `complete` true. A file that is not
    an image ends in **File not readable** with the engine's `[QRS-001]` message, and Dify reports
    that run as `partial-succeeded`.
 5. It exports the app as YAML and as an `.ifpkg` app package, deletes the apps, uninstalls the
@@ -49,14 +50,16 @@ The job's artifact `dify-template-in-dify-1.20.0` keeps the plugin package, both
 receipt and a `SHA256SUMS` file. The exports name the local package as their dependency, so they
 show what Dify writes and are not the file to submit.
 
-## When the plugin is on the Marketplace
+## Installing the plugin from the Marketplace
 
-Once pull request 3862 is merged and the plugin is listed, the job can install it the way a
-Marketplace user does instead of building it:
+The job builds the plugin from the checkout, so it tests the plugin's source before a version is
+listed. To run the template on the listed plugin instead, the way a Marketplace user does:
 
 1. Replace the packaging step and the local install with
    `POST /console/api/workspaces/current/plugin/install/marketplace`, whose body
-   `{"plugin_unique_identifiers": [...]}` names the identifier the Marketplace lists for 0.1.0.
+   `{"plugin_unique_identifiers": [...]}` names the identifier the Marketplace lists for the
+   version under test (for 0.1.0,
+   `qrcode-ai-com/qrcode-barcode-scanner:0.1.0@3b5cc2fe0a55ffc0f8f2cc8fdfa5b02f18f4fc138930856a47afac3c7c13038c`).
 2. Remove `FORCE_VERIFYING_SIGNATURE=false`: a Marketplace package is signed.
 3. Expect the export's dependency to read `type: marketplace`, which is what the Creator Center
    needs.
