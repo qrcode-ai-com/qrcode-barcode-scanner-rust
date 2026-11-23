@@ -13,6 +13,12 @@ Agent and container versions also have separate subsequent publications: use the
 [current distribution guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner/blob/main/distribution/README.md)
 for those coordinates. This update changes neither the historical archives nor
 the dated publication record below.
+
+**23 November 2026.** The Swift package `QRCodeBarcodeScanner` 0.12.0 is public
+from [`qrcode-ai-com/qrcode-barcode-scanner-swift`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift):
+SwiftPM adds it by repository URL, as the [mobile page](/api/mobile) shows. Its
+module is `QRCodeBarcodeScanner`; the local source package in `bindings/swift`
+keeps `QrcodeAiScanner`.
 </Note>
 
 <Note>
@@ -71,7 +77,7 @@ name.
 | Python | `qrcode-ai-scanner` (last release 0.9.0; PyPI never had 0.10.x), `import qrcode_ai_scanner` | `qrcode-barcode-scanner`, `import qrcode_barcode_scanner` |
 | Flutter | never published (built from source) | not yet published (built from source) |
 | Kotlin | a JitPack coordinate under the former repository owner, never qualified | com.github.qrcode-ai-com:qrcode-barcode-scanner, once a JitPack build of the release tag succeeds |
-| Swift | built from source | built from source |
+| Swift | built from source | built from source in 0.11; from 0.12.0, `QRCodeBarcodeScanner` by SwiftPM from qrcode-ai-com/qrcode-barcode-scanner-swift |
 | MCP server | adapter 0.1.0 on engine 0.10.0, a GitHub release asset, never on npm | `@qrcode-ai-com/qrcode-barcode-scanner-mcp` with its own version and the MCP Registry name `io.github.qrcode-ai-com/qrcode-barcode-scanner`, announced when published |
 | Agent skill | ClawHub `@thibautmelen/qr-image-scanner` 0.1.0, on engine 0.10.0 | [qrcode-ai-com/qrcode-barcode-scanner](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner), wrapper 0.1.1 on engine 0.10.0; upgrade to engine 0.11 still pending |
 | Container | `ghcr.io/supernovae-st/qrcode-ai-scanner:0.10.0` and `docker.io/thibautmelen/qrcode-ai-scanner:0.10.0` | ghcr.io/qrcode-ai-com/qrcode-barcode-scanner, announced when published; no Docker Hub image for 0.11 |
@@ -187,10 +193,11 @@ for API and compatibility details.
 
 The Flutter package is not yet published on pub.dev: build it from source as
 the [Flutter page](/api/flutter) shows. No JitPack build of the Kotlin binding
-is qualified yet, and the Swift package cannot be added by repository URL: build
-both from source as the [mobile page](/api/mobile) shows. Their module names are
-unchanged in 0.11: Kotlin imports `uniffi.qrcode_ai_scanner_uniffi` and Swift
-imports `QrcodeAiScanner`.
+is qualified yet: build it from source as the [mobile page](/api/mobile) shows.
+The Swift package was a local source build in 0.11; from 0.12.0 SwiftPM adds it
+by repository URL, as the same page shows. Their module names are unchanged in
+0.11: Kotlin imports `uniffi.qrcode_ai_scanner_uniffi` and Swift imports
+`QrcodeAiScanner`; the published Swift package imports `QRCodeBarcodeScanner`.
 
 ### MCP server, agent skill and container
 

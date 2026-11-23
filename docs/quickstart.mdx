@@ -139,8 +139,10 @@ Mobile bindings use the same report contract. The public
 signed precompiled native library or compiles its bundled Rust core. Its tag
 runs built the example for Android and iOS with and without Rust; a scan with
 the published archive on an emulator, simulator or device is not yet
-qualified. Kotlin/JitPack is not qualified and Swift requires a local
-build; see the [native mobile API page](/api/mobile).
+qualified. Kotlin/JitPack is not qualified. The Swift package
+`QRCodeBarcodeScanner` 0.12.0 installs with SwiftPM from its repository URL:
+`.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0")`.
+See the [native mobile API page](/api/mobile).
 
 ## Choosing a profile
 

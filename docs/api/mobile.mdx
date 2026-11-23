@@ -9,8 +9,10 @@ as a **JSON string** — parse it (`kotlinx.serialization`, `JSONDecoder`, …) 
 [`spec/scan-report.schema.json`](/api/report). `"No QR found"` is an empty
 `detections` array, not an error.
 
-The module names keep their original spelling: Kotlin imports
-`uniffi.qrcode_ai_scanner_uniffi` and Swift imports `QrcodeAiScanner`.
+Kotlin keeps the original module name and imports
+`uniffi.qrcode_ai_scanner_uniffi`. The published Swift package imports
+`QRCodeBarcodeScanner`; the local source package in `bindings/swift` keeps the
+module name `QrcodeAiScanner`.
 
 ## Kotlin / Android (JitPack)
 
@@ -38,16 +40,33 @@ main thread.
 
 ## Swift / iOS (SwiftPM)
 
+Add the package by its repository URL, in Xcode or in a `Package.swift`, and
+link its `QRCodeBarcodeScanner` library:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0"),
+],
+targets: [
+    .target(name: "MyApp", dependencies: [
+        .product(name: "QRCodeBarcodeScanner", package: "qrcode-barcode-scanner-swift"),
+    ]),
+],
+```
+
 <Note>
-The Swift package cannot be added by repository URL: its manifest sits in
-`bindings/swift`, not at the repository root. Build it from source as shown in
-the [Swift binding's README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/swift/README.md#build-the-xcframework-locally),
-then add the `bindings/swift` directory of that checkout to your app as a local
-package and link its `QrcodeAiScanner` library.
+Version 0.12.0 is the tag `0.12.0` of
+[`qrcode-ai-com/qrcode-barcode-scanner-swift`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift).
+Its `Package.swift` pins the prebuilt xcframework of the release
+[`swift-v0.12.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/swift-v0.12.0)
+by its checksum, so no Rust toolchain is needed. On 23 November 2026 a clean
+SwiftPM consumer on macOS resolved that tag, built it and scanned a QR code; a
+scan on an iOS simulator or device is not yet qualified. The Swift Package
+Index submission is open; the package is not listed there yet.
 </Note>
 
 ```swift
-import QrcodeAiScanner
+import QRCodeBarcodeScanner
 
 let json = try scan(image: imageData, profile: "full")  // empty detections = no QR
 let report = try JSONDecoder().decode(ScanReport.self, from: Data(json.utf8))
@@ -60,7 +79,7 @@ let readers = try capabilities()
 order `rxing`, `rqrr`, `rescue`, and the `symbologies` they can return
 (spec/01 § Capabilities) — not that an image will decode.
 
-iOS 13+. A native app on the App Store is almost always closed-source and needs
+iOS 13+ and macOS 11+. A native app on the App Store is almost always closed-source and needs
 Project-authored source is MIT; pinned published engines retain their packaged license.
 
 ## Errors

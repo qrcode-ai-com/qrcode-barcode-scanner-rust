@@ -177,6 +177,7 @@ held = "the Swift package, under its own tag swift-v: its satellite.json pins th
 paths = [
   "bindings/swift/package/**",
   "bindings/swift/LISTING.md",
+  "bindings/swift/README.md",
   "scripts/stage-swift-package.py",
   ".github/workflows/swift-package.yml",
   "tests/consumers/swift-package/**",
@@ -342,6 +343,13 @@ match = '0\.12\.0'
 keep = "The published Flutter 0.11.0 archive: what it declares, its licence, its hash and its dated consumer run."
 paths = ["docs/api/flutter.mdx"]
 match = '0\.11\.0'
+
+# The Swift package's version is a tag of its satellite repository, and its zip an asset of the
+# release swift-vX.Y.Z: it moves when the package is published again, not with the engine.
+[[line]]
+held = "the Swift package, under its own tag swift-v: its satellite.json pins the engine tag it is built from"
+paths = ["README.md", "AGENTS.md", "SOURCE-AND-EXTRACTION.md", "docs/introduction.mdx", "docs/quickstart.mdx", "docs/api/mobile.mdx", "docs/guides/choosing-a-surface.mdx"]
+match = '`QRCodeBarcodeScanner` 0\.12\.0|swift-v0\.12\.0|qrcode-barcode-scanner-swift\.git", from: "0\.12\.0"|tag `0\.12\.0`|Swift package 0\.12\.0|SwiftPM, 0\.12\.0'
 
 # ------------------------------------------------------------------ lines that follow another source than their file
 
