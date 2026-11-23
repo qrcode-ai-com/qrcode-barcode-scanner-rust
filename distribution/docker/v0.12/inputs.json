@@ -1,0 +1,41 @@
+{
+  "schema": "qrscan-oci-inputs/1",
+  "version": "0.12.0",
+  "engineSource": "897dd50cdf27cbde54d408bf65e1ca4622035d42",
+  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+  "license": "MIT",
+  "rustc": "1.99.1",
+  "baseImage": "debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc",
+  "releaseManifest": {
+    "name": "qrcode-barcode-scanner-cli-0.12.0-SHA256SUMS",
+    "sha256": "f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691"
+  },
+  "platforms": {
+    "amd64": {
+      "target": "x86_64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.0-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "1e6aea17507d22b13a370de3531697264dc748f34a1039425e892c3ee008217c",
+      "binarySha256": "cbc1ac6456a0a791ae636da55388f981dcbd740081af79abb680c3a876be5357"
+    },
+    "arm64": {
+      "target": "aarch64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.0-aarch64-unknown-linux-gnu.tar.gz",
+      "sha256": "17512dea779823b0ab26e1556966c9ac6d8be0d544a99dbbb43edc4b47d57d6a",
+      "binarySha256": "e400b7464357f35d43bae7172d5408a5e412fbd90a371577baca9473746fbe55"
+    }
+  },
+  "sources": {
+    "qrcode-barcode-scanner-cli-0.12.0-source.tar.gz": {
+      "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.0/qrcode-barcode-scanner-cli-0.12.0-source.tar.gz",
+      "sha256": "642f1cd4abcf16c2100eb8fdc2a84691a2af3d78549af4efce7398c2c6a78e17"
+    },
+    "qrcode-barcode-scanner-0.12.0.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner/qrcode-barcode-scanner-0.12.0.crate",
+      "sha256": "ea7a38df475e1fa1904e9c371983d288d095ffbfeeb093447ff68affe6403819"
+    },
+    "qrcode-barcode-scanner-cli-0.12.0.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner-cli/qrcode-barcode-scanner-cli-0.12.0.crate",
+      "sha256": "e800eb7209f7b41dc72b8f50e8b9715a162af845871d094d93506b2ff2374f7a"
+    }
+  }
+}

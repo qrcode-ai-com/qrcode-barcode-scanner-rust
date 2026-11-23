@@ -86,11 +86,39 @@ class LicensingTests(unittest.TestCase):
         self.assertNotIn('| `LICENSE` | the GNU Affero General Public License, version 3 |', cli_readme)
         self.assertIn('MIT in current source, AGPL-3.0-or-later in published 0.11.0 archives', cli_readme)
 
-    def test_pinned_public_binaries_keep_their_actual_agpl_metadata(self):
-        self.assertIn("license=('AGPL-3.0-or-later')", (ROOT / 'distribution/aur/PKGBUILD').read_text())
-        self.assertIn('license = AGPL-3.0-or-later', (ROOT / 'distribution/aur/.SRCINFO').read_text())
+    def test_pinned_public_binaries_declare_the_license_of_the_version_they_pin(self):
+        # Each Linux recipe wraps published CLI bytes, so it states the license of the release it
+        # pins: AGPL-3.0-or-later up to 0.11.x, MIT from 0.12.0. The pin is read from the recipe.
+        def pinned(relative, pattern):
+            found = re.search(pattern, (ROOT / relative).read_text(), re.M)
+            self.assertIsNotNone(found, f'{relative} does not pin a version')
+            return found[1]
+
+        def expected(version):
+            major, minor, _ = (int(part) for part in version.split('.'))
+            return 'MIT' if (major, minor) >= (0, 12) else 'AGPL-3.0-or-later'
+
+        other = {'MIT': 'AGPL-3.0-or-later', 'AGPL-3.0-or-later': 'MIT'}
+        license = expected(pinned('distribution/aur/PKGBUILD', r'^pkgver=(\S+)$'))
+        self.assertIn(f"\nlicense=('{license}')\n", (ROOT / 'distribution/aur/PKGBUILD').read_text())
+        license = expected(pinned('distribution/aur/.SRCINFO', r'^\tpkgver = (\S+)$'))
+        self.assertIn(f'\tlicense = {license}\n', (ROOT / 'distribution/aur/.SRCINFO').read_text())
         appdata = ET.parse(ROOT / 'distribution/appimage/qrcode-barcode-scanner.appdata.xml')
-        self.assertEqual(appdata.find('.//project_license').text, 'AGPL-3.0-or-later')
+        license = expected(appdata.find('.//releases/release').get('version'))
+        self.assertEqual(appdata.find('.//project_license').text, license)
+        self.assertEqual(expected(pinned('distribution/appimage/build.sh', r'^version=(\S+)$')), license)
+        license = expected(pinned('distribution/rpm/qrcode-barcode-scanner.spec', r'^Version:\s+(\S+)$'))
+        terms = pinned('distribution/rpm/qrcode-barcode-scanner.spec', r'^License:\s+(.+)$').split(' AND ')
+        # The payload's third-party terms include MIT at every version; AGPL is only the scanner's.
+        self.assertEqual(terms[0], license)
+        self.assertEqual(terms.count('AGPL-3.0-or-later'), int(license == 'AGPL-3.0-or-later'))
+        license = expected(pinned('distribution/debian/build.sh', r'^version=(\S+)$'))
+        copyright = re.search(r"^cat >\"\$docdir/copyright\" <<'COPYRIGHT'\n(.*?)^COPYRIGHT$",
+                              (ROOT / 'distribution/debian/build.sh').read_text(), re.M | re.S)[1]
+        spelled = {'MIT': 'distributed under the MIT License', 'AGPL-3.0-or-later': 'distributed under AGPL-3.0-or-later'}
+        self.assertIn(spelled[license], ' '.join(copyright.split()))
+        self.assertNotIn(spelled[other[license]], ' '.join(copyright.split()))
+        self.assertIn('retain upstream third-party notices and licenses', ' '.join(copyright.split()))
         self.assertIn('GNU AFFERO GENERAL PUBLIC LICENSE', (ROOT / 'distribution/releases/historical-agpl-3.0.txt').read_text())
 
     def test_upstream_notices_are_kept_separate(self):

@@ -44,15 +44,15 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a label for a Debian or Ubuntu installation check, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-This recipe packages the official 0.11.0 GNU/Linux CLI archives for Debian
+This recipe packages the official 0.12.0 GNU/Linux CLI archives for Debian
 `amd64` and `arm64`. It preserves the published `qrscan` executable, licenses,
-notices and source reference. The package revision is `0.11.0-1`.
+notices and source reference. The package revision is `0.12.0-1`.
 
 ## Build
 
-Put the two GNU/Linux archives, `qrcode-barcode-scanner-cli-0.11.0-SHA256SUMS`
-and `qrcode-barcode-scanner-cli-0.11.0-source.tar.gz` from the
-[0.11.0 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.11.0)
+Put the two GNU/Linux archives, `qrcode-barcode-scanner-cli-0.12.0-SHA256SUMS`
+and `qrcode-barcode-scanner-cli-0.12.0-source.tar.gz` from the
+[0.12.0 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.0)
 in an input directory. Run on Debian 12 with Bash, GNU tar, GNU coreutils, gzip and
 `dpkg-deb` installed. Use a fresh output directory:
 
@@ -64,9 +64,9 @@ distribution/debian/build.sh arm64 ./input ./out
 
 The recipe verifies the manifest, archive, source and executable hashes
 before creating a package. The original source archive remains at the same
-[corresponding source URL](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.11.0/qrcode-barcode-scanner-cli-0.11.0-source.tar.gz)
+[corresponding source URL](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.0/qrcode-barcode-scanner-cli-0.12.0-source.tar.gz)
 named in the installed documentation. Its SHA-256 is
-`8e5e09f0ec8d93ae49ca35615c05bb1d326448b6de9757cef86ef48d7bf3a96d`.
+`642f1cd4abcf16c2100eb8fdc2a84691a2af3d78549af4efce7398c2c6a78e17`.
 
 ## Install and test
 
@@ -77,7 +77,7 @@ Install the file and check the scanner version:
 ```sh
 sudo apt install ./qrcode-barcode-scanner_0.11.0-1_amd64.deb
 qrscan --version
-curl -fL -O https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/176ac96ef16ee330dbfc6ada10327d0b4e23a8b2/fixtures/symbology/mixed-code128-qr.png
+curl -fL -O https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/897dd50cdf27cbde54d408bf65e1ca4622035d42/fixtures/symbology/mixed-code128-qr.png
 for profile in fast frame full; do
   qrscan mixed-code128-qr.png --profile "$profile" --budget-ms 0
 done
