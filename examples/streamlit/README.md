@@ -52,7 +52,7 @@ links with their prompt, and the pictures of how it works, what it returns, what
 other runtimes. The browser loads each picture from its address on GitHub.
 
 The app uses the published Python package
-[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0 and
+[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0 and
 Streamlit 1.67.0, pinned in [`requirements.txt`](requirements.txt).
 
 <p align="center">
@@ -63,7 +63,8 @@ Streamlit 1.67.0, pinned in [`requirements.txt`](requirements.txt).
 
 The app is built and tested in the engine repository, and it is ready to deploy on Streamlit
 Community Cloud from this repository as it is. It is not deployed yet: the public address is
-not live. The picture above is the app served on a local machine, after it scanned its sample.
+not live. The picture above is the app served on a local machine, after it scanned its sample with
+version 0.11.0.
 
 ## Run it on your machine
 
@@ -86,7 +87,7 @@ the way it reads one:
 | Community Cloud reads | Here |
 | --- | --- |
 | The main file | `examples/streamlit/streamlit_app.py`, started with `streamlit run` from the root of the repository, which is where the sample image is found |
-| The dependencies | [`requirements.txt`](requirements.txt) beside the main file, which wins over any file at the root: Streamlit, Pillow and `qrcode-barcode-scanner==0.11.0`, each at an exact version |
+| The dependencies | [`requirements.txt`](requirements.txt) beside the main file, which wins over any file at the root: Streamlit, Pillow and `qrcode-barcode-scanner==0.12.0`, each at an exact version |
 | The configuration | [`.streamlit/config.toml`](.streamlit/config.toml) beside the main file: an 8 MB upload limit, the app's own limit |
 | The Python version | No file: it is chosen in the deploy form. Pick 3.12, the version the tests run on |
 
@@ -106,7 +107,7 @@ The steps, for the repository's owner:
 4. Open **Advanced settings**, choose Python 3.12, leave the secrets empty, then **Save** and
    **Deploy**. The Python version cannot change after deployment without deleting the app.
 5. Open the address signed out, wait for the app to wake up, and check that the sample shows
-   `https://qrc-ai.com/76xMa` and `STOCK-4827` in each profile with version 0.11.0.
+   `https://qrc-ai.com/76xMa` and `STOCK-4827` in each profile with version 0.12.0.
 
 [`LISTING.md`](LISTING.md) holds the field values, the owner decisions to settle first and the
 checks to read back after the deploy. Once the app is live, add this badge under the title of
@@ -191,10 +192,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 The app shows a table of the codes with their format, text and payload kind, the image with each code outlined, and the engine's full report, which you can download as JSON.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -246,7 +247,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored example source is MIT; see [LICENSE](LICENSE). It installs the engine wheel `qrcode-barcode-scanner` 0.11.0 from PyPI. The published engine 0.11.0 keeps the license it shipped with, AGPL-3.0-or-later; read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
+Project-authored example source is MIT; see [LICENSE](LICENSE). It installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI. The published engine 0.12.0 ships under the MIT License; read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

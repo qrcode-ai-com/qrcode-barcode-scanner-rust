@@ -5,7 +5,7 @@ and to check it afterwards. Nothing here is deployed: creating the account, acce
 connecting GitHub and clicking **Deploy** are the owner's steps.
 
 The app is the one engine, the open-source QR Code & Barcode Scanner, running from the published
-Python package `qrcode-barcode-scanner` 0.11.0. It is the same code that the workflow
+Python package `qrcode-barcode-scanner` 0.12.0. It is the same code that the workflow
 `integration-python-hosts` tests on every change.
 
 ## Decisions to settle first
@@ -46,7 +46,7 @@ Python package `qrcode-barcode-scanner` 0.11.0. It is the same code that the wor
 | Sharing | public, as the repository is public |
 
 Community Cloud installs [`requirements.txt`](requirements.txt), which sits beside the main file:
-`streamlit==1.67.0`, `pillow==13.0.0` and `qrcode-barcode-scanner==0.11.0`. It reads the
+`streamlit==1.67.0`, `pillow==13.0.0` and `qrcode-barcode-scanner==0.12.0`. It reads the
 configuration in [`.streamlit/config.toml`](.streamlit/config.toml) beside the main file. It
 reads no Python version file: the version is the one chosen in the form, and it cannot change
 later without deleting the app.
@@ -105,6 +105,8 @@ planned; they are live after the owner's review, not before.
 
 - Screenshot: [`media/app-sample-scan.png`](media/app-sample-scan.png), 800 × 1714, the app served
   locally from this folder after it scanned its sample image, from its banner to the download button.
+  It was taken with version 0.11.0, which its introduction shows: retake it with 0.12.0 before
+  the listing uses it.
 
 ## Click by click
 
@@ -127,7 +129,7 @@ In a browser that is signed out of Streamlit:
 
 1. Open the app's address. If it shows "This app has gone to sleep due to inactivity", click
    **Yes, get this app back up!** and wait.
-2. The page shows version 0.11.0 in its introduction and the Community Cloud note under it.
+2. The page shows version 0.12.0 in its introduction and the Community Cloud note under it.
 3. With the sample image, choose each profile, `fast`, `frame` and `full`, with a budget of `0`:
    the table shows `qr_code` `https://qrc-ai.com/76xMa` and `code128` `STOCK-4827` each time, and
    no warning says the result is not final.

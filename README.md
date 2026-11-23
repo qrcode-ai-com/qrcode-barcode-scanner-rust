@@ -79,7 +79,7 @@ qualification remain separate evidence. The engine's
 ## Examples
 
 To scan a QR code from an image or read a barcode label, run the [browser image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml) or the [command-line quick start](#command-line).
-Try it online, with nothing to install. The [Vite example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/web-vite) installs the published WebAssembly package 0.12.0 from npm and scans in your browser, on your device; the workflow `pages.yml` publishes its build from `main` on [GitHub Pages](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/), and the same build runs in a [Hugging Face Space](https://huggingface.co/spaces/ThibautMELEN/qrcode-barcode-scanner). The [notebook](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/notebooks) installs the Python package 0.11.0 from PyPI and scans in a Jupyter session, on Binder or on Google Colab.
+Try it online, with nothing to install. The [Vite example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/web-vite) installs the published WebAssembly package 0.12.0 from npm and scans in your browser, on your device; the workflow `pages.yml` publishes its build from `main` on [GitHub Pages](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/), and the same build runs in a [Hugging Face Space](https://huggingface.co/spaces/ThibautMELEN/qrcode-barcode-scanner). The [notebook](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/notebooks) installs the Python package 0.12.0 from PyPI and scans in a Jupyter session, on Binder or on Google Colab. The StackBlitz, Binder and Colab buttons below open a fixed tag, `demos-v0.11.0-r3`, whose examples install 0.11.0.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/demos-v0.11.0-r3/examples/web-vite) [![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.11.0-r3?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.11.0-r3/examples/notebooks/scan-images.ipynb)
 
@@ -520,13 +520,13 @@ Current installation guides are linked below; report types, schemas and release 
 <details>
 <summary><strong>Build the released source</strong></summary>
 
-The packages above come from [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0)
-(`176ac96`), separately from the code currently on `main`. Check out the release
-tag for matching source:
+The packages above come from [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0),
+separately from the code currently on `main`. Check out the release tag for
+matching source:
 
 ```sh
 git clone --branch v0.12.0 --depth 1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust.git
-cd qrcode-barcode-scanner
+cd qrcode-barcode-scanner-rust
 cargo build --release --locked -p qrcode-barcode-scanner-cli
 ```
 
