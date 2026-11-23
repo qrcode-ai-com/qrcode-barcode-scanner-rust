@@ -72,9 +72,9 @@ for (const profile of ['fast', 'frame', 'full']) {
 		assert.deepEqual(item.json.codes.map((code) => code.symbology), ['qr_code', 'code128']);
 		assert.equal(item.json.count, 2);
 		assert.equal(item.json.profile, profile);
-		assert.equal(item.json.engine, '0.11.0');
+		assert.equal(item.json.engine, '0.12.0');
 		assert.deepEqual(item.json.image, { fileName: 'label.png', mimeType: 'image/png', field: 'data' });
-		assert.equal(item.json.report.versions.scanner, '0.11.0');
+		assert.equal(item.json.report.versions.scanner, '0.12.0');
 		assert.equal(item.json.report.trace.budget_exhausted, false);
 		assert.equal(item.json.report.score === null, profile === 'frame');
 		assert.equal(item.binary, items[0].binary, 'the image stays on the item');

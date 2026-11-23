@@ -22,7 +22,7 @@ exports.stopScanner = stopScanner;
 const node_worker_threads_1 = require("node:worker_threads");
 /** The engine package every host depends on, pinned to an exact version. */
 exports.ENGINE_PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
-exports.ENGINE_VERSION = '0.11.0';
+exports.ENGINE_VERSION = '0.12.0';
 /** The engine profiles. `frame` decodes without scoring and is the default. */
 exports.PROFILES = ['frame', 'fast', 'full'];
 /** The same input boundary as the MCP adapter: bytes, pixels per side, pixels in all. */

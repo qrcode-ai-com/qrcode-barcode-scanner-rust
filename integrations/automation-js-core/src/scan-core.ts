@@ -14,7 +14,7 @@ import { Worker } from 'node:worker_threads';
 
 /** The engine package every host depends on, pinned to an exact version. */
 export const ENGINE_PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
-export const ENGINE_VERSION = '0.11.0';
+export const ENGINE_VERSION = '0.12.0';
 
 /** The engine profiles. `frame` decodes without scoring and is the default. */
 export const PROFILES = ['frame', 'fast', 'full'] as const;
