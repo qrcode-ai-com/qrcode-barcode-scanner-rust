@@ -18,13 +18,23 @@ MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
 # dropped. The README staged for it (scripts/stage-glama-package.py) gets its assistants as text
 # links and its prompt unfolded; its pictures are plain Markdown images.
 TEXT_LINKS = {'distribution/glama/README.md'}
+# The Dify Marketplace shows every image of a README as a block of its own, an image gallery whose
+# click opens a preview over the page as well as the link, whatever the markup: badges cannot form
+# a row there. It also turns each line break of a paragraph into <br>. The README packed for it
+# gets its assistants as text links on one line; its HTML is kept.
+GALLERY_IMAGES = {'integrations/dify/README.md'}
+# community.obsidian.md renders the README of the plugin's repository with a stylesheet that makes
+# every image a block (`img { display: block }`) and gives an image in a paragraph 2rem margins:
+# linked badges would stand one per line. The README staged for it gets its badges as images that
+# float into a row (readme_actions.floated_badges); its sanitizer keeps align and clear.
+BLOCK_IMAGES = {'integrations/obsidian/README.md'}
 # Pages a registry shows from a raw Markdown file, outside the maintained READMEs. Artifact Hub
 # renders the page of a container image (distribution/artifacthub/LISTING.md, pinned to a commit
 # by the image's readme-url) with react-markdown and skipHtml: every HTML tag and comment is
 # dropped, while a Markdown image and an image inside a link are kept. The page gets its
-# assistants as linked badges and its prompt unfolded. It describes an image whose archive is
-# AGPL, so it gets no MIT source-license section (scripts/build-readme-licensing.py reads the
-# READMEs only).
+# assistants as linked badges and its prompt unfolded. It states the license of the program its
+# image runs in its own License section, so it gets no source-license section
+# (scripts/build-readme-licensing.py reads the READMEs only).
 LISTINGS = ('distribution/artifacthub/LISTING.md',)
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
@@ -61,7 +71,8 @@ def outputs():
         text = (ROOT / path).read_text()
         installers = mcp_links(config) if path in ('README.md', 'integrations/mcp/README.md') else ()
         block = action_block(prompt_of(path, text), installers, markdown_only=path in MARKDOWN_ONLY | TEXT_LINKS,
-                             text_links=path in TEXT_LINKS)
+                             text_links=path in TEXT_LINKS | GALLERY_IMAGES, floated=path in BLOCK_IMAGES,
+                             line_breaks=path in GALLERY_IMAGES)
         result[path] = insert_actions(text, block)
     for path in LISTINGS:
         text = (ROOT / path).read_text()
