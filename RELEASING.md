@@ -1614,7 +1614,48 @@ request here: `MODULE_VERSION` of the `go-module` job of
 supports, and the row of `distribution/README.md`. The job then proves the new
 version from the proxy on three systems.
 
-## OCI 0.11 preparation — unchanged public CLI inputs
+## OCI container image — unchanged public CLI inputs
+
+The image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner` repackages the public
+Linux CLI archives of an engine release without recompilation, under its own
+`oci-v` tag. No Docker Hub upload and no `latest` tag are part of it.
+
+### OCI 0.12 — the MIT image
+
+The [0.12 recipe](distribution/docker/v0.12/README.md) repackages the public
+`v0.12.0` Linux CLI archives, MIT. Its input manifest pins both binaries, the
+public SHA256SUMS, the source archive, both crates and the Debian runtime index.
+The native `distribution-checks` AMD64/ARM64 matrix, dispatched on `main` at
+`6b03e6aca92b3186d4ecddfee3baf5c2a369fd3e`, prepared the context, executed the shared truth and the mixed
+QR/Code 128 profiles (35 truth inputs, 39 profile runs and 49 CLI commands per
+architecture), and exported each tested image once as
+`qrscan-oci012-<architecture>`: run `45180020718`, AMD64 artifact `14820846459`, ARM64
+artifact `14821475784`.
+
+The frozen [0.12 BOM](distribution/docker/v0.12/release-0.12.0.json) names that
+run, its packaging revision, both artifacts with their ZIP digests, config IDs,
+raw layers and binary hashes, and the hashes of the recipe, verifier, workflow
+and consumer truth (the recipe README is left out: it records the publication).
+Engine source is the commit of the `v0.12.0` tag; the image label
+`org.opencontainers.image.licenses` is `MIT`.
+
+Unlike 0.11, the published index also carries the Artifact Hub listing keys
+(`index_annotations`): creation time `2026-11-23T13:03:14.406718446Z`, MIT, vendor, keywords, logo,
+maintainer and `distribution/artifacthub/LISTING.md` at `6b03e6aca92b3186d4ecddfee3baf5c2a369fd3e`. The
+version tag `0.12.0` is therefore its own listing tag; the images keep only the
+eight OCI labels. `oci-publish.yml` consumes this BOM through
+`distribution/docker/v0.12/publish.py` with the same gates as 0.11: default
+dispatch **inspect** runs only the read-only native inspectors; the publisher
+needs the exact `oci-v0.12.0` tag, the `container` environment and a fresh
+in-job reinspection before ephemeral `github.token` authentication. It pushes
+`0.12.0-amd64`, `0.12.0-arm64`, then the index `0.12.0` last, so the newest
+package version is the version tag. After upload, dispatch **public-pull** on the
+same tag; both native anonymous consumers must pass before public delivery is
+claimed. Then add the tag `0.12.0` to the repository in the Artifact Hub control
+panel. Producer artifacts have 14-day retention; expiry is not authority to
+substitute a rebuild.
+
+### OCI 0.11 — the AGPL image, retained
 
 The separate [0.11 recipe](distribution/docker/v0.11/README.md) repackages the
 public `v0.11.0` Linux CLI archives without recompilation. Its input manifest pins
@@ -1639,7 +1680,7 @@ layers and binary hashes. Its two native consumers execute 35 truth inputs,
 39 profile runs and 49 CLI commands each, including the mixed regressions in
 fast/frame/full. Engine source remains `176ac96ef16ee330dbfc6ada10327d0b4e23a8b2`.
 
-The active `oci-publish.yml` now consumes that exact 0.11 BOM through
+Until the 0.12 retarget, `oci-publish.yml` consumed that exact 0.11 BOM through
 `distribution/docker/v0.11/publish.py`. Its default branch dispatch **inspect**
 runs only read-only native inspectors. The publisher is still gated by the
 independent exact `oci-v0.11.0` tag, `container` environment and a fresh in-job
