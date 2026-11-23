@@ -16,7 +16,7 @@ set -eu
 out=$1
 run_url=${2:-}
 package=qrcode-barcode-scanner-bin
-version=0.11.0
+version=0.12.0
 engine=/engine
 home=/home/builder
 
