@@ -472,17 +472,23 @@ GUARD = "startsWith(github.ref, 'refs/tags/v')"
 CONCURRENCY = "publish-${{ github.workflow }}-${{ github.ref }}"
 OCI_JOB = ("oci-publish.yml", "publish")
 OCI_GUARD = "startsWith(github.ref, 'refs/tags/oci-v')"
-OCI_GATE_RUN = 'python3 distribution/docker/v0.11/publish.py gate --ref "$GITHUB_REF"'
+# The frozen release BOM in distribution/docker/v0.12/: its native producer run, the
+# repository that ran it, its packaging revision and one official artifact per platform.
+OCI_RUN = "45180020718"
+OCI_REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
+OCI_PACKAGING = "6b03e6aca92b3186d4ecddfee3baf5c2a369fd3e"
+OCI_ARTIFACTS = {"amd64": "14820846459", "arm64": "14821475784"}
+OCI_GATE_RUN = 'python3 distribution/docker/v0.12/publish.py gate --ref "$GITHUB_REF"'
 OCI_REINSPECT_RUN = '\n'.join((
     "set -euo pipefail",
-    'python3 distribution/docker/v0.11/publish.py inspect --artifacts "$PWD/qualified" --architecture amd64',
-    'python3 distribution/docker/v0.11/publish.py inspect --artifacts "$PWD/qualified" --architecture arm64',
+    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture amd64',
+    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture arm64',
 ))
 OCI_INSPECT_RUN = '\n'.join((
     "set -euo pipefail",
-    'python3 distribution/docker/v0.11/publish.py inspect --artifacts "$PWD/qualified" --architecture "$ARCHITECTURE" --load --native',
-    'python3 distribution/docker/v0.11/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png --expected-platform "linux/$ARCHITECTURE" --packaging-revision 1c015523547226f14cc7abc1931bb074786c32dc --native --receipt "inspected/$ARCHITECTURE.json"',
-    'python3 distribution/docker/v0.11/publish.py record-consumer --architecture "$ARCHITECTURE" --receipt "inspected/$ARCHITECTURE.json"',
+    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture "$ARCHITECTURE" --load --native',
+    'python3 distribution/docker/v0.12/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png --expected-platform "linux/$ARCHITECTURE" --packaging-revision ' + OCI_PACKAGING + ' --native --receipt "inspected/$ARCHITECTURE.json"',
+    'python3 distribution/docker/v0.12/publish.py record-consumer --architecture "$ARCHITECTURE" --receipt "inspected/$ARCHITECTURE.json"',
 ))
 GATE_RUN = 'python3 scripts/package-inspect.py versions --tag "$GITHUB_REF" --strict --quiet'
 SHA = re.compile(r"[0-9a-f]{40}")
@@ -1643,8 +1649,8 @@ def _oci_contract_problems(wf: dict, publisher: dict, first_publish: int) -> lis
     if inspector.get("permissions") != {"contents": "read", "actions": "read"} or "if" in inspector or inspector.get("continue-on-error"):
         fail("OCI native inspector must be unconditional and read-only")
     matrix = ((inspector.get("strategy") or {}).get("matrix") or {}).get("include")
-    if matrix != [{"runner": "ubuntu-24.04", "architecture": "amd64", "artifact_id": "13432955505"},
-                  {"runner": "ubuntu-24.04-arm", "architecture": "arm64", "artifact_id": "13430944709"}]:
+    if matrix != [{"runner": "ubuntu-24.04", "architecture": "amd64", "artifact_id": OCI_ARTIFACTS["amd64"]},
+                  {"runner": "ubuntu-24.04-arm", "architecture": "arm64", "artifact_id": OCI_ARTIFACTS["arm64"]}]:
         fail("OCI inspector must execute both frozen artifacts on native runners")
     if _needs(publisher) != ["inspect"]:
         fail("OCI publisher must depend on the complete native inspect matrix")
@@ -1658,14 +1664,14 @@ def _oci_contract_problems(wf: dict, publisher: dict, first_publish: int) -> lis
     if not any(set(step) <= {"name", "run", "env"} and _block(step.get("run")) == OCI_INSPECT_RUN and (step.get("env") or {}) == {"ARCHITECTURE": "${{ matrix.architecture }}"} for step in _steps(inspector)):
         fail("OCI inspector must reload, require native execution and run the owning consumer assertions")
     expected_downloads = [
-        {"artifact-ids": "13432955505", "run-id": "42063666939", "repository": "qrcode-ai-com/qrcode-barcode-scanner", "digest-mismatch": "error", "github-token": "${{ github.token }}", "path": "qualified/amd64"},
-        {"artifact-ids": "13430944709", "run-id": "42063666939", "repository": "qrcode-ai-com/qrcode-barcode-scanner", "digest-mismatch": "error", "github-token": "${{ github.token }}", "path": "qualified/arm64"},
+        {"artifact-ids": OCI_ARTIFACTS[architecture], "run-id": OCI_RUN, "repository": OCI_REPOSITORY, "digest-mismatch": "error", "github-token": "${{ github.token }}", "path": "qualified/" + architecture}
+        for architecture in ("amd64", "arm64")
     ]
     downloads = [step.get("with") for step in _steps(publisher) if _uses(step)[0] == "actions/download-artifact"]
     if downloads != expected_downloads:
         fail("OCI publisher must download exactly the two frozen artifact IDs from the qualified run")
     inspected_downloads = [step.get("with") for step in _steps(inspector) if _uses(step)[0] == "actions/download-artifact"]
-    if inspected_downloads != [{"artifact-ids": "${{ matrix.artifact_id }}", "run-id": "42063666939", "repository": "qrcode-ai-com/qrcode-barcode-scanner", "digest-mismatch": "error", "github-token": "${{ github.token }}", "path": "qualified/${{ matrix.architecture }}"}]:
+    if inspected_downloads != [{"artifact-ids": "${{ matrix.artifact_id }}", "run-id": OCI_RUN, "repository": OCI_REPOSITORY, "digest-mismatch": "error", "github-token": "${{ github.token }}", "path": "qualified/${{ matrix.architecture }}"}]:
         fail("OCI inspector must download its exact frozen platform artifact")
     for job_id in ("inspect", "publish", "consume-public"):
         given = jobs.get(job_id) or {}
@@ -3835,7 +3841,7 @@ MUTATIONS += (
     ("OCI inspector ignores failed native assertions", P, [("oci-publish.yml", "      - name: re-inspect and reload the exact native image\n        env:", "      - name: re-inspect and reload the exact native image\n        continue-on-error: true\n        env:")], {}, 1, "propagate every step failure"),
     ("OCI inspector skips native assertions", P, [("oci-publish.yml", "      - name: re-inspect and reload the exact native image\n        env:", "      - name: re-inspect and reload the exact native image\n        if: false\n        env:")], {}, 1, "owning consumer assertions"),
     ("OCI inspector skips native identity", P, [("oci-publish.yml", "--load --native", "--load")], {}, 1, "owning consumer assertions"),
-    ("OCI publisher downloads wrong producer run", P, [("oci-publish.yml", '          run-id: "42063666939"', '          run-id: "1"')], {}, 1, "exact frozen platform artifact"),
+    ("OCI publisher downloads wrong producer run", P, [("oci-publish.yml", '          run-id: "' + OCI_RUN + '"', '          run-id: "1"')], {}, 1, "exact frozen platform artifact"),
     ("OCI publisher omits in-job reinspection", P, [("oci-publish.yml", "      - name: re-inspect both downloaded images before registry authentication\n        run: |\n          " + OCI_REINSPECT_RUN.replace("\n", "\n          ") + "\n", "")], {}, 1, "re-inspect both downloaded archives"),
     ("unknown job claims OCI package write", P, [("oci-publish.yml", "  publish:\n", "  surprise:\n")], {}, 1, "no inspection job declared"),
     ("OCI download ignores official digest", P, [("oci-publish.yml", "          digest-mismatch: error", "          digest-mismatch: ignore")], {}, 1, "exact frozen platform artifact"),
