@@ -92,7 +92,8 @@ Plus **GS1 awareness** (element strings + Digital Link with a per-criterion
 | `@qrcode-ai-com/qrcode-barcode-scanner` | npm | Node servers (async, libuv pool) |
 | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` | npm | browsers (one portable WASM, no SIMD) |
 | `qrcode-barcode-scanner` | PyPI | Python — abi3 wheels, declared CPython 3.8 → 3.14 compatibility |
-| Kotlin/Android · Swift/iOS | built from source | native mobile (UniFFI) |
+| Kotlin/Android | built from source | native mobile (UniFFI) |
+| [`QRCodeBarcodeScanner`](/api/mobile) (Swift) | SwiftPM, 0.12.0 public by repository URL | iOS and macOS (UniFFI), prebuilt xcframework |
 | [`qr_barcode_scanner`](/api/flutter) | pub.dev, 0.12.0 public | Flutter — typed `ScanReport`, signed precompiled native library or Rust compiled at app-build time |
 
 <Note>
@@ -103,6 +104,9 @@ separate publication and qualification gates. Flutter is public under verified
 publisher `qrcode-ai.com`; its [native consumer evidence](/api/flutter#native-consumer-evidence)
 records Android and iOS builds with and without Rust, not yet a qualified scan
 on an emulator, simulator or device.
+The Swift package `QRCodeBarcodeScanner` 0.12.0 is public from its own
+repository; a macOS SwiftPM consumer scanned with it, and its Swift Package
+Index submission is not listed yet.
 Old package versions remain
 available under their historical names; the
 [migration guide](/guides/migrate-to-qrcode-barcode-scanner) maps each name.

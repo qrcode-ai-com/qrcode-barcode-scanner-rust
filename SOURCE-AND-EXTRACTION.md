@@ -29,7 +29,12 @@ compiles its Rust core. The [Flutter guide](docs/api/flutter.mdx) records the
 Android and iOS builds of its tag, with and without Rust, and the earlier
 emulator and simulator consumer run of the previous archive.
 Publication does not establish general device qualification. Kotlin/JitPack is
-unqualified, and Swift requires a local source build. JSR has no qualified
+unqualified. The Swift package `QRCodeBarcodeScanner` 0.12.0 is public from its
+own repository, [`qrcode-ai-com/qrcode-barcode-scanner-swift`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift),
+whose tag `0.12.0` pins the xcframework of the release `swift-v0.12.0` by its
+checksum: SwiftPM adds it by repository URL. A macOS SwiftPM consumer of that tag
+scanned a QR code; a scan on an iOS simulator or device is not qualified, and
+its Swift Package Index submission is open, not yet listed. JSR has no qualified
 publication here. The public ClawHub
 skill and OpenClaw bundle are 0.2.0 on engine 0.11.0. The MCP adapter is 0.3.1
 on npm and in the Official MCP Registry. Homebrew and GHCR distribute the CLI

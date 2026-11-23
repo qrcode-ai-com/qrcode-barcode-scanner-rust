@@ -1,9 +1,21 @@
 # Publishing the Swift package and listing it on the Swift Package Index
 
-The Swift package is not published yet. Its repository,
-[`qrcode-ai-com/qrcode-barcode-scanner-swift`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift),
-holds the staged tree but no tag, and the release asset its `Package.swift` pins does not exist
-yet. Each step below that creates an environment or a tag, approves a deployment, publishes a
+Version 0.12.0 is published. On 23 November 2026 the release
+[`swift-v0.12.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/swift-v0.12.0)
+of this repository was published, not marked as the latest, with `QrcodeAiScannerFFI.xcframework.zip` (sha256
+`09cc53e7d538645e544ca2b617d6db519b72358e70d1a5111a70e0544bb14029`), and the annotated tag
+`0.12.0` of
+[`qrcode-ai-com/qrcode-barcode-scanner-swift`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift)
+on the commit `f37477c0`, whose `Package.swift` pins that zip and checksum. A clean SwiftPM
+consumer on macOS that depends on
+`.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", exact: "0.12.0")`
+resolved it, built it and scanned a QR code (report `versions.scanner` 0.12.0). The Swift
+Package Index submission is
+[PackageList issue 16347](https://github.com/SwiftPackageIndex/PackageList/issues/16347), open:
+the package is not listed yet. Applications add the package with
+`.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0")`.
+
+Each step below that creates an environment or a tag, approves a deployment, publishes a
 release or sends a submission is the owner's; no workflow performs it.
 
 ## What a release publishes
@@ -92,9 +104,12 @@ after step 7 above.
 4. Click **Create** (sending it is the owner's step). The index's own automation validates the
    package and opens the change that adds it.
 
-Once the package page exists, its sidebar link **Do you maintain this package?** gives the
-platform and Swift version badges; adding them and replacing the "Not published yet" note of
-the satellite README are one change in `bindings/swift/package/README.md` here, then a new stage.
+The "Not published yet" note of the satellite README is replaced by an install section in
+`bindings/swift/package/README.md` here. The tag `0.12.0` keeps the old note, since a tag is
+never moved; the satellite's default branch shows the new text once its tree is replaced with
+a new stage (step 2 above). Once the package page exists, its sidebar link
+**Do you maintain this package?** gives the platform and Swift version badges; adding them is
+one more change of that README here, then a new stage.
 
 Sources: [Add a Package](https://swiftpackageindex.com/add-a-package),
 [GitHub environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments).

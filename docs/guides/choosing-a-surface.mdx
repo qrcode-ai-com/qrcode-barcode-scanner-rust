@@ -13,7 +13,8 @@ your code runs:
 | Node server (Nuxt/Next/worker) | [`@qrcode-ai-com/qrcode-barcode-scanner`](/api/node) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0` |
 | Browser | [`…-wasm`](/api/wasm) | `npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0` |
 | Python | [`qrcode-barcode-scanner`](/api/python) | `python -m pip install qrcode-barcode-scanner==0.12.0` |
-| Native Android / iOS | [Kotlin / Swift](/api/mobile) | from source |
+| Native Android | [Kotlin](/api/mobile) | from source |
+| Native iOS / macOS | [Swift `QRCodeBarcodeScanner`](/api/mobile) | `.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0")` |
 | Cross-platform app | [Flutter](/api/flutter) | `flutter pub add qr_barcode_scanner:0.12.0`; signed precompiled native library, or Rust built at app-build time |
 
 <Note>
@@ -24,8 +25,10 @@ The [migration guide](/guides/migrate-to-qrcode-barcode-scanner) keeps old
 packages separate. Flutter is also public on pub.dev; its
 [dated native consumer evidence](/api/flutter#native-consumer-evidence) records
 Android and iOS builds with and without Rust, not yet a qualified scan on an
-emulator, simulator or device. Kotlin
-and Swift retain their source-build limits; a binding is not a mobile application.
+emulator, simulator or device. The Swift package 0.12.0 is public by repository
+URL; a macOS consumer scanned with it, not yet an iOS simulator or device, and its
+Swift Package Index submission is not listed yet. Kotlin retains its source-build
+limits; a binding is not a mobile application.
 </Note>
 
 ## What each surface needs to *install*
@@ -38,8 +41,10 @@ and Swift retain their source-build limits; a binding is not a mobile applicatio
   a source build does. See the [wheel platforms and tested interpreter](/api/python).
 - **Kotlin/Android** — source build; no qualified JitPack release is claimed.
   Building needs Rust and the Android NDK.
-- **Swift/iOS** — source build of the `.xcframework`; the package cannot be
-  added by repository URL. Rust and the platform SDK are needed to build it.
+- **Swift/iOS** — SwiftPM fetches the prebuilt `.xcframework` that the
+  package's `Package.swift` pins by its checksum; no Rust toolchain is needed.
+  Building the local source package in `bindings/swift` needs Rust and the
+  platform SDK.
 - **Flutter** — install `qr_barcode_scanner` from pub.dev. At application build
   time, cargokit links a signed precompiled native library, by default on a
   machine without rustup or when the app opts in. Otherwise it compiles the

@@ -42,10 +42,18 @@ This Swift package reads QR codes and barcodes from an image on iOS and macOS, i
 
 The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) are QR Code AI's browser scanning entry points. The [QR code scanner iOS guide](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/ios) and the [barcode scanner iOS guide](https://qrcode-ai.com/en-US/barcode-scanner/sdk/ios) are the development routes for Apple platforms. To prepare a known label for a test, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator), and keep the payload you encoded to compare it with the report.
 
-> **Not published yet.** This repository is the package SwiftPM and the Swift Package Index read,
-> and no version of it is tagged yet: until the first tag and its release asset exist, no
-> dependency line resolves. [How this repository is made](#how-this-repository-is-made) says
-> what a release adds.
+## Install
+
+Add the package by this repository's URL, in Xcode or in a `Package.swift`:
+
+```swift
+.package(url: "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git", from: "0.12.0")
+```
+
+Then link `.product(name: "QRCodeBarcodeScanner", package: "qrcode-barcode-scanner-swift")` to
+your target. SwiftPM fetches the prebuilt xcframework that `Package.swift` pins by its checksum,
+so no Rust toolchain is needed. The Swift Package Index submission is open; the package is not
+listed there yet.
 
 ## How it works
 
