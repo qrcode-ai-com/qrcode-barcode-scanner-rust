@@ -28,6 +28,10 @@ why = "The record of the 0.11 container image. release-0.11.0.json pins these fi
 paths = ["distribution/docker/v0.11/**"]
 
 [[frozen]]
+why = "The recipe and record of the 0.12 container image: its inputs, labels and receipts pin the 0.12.0 release by hash, and its release BOM pins the recipe files."
+paths = ["distribution/docker/v0.12/**"]
+
+[[frozen]]
 why = "Written by its package manager. Regenerate it with that tool."
 paths = ["Cargo.lock", "**/Cargo.lock", "**/package-lock.json", "**/pubspec.lock"]
 

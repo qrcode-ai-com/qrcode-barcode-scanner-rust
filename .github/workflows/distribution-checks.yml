@@ -31,9 +31,9 @@ jobs:
       - name: verify public CLI inputs and prepare a minimal context
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.11/prepare.py --self-test
-          python3 distribution/docker/v0.11/record.py --self-test
-          env -u GH_TOKEN -u GITHUB_TOKEN python3 distribution/docker/v0.11/prepare.py \
+          python3 distribution/docker/v0.12/prepare.py --self-test
+          python3 distribution/docker/v0.12/record.py --self-test
+          env -u GH_TOKEN -u GITHUB_TOKEN python3 distribution/docker/v0.12/prepare.py \
             --assets "$RUNNER_TEMP/qrscan-public-assets" --out "$RUNNER_TEMP/qrscan-oci-context" \
             --receipt qualified/preparation.json
       - name: package unchanged public CLI bytes in the pinned runtime base
@@ -51,7 +51,7 @@ jobs:
           }
           test "$(normalize "$(uname -m)")" = "$ARCHITECTURE"
           test "$(normalize "$(docker info --format '{{.Architecture}}')")" = "$ARCHITECTURE"
-          docker build --no-cache --network none -f distribution/docker/v0.11/Dockerfile \
+          docker build --no-cache --network none -f distribution/docker/v0.12/Dockerfile \
             --platform "linux/$ARCHITECTURE" --build-arg "PACKAGING_REVISION=$GITHUB_SHA" \
             -t qrscan:qualified "$RUNNER_TEMP/qrscan-oci-context"
       - name: execute mounted input, shared truth and mixed profiles without network or write access
@@ -59,18 +59,18 @@ jobs:
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.11/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png \
+          python3 distribution/docker/v0.12/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png \
             --expected-platform "linux/$ARCHITECTURE" --packaging-revision "$GITHUB_SHA" --native \
             --receipt qualified/consumer.json
       - name: export the tested image without rebuilding
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.11/record.py qrscan:qualified \
+          python3 distribution/docker/v0.12/record.py qrscan:qualified \
             --consumer qualified/consumer.json --out qualified-export
           cp qualified/preparation.json qualified-export/preparation.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: qrscan-oci011-${{ matrix.architecture }}
+          name: qrscan-oci012-${{ matrix.architecture }}
           path: qualified-export/
           if-no-files-found: error
           retention-days: 14
