@@ -31,11 +31,24 @@ class LicensingTests(unittest.TestCase):
         paths = ['crates/qrcode-ai-scanner', 'crates/qrcode-ai-scanner-cli',
                  'crates/qrcode-ai-scanner-node', 'crates/qrcode-ai-scanner-wasm',
                  'crates/qrcode-ai-scanner-py', 'bindings/flutter', 'integrations/mcp',
-                 'integrations/openclaw', 'skills/qrcode-barcode-scanner', 'distribution/aur',
-                 'bindings/kotlin']
+                 'integrations/openclaw', 'skills/qrcode-barcode-scanner', 'bindings/kotlin']
         for path in paths:
             with self.subTest(path=path):
                 self.assertEqual((ROOT / path / 'LICENSE').read_bytes(), license_text.encode())
+
+    def test_aur_recipe_is_0bsd_like_the_published_aur_repository(self):
+        # Arch recipes are 0BSD by convention; the packaged qrscan keeps its MIT license.
+        # The owner chose 0BSD for this recipe on 23 November 2026, matching the AUR repository.
+        recipe = (ROOT / 'distribution/aur/LICENSE').read_text()
+        self.assertTrue(recipe.startswith('Copyright (C) 2026 SuperNovae\n'))
+        self.assertIn('Permission to use, copy, modify, and/or distribute this software for any\n'
+                      'purpose with or without fee is hereby granted.', recipe)
+        self.assertNotIn('MIT License', recipe)
+        pkgbuild = (ROOT / 'distribution/aur/PKGBUILD').read_text()
+        self.assertIn('# SPDX-License-Identifier: 0BSD', pkgbuild)
+        self.assertIn("license=('MIT')", pkgbuild)
+        self.assertIn('The recipe is licensed under [0BSD](LICENSE).',
+                      (ROOT / 'distribution/aur/README.md').read_text())
 
     def test_authored_package_manifests_declare_mit(self):
         self.assertEqual(tomllib.loads((ROOT / 'Cargo.toml').read_text())['workspace']['package']['license'], 'MIT')
