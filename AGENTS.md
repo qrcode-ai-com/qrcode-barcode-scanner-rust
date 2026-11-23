@@ -44,8 +44,8 @@ package `QRCodeBarcodeScanner` 0.12.0 is public: SwiftPM adds
 `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-swift.git` by URL, and its
 tag `0.12.0` pins the xcframework of the release `swift-v0.12.0` by its checksum
 ([bindings/swift/LISTING.md](bindings/swift/LISTING.md)). A macOS SwiftPM consumer
-of that tag scanned a QR code; iOS simulator or device scans are not qualified, and
-the Swift Package Index submission is open, not yet listed. JSR, agent adapters
+of that tag scanned a QR code; iOS simulator or device scans are not qualified. It is
+listed on the Swift Package Index (https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift). JSR, agent adapters
 and containers retain their own publication and qualification gates. QR Code AI's SaaS and creation engine have separate
 sources and release qualification. A mobile scanner binding is not a consumer
 app. Component licenses do not determine the SaaS's license.
@@ -97,7 +97,7 @@ transport the caller supplies.
 | `crates/qrcode-ai-scanner-py` | `qrcode-barcode-scanner` (PyO3, workspace-excluded), 0.12.0 published | PyPI |
 | `bindings/flutter` | `qr_barcode_scanner`, Flutter plugin (FRB + cargokit), 0.12.0 public with signed precompiled libraries; separate native qualification limits | pub.dev |
 | `bindings/kotlin` | com.github.qrcode-ai-com:qrcode-barcode-scanner, not yet qualified | JitPack |
-| `bindings/swift` | `QRCodeBarcodeScanner` 0.12.0 published from `qrcode-ai-com/qrcode-barcode-scanner-swift`, staged from `bindings/swift/package`, its xcframework on the release `swift-v0.12.0`; the local source package `QrcodeAiScanner` stays for development | SwiftPM by repository URL; Swift Package Index submitted, not listed |
+| `bindings/swift` | `QRCodeBarcodeScanner` 0.12.0 published from `qrcode-ai-com/qrcode-barcode-scanner-swift`, staged from `bindings/swift/package`, its xcframework on the release `swift-v0.12.0`; the local source package `QrcodeAiScanner` stays for development | SwiftPM by repository URL; listed on the Swift Package Index |
 
 **Downstream, this crate is "the judge"**: the generator's e2e floors,
 the qrt templates layer and the 306-template factory all score through

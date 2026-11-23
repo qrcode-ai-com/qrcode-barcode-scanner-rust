@@ -38,6 +38,9 @@ Help me understand QR Code & Barcode Scanner for Swift (bindings/swift/package/R
 
 <!-- /qrcode-ai-readme-actions:v2 -->
 
+[![Swift versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift)
+[![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-swift%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift)
+
 This Swift package reads QR codes and barcodes from an image on iOS and macOS, in process, with the open-source engine of QR Code & Barcode Scanner compiled into an xcframework. Your app supplies the image or the camera frame and owns permissions and presentation; the package returns one JSON report that lists every code it found, with its format, its content and where it sits in the image.
 
 The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) are QR Code AI's browser scanning entry points. The [QR code scanner iOS guide](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/ios) and the [barcode scanner iOS guide](https://qrcode-ai.com/en-US/barcode-scanner/sdk/ios) are the development routes for Apple platforms. To prepare a known label for a test, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator), and keep the payload you encoded to compare it with the report.
@@ -52,8 +55,8 @@ Add the package by this repository's URL, in Xcode or in a `Package.swift`:
 
 Then link `.product(name: "QRCodeBarcodeScanner", package: "qrcode-barcode-scanner-swift")` to
 your target. SwiftPM fetches the prebuilt xcframework that `Package.swift` pins by its checksum,
-so no Rust toolchain is needed. The Swift Package Index submission is open; the package is not
-listed there yet.
+so no Rust toolchain is needed. The package is listed on the
+[Swift Package Index](https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift).
 
 ## How it works
 
