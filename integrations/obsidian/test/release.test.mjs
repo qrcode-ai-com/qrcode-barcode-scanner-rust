@@ -64,7 +64,9 @@ test('main.js names the engine and closes with its license texts', () => {
 
 test('the repository license files are the plugin MIT license and the engine package texts', () => {
   assert.ok(readFileSync(join(HERE, 'LICENSE'), 'utf8').startsWith('MIT License\n'));
-  assert.equal(staged('ENGINE-LICENSE', 'distribution/releases/historical-agpl-3.0.txt'), readFileSync(join(enginePackage, 'LICENSE'), 'utf8'));
+  // Engine 0.12.0 and later ship the engine repository's MIT LICENSE; releases up to 1.0.2 embedded
+  // engine 0.11.0 and carried its AGPL text instead.
+  assert.equal(staged('ENGINE-LICENSE', 'LICENSE'), readFileSync(join(enginePackage, 'LICENSE'), 'utf8'));
   assert.equal(staged('ENGINE-LICENSE-APACHE-2.0', 'crates/qrcode-ai-scanner/LICENSE-APACHE-2.0'), readFileSync(join(enginePackage, 'LICENSE-APACHE-2.0'), 'utf8'));
   assert.equal(readFileSync(join(HERE, 'ENGINE-THIRD-PARTY.md'), 'utf8'), readFileSync(join(enginePackage, 'THIRD-PARTY.md'), 'utf8'));
 });

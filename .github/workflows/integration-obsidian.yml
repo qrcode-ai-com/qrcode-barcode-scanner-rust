@@ -15,7 +15,7 @@ on:
       - scripts/stage-obsidian-satellite.py
       - scripts/satellite_stage.py
       - fixtures/symbology/mixed-code128-qr.png
-      - distribution/releases/historical-agpl-3.0.txt
+      - LICENSE
       - crates/qrcode-ai-scanner/LICENSE-APACHE-2.0
 
 permissions:
