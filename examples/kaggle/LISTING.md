@@ -21,8 +21,8 @@ the same sample, and judges its three reports.
      the notebook is published from one personal account and links a commercial product.
    - (c) Skip Kaggle. The only option with no terms risk.
 2. **Licence notice.** Kaggle shows a public notebook as released under Apache 2.0. The notebook's
-   own cells are project-authored MIT source in this repository; the engine 0.11.0 it installs
-   from PyPI keeps AGPL-3.0-or-later, and no engine source is pasted in a cell. Publishing means
+   own cells are project-authored MIT source in this repository; the engine 0.12.0 it installs
+   from PyPI ships under the MIT License, and no engine source is pasted in a cell. Publishing means
    accepting that Kaggle shows the cells under Apache 2.0 as well.
 3. **Kaggle username.** The notebook's address is `https://www.kaggle.com/code/<username>/qr-code-barcode-scanner-demo`.
    The slug follows the title (Kaggle lowercases it and turns every other character into a
@@ -53,7 +53,7 @@ Read a QR code and a Code 128 barcode with the open-source qrcode-barcode-scanne
 Short description, for a profile post or a discussion:
 
 ```text
-An executed notebook that installs the open-source Python package qrcode-barcode-scanner 0.11.0 from PyPI, checks that the installed native module is the published wheel, and reads a QR code and a Code 128 barcode from one sample image with the fast, frame and full profiles. Each scan runs without a time budget, the reports are saved as JSON outputs, and the last cell uninstalls the package and proves it is gone. The engine runs in the Kaggle session.
+An executed notebook that installs the open-source Python package qrcode-barcode-scanner 0.12.0 from PyPI, checks that the installed native module is the published wheel, and reads a QR code and a Code 128 barcode from one sample image with the fast, frame and full profiles. Each scan runs without a time budget, the reports are saved as JSON outputs, and the last cell uninstalls the package and proves it is gone. The engine runs in the Kaggle session.
 ```
 
 ### Privacy answers
@@ -112,9 +112,9 @@ Source and issues: `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust
      --fast /tmp/kaggle-output/scan-reports/fast.json \
      --frame /tmp/kaggle-output/scan-reports/frame.json \
      --full /tmp/kaggle-output/scan-reports/full.json \
-     --destination "Kaggle Notebooks" --identifier qrcode-barcode-scanner --version 0.11.0 \
+     --destination "Kaggle Notebooks" --identifier qrcode-barcode-scanner --version 0.12.0 \
      --url https://www.kaggle.com/code/<username>/qr-code-barcode-scanner-demo \
-     --install "%pip install qrcode-barcode-scanner==0.11.0, in the notebook" \
+     --install "%pip install qrcode-barcode-scanner==0.12.0, in the notebook" \
      --receipt /tmp/kaggle-receipt.json
    python3 scripts/destination-acceptance.py removed --not-applicable --receipt /tmp/kaggle-receipt.json
    ```

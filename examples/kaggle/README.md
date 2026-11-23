@@ -46,8 +46,8 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 
 [`qrcode-barcode-scanner-demo.ipynb`](qrcode-barcode-scanner-demo.ipynb) is the notebook and
 [`kernel-metadata.json`](kernel-metadata.json) the settings `kaggle kernels push` reads. The
-notebook installs [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/)
-0.11.0, the scanner engine written in Rust, which runs inside the notebook's session.
+notebook installs [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/)
+0.12.0, the scanner engine written in Rust, which runs inside the notebook's session.
 
 ## Status
 
@@ -61,14 +61,15 @@ and step. Once it is public, this page will link it.
   <img src="media/notebook-run.png" alt="The notebook after a run: the installed wheel and the SHA-256 of its native module, then the QR code https://qrc-ai.com/76xMa and the Code 128 STOCK-4827 read in the fast, frame and full profiles with budget_exhausted False" width="100%">
 </p>
 
-The picture is the notebook as `demos.yml` ran it, rendered to a page. Each cell asserts its own
+The picture is the notebook as `demos.yml` ran it with version 0.11.0, rendered to a page; a run
+of 0.12.0 names that version's wheel and module hash. Each cell asserts its own
 result, so a cell that finishes without an error did what it says.
 
 | Step | Result |
 | --- | --- |
-| Install | `%pip install qrcode-barcode-scanner==0.11.0`. The package has no dependency. |
+| Install | `%pip install qrcode-barcode-scanner==0.12.0`. The package has no dependency. |
 | Check what is installed | The Python version, the platform, the package version and the SHA-256 of the installed native module, which must be the module of a wheel published on PyPI. The output names that wheel. |
-| Get the sample | One image with a QR code and a Code 128 barcode, downloaded from the release tag `v0.11.0` and checked against its SHA-256. |
+| Get the sample | One image with a QR code and a Code 128 barcode, downloaded from the release tag `v0.12.0` and checked against its SHA-256. |
 | Scan | The `fast`, `frame` and `full` profiles each return the QR code `https://qrc-ai.com/76xMa` and the Code 128 `STOCK-4827`, each once, with `budget_ms=0` and the budget flag printed as `False`. |
 | Read a report | The symbology, text, payload kind and measured position of each code. |
 | Save the reports | `scan-reports/fast.json`, `frame.json` and `full.json` in the working folder: on Kaggle, `/kaggle/working`, shown under the notebook's **Output**. |
@@ -156,10 +157,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 The notebook prints each code with its format, text, payload kind and measured position, and saves the engine's full report of each profile as JSON under `scan-reports/`.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -213,8 +214,8 @@ each one starts `qrscan` and hands you its report.
 
 MIT for the notebook's project-authored cells, like the rest of this example source. Kaggle shows a
 public notebook under Apache 2.0. The notebook installs the engine wheel `qrcode-barcode-scanner`
-0.11.0 from PyPI and pastes none of its source; the published engine 0.11.0 keeps the license it
-shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the
+0.12.0 from PyPI and pastes none of its source; the published engine 0.12.0 ships under the MIT
+License. Read the license packaged with the version you install and the
 [licensing guide](../../LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.

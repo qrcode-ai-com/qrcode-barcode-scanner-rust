@@ -20,6 +20,8 @@ APP = pathlib.Path(__file__).resolve().parents[1]
 QR = "https://qrc-ai.com/76xMa"
 CODE128 = "STOCK-4827"
 PROFILES = ("fast", "frame", "full")
+# The engine version requirements.txt pins; the host kit's default follows the other Python hosts.
+ENGINE_VERSION = "0.12.0"
 PICTURES = (page.BANNER, page.STEPS, page.RETURNS, page.FORMATS, page.RUNTIMES)
 # The six QR Code AI pages every scanner destination links in its sentences: the two scanners, the
 # two guides of the route this app uses (Python) and the two generators.
@@ -124,7 +126,7 @@ def test_an_uploaded_mixed_image_gives_both_codes_in_each_profile(mixed_bytes, p
     upload(app, "label.png", mixed_bytes)
     assert app.success[0].value == "2 code(s) found in label.png."
     assert [row["Text"] for row in table(app)] == [QR, CODE128]
-    report = kit.assert_mixed(json.loads(app.json[0].value), profile)
+    report = kit.assert_mixed(json.loads(app.json[0].value), profile, ENGINE_VERSION)
     direct = qrcode_barcode_scanner.scan(mixed_bytes, profile, budget_ms=0)
     assert report["detections"] == json.loads(json.dumps(direct["detections"]))
 
@@ -184,7 +186,7 @@ def test_the_pictures_prompt_and_ask_ai_links_match_the_readme():
 def test_the_requirements_pin_the_published_engine():
     assert (APP / "requirements.txt").read_text().split() == [
         "streamlit==1.67.0", "pillow==13.0.0", f"qrcode-barcode-scanner=={qrcode_barcode_scanner.__version__}"]
-    assert qrcode_barcode_scanner.__version__ == "0.11.0"
+    assert qrcode_barcode_scanner.__version__ == ENGINE_VERSION
 
 
 def test_the_config_beside_the_app_matches_its_limits():
@@ -206,6 +208,6 @@ def test_the_acceptance_reports_are_written_through_the_app(mixed_bytes):
         app.number_input[0].set_value(0)
         upload(app, "mixed.png", mixed_bytes)
         assert app.success[0].value == "2 code(s) found in mixed.png."
-        return kit.assert_mixed(json.loads(app.json[0].value), profile)
+        return kit.assert_mixed(json.loads(app.json[0].value), profile, ENGINE_VERSION)
 
     assert len(kit.write_acceptance_reports(scan)) == 3
