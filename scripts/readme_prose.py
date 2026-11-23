@@ -66,6 +66,7 @@ for _path in ('distribution/alpine', 'distribution/conda-forge', 'distribution/f
               'distribution/ppa', 'distribution/snap', 'distribution/termux', 'distribution/wasmer'):
     GUIDES[f'{_path}/README.md'] = ('cli', 'command line')
 GUIDES['distribution/artifacthub/README.md'] = ('docker', 'Docker')
+GUIDES['distribution/artifacthub/LISTING.md'] = ('docker', 'Docker')
 GUIDES['distribution/glama/README.md'] = ('mcp', 'MCP')
 GUIDES['distribution/http/README.md'] = ('docker', 'Docker')
 GUIDES['distribution/jsr/README.md'] = ('sdk/javascript', 'JavaScript')

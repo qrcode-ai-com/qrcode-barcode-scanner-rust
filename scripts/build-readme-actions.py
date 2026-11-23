@@ -18,6 +18,14 @@ MARKDOWN_ONLY = {'bindings/dotnet/README.md'}
 # dropped. The README staged for it (scripts/stage-glama-package.py) gets its assistants as text
 # links and its prompt unfolded; its pictures are plain Markdown images.
 TEXT_LINKS = {'distribution/glama/README.md'}
+# Pages a registry shows from a raw Markdown file, outside the maintained READMEs. Artifact Hub
+# renders the page of a container image (distribution/artifacthub/LISTING.md, pinned to a commit
+# by the image's readme-url) with react-markdown and skipHtml: every HTML tag and comment is
+# dropped, while a Markdown image and an image inside a link are kept. The page gets its
+# assistants as linked badges and its prompt unfolded. It describes an image whose archive is
+# AGPL, so it gets no MIT source-license section (scripts/build-readme-licensing.py reads the
+# READMEs only).
+LISTINGS = ('distribution/artifacthub/LISTING.md',)
 # Sources that another repository publishes as its README.md: scripts/stage-publisher-site.py
 # writes REPOSITORY.md as the README of qrcode-ai-com/qrcode-ai-com.github.io.
 STAGED_AS_README = ('distribution/publisher/REPOSITORY.md',)
@@ -55,6 +63,9 @@ def outputs():
         block = action_block(prompt_of(path, text), installers, markdown_only=path in MARKDOWN_ONLY | TEXT_LINKS,
                              text_links=path in TEXT_LINKS)
         result[path] = insert_actions(text, block)
+    for path in LISTINGS:
+        text = (ROOT / path).read_text()
+        result[path] = insert_actions(text, action_block(prompt_of(path, text), markdown_only=True))
     for path in NOTEBOOKS:
         notebook = json.loads((ROOT / path).read_text())
         first = notebook['cells'][0]
