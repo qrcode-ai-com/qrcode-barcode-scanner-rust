@@ -61,6 +61,7 @@ OTHER_DIGESTS = {
     "8720bf185c698747893fbd67d33bda9f42ffa99ef86af094fbaa7e4a9298a359": "the arm64 image manifest",
     "6022934ca26dda33a52ea5f3d2585c0b7430a74e0c51cc9722aa1a4d8b711e64": "the amd64 image configuration",
     "2c1e8d30e960ecf1d32c88200b32dd3df38e80a379637ce2ac91c32d1cceea58": "the arm64 image configuration",
+    "6963624a7b4f173e533e61f893cc67d3144bccd5be99ef5a93b5abcdfffeb366": "the listing index of tag 0.11.0-r1",
 }
 ARCHIVE = "qrcode-barcode-scanner-cli-0.11.0-source"
 LICENSE_INSTALLED = ("LICENSE", "LICENSING.md", "crates/qrcode-ai-scanner/LICENSE-APACHE-2.0",
