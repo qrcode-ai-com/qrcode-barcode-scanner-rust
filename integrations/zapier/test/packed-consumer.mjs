@@ -22,7 +22,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const app = resolve(here, '..');
 const checkout = resolve(app, '../..');
 const ENGINE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
-const ENGINE_VERSION = '0.11.0';
+const ENGINE_VERSION = '0.12.0';
 const PROFILES = ['fast', 'frame', 'full'];
 const EXPECTED = { qr_code: 'https://qrc-ai.com/76xMa', code128: 'STOCK-4827' };
 const METHOD = 'creates.scan_image.operation.perform';
@@ -96,7 +96,7 @@ for (const [id, { license, dir }] of packages) {
   // A package published without any license text is accepted only when LICENSE-NOTES.md names it.
   if (!notice && license !== 'Public Domain' && !notes.includes(`\`${id}\``)) fail(`build.zip carries no licence text for ${id}`);
 }
-if (packages.get(`${ENGINE}@${ENGINE_VERSION}`)?.license !== 'AGPL-3.0-or-later') fail('the engine must be the AGPL-3.0-or-later 0.11.0 package');
+if (packages.get(`${ENGINE}@${ENGINE_VERSION}`)?.license !== 'MIT') fail(`the engine must be the MIT ${ENGINE_VERSION} package`);
 
 // 4. The image, served over HTTP as Zapier hands a file to an action.
 const image = readFileSync(imagePath);

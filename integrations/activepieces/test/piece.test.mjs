@@ -42,7 +42,7 @@ test('the bundle exports one Piece with the scan action and no connection', () =
 
 test('the published manifest installs only the pinned engine', () => {
   assert.equal(published.main, './src/index.js');
-  assert.deepEqual(published.dependencies, { '@qrcode-ai-com/qrcode-barcode-scanner-wasm': '0.11.0' });
+  assert.deepEqual(published.dependencies, { '@qrcode-ai-com/qrcode-barcode-scanner-wasm': '0.12.0' });
   assert.equal(published.license, 'MIT');
   for (const key of ['scripts', 'devDependencies', 'bundleDeps', 'types']) assert.ok(!(key in published), `${key} is removed`);
   const source = readFileSync(bundlePath, 'utf8');
@@ -64,9 +64,9 @@ for (const profile of ['fast', 'frame', 'full']) {
     assert.deepEqual(result.texts, EXPECTED);
     assert.deepEqual(result.codes.map((code) => code.symbology), ['qr_code', 'code128']);
     assert.equal(result.count, 2);
-    assert.deepEqual([result.profile, result.engine], [profile, '0.11.0']);
+    assert.deepEqual([result.profile, result.engine], [profile, '0.12.0']);
     assert.deepEqual(result.file, { name: 'label.png', extension: 'png' });
-    assert.equal(result.report.versions.scanner, '0.11.0');
+    assert.equal(result.report.versions.scanner, '0.12.0');
     assert.equal(result.report.trace.budget_exhausted, false);
     assert.equal(result.report.score === null, profile === 'frame');
   });

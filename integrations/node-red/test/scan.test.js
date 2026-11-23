@@ -68,7 +68,7 @@ for (const profile of ['fast', 'frame', 'full']) {
     const { msg, scan } = await exchange({ payload: fixture, profile, budgetMs: 0, topic: 'label' });
     assert.deepEqual(msg.texts, EXPECTED);
     assert.deepEqual(msg.codes.map((code) => code.symbology), ['qr_code', 'code128']);
-    assert.equal(msg.payload.versions.scanner, '0.11.0');
+    assert.equal(msg.payload.versions.scanner, '0.12.0');
     assert.equal(msg.payload.trace.budget_exhausted, false);
     assert.equal(msg.payload.score === null, profile === 'frame');
     assert.equal(msg.topic, 'label', 'the rest of the message is kept');

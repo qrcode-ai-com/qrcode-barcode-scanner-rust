@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@activepieces/pieces-framework": "0.32.0",
-    "@qrcode-ai-com/qrcode-barcode-scanner-wasm": "0.11.0",
+    "@qrcode-ai-com/qrcode-barcode-scanner-wasm": "0.12.0",
     "@types/node": "22.19.1",
     "deepmerge-ts": "8.0.2",
     "esbuild": "0.28.1",

@@ -18,7 +18,7 @@ import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 
 const ENGINE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
-const ENGINE_VERSION = '0.11.0';
+const ENGINE_VERSION = '0.12.0';
 const fixture = readFileSync(new URL('../../../fixtures/symbology/mixed-code128-qr.png', import.meta.url));
 const EXPECTED = ['https://qrc-ai.com/76xMa', 'STOCK-4827'];
 const PROFILES = ['fast', 'frame', 'full'];
@@ -136,7 +136,7 @@ for (const [host, spec] of Object.entries(HOSTS)) {
   assert.deepEqual(manifest.dependencies, { [ENGINE]: ENGINE_VERSION });
   assert.equal(manifest.license, 'MIT');
   const engine = JSON.parse(readFileSync(join(consumer, 'node_modules', ...ENGINE.split('/'), 'package.json'), 'utf8'));
-  assert.deepEqual([engine.version, engine.license], [ENGINE_VERSION, 'AGPL-3.0-or-later']);
+  assert.deepEqual([engine.version, engine.license], [ENGINE_VERSION, 'MIT']);
 
   const scans = {};
   for (const profile of PROFILES) {

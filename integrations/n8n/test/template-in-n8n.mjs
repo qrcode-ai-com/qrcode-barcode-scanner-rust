@@ -105,11 +105,11 @@ inN8n([
 	editJson('~/.n8n/nodes/package.json', `json.dependencies["${PACKAGE}"] = require(process.env.HOME + "/.n8n/nodes/node_modules/${PACKAGE}/package.json").version;`),
 ].join('\n'));
 const installed = JSON.parse(inN8n(`cat ${PACKAGE_DIR}/package.json`));
-assert.equal(installed.version, '0.1.0');
+assert.equal(installed.version, '0.1.1');
 assert.equal(installed.peerDependencies, undefined);
 const engine = JSON.parse(inN8n(`cat ${PACKAGE_DIR}/node_modules/${ENGINE}/package.json`));
-assert.equal(engine.version, '0.11.0');
-assert.deepEqual(JSON.parse(inN8n('cat ~/.n8n/nodes/package.json')).dependencies, { [PACKAGE]: '0.1.0' });
+assert.equal(engine.version, '0.12.0');
+assert.deepEqual(JSON.parse(inN8n('cat ~/.n8n/nodes/package.json')).dependencies, { [PACKAGE]: '0.1.1' });
 // The file n8n loads, resolved from ~/.n8n/nodes: found now, and gone after step 6.
 const NODE_FILE = `${PACKAGE}/dist/nodes/QrcodeBarcodeScanner/QrcodeBarcodeScanner.node.js`;
 const resolveNode = `node -e "console.log(require.resolve('${NODE_FILE}', { paths: ['/home/node/.n8n/nodes'] }))"`;
@@ -198,7 +198,7 @@ for (const key of ['shipped', 'fast', 'frame', 'full']) {
 	const profile = key === 'shipped' ? 'frame' : key;
 	for (const json of scanned) {
 		assert.equal(json.profile, profile);
-		assert.equal(json.engine, '0.11.0');
+		assert.equal(json.engine, '0.12.0');
 		assert.equal('report' in json, key !== 'shipped', `${key}: report kept only in the copies`);
 	}
 	const got = branches(runData);
@@ -210,7 +210,7 @@ for (const key of ['shipped', 'fast', 'frame', 'full']) {
 	if (key !== 'shipped' && args.reports) {
 		mkdirSync(args.reports, { recursive: true });
 		const mixed = scanned.find((json) => json.image.fileName === 'mixed.png');
-		assert.equal(mixed.report.versions.scanner, '0.11.0');
+		assert.equal(mixed.report.versions.scanner, '0.12.0');
 		assert.equal(mixed.report.trace.budget_exhausted, false);
 		writeFileSync(join(args.reports, `${key}.json`), JSON.stringify(mixed.report));
 	}
