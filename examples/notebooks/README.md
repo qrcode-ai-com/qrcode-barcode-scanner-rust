@@ -49,12 +49,12 @@ package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scann
 and scans a sample image with it. The scanner is a local Rust engine: every image is decoded in
 the session that runs the notebook.
 
-[![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.11.0-r3?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.11.0-r3/examples/notebooks/scan-images.ipynb)
+[![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.12.0?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.12.0/examples/notebooks/scan-images.ipynb)
 
-The badges open a fixed tag, `demos-v0.11.0-r3`, whose notebook installs 0.11.0; this folder on
-`main` installs 0.12.0. The first badge opens the notebook on [mybinder.org](https://mybinder.org/),
-a free public service with no account. It prepares a session with the package already installed,
-which can take a few minutes, and the session ends after about ten minutes of inactivity.
+The badges open a fixed tag, `demos-v0.12.0`, whose notebook installs 0.12.0. The first badge
+opens the notebook on [mybinder.org](https://mybinder.org/), a free public service with no
+account. It prepares a session with the package already installed, which can take a few minutes,
+and the session ends after about ten minutes of inactivity.
 
 The second badge opens it in [Google Colab](https://colab.research.google.com/). Colab runs code
 only for a signed-in Google account, and its first code cell installs the package into the Colab
