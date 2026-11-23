@@ -284,7 +284,7 @@ payload and Code 128 `STOCK-4827` together in `fast`, `frame`, and `full`.
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0) | 0.12.0-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.11.0) | 0.11.0-1.fc44 | Fedora 44, x86_64 and aarch64 |
-| [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.11.0) | 0.11.0 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
+| [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.0) | 0.12.0 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
 | [GitHub Container Registry](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) | 0.11.0 | Linux AMD64 and ARM64 |
 
 Install `qrscan` through Homebrew.
@@ -319,9 +319,10 @@ containers ran under emulation.
 On Arch Linux x86_64, clone the
 [`qrcode-barcode-scanner-bin` AUR recipe](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin)
 and run `makepkg -si`. The [Arch install guide](aur/README.md) covers the
-existing `qrscan` command conflict. A clean Arch x86_64 container built from
-the public recipe, installed the scanner, read both codes in all three profiles,
-and removed the package. The container ran under x86-64 emulation.
+existing `qrscan` command conflict. In the [destination acceptance run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45179767772)
+of 23 November 2026, a clean Arch Linux container on an x86_64 runner cloned the
+public recipe signed out at AUR commit `a739e38`, built and installed the
+package it describes, read both codes in all three profiles, and removed it.
 
 On Fedora 44, download the [RPM release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.11.0),
 verify its SHA-256, then run
@@ -331,14 +332,15 @@ Fresh Fedora 44 installs from the public downloads passed the mixed scan and
 removal on both architectures. COPR follows its own publication process.
 
 On any other GNU/Linux system, download the AppImage for your architecture from the
-[AppImage release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.11.0):
+[AppImage release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.0):
 one file that runs `qrscan` with nothing to install. Check it against the accompanying SHA-256
 list, make it executable and run it. The [AppImage recipe](appimage/README.md) documents the
-build and the route for hosts without FUSE. The [public files](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/42953422833),
+build and the route for hosts without FUSE. The [public files](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45181776909),
 downloaded signed out, passed the mixed scan on an Ubuntu 22.04 runner and, with no network, on
 AlmaLinux 8, Ubuntu 22.04 and Fedora containers, for both architectures. The
 [AppImage catalogue](https://appimage.github.io/qrcode-barcode-scanner/) lists it since
-20 November 2026.
+20 November 2026; its page still describes the earlier file it tested on that day, until the
+catalogue tests the entry again.
 
 For containers, use the [public GHCR image 0.11.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
 on Linux AMD64 or ARM64. The [container guide](docker/v0.11/README.md#run-the-public-image)
