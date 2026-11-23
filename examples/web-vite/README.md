@@ -46,8 +46,8 @@ To prepare a saved label to select in the Vite page, use the [QR code generator]
 
 A small web page that scans QR codes and barcodes from an image, in the browser. It installs the
 published WebAssembly package
-[`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.11.0)
-0.11.0 from npm and runs it in a worker. The image stays on your device.
+[`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.12.0)
+0.12.0 from npm and runs it in a worker. The image stays on your device.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/demos-v0.11.0-r3/examples/web-vite)
 
@@ -57,8 +57,8 @@ need no account. The folder stands alone: it depends on nothing else in this rep
 The workflow [`pages.yml`](../../.github/workflows/pages.yml) publishes the built page on GitHub
 Pages, at <https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/>. It builds this folder
 from `main` with `npm run build -- --base /qrcode-barcode-scanner-rust/`, the path of that
-address. That page follows `main`; the button opens a fixed tag. The same page, built with
-`--base ./`, also runs in the Hugging Face Space
+address. That page follows `main`; the button opens a fixed tag, `demos-v0.11.0-r3`, whose
+folder installs 0.11.0. The same page, built with `--base ./`, also runs in the Hugging Face Space
 [`ThibautMELEN/qrcode-barcode-scanner`](https://huggingface.co/spaces/ThibautMELEN/qrcode-barcode-scanner).
 
 ## Run it on your machine
@@ -144,10 +144,10 @@ The page lists each code with its symbology, the kind of payload and the decoded
 **Full report (JSON)** shows the whole report the engine returned.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 

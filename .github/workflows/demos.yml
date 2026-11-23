@@ -81,7 +81,7 @@ jobs:
             --frame "$RUNNER_TEMP/reports/frame.json" \
             --full "$RUNNER_TEMP/reports/full.json" \
             --destination "examples/web-vite, built and served on the runner" \
-            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-wasm" --version 0.11.0 \
+            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-wasm" --version 0.12.0 \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/examples/web-vite" \
             --install "npm ci" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
