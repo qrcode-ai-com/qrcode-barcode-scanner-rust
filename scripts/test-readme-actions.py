@@ -9,7 +9,7 @@ import re
 import unittest
 from urllib.parse import parse_qs, urlsplit, unquote
 from readme_prose import canonical_links, prose_links
-from readme_actions import action_block, ai_links, html_tags, insert_actions, mcp_links, question, strip_actions
+from readme_actions import ASSETS, action_block, ai_links, html_tags, insert_actions, mcp_links, question, strip_actions
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('builder', ROOT / 'scripts/build-readme-actions.py')
@@ -98,6 +98,69 @@ class ReadmeActions(unittest.TestCase):
                 self.assertEqual(len(pictures), 5)
                 self.assertTrue(all(url.startswith('https://raw.githubusercontent.com/qrcode-ai-com/') for url in pictures))
 
+    def test_a_page_that_makes_every_image_a_block_gets_badges_floated_into_a_row(self):
+        # community.obsidian.md styles every image as a block and an image in a paragraph with
+        # 2rem margins: Markdown badges stand one per line there. align="left" floats each image
+        # whatever its display, hspace keeps a gap, <br clear="all"> ends the row; GitHub's
+        # sanitizer keeps the three attributes.
+        import html as markup
+        prompt = 'Explain this destination & its limits.'
+        block = action_block(prompt, floated=True)
+        row = block.split('### Ask AI\n\n')[1].split('\n\n')[0]
+        lines = row.splitlines()
+        # One HTML block: no blank line inside, so Markdown passes it through whole.
+        self.assertEqual((lines[0], lines[-3:]), ('<div>', ['<br clear="all">', '</div>', '<p></p>']))
+        badges = [re.fullmatch(r'<a href="([^"]+)"><img src="([^"]+)" alt="([^"]+)" align="left" hspace="2"></a>', line)
+                  for line in lines[1:-3]]
+        self.assertTrue(all(badges), lines[1:-3])
+        self.assertEqual([(markup.unescape(m[1]), m[2], m[3]) for m in badges],
+                         [(url, f'{ASSETS}{key}-v2.svg', label) for key, label, url in ai_links(prompt)])
+        self.assertNotIn('[![', block)
+        self.assertIn('<details>', block)
+        self.assertEqual(strip_actions(insert_actions('# Obsidian\n\nNatural description.\n', block)),
+                         '# Obsidian\n\nNatural description.\n')
+        installers = action_block(prompt, mcp_links(json.loads((ROOT / 'distribution/readme-actions.json').read_text())['mcpLaunch']),
+                                  floated=True)
+        self.assertEqual(installers.count('<br clear="all">'), 2)
+        self.assertNotIn('&config', installers)
+        for flags in ({'markdown_only': True}, {'text_links': True}):
+            with self.subTest(flags=flags), self.assertRaises(ValueError):
+                action_block(prompt, floated=True, **flags)
+        outputs = builder.outputs()
+        self.assertEqual(builder.BLOCK_IMAGES, {'integrations/obsidian/README.md'})
+        for path in builder.BLOCK_IMAGES:
+            with self.subTest(path=path):
+                text = outputs[path]
+                self.assertEqual(text, (ROOT / path).read_text())
+                self.assertEqual(text.count('align="left" hspace="2"></a>'), 9)
+                self.assertEqual(text.count('<br clear="all">'), 1)
+                self.assertNotRegex(text, r'\[!\[(ChatGPT|Qwen)\]')
+                prompt = markup.unescape(re.search(r'```text\n(.+)\n```', text)[1])
+                for _, _, url in ai_links(prompt):
+                    self.assertEqual(text.count(f'<a href="{markup.escape(url)}"><img '), 1)
+
+    def test_a_page_that_shows_each_image_as_a_gallery_gets_one_line_of_text_links(self):
+        # The Dify Marketplace shows each image as a block gallery and each line break as <br>:
+        # its assistants are text links on one line, and its <details> stays.
+        prompt = 'Explain this destination.'
+        block = action_block(prompt, text_links=True, line_breaks=True)
+        row = block.split('### Ask AI\n\n')[1].split('\n\n')[0]
+        self.assertEqual(row, ' · '.join(f'[Ask {label}]({url})' for _, label, url in ai_links(prompt)))
+        self.assertIn('<details>', block)
+        with self.assertRaises(ValueError):
+            action_block(prompt, line_breaks=True)
+        outputs = builder.outputs()
+        self.assertEqual(builder.GALLERY_IMAGES, {'integrations/dify/README.md'})
+        for path in builder.GALLERY_IMAGES:
+            with self.subTest(path=path):
+                text = outputs[path]
+                self.assertEqual(text, (ROOT / path).read_text())
+                prompt = re.search(r'```text\n(.+)\n```', text)[1]
+                row = text.split('### Ask AI\n\n')[1].split('\n\n')[0]
+                self.assertEqual(row, ' · '.join(f'[Ask {label}]({url})' for _, label, url in ai_links(prompt)))
+                self.assertNotIn('/docs/assets/actions/', text)
+                self.assertEqual(text.count('<details>'), 1)
+
     def test_the_artifact_hub_listing_keeps_its_block_and_pictures_without_html(self):
         # Artifact Hub renders the page with react-markdown and skipHtml: any tag would vanish,
         # while a Markdown image, linked or not, is kept.
@@ -171,7 +234,9 @@ class ReadmeActions(unittest.TestCase):
         outputs = builder.outputs()
         for path in paths:
             self.assertEqual(outputs[path].count('### Ask AI'), 1)
-            ask = '[Ask ChatGPT](https://chatgpt.com/?q=' if path in builder.TEXT_LINKS else '[![ChatGPT]'
+            ask = ('[Ask ChatGPT](https://chatgpt.com/?q=' if path in builder.TEXT_LINKS | builder.GALLERY_IMAGES
+                   else '<img src="' + ASSETS + 'chatgpt-v2.svg" alt="ChatGPT" align="left"' if path in builder.BLOCK_IMAGES
+                   else '[![ChatGPT]')
             self.assertEqual(outputs[path].count(ask), 1)
             self.assertEqual('Add to Cursor' in outputs[path], path in ('README.md', 'integrations/mcp/README.md'))
 
@@ -275,7 +340,7 @@ class ReadmeActions(unittest.TestCase):
         from readme_actions import badge_svg
         for key, label, *_ in builder.PROVIDERS:
             self.assertEqual((ROOT / f'docs/assets/actions/{key}-v1.svg').read_text(), badge_svg('Ask ' + label))
-        for path in sorted(set(builder.maintained_readmes()) - builder.TEXT_LINKS):
+        for path in sorted(set(builder.maintained_readmes()) - builder.TEXT_LINKS - builder.GALLERY_IMAGES):
             for key, *_ in builder.PROVIDERS:
                 self.assertTrue(f'/{key}-v2.svg' in outputs[path], path + ': missing colored ' + key)
 

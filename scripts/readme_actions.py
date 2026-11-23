@@ -85,11 +85,37 @@ def strip_actions(text):
     return before + after[2:]
 
 
-def action_block(prompt, installers=(), markdown_only=False, text_links=False):
+def badge_url(key):
+    return f'{ASSETS}{key}-v{2 if key in {p[0] for p in PROVIDERS} else 1}.svg'
+
+
+def floated_badges(rows):
+    """Linked badges that float into a row, for a page whose stylesheet makes every image a block.
+
+    `align="left"` floats an image whatever its display, `hspace` keeps a gap beside it, and
+    `<br clear="all">` ends the row; GitHub's sanitizer and hast-util-sanitize's default schema keep
+    all three. The images sit in a `<div>`, not a paragraph, since a stylesheet can give an image
+    inside a paragraph vertical margins (Obsidian's `.typeset p img`). The empty paragraph after
+    the row restores the gap a Markdown paragraph leaves before the next one.
+    """
+    return ('<div>\n' + '\n'.join(
+        f'<a href="{html.escape(url)}"><img src="{badge_url(key)}" alt="{html.escape(label)}" align="left" hspace="2"></a>'
+        for key, label, url in rows) + '\n<br clear="all">\n</div>\n<p></p>')
+
+
+def action_block(prompt, installers=(), markdown_only=False, text_links=False, floated=False, line_breaks=False):
     """The Ask AI block. markdown_only unfolds the prompt (no HTML); text_links writes each assistant
-    as a text link instead of a linked badge, for a page that drops the link around an image."""
-    badges = lambda rows: '\n'.join(f'[![{label}]({ASSETS}{key}-v{2 if key in {p[0] for p in PROVIDERS} else 1}.svg)]({url})' for key, label, url in rows)
-    texts = lambda rows, prefix='': ' ·\n'.join(f'[{prefix}{label}]({url})' for _, label, url in rows)
+    as a text link instead of a linked badge, for a page that drops the link around an image or
+    shows each image as a block of its own; line_breaks keeps those links on one line, for a page
+    that shows each line break of a paragraph; floated writes the badges as HTML images that float
+    into a row, for a page whose stylesheet makes every image a block."""
+    if floated and (markdown_only or text_links):
+        raise ValueError('Floated badges are HTML badges: not for a Markdown-only or text-link page')
+    if line_breaks and not text_links:
+        raise ValueError('Only text links are joined on one line')
+    badges = lambda rows: (floated_badges(rows) if floated else
+                           '\n'.join(f'[![{label}]({badge_url(key)})]({url})' for key, label, url in rows))
+    texts = lambda rows, prefix='': (' · ' if line_breaks else ' ·\n').join(f'[{prefix}{label}]({url})' for _, label, url in rows)
     assistants = texts(ai_links(prompt), 'Ask ') if text_links else badges(ai_links(prompt))
     installation = ''
     if installers:
