@@ -45,15 +45,16 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 To prepare a notebook input with an expected text value, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
 [`scan-images.ipynb`](scan-images.ipynb) is a Jupyter notebook that installs the published Python
-package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0
+package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0
 and scans a sample image with it. The scanner is a local Rust engine: every image is decoded in
 the session that runs the notebook.
 
-[![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.11.0-r3?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.11.0-r3/examples/notebooks/scan-images.ipynb)
+[![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.12.0?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.12.0/examples/notebooks/scan-images.ipynb)
 
-The first badge opens the notebook on [mybinder.org](https://mybinder.org/), a free public service
-with no account. It prepares a session with the package already installed, which can take a few
-minutes, and the session ends after about ten minutes of inactivity.
+The badges open a fixed tag, `demos-v0.12.0`, whose notebook installs 0.12.0. The first badge
+opens the notebook on [mybinder.org](https://mybinder.org/), a free public service with no
+account. It prepares a session with the package already installed, which can take a few minutes,
+and the session ends after about ten minutes of inactivity.
 
 The second badge opens it in [Google Colab](https://colab.research.google.com/). Colab runs code
 only for a signed-in Google account, and its first code cell installs the package into the Colab
@@ -95,7 +96,7 @@ process, and the next cells read the report it returns.
 
 | Step | Result |
 | --- | --- |
-| Install | `qrcode-barcode-scanner==0.11.0`. The package has no dependency. |
+| Install | `qrcode-barcode-scanner==0.12.0`. The package has no dependency. |
 | Check what is installed | The Python version, the platform and the package version. The SHA-256 of the installed native module must be the one of a wheel published on PyPI. |
 | Get the sample | One image with a QR code and a Code 128 barcode, downloaded from the release tag and checked against its SHA-256. |
 | Scan | The `fast`, `frame` and `full` profiles each return the QR code `https://qrc-ai.com/76xMa` and the Code 128 `STOCK-4827`. |
@@ -125,10 +126,10 @@ In Python a report is a `dict`. The notebook prints the symbology, text, payload
 position of each code, and checks that each profile returns exactly these two codes.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 

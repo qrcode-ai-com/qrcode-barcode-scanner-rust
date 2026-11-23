@@ -79,9 +79,9 @@ qualification remain separate evidence. The engine's
 ## Examples
 
 To scan a QR code from an image or read a barcode label, run the [browser image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml) or the [command-line quick start](#command-line).
-Try it online, with nothing to install. The [Vite example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/web-vite) installs the published WebAssembly package 0.11.0 from npm and scans in your browser, on your device; the workflow `pages.yml` publishes its build from `main` on [GitHub Pages](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/), and the same build runs in a [Hugging Face Space](https://huggingface.co/spaces/ThibautMELEN/qrcode-barcode-scanner). The [notebook](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/notebooks) installs the Python package 0.11.0 from PyPI and scans in a Jupyter session, on Binder or on Google Colab.
+Try it online, with nothing to install. The [Vite example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/web-vite) installs the published WebAssembly package 0.12.0 from npm and scans in your browser, on your device; the workflow `pages.yml` publishes its build from `main` on [GitHub Pages](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/), and the same build runs in a [Hugging Face Space](https://huggingface.co/spaces/ThibautMELEN/qrcode-barcode-scanner). The [notebook](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/examples/notebooks) installs the Python package 0.12.0 from PyPI and scans in a Jupyter session, on Binder or on Google Colab. The StackBlitz, Binder and Colab buttons below open a fixed tag, `demos-v0.12.0`, whose examples install 0.12.0.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/demos-v0.11.0-r3/examples/web-vite) [![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.11.0-r3?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.11.0-r3/examples/notebooks/scan-images.ipynb)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/demos-v0.12.0/examples/web-vite) [![Launch on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/qrcode-ai-com/qrcode-barcode-scanner-rust/demos-v0.12.0?urlpath=lab/tree/examples/notebooks/scan-images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/demos-v0.12.0/examples/notebooks/scan-images.ipynb)
 
 ### Scan a QR code and a Code 128 barcode in one image
 
@@ -209,7 +209,11 @@ These directories list it, so you can add it from inside the tool you work in:
 | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-comfyui-dark.png?v=96af9ee25553"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-comfyui-light.png?v=56a787fd873c" alt="" width="24" height="24" align="absmiddle"></picture> Comfy Registry | [`qrcode-barcode-scanner-nodes`](https://registry.comfy.org/nodes/qrcode-barcode-scanner-nodes) | A node reads every code in an image batch, to check that a generated code still decodes to the text you meant. [Guide](integrations/comfyui/README.md) |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-glama-dark.png?v=cd36fc162618"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-glama-light.png?v=edbf6212f964" alt="" width="24" height="24" align="absmiddle"></picture> Glama MCP directory | [`qrcode-barcode-scanner-mcp`](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp) | Lists the MCP server, whose `scan_image` tool reads the codes in image bytes, offline. [Guide](distribution/glama/README.md) |
 
-n8n, Node-RED, Activepieces, Raycast, Dify, Apify, napari and the browser extension are built and tested in
+The Dify tool plugin has been on the [Dify Marketplace](https://marketplace.dify.ai/plugins/qrcode-ai-com/qrcode-barcode-scanner) since 22 November 2026: in
+Dify, open **Plugins**, then **Marketplace**, and install **QR Code & Barcode Scanner**. Its
+[guide](integrations/dify/README.md) gives its tool, its options and its limits.
+
+n8n, Node-RED, Activepieces, Raycast, Apify, napari and the browser extension are built and tested in
 [`integrations/`](integrations/) and wait for their stores. The [distribution guide](distribution/README.md) gives the
 state of each package and recipe.
 
@@ -516,13 +520,13 @@ Current installation guides are linked below; report types, schemas and release 
 <details>
 <summary><strong>Build the released source</strong></summary>
 
-The packages above come from [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0)
-(`176ac96`), separately from the code currently on `main`. Check out the release
-tag for matching source:
+The packages above come from [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0),
+separately from the code currently on `main`. Check out the release tag for
+matching source:
 
 ```sh
 git clone --branch v0.12.0 --depth 1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust.git
-cd qrcode-barcode-scanner
+cd qrcode-barcode-scanner-rust
 cargo build --release --locked -p qrcode-barcode-scanner-cli
 ```
 
@@ -544,7 +548,7 @@ The [Official MCP Registry entry](https://registry.modelcontextprotocol.io/v0.1/
 - The [public GHCR image](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) ships `qrscan` 0.11.0 for Linux AMD64 and ARM64. Pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner:0.11.0` and follow the [offline container example](distribution/docker/v0.11/README.md#run-the-public-image). Anonymous pulls and exact scan checks passed on [both native architectures](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/42208687356).
 - For a version-pinned install of the portable skill 0.2.0, use the [GitHub route for Codex](distribution/README.md#install-the-portable-skill-from-git-in-a-codex-project). [OpenCode setup](distribution/README.md#connect-the-published-mcp-adapter-to-opencode) uses the published npm adapter 0.3.1.
 - The [Docker Hub image](https://hub.docker.com/r/thibautmelen/qrcode-ai-scanner) is a historical mirror for 0.10.0. Its pinned digest is in the [historical installation guide](distribution/README.md#docker-run-the-local-cli).
-- Public Flutter package [`qr_barcode_scanner` 0.11.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.11.0) is available under verified publisher `qrcode-ai.com`. Follow the [Flutter installation guide and native consumer limits](docs/api/flutter.mdx): the package compiles Rust at app-build time, the optimized Android emulator consumer passes, and the iOS simulator fast-budget check remains red.
+- Public Flutter package [`qr_barcode_scanner` 0.12.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.0) is available under verified publisher `qrcode-ai.com`. Follow the [Flutter installation guide and native consumer limits](docs/api/flutter.mdx): an app build links a signed precompiled native library by default without rustup and compiles the Rust core otherwise, the tag runs built the example for Android and iOS with and without Rust, and scanning with the published archive on an emulator, simulator or device is not yet qualified.
 - [Kotlin](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0/bindings/kotlin/) and [Swift](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0/bindings/swift/) have separate source-build instructions and qualification limits. These are bindings, not mobile applications.
 
 </details>

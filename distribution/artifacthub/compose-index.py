@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 """Compose the Artifact Hub index of the 0.11.0 container image, without rebuilding anything.
 
-  compose-index.py compose --readme-commit SHA --out DIR [--fetch]
+  compose-index.py compose --tag TAG --readme-commit SHA --out DIR [--fetch]
+  compose-index.py compare-pushed --tag PREVIOUS --expect DIR/index.json
   compose-index.py verify-pushed --tag TAG --expect DIR/index.json
   compose-index.py --self-test
 
 Artifact Hub reads its listing keys from the annotations of an OCI index. The published index of
 ghcr.io/qrcode-ai-com/qrcode-barcode-scanner, tag 0.11.0, lacks two keys it needs
 (org.opencontainers.image.created and io.artifacthub.package.readme-url), and that index is frozen
-by distribution/docker/v0.11/release-0.11.0.json. So the listing gets a new index under a new tag:
-the same two platform manifests, copied by digest and size, byte for byte, plus the listing
-annotations. No image, layer or manifest is rebuilt or uploaded; only the small index is new.
+by distribution/docker/v0.11/release-0.11.0.json. So the listing gets a new index under a listing
+tag (0.11.0-r1, 0.11.0-r2, ...): the same two platform manifests, copied by digest and size, byte
+for byte, plus the listing annotations. No image, layer or manifest is rebuilt or uploaded; only
+the small index is new. Artifact Hub processes an immutable tag once, so a new page needs a new
+listing tag; between two listing tags only the page address and the creation time change.
 
 `compose` starts from published-index-0.11.0.json, the exact bytes of the published index (or, with
 --fetch, from the registry, read anonymously). It refuses any byte that differs from the pinned
-digests below, keeps every original annotation, adds the listing keys and writes DIR/index.json,
-DIR/index.sha256 and DIR/compose.json. The new digest depends on the README commit, which must be
-a full 40-character commit of this repository whose distribution/artifacthub/LISTING.md is the page.
+digests below, keeps every original annotation, adds the listing keys of TAG and writes
+DIR/index.json, DIR/index.sha256 and DIR/compose.json. The new digest depends on the README commit,
+which must be a full 40-character commit of this repository whose
+distribution/artifacthub/LISTING.md is the page.
+
+`compare-pushed` reads the previous listing tag anonymously and checks that DIR/index.json names
+the same manifests and annotations, with only the page address and a later creation time.
 
 `verify-pushed` reads TAG anonymously after the owner pushed it and checks that the registry
 returns exactly DIR/index.json and that both platform manifests are still the published ones.
@@ -50,10 +57,23 @@ CHILDREN = {
               "config": "sha256:2c1e8d30e960ecf1d32c88200b32dd3df38e80a379637ce2ac91c32d1cceea58",
               "created": "2026-11-05T16:22:15.301462348Z"},
 }
-# The build time of the images: the later of the two configurations, not the date of the new index.
+# The build time of the images: the later of the two configurations.
 CREATED = max(child["created"] for child in CHILDREN.values())
+# Each listing tag and its org.opencontainers.image.created. Artifact Hub picks the latest version
+# of a container package by that time, not by its name (is_latest in its database takes a version
+# whose time is not earlier than the current latest one). 0.11.0-r1 carries the build time of the
+# images; each later tag carries the date of its page, later than the tag before it, so that it
+# becomes the latest version and stays so.
+TAGS = {
+    "0.11.0-r1": CREATED,
+    "0.11.0-r2": "2026-11-23T00:00:00Z",
+}
+# The index pushed under 0.11.0-r1, composed from this commit's LISTING.md.
+R1_COMMIT = "ffc00ddae0d75ac465e20aa06eb21a16298d802c"
+R1_DIGEST = "sha256:6963624a7b4f173e533e61f893cc67d3144bccd5be99ef5a93b5abcdfffeb366"
+CREATED_KEY = "org.opencontainers.image.created"
+README_KEY = "io.artifacthub.package.readme-url"
 LISTING = {
-    "org.opencontainers.image.created": CREATED,
     "org.opencontainers.image.vendor": "QR Code AI",
     "io.artifacthub.package.license": "AGPL-3.0-or-later",
     "io.artifacthub.package.keywords": "qr-code,barcode,scanner,qrscan,offline,cli,data-matrix,pdf417",
@@ -96,18 +116,45 @@ def read_published(data):
     return index
 
 
-def compose(index, commit):
+def compose(index, commit, tag):
     if not re.fullmatch(r"[0-9a-f]{40}", commit or ""):
         raise Refused("--readme-commit must be a full 40-character commit of the engine repository")
+    if tag not in TAGS:
+        raise Refused(f"{tag} is not a listing tag ({', '.join(TAGS)}): add it to TAGS first")
     annotations = dict(index["annotations"])
-    for key, value in LISTING.items():
+    for key, value in {**LISTING, CREATED_KEY: TAGS[tag], README_KEY: README_URL.format(commit=commit)}.items():
         if key in annotations:
             raise Refused(f"the published index already sets {key}: compose would replace it")
         annotations[key] = value
-    annotations["io.artifacthub.package.readme-url"] = README_URL.format(commit=commit)
     # The platform manifests are copied as they are: same digest, size, type and platform.
     return {"annotations": annotations, "manifests": index["manifests"],
             "mediaType": index["mediaType"], "schemaVersion": index["schemaVersion"]}
+
+
+def instant(value):
+    """An RFC 3339 UTC time as a comparable pair: seconds, then nanoseconds."""
+    match = re.fullmatch(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,9}))?Z", value or "")
+    if not match:
+        raise Refused(f"{value!r} is not an RFC 3339 UTC time")
+    return match[1], (match[2] or "").ljust(9, "0")
+
+
+def revision_changes(previous, composed):
+    """The annotations that differ from the previous listing index, refused unless they are only
+    the page address and a later creation time, over the same manifests."""
+    old, new = json.loads(previous), json.loads(composed)
+    for key in ("manifests", "mediaType", "schemaVersion"):
+        if old.get(key) != new.get(key):
+            raise Refused(f"the {key} of the new index differ from the previous listing tag")
+    before, after = old.get("annotations", {}), new.get("annotations", {})
+    changed = sorted(key for key in set(before) | set(after) if before.get(key) != after.get(key))
+    if set(changed) - {README_KEY, CREATED_KEY}:
+        raise Refused(f"the new index also changes {sorted(set(changed) - {README_KEY, CREATED_KEY})}")
+    if README_KEY not in changed:
+        raise Refused("the new index points to the same page as the previous listing tag")
+    if instant(after.get(CREATED_KEY)) <= instant(before.get(CREATED_KEY)):
+        raise Refused("the new index is not created after the previous listing tag")
+    return {key: (before.get(key), after.get(key)) for key in changed}
 
 
 # ------------------------------------------------------------------ the registry, read anonymously
@@ -143,7 +190,7 @@ def fetch_published():
     return data, index
 
 
-def write(out, document, source):
+def write(out, document, source, tag):
     out = pathlib.Path(out)
     if out.exists() and any(out.iterdir()):
         raise Refused(f"{out} is not empty")
@@ -152,7 +199,7 @@ def write(out, document, source):
     digest = sha256(data)
     (out / "index.json").write_bytes(data)
     (out / "index.sha256").write_text(digest + "\n")
-    record = {"schema": "qrscan-artifacthub-index/1", "image": f"{REGISTRY}/{REPOSITORY}",
+    record = {"schema": "qrscan-artifacthub-index/1", "image": f"{REGISTRY}/{REPOSITORY}", "tag": tag,
               "from": {"digest": INDEX_DIGEST, "read": source},
               "manifests": {name: child["digest"] for name, child in CHILDREN.items()},
               "added": {key: document["annotations"][key] for key in
@@ -160,6 +207,12 @@ def write(out, document, source):
               "index": {"digest": digest, "size": len(data)}}
     (out / "compose.json").write_text(json.dumps(record, indent=2) + "\n")
     return digest, len(data)
+
+
+def compare_pushed(tag, expect):
+    if tag not in TAGS:
+        raise Refused(f"{tag} is not a listing tag ({', '.join(TAGS)})")
+    return revision_changes(get(f"manifests/{tag}", INDEX_TYPE, token()), pathlib.Path(expect).read_bytes())
 
 
 def verify_pushed(tag, expect):
@@ -196,39 +249,77 @@ def self_test():
     except Refused as error:
         print(f"SELF-TEST FAILED · the recorded published index was refused: {error}", file=sys.stderr)
         return 1
-    composed = compose(index, commit)
+    composed = compose(index, commit, "0.11.0-r2")
     if composed["manifests"] != index["manifests"]:
         failures.append("the platform manifests were not copied as they are")
     if any(composed["annotations"][key] != value for key, value in index["annotations"].items()):
         failures.append("an original annotation was changed")
-    for key in ("org.opencontainers.image.created", "io.artifacthub.package.readme-url",
-                "io.artifacthub.package.license"):
+    for key in (CREATED_KEY, README_KEY, "io.artifacthub.package.license"):
         if key not in composed["annotations"]:
             failures.append(f"{key} is missing")
     if composed["annotations"]["io.artifacthub.package.license"] != "AGPL-3.0-or-later":
         failures.append("the listing license is not the archive's AGPL-3.0-or-later")
-    if composed["annotations"]["org.opencontainers.image.created"] != "2026-11-05T16:22:15.301462348Z":
-        failures.append("created is not the build time of the images")
-    if encode(compose(index, commit)) != encode(composed):
+    if composed["annotations"][README_KEY] != README_URL.format(commit=commit):
+        failures.append("readme-url is not the LISTING.md of the README commit")
+    if encode(compose(index, commit, "0.11.0-r2")) != encode(composed):
         failures.append("two compositions of the same input differ")
-    if sha256(encode(compose(index, "0" * 40))) == sha256(encode(composed)):
+    if sha256(encode(compose(index, "0" * 40, "0.11.0-r2"))) == sha256(encode(composed)):
         failures.append("the README commit does not reach the digest")
+    # 0.11.0-r1 is reproduced byte for byte: the build time of the images and its page commit.
+    first = compose(index, R1_COMMIT, "0.11.0-r1")
+    if first["annotations"][CREATED_KEY] != "2026-11-05T16:22:15.301462348Z":
+        failures.append("0.11.0-r1 is not created at the build time of the images")
+    if sha256(encode(first)) != R1_DIGEST:
+        failures.append(f"0.11.0-r1 composes to {sha256(encode(first))}, not the pushed {R1_DIGEST}")
+    times = [instant(value) for value in TAGS.values()]
+    if times != sorted(set(times)):
+        failures.append("the listing tags are not created one after the other")
+    # From one listing tag to the next, only the page address and the creation time change.
+    try:
+        changes = revision_changes(encode(first), encode(composed))
+        if set(changes) != {README_KEY, CREATED_KEY}:
+            failures.append(f"0.11.0-r1 to 0.11.0-r2 changes {sorted(changes)}")
+    except Refused as error:
+        failures.append(f"0.11.0-r1 to 0.11.0-r2 was refused: {error}")
+
+    def changed(edit, document=composed):
+        copy = json.loads(encode(document))
+        edit(copy)
+        return encode(copy)
+
     tampered = data.replace(b"0.11.0", b"0.11.1")
     refused("an index with other bytes", lambda: read_published(tampered), "not the published")
-    refused("a short commit", lambda: compose(index, "176ac96"), "full 40-character")
-    refused("a branch name", lambda: compose(index, "main"), "full 40-character")
+    refused("a short commit", lambda: compose(index, "176ac96", "0.11.0-r2"), "full 40-character")
+    refused("a branch name", lambda: compose(index, "main", "0.11.0-r2"), "full 40-character")
+    refused("the frozen release tag", lambda: compose(index, commit, "0.11.0"), "not a listing tag")
+    refused("a tag of another version", lambda: compose(index, commit, "0.12.0-r1"), "not a listing tag")
+    refused("another manifest", lambda: revision_changes(encode(first), changed(
+        lambda copy: copy["manifests"][0].update(size=1575))), "manifests")
+    refused("another listing key", lambda: revision_changes(encode(first), changed(
+        lambda copy: copy["annotations"].update({"io.artifacthub.package.license": "MIT"}))), "also changes")
+    refused("a dropped annotation", lambda: revision_changes(encode(first), changed(
+        lambda copy: copy["annotations"].pop("org.opencontainers.image.version"))), "also changes")
+    refused("the same page", lambda: revision_changes(encode(first), changed(
+        lambda copy: copy["annotations"].update({README_KEY: first["annotations"][README_KEY]}))), "same page")
+    refused("an earlier creation", lambda: revision_changes(encode(composed), encode(first)), "not created after")
+    refused("a creation time without its zone", lambda: instant("2026-11-23T00:00:00"), "RFC 3339")
     with tempfile.TemporaryDirectory() as temporary:
         out = pathlib.Path(temporary) / "out"
-        digest, size = write(out, composed, "published-index-0.11.0.json")
+        digest, size = write(out, composed, "published-index-0.11.0.json", "0.11.0-r2")
         if (out / "index.json").read_bytes() != encode(composed) or (out / "index.sha256").read_text().strip() != digest:
             failures.append("the written index or its digest differ from the composition")
         record = json.loads((out / "compose.json").read_text())
-        if record["index"] != {"digest": digest, "size": size} or record["from"]["digest"] != INDEX_DIGEST:
+        if (record["index"] != {"digest": digest, "size": size} or record["from"]["digest"] != INDEX_DIGEST
+                or record["tag"] != "0.11.0-r2"):
             failures.append("compose.json does not describe the written index")
-        refused("a second compose into the same directory", lambda: write(out, composed, "x"), "is not empty")
+        if sorted(record["added"]) != sorted([*LISTING, CREATED_KEY, README_KEY]):
+            failures.append("compose.json does not list the added listing keys")
+        refused("a second compose into the same directory",
+                lambda: write(out, composed, "x", "0.11.0-r2"), "is not empty")
     for failure in failures:
         print(f"SELF-TEST FAILED · {failure}", file=sys.stderr)
-    print(f"self-test: {'FAILED' if failures else 'ok'} (the published index, one composition, 4 refusals)")
+    print(f"self-test: {'FAILED' if failures else 'ok'} "
+          f"(the published index, 0.11.0-r1 reproduced, 0.11.0-r2 composed, 12 refusals)")
     return 1 if failures else 0
 
 
@@ -236,13 +327,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--self-test", action="store_true")
     commands = parser.add_subparsers(dest="command")
-    one = commands.add_parser("compose", help="write the listing index from the published one")
+    one = commands.add_parser("compose", help="write the listing index of a tag from the published one")
+    one.add_argument("--tag", required=True, help=f"the listing tag: {', '.join(TAGS)}")
     one.add_argument("--readme-commit", required=True)
     one.add_argument("--out", required=True)
     one.add_argument("--fetch", action="store_true", help="read the published index from the registry")
-    two = commands.add_parser("verify-pushed", help="read a pushed tag back and compare")
+    two = commands.add_parser("compare-pushed", help="compare a composed index with the previous listing tag")
     two.add_argument("--tag", required=True)
     two.add_argument("--expect", required=True)
+    three = commands.add_parser("verify-pushed", help="read a pushed tag back and compare")
+    three.add_argument("--tag", required=True)
+    three.add_argument("--expect", required=True)
     args = parser.parse_args()
     if args.self_test:
         return self_test()
@@ -256,8 +351,12 @@ def main():
             else:
                 index = read_published(PUBLISHED.read_bytes())
                 source = "published-index-0.11.0.json"
-            digest, size = write(args.out, compose(index, args.readme_commit), source)
-            print(f"composed {args.out}/index.json · {digest} · {size} bytes")
+            digest, size = write(args.out, compose(index, args.readme_commit, args.tag), source, args.tag)
+            print(f"composed {args.out}/index.json for {args.tag} · {digest} · {size} bytes")
+        elif args.command == "compare-pushed":
+            for key, (before, after) in compare_pushed(args.tag, args.expect).items():
+                print(f"changed {key}\n  {args.tag}: {before}\n  new: {after}")
+            print(f"ok    only the page address and the creation time differ from {args.tag}")
         elif args.command == "verify-pushed":
             print(f"ok    {args.tag} is {verify_pushed(args.tag, args.expect)}")
         else:

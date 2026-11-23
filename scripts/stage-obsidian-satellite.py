@@ -15,8 +15,9 @@ says how), with:
   - every file of `integrations/obsidian` at REV, its `mirror/` folder as `.github/workflows/`
     (the tests, and the release that builds main.js and opens a draft);
   - the mixed fixture its tests scan, as `test/fixtures/mixed-code128-qr.png`;
-  - the engine's license texts for the WebAssembly module main.js embeds: `ENGINE-LICENSE` (the
-    AGPL text the published engine package ships) and `ENGINE-LICENSE-APACHE-2.0`;
+  - the engine's license texts for the WebAssembly module main.js embeds: `ENGINE-LICENSE` (this
+    repository's LICENSE, the MIT text the pinned engine package ships) and
+    `ENGINE-LICENSE-APACHE-2.0`;
   - `SOURCE.json`: the commit and the sha256 of every staged file.
 
 Before writing, the stage checks the plugin against the community directory rules it can read
@@ -83,7 +84,7 @@ SATELLITE = Satellite(
     package=PACKAGE,
     extras={
         "test/fixtures/mixed-code128-qr.png": "fixtures/symbology/mixed-code128-qr.png",
-        "ENGINE-LICENSE": "distribution/releases/historical-agpl-3.0.txt",
+        "ENGINE-LICENSE": "LICENSE",
         "ENGINE-LICENSE-APACHE-2.0": "crates/qrcode-ai-scanner/LICENSE-APACHE-2.0",
     },
     required=("manifest.json", "versions.json", "styles.css", "package.json", "package-lock.json", "src/main.ts",
@@ -96,8 +97,8 @@ SATELLITE = Satellite(
 def license_is_engine(directory):
     if (directory / "LICENSE").read_bytes() != (ROOT / "LICENSE").read_bytes():
         return "the staged LICENSE is not the engine repository's MIT license"
-    if b"GNU AFFERO GENERAL PUBLIC LICENSE" not in (directory / "ENGINE-LICENSE").read_bytes():
-        return "ENGINE-LICENSE is not the AGPL text of the published engine"
+    if not (directory / "ENGINE-LICENSE").read_bytes().startswith(b"MIT License\n"):
+        return "ENGINE-LICENSE is not the MIT text of the published engine"
     return None
 
 

@@ -19,7 +19,7 @@ after(() => core.stopScanner());
 for (const profile of ['fast', 'frame', 'full']) {
 	test(`the mixed fixture returns both codes in ${profile}`, async () => {
 		const report = await core.scanImage(fixture, { profile, budgetMs: 0 });
-		assert.deepEqual(report.versions, { scanner: '0.11.0', pipeline: 5, score_contract: 5 });
+		assert.deepEqual(report.versions, { scanner: '0.12.0', pipeline: 5, score_contract: 5 });
 		assert.deepEqual(report.detections.map((d) => [d.symbology, d.content.text]), EXPECTED);
 		assert.equal(report.trace.budget_exhausted, false);
 		const summary = core.summarize(report);

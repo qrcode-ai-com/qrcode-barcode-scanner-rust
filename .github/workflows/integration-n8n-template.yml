@@ -39,8 +39,8 @@ env:
   N8N_VERSION: 2.48.7
   PLAYWRIGHT_VERSION: 1.65.1
   PACKAGE: "@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner"
-  NODE_VERSION: 0.1.0
-  ENGINE_VERSION: 0.11.0
+  NODE_VERSION: 0.1.1
+  ENGINE_VERSION: 0.12.0
 
 jobs:
   template:

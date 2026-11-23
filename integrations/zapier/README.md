@@ -76,7 +76,7 @@ A file field in Zapier accepts the file of an earlier step, such as an email att
 | Codes | `codes` | One item per code: `symbology` (such as `qr_code` or `code128`), `text`, the exact bytes in base64 as `raw`, `charset` and the parsed `payload`. |
 | Budget exhausted | `budget_exhausted` | `true` when the profile's time budget cut the scan short, so a code may be missing. |
 | Profile | `profile` | The profile that ran. |
-| Scanner version | `scanner_version` | The engine version, `0.11.0`. |
+| Scanner version | `scanner_version` | The engine version, `0.12.0`. |
 | Engine report (JSON) | `report_json` | The complete scanner report as JSON text: positions, scores, hints, trace and versions. |
 
 An image without a code is a normal result: the count is 0 and the texts are empty, so a Filter step can stop the Zap there. The **Frame** profile leaves the score of each code null, because it does not score.
@@ -101,7 +101,7 @@ Each image can have at most 8 MiB, 4096 pixels per side and 16 million pixels in
 
 ## How it works
 
-Zapier runs an integration's code on AWS Lambda, in Node.js 22 for `zapier-platform-core` 19. The action downloads the image with Zapier's request client, then hands the bytes to the engine package `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, which runs in one worker thread of the step's process. The worker stays loaded between the steps that the same Lambda instance runs, so only the first scan pays for loading the engine.
+Zapier runs an integration's code on AWS Lambda, in Node.js 22 for `zapier-platform-core` 19. The action downloads the image with Zapier's request client, then hands the bytes to the engine package `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, which runs in one worker thread of the step's process. The worker stays loaded between the steps that the same Lambda instance runs, so only the first scan pays for loading the engine.
 
 The test suite runs the built bundle in the AWS Lambda Node.js 22 base image, at 256 MB, read-only and as a non-root user, the way Zapier invokes it: the worker thread and the WebAssembly engine load and scan there in the three profiles.
 
@@ -163,7 +163,7 @@ The same engine also runs as an [n8n community node](../n8n/README.md), a [Node-
 
 ## Licensing
 
-The integration's own source is MIT, in [LICENSE](LICENSE). The bundle Zapier runs is not only this source: it holds the published engine, `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, under its AGPL-3.0-or-later license, and Zapier's own `zapier-platform-core`, under the Zapier Platform Agreement. [LICENSE-NOTES.md](LICENSE-NOTES.md) lists every part of the bundle with its license and names the engine's corresponding source.
+The integration's own source is MIT, in [LICENSE](LICENSE). The bundle Zapier runs is not only this source: it holds the published engine, `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, under its MIT license, and Zapier's own `zapier-platform-core`, under the Zapier Platform Agreement. [LICENSE-NOTES.md](LICENSE-NOTES.md) lists every part of the bundle with its license and names the engine's corresponding source.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**.
 

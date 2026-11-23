@@ -190,7 +190,7 @@ The stage reads one commit, checks the manifest against the community directory 
 
 ## Licenses of what you install
 
-The plugin source is MIT, in [LICENSE](LICENSE). `main.js` also embeds the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0. That engine keeps its own license, AGPL-3.0-or-later, and two of its reader parts keep their Apache-2.0 notice. Their texts close `main.js` and sit beside it as [ENGINE-LICENSE](../../distribution/releases/historical-agpl-3.0.txt), [ENGINE-LICENSE-APACHE-2.0](../../crates/qrcode-ai-scanner/LICENSE-APACHE-2.0) and [ENGINE-THIRD-PARTY.md](ENGINE-THIRD-PARTY.md). The source of that engine version is the tag `v0.11.0` of the [engine repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust). Installing the plugin does not relicense the engine.
+The plugin source is MIT, in [LICENSE](LICENSE). `main.js` also embeds the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0. That engine is MIT too, and two of its reader parts keep their Apache-2.0 notice. The texts the engine package ships close `main.js` and sit beside it as [ENGINE-LICENSE](../../LICENSE), [ENGINE-LICENSE-APACHE-2.0](../../crates/qrcode-ai-scanner/LICENSE-APACHE-2.0) and [ENGINE-THIRD-PARTY.md](ENGINE-THIRD-PARTY.md). The source of that engine version is the tag `v0.12.0` of the [engine repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust). Plugin releases up to 1.0.2 embed engine 0.11.0, which keeps its AGPL-3.0-or-later license in those releases.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

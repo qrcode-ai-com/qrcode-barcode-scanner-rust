@@ -1,6 +1,6 @@
 ---
 title: "Flutter"
-description: "Install qr_barcode_scanner from pub.dev, build its native Rust core, and read typed QR and barcode reports with documented platform limits."
+description: "Install qr_barcode_scanner from pub.dev, link its signed precompiled native library or build its Rust core, and read typed QR and barcode reports with documented platform limits."
 ---
 
 Use `qr_barcode_scanner` to scan encoded images or application-supplied RGBA
@@ -20,50 +20,106 @@ If a product guide is unavailable, use the API and build instructions here.
 
 ## Install the published package
 
-Public Flutter package [`qr_barcode_scanner` 0.11.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.11.0)
+Public Flutter package [`qr_barcode_scanner` 0.12.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.0)
 is published under verified publisher [`qrcode-ai.com`](https://pub.dev/publishers/qrcode-ai.com/packages).
 In an existing Flutter project:
 
 ```bash
-flutter pub add qr_barcode_scanner:0.11.0
+flutter pub add qr_barcode_scanner:0.12.0
 ```
 
-The public archive declares Dart `>=3.3.0 <4.0.0`, Flutter `>=3.19.0` and
-`flutter_rust_bridge` exactly `2.12.0`. The working source moves to
-`flutter_rust_bridge` 2.13.0 for the next release, which requires Dart 3.9.2
-and Flutter 3.35.3 or later. These declarations are not evidence of
-installation on every SDK version. Android and iOS are the plugin's declared
-platforms. For an upcoming source candidate, follow the
+The public archive declares Dart `>=3.9.2 <4.0.0`, Flutter `>=3.35.3` and
+`flutter_rust_bridge` exactly `2.13.0`. Up to 0.11.0 the package declares Dart
+`>=3.3.0 <4.0.0`, Flutter `>=3.19.0` and `flutter_rust_bridge` `2.12.0`.
+These declarations are not evidence of installation on every SDK version.
+Android and iOS are the plugin's declared platforms. For an upcoming source
+candidate, follow the
 [separate packaging instructions](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#packaging-from-a-candidate-checkout);
 they do not replace or republish the archive on pub.dev.
 
+## Precompiled or built native library
+
+The package ships `rust/cargokit.yaml`. When your app builds, cargokit, which
+drives the Rust part of the build, first looks for a native library
+precompiled from the exact package sources, in the engine's GitHub release
+[`precompiled_bb4bac3bc00d4d8d9fd8b35826e8e649`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/precompiled_bb4bac3bc00d4d8d9fd8b35826e8e649).
+It downloads the library and its Ed25519 signature, and links the library
+only if the signature verifies against the public key in `rust/cargokit.yaml`.
+The release covers Android (`armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) and
+iOS (devices, Apple silicon simulators and Intel simulators). Its libraries
+are built with the release profile, and debug app builds use them too.
+
+- On a machine without rustup, cargokit uses the precompiled library by
+  default.
+- With rustup installed, cargokit compiles the core unless the app opts in
+  with a `cargokit_options.yaml` next to its `pubspec.yaml`:
+
+  ```yaml
+  use_precompiled_binaries: true
+  ```
+
 <Warning>
-This package compiles the Rust core at **your app's build time** (via cargokit) —
-the building machine needs the **Rust toolchain (≥1.88)** and, for Android, the
-**NDK (r28+)**, which aligns the native library for 16 KB memory pages. A one-time `rustup` install; no Rust knowledge required.
+When cargokit compiles the Rust core at **your app's build time** (rustup is
+installed and the app does not opt in, or no library with a valid signature is
+available), the building machine needs the **Rust toolchain (≥1.88)** and, for
+Android, the **NDK (r28+)**, which aligns the native library for 16 KB memory
+pages. A one-time `rustup` install; no Rust knowledge required.
 </Warning>
+
+Up to 0.11.0 the package ships no `rust/cargokit.yaml`, and every app build
+compiles the core.
 
 ## Native consumer evidence
 
-The [12 November 2026 public-package run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43278040726)
-installs the exact pub.dev archive in fresh Flutter apps with an empty package
-cache and checks the installed files. Both native jobs use Flutter debug mode
-with explicit `CARGO_PROFILE_DEV_OPT_LEVEL=2`.
+Two runs on tag `v0.12.0` (commit `897dd50c`), on 22 November 2026, back the
+published 0.12.0 package. Both prove builds, not scans.
 
-Android 14 x86_64 passes mixed QR/Code 128 scans in `fast`, `frame` and `full`,
-blank-frame and invalid-image cases, and uninstall. The APK passes the 16 KB
-alignment check; the emulator runs with 4 KB pages. This is evidence for that
+- The [`flutter` run of the tag](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45033138275)
+  packed the package once, analyzed it and ran its host tests, then built the
+  example app from it as an Android debug APK and an unsigned iOS debug app on
+  runners with rustup, where cargokit compiles the Rust core. It uploaded the
+  same package to pub.dev.
+- The [verification run of the precompiled libraries](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45040504440)
+  checked each of the seven published libraries against its signature, then
+  built the example again as an Android debug APK and an unsigned iOS device
+  debug app with `rustup`, `cargo` and `rustc` out of reach. The APK contains
+  `libqrcode_ai_scanner.so` and the iOS build `libqrcode_ai_scanner.a`.
+
+The crate hash of the pub.dev archive is `bb4bac3bc00d4d8d9fd8b35826e8e649`, the
+hash that names that release
+(`python3 scripts/flutter-precompiled.py hash --manifest-dir <extracted archive>/rust`).
+No run has installed the 0.12.0 archive from pub.dev in a new app and scanned
+with it: scanning on an emulator, a simulator or a device is not qualified for
+this version. The
+[package README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#debug-builds-and-scan-time)
+gives CI scan timings of source builds on an Android emulator and an iPhone
+simulator, measured on 21 November 2026, before the tag.
+
+The 0.12.0 archive SHA-256 is
+`14cb22e0e5d726a997f542c09fa938ee2045b995a3ad115886987417bbb8407b`. pub.dev
+lists its publication on 22 November 2026 at 16:51 UTC.
+
+### 0.11.0 · 12 November 2026
+
+The [12 November 2026 public-package run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43278040726)
+installed the exact pub.dev archive of 0.11.0 in fresh Flutter apps with an
+empty package cache and checked the installed files. Both native jobs used
+Flutter debug mode with explicit `CARGO_PROFILE_DEV_OPT_LEVEL=2`.
+
+Android 14 x86_64 passed mixed QR/Code 128 scans in `fast`, `frame` and `full`,
+blank-frame and invalid-image cases, and uninstall. The APK passed the 16 KB
+alignment check; the emulator ran with 4 KB pages. This is evidence for that
 optimized emulator configuration, not default unoptimized debug or physical devices.
 
-The iOS simulator decodes both exact payloads in all three profiles, but the
-fast report has `budgetExhausted == true`; its unchanged assertion fails.
-Common iOS acceptance and uninstall are skipped after that failure. Publication
-is complete; iOS consumer qualification is incomplete. No physical-device or
-cross-platform performance comparison is claimed by this run.
+The iOS simulator decoded both exact payloads in all three profiles, but the
+fast report had `budgetExhausted == true`; its unchanged assertion failed.
+Common iOS acceptance and uninstall were skipped after that failure.
+Publication was complete; iOS consumer qualification stayed incomplete. No
+physical-device or cross-platform performance comparison is claimed by this run.
 
-The public archive SHA-256 is
+That archive's SHA-256 is
 `460e3a09878f1148554732212f31e5ec604fd820583a78554292cf8689ff862e`.
-These observations describe the published archive, not a future source candidate.
+These observations describe that archive only.
 
 ## API
 
@@ -80,12 +136,12 @@ final report = await QrcodeAiScanner.scan(pngBytes); // profile: 'full' (default
 // raw RGBA camera frame (width*height*4 bytes), no scoring
 final frame = await QrcodeAiScanner.scanFrame(rgba, w, h); // profile: 'frame'
 
-// next release: a wall-clock budget in milliseconds (0 = unbounded)
+// a wall-clock budget in milliseconds (0 = unbounded)
 final slow = await QrcodeAiScanner.scan(pngBytes, budgetMs: 10000);
 ```
 
-This release does not expose `capabilities()` (spec/01 § Capabilities); the
-package builds the core with its default engines.
+Published 0.12.0 does not expose `capabilities()` (spec/01 § Capabilities);
+its native library carries the core's default engines.
 
 Scans run on flutter_rust_bridge's Rust worker pool, so `await` never blocks the
 UI isolate. Profiles: `'full'` · `'fast'` · `'frame'`, each under its default
@@ -118,8 +174,7 @@ if (report.detections.isEmpty) {
 
 ## Scan budget
 
-Published 0.11.0 cannot change the budget. The working source adds an optional
-`budgetMs` argument to `scan` and `scanFrame` for the next release, with the
+`scan` and `scanFrame` take an optional `budgetMs` argument, with the
 semantics of `budget_ms` in the other bindings
 ([spec/02 § Budget semantics](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/spec/02-profiles.md#budget-semantics)):
 
@@ -131,20 +186,22 @@ semantics of `budget_ms` in the other bindings
 | above 4294967295 | refused before the image is read: the call throws a `String` ending with `[QRS-006]` |
 | negative | refused before the native call: `RangeError`, without a code |
 
-Calls written for 0.11.0 keep their meaning: without `budgetMs`, each profile
-keeps its default budget.
+A call without `budgetMs` keeps its meaning: each profile keeps its default
+budget. Up to 0.11.0 the package has no `budgetMs`.
 
 The budget stops the scan from starting a stage or an attempt once its
 deadline has passed. It does not stop one that is running. So a `frame` scan
 can take longer than 80 ms and still be final: its last stage started in time,
 and `budgetExhausted` is `false`.
 
-Simulators and emulators run Flutter in debug mode, where cargokit builds the
-core with the package's dev profile. In the working source that profile is
-optimized (opt-level 3, no debug assertions, no LTO). The
+Simulators and emulators run Flutter in debug mode. When cargokit compiles the
+core there, it uses the package's dev profile, which the package optimizes
+(opt-level 3, no debug assertions, no LTO); up to 0.11.0 that profile is not
+optimized. A signed precompiled library is built with the release profile and
+serves debug builds too. The
 [package README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/bindings/flutter/README.md#debug-builds-and-scan-time)
-gives the dated CI timings of the mixed QR/Code 128 fixture with it. They are
-CI observations, not device performance.
+gives the dated CI timings of the mixed QR/Code 128 fixture with the dev
+profile. They are CI observations of source builds, not device performance.
 
 ## Errors + license
 
@@ -153,4 +210,7 @@ A scan fault throws a `String` ending with the `[QRS-xxx]` wire code
 a negative `budgetMs` throws a `RangeError`.
 The report shape is the [one contract](/api/report).
 
-Current project-authored scanner source uses the [MIT License](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSE), including use in proprietary and commercial applications with the required copyright and permission notice. Published `qr_barcode_scanner` 0.11.0 retains the license included in its archive; changing this source does not replace that release. Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) for third-party notices and the source/archive distinction.
+Current project-authored scanner source uses the [MIT License](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSE), including use in proprietary and commercial applications with the required copyright and permission notice.
+The published `qr_barcode_scanner` 0.12.0 archive includes that MIT License.
+Published `qr_barcode_scanner` 0.11.0 retains the license included in its archive; changing this source does not replace that release.
+Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) for third-party notices and the source/archive distinction.

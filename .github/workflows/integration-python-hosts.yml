@@ -116,7 +116,7 @@ jobs:
             install: >-
               python -m pip install -r integrations/dify/requirements.txt
               -r integrations/dify/tests/requirements.txt
-            identifier: qrcode-ai-com/qrcode-barcode-scanner@0.1.0
+            identifier: qrcode-ai-com/qrcode-barcode-scanner@0.1.1
             uninstall: python -m pip uninstall -y qrcode-barcode-scanner
             gone: python -c "import qrcode_barcode_scanner"
           # The actor's image is apify/actor-python:3.12; its main runs here without Docker.
@@ -332,7 +332,7 @@ jobs:
           mkdir -p receipt
           python scripts/python-host-consumer.py run \
             --destination "Streamlit app started as Community Cloud starts it (not deployed)" \
-            --identifier examples/streamlit/streamlit_app.py --version 0.11.0 \
+            --identifier examples/streamlit/streamlit_app.py --version 0.12.0 \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/examples/streamlit" \
             --install "-r examples/streamlit/requirements.txt" \
             --install "-r examples/streamlit/tests/requirements.txt" \

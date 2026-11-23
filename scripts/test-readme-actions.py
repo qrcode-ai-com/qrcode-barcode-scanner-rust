@@ -98,6 +98,38 @@ class ReadmeActions(unittest.TestCase):
                 self.assertEqual(len(pictures), 5)
                 self.assertTrue(all(url.startswith('https://raw.githubusercontent.com/qrcode-ai-com/') for url in pictures))
 
+    def test_the_artifact_hub_listing_keeps_its_block_and_pictures_without_html(self):
+        # Artifact Hub renders the page with react-markdown and skipHtml: any tag would vanish,
+        # while a Markdown image, linked or not, is kept.
+        path = 'distribution/artifacthub/LISTING.md'
+        self.assertEqual(builder.LISTINGS, (path,))
+        text = builder.outputs()[path]
+        self.assertEqual(text, (ROOT / path).read_text())
+        self.assertEqual(html_tags(text), [])
+        self.assertEqual((text.count('<!-- qrcode-ai-readme-actions:v2 -->'), text.count('### Ask AI')), (1, 1))
+        self.assertIn('**Copy the plain-text prompt**', text)
+        prompt = re.search(r'```text\n(.+)\n```', text)[1]
+        self.assertIn('/blob/main/' + path, prompt)
+        badges = re.findall(r'\[!\[([^\]]+)\]\(https://[^)\s]+/docs/assets/actions/([a-z-]+)-v2\.svg\)\]\(([^)\s]+)\)', text)
+        self.assertEqual(badges, [(label, key, link) for (key, *_), (_, label, link) in
+                                  zip(builder.PROVIDERS, ai_links(prompt), strict=True)])
+        pictures = re.findall(r'!\[[^\]]+\]\((https://[^)\s]+)\)', text)
+        pictures = [url for url in pictures if '/docs/assets/actions/' not in url]
+        readme = (ROOT / 'distribution/artifacthub/README.md').read_text()
+        self.assertEqual([url.split('/')[-1].split('?')[0] for url in pictures],
+                         ['banner-container-light.gif', 'journey-containers-light.gif', 'examples-mixed-light.png',
+                          'formats-light.gif', 'runtimes-light.png'])
+        for url in pictures:
+            # The same address and hash as the light variant of the folder README.
+            self.assertTrue(f'<img src="{url}"' in readme, url + ' is not the light picture of the folder README')
+        self.assertEqual(set(canonical_links(path)) - prose_links(text), set())
+        self.assertTrue(all(link.endswith('/docker') for link in canonical_links(path)[2:4]))
+        # The page of an AGPL image gets no MIT source-license section, and names one version.
+        self.assertNotIn('qrscan-source-license', text)
+        runs = re.search(r'This image runs `qrscan` (\d+\.\d+\.\d+)', text)[1]
+        licensed = re.search(r'The (\d+\.\d+\.\d+) program in this image is licensed AGPL-3\.0-or-later\.', text)[1]
+        self.assertEqual(runs, licensed)
+
     def test_html_tags_are_found_outside_code_and_comments_only(self):
         self.assertEqual(html_tags('<details>\n<summary>Copy</summary>\n\n</details>'),
                          ['<details>', '<summary>', '</summary>', '</details>'])

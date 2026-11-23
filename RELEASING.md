@@ -1730,7 +1730,10 @@ license and notices inside, and packs it with
 date, fixed permissions. `stage` writes the satellite's tree from one commit of
 this repository; `verify` compares a tree with the stage of the commit its
 `SOURCE.json` names. The job `satellite` compares the published repository that
-way, and `consumer` installs the staged package in
+way, when it is built from the engine this commit pins: a pull request that
+moves the pin to another engine only says so, and a run on `main` or a tag
+fails until the satellite holds the stage, which the job uploads before it
+compares. `consumer` installs the staged package in
 `tests/consumers/swift-package` on macOS and builds it for iOS.
 
 On a tag `swift-v*`, `attach` runs in the protected environment `swift` with
