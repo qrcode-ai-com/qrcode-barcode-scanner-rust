@@ -8,16 +8,16 @@ page, read on 21 November 2026.
 ## Before anything: the plugin must be on the Marketplace
 
 Dify requires every plugin a template uses to be **installed directly from Marketplace**. The
-plugin `qrcode-ai-com/qrcode-barcode-scanner` 0.1.0 waits in
-[pull request 3862](https://github.com/langgenius/dify-plugins/pull/3862) of
-`langgenius/dify-plugins`, which is open. Do not submit the template before that pull request is
-merged and the plugin can be installed from the Marketplace.
+plugin `qrcode-ai-com/qrcode-barcode-scanner` has been on the
+[Dify Marketplace](https://marketplace.dify.ai/plugins/qrcode-ai-com/qrcode-barcode-scanner) since
+22 November 2026, when [pull request 3862](https://github.com/langgenius/dify-plugins/pull/3862) of
+`langgenius/dify-plugins` was merged. Install it from there before you export the template.
 
 ## The files
 
 | File | What it is | sha256 |
 |---|---|---|
-| [qr-and-barcode-reader.yml](qr-and-barcode-reader.yml) | The workflow to import, exactly as committed | `f8f3c5ff610c60739a428244957b3d53dbf60faaccd14471b8598a6844314b2a` |
+| [qr-and-barcode-reader.yml](qr-and-barcode-reader.yml) | The workflow to import, exactly as committed | `166754d425c7ced57be24fea411f0092e7804078cfa2a0dc994a806a39e63681` |
 
 The Creator Center takes an `.ifpkg` app package of at most 10 MB, exported from Dify. The
 [Dify template job](../../../.github/workflows/integration-dify-template.yml) imports this file
@@ -55,8 +55,8 @@ All in English, the language selected for the template.
 
 ## Owner steps
 
-1. Wait until pull request 3862 is merged and **QR Code & Barcode Scanner** appears in the Dify
-   Marketplace.
+1. Check that **QR Code & Barcode Scanner** appears in the Dify Marketplace. It has been listed
+   there since 22 November 2026.
 2. Sign in to Dify with the account that will publish. In **Plugins**, install the plugin from the
    Marketplace.
 3. In **Studio**, choose **Import DSL file** and select `qr-and-barcode-reader.yml`. Dify warns

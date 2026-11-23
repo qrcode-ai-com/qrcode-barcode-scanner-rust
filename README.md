@@ -209,7 +209,11 @@ These directories list it, so you can add it from inside the tool you work in:
 | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-comfyui-dark.png?v=96af9ee25553"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-comfyui-light.png?v=56a787fd873c" alt="" width="24" height="24" align="absmiddle"></picture> Comfy Registry | [`qrcode-barcode-scanner-nodes`](https://registry.comfy.org/nodes/qrcode-barcode-scanner-nodes) | A node reads every code in an image batch, to check that a generated code still decodes to the text you meant. [Guide](integrations/comfyui/README.md) |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-glama-dark.png?v=cd36fc162618"><img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/mark-glama-light.png?v=edbf6212f964" alt="" width="24" height="24" align="absmiddle"></picture> Glama MCP directory | [`qrcode-barcode-scanner-mcp`](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp) | Lists the MCP server, whose `scan_image` tool reads the codes in image bytes, offline. [Guide](distribution/glama/README.md) |
 
-n8n, Node-RED, Activepieces, Raycast, Dify, Apify, napari and the browser extension are built and tested in
+The Dify tool plugin has been on the [Dify Marketplace](https://marketplace.dify.ai/plugins/qrcode-ai-com/qrcode-barcode-scanner) since 22 November 2026: in
+Dify, open **Plugins**, then **Marketplace**, and install **QR Code & Barcode Scanner**. Its
+[guide](integrations/dify/README.md) gives its tool, its options and its limits.
+
+n8n, Node-RED, Activepieces, Raycast, Apify, napari and the browser extension are built and tested in
 [`integrations/`](integrations/) and wait for their stores. The [distribution guide](distribution/README.md) gives the
 state of each package and recipe.
 
