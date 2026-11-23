@@ -96,7 +96,7 @@ Description: offline QR code and barcode scanner
 CONTROL
 
 # Use the packaging changelog timestamp and retain root-owned payload files.
-export SOURCE_DATE_EPOCH=1794225801
+export SOURCE_DATE_EPOCH=1795374973
 export TZ=UTC LC_ALL=C
 find "$root" -type d -exec chmod 0755 {} +
 find "$root" -type f ! -path "$root/usr/bin/qrscan" -exec chmod 0644 {} +
