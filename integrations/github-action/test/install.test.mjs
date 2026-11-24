@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import { ArchiveError, readTarGz, readZip } from '../src/archive.mjs';
 import { assetNames, install, InstallError, parseSums, sha256, targetFor, trustFor } from '../src/install.mjs';
 import { DEFAULT_VERSION, RELEASES } from '../src/releases.mjs';
-import { fakeFetch, tarGz, zip } from './helpers.mjs';
+import { ACTION, fakeFetch, tarGz, zip } from './helpers.mjs';
 
 const TOP = 'qrcode-barcode-scanner-cli-9.9.9-x86_64-unknown-linux-gnu';
 
@@ -24,15 +24,42 @@ test('each runner maps to the archive published for it, and the others are refus
   assert.throws(() => targetFor('freebsd', 'x64'), InstallError);
 });
 
+const FIVE_TARGETS = ['aarch64-apple-darwin', 'aarch64-unknown-linux-gnu', 'x86_64-apple-darwin', 'x86_64-pc-windows-msvc',
+  'x86_64-unknown-linux-gnu'];
+const SEVEN_TARGETS = [...FIVE_TARGETS, 'aarch64-unknown-linux-musl', 'x86_64-unknown-linux-musl'].sort();
+
 test('the pinned table names every published target of the default version', () => {
+  assert.equal(DEFAULT_VERSION, '0.12.0');
   const pinned = RELEASES[DEFAULT_VERSION];
   assert.equal(pinned.tag, `v${DEFAULT_VERSION}`);
-  assert.deepEqual(Object.keys(pinned.archives).sort(), ['aarch64-apple-darwin', 'aarch64-unknown-linux-gnu',
-    'x86_64-apple-darwin', 'x86_64-pc-windows-msvc', 'x86_64-unknown-linux-gnu']);
+  assert.equal(pinned.sums, 'f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691');
+  assert.deepEqual(Object.keys(pinned.archives).sort(), SEVEN_TARGETS);
   for (const value of [pinned.sums, ...Object.values(pinned.archives).flatMap((a) => [a.sha256, a.executable])]) {
     assert.match(value, /^[0-9a-f]{64}$/);
   }
   assert.equal(assetNames(DEFAULT_VERSION, 'x86_64-pc-windows-msvc').archive, `qrcode-barcode-scanner-cli-${DEFAULT_VERSION}-x86_64-pc-windows-msvc.zip`);
+  assert.equal(assetNames(DEFAULT_VERSION, 'x86_64-unknown-linux-musl').archive, `qrcode-barcode-scanner-cli-${DEFAULT_VERSION}-x86_64-unknown-linux-musl.tar.gz`);
+});
+
+test('0.11.0 stays pinned with its five archives, so a workflow that names it keeps installing it', () => {
+  const pinned = RELEASES['0.11.0'];
+  assert.equal(pinned.tag, 'v0.11.0');
+  assert.equal(pinned.sums, '1b3263cf6c29af99fbcf9cc3f82e32febc7e598638292685fcd57c0656cc911e');
+  assert.deepEqual(Object.keys(pinned.archives).sort(), FIVE_TARGETS);
+  assert.equal(trustFor('0.11.0', '').sums, pinned.sums);
+});
+
+test('every runner target the action chooses is pinned in every version it pins', () => {
+  const chosen = [targetFor('linux', 'x64', '2.39'), targetFor('linux', 'arm64', '2.28'), targetFor('darwin', 'arm64'),
+    targetFor('darwin', 'x64'), targetFor('win32', 'x64')];
+  for (const [version, pinned] of Object.entries(RELEASES)) {
+    for (const target of chosen) assert.ok(Object.hasOwn(pinned.archives, target), `${version} pins ${target}`);
+  }
+});
+
+test('the default version input of action.yml is the pinned default', () => {
+  const action = readFileSync(join(ACTION, 'action.yml'), 'utf8');
+  assert.match(action, new RegExp(`\\n  version:\\n(?:    .*\\n)*?    default: ${DEFAULT_VERSION.replace(/\./g, '\\.')}\\n`));
 });
 
 test('a version is trusted only through the pinned table or a given SHA256SUMS hash', () => {
