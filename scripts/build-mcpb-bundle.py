@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.1, the same bytes on every host.
+"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.2, the same bytes on every host.
 
   build-mcpb-bundle.py build --out DIR [--revision REV] [--cache DIR]
   build-mcpb-bundle.py verify FILE [--revision REV] [--cache DIR]
@@ -8,8 +8,8 @@
 
 An MCP Bundle is a ZIP archive with a manifest.json at its root, which MCPB hosts such as Claude
 Desktop install in one step (https://github.com/modelcontextprotocol/mcpb). This one runs the
-published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.1 with its dependencies, the
-scanner engine 0.11.0 and its six native platform packages included: it installs nothing and
+published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.2 with its dependencies, the
+scanner engine 0.12.0 and its six native platform packages included: it installs nothing and
 needs no network. Nothing is compiled.
 
 `build` reads distribution/mcpb at REV (HEAD by default) from git, never from the working tree:
@@ -17,7 +17,7 @@ manifest.json, package.json, package-lock.json and server/launch.mjs. Every npm 
 lock is downloaded from its `resolved` address and must match its `integrity` (SHA-512): npm ci
 would install only the host's native package, the bundle carries all six. Each archive is
 extracted unchanged under node_modules/; a link, a device or a path leaving the package is
-refused. Two notice files of the engine's rxing-derived source come from tag v0.11.0, pinned by
+refused. Two notice files of the engine's rxing-derived source come from tag v0.12.0, pinned by
 SHA-256. The bundle adds icon.png (the QR Code AI logo of the VS Code extension), LICENSE.md,
 SOURCE.md and licenses/LICENSE-MIT (this repository's license at REV, for the bundle's own files).
 
@@ -57,24 +57,24 @@ PACKAGE = "distribution/mcpb"
 SCHEMA = "qrscan-mcpb-build/1"
 NAME = "qrcode-barcode-scanner"
 DISPLAY_NAME = "QR Code & Barcode Scanner"
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 TAG_PREFIX = "refs/tags/mcpb-v"
 BUNDLE = f"{NAME}-{VERSION}.mcpb"
 SUMS = f"{NAME}-mcpb-{VERSION}-SHA256SUMS"
 REGISTRY = "https://registry.npmjs.org/"
 ADAPTER = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
-ADAPTER_INTEGRITY = "sha512-JLPa1AqFpygcrt/zKMQwhIfD67U9j1DUPnKdBmYYwo8yQoZmwNtd4FH80yllFbONKwxcjpReqLiVrWilWgeEng=="
-ADAPTER_COMMIT = "365585f9db955fd41a6101a3240c4f63436434a3"  # tag agents-v0.3.1
+ADAPTER_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
+ADAPTER_COMMIT = "3c5e211a6fb31151b13d0801c98ab118f48dcceb"  # tag agents-v0.3.2
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
-ENGINE_VERSION = "0.11.0"
-ENGINE_COMMIT = "176ac96ef16ee330dbfc6ada10327d0b4e23a8b2"  # tag v0.11.0
+ENGINE_VERSION = "0.12.0"
+ENGINE_COMMIT = "897dd50cdf27cbde54d408bf65e1ca4622035d42"  # tag v0.12.0
 NATIVES = ("darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu", "linux-x64-musl", "win32-x64-msvc")
-AGPL, APACHE, MIT = "AGPL-3.0-or-later", "Apache-2.0", "MIT"
+APACHE, MIT = "Apache-2.0", "MIT"
 # Every package the bundle holds: (version, license). The lock may hold no other.
 LOCKED = {
-    ADAPTER: (VERSION, AGPL),
-    ENGINE: (ENGINE_VERSION, AGPL),
-    **{f"{ENGINE}-{native}": (ENGINE_VERSION, AGPL) for native in NATIVES},
+    ADAPTER: (VERSION, MIT),
+    ENGINE: (ENGINE_VERSION, MIT),
+    **{f"{ENGINE}-{native}": (ENGINE_VERSION, MIT) for native in NATIVES},
     "@modelcontextprotocol/server": ("2.3.1", APACHE),
     "@modelcontextprotocol/core": ("2.3.1", APACHE),
     "zod": ("4.6.7", MIT),
@@ -89,12 +89,12 @@ SERVER_CONFIG = {
 }
 TOOLS = ("scan_image", "scan_file")
 PLATFORMS = ["darwin", "win32", "linux"]
-# The engine's notices for the reader parts derived from rxing (Apache-2.0), at tag v0.11.0.
+# The engine's notices for the reader parts derived from rxing (Apache-2.0), at tag v0.12.0.
 RAW = f"https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/{ENGINE_COMMIT}/"
 NOTICES = (
-    ("licenses/engine-0.11.0/THIRD-PARTY.md", RAW + "crates/qrcode-ai-scanner/THIRD-PARTY.md",
-     "sha256-e3c3e5d7b5f2e2d880fa39216658df0f84f0de297dd211b65d38373e8e7c6a4a"),
-    ("licenses/engine-0.11.0/LICENSE-APACHE-2.0", RAW + "crates/qrcode-ai-scanner/LICENSE-APACHE-2.0",
+    (f"licenses/engine-{ENGINE_VERSION}/THIRD-PARTY.md", RAW + "crates/qrcode-ai-scanner/THIRD-PARTY.md",
+     "sha256-542c2d99262bf4215de4de3d7e1a6e8b065b934b61ccb650dd82d2c4f96a71ab"),
+    (f"licenses/engine-{ENGINE_VERSION}/LICENSE-APACHE-2.0", RAW + "crates/qrcode-ai-scanner/LICENSE-APACHE-2.0",
      "sha256-865b180617725f20be71aa305e82efaa8e56b3c6936d68089bc63cf91cb23087"),
 )
 DOS_EPOCH = 315532800  # 1980-01-01T00:00:00Z, the earliest date a ZIP entry holds
@@ -347,13 +347,15 @@ The bundle's own files, `manifest.json`, `package.json`, `package-lock.json`, `s
 `LICENSE.md` and `SOURCE.md`, are licensed MIT: `licenses/LICENSE-MIT`. `icon.png` is the QR Code AI
 logo; no license of this bundle grants a trademark right.
 
-The MCP server and the scanner engine are licensed AGPL-3.0-or-later in these published versions.
-`SOURCE.md` names their corresponding source.
+The MCP server {VERSION} and the scanner engine {ENGINE_VERSION} are licensed MIT in these published
+versions; `SOURCE.md` names their source. Earlier archives keep the license they were published
+with: the MCP server 0.3.1 and earlier, and the engine 0.11.0 and earlier, remain
+AGPL-3.0-or-later, as does the MCP Bundle 0.3.1 that carried them.
 
 The native scanner builds hold two reader parts derived from rxing 0.9.3, a Rust port of ZXing,
-which keep their Apache-2.0 notices: `licenses/engine-0.11.0/THIRD-PARTY.md` describes them and
-`licenses/engine-0.11.0/LICENSE-APACHE-2.0` is their license. Both files come from tag v0.11.0 of
-the scanner repository. The native builds also link Rust crates under their own licenses;
+which keep their Apache-2.0 notices: `licenses/engine-{ENGINE_VERSION}/THIRD-PARTY.md` describes them
+and `licenses/engine-{ENGINE_VERSION}/LICENSE-APACHE-2.0` is their license. Both files come from tag
+v{ENGINE_VERSION} of the scanner repository. The native builds also link Rust crates under their own licenses;
 `Cargo.lock` at that tag names each crate and its version.
 """
 
@@ -366,7 +368,7 @@ def source_text(commit, packages):
 Built by `scripts/build-mcpb-bundle.py` from commit {commit} of
 {REPOSITORY}, with the files of `{PACKAGE}` at that commit.
 
-Corresponding source of the AGPL-3.0-or-later parts:
+Source of the MCP server and the scanner engine, both MIT in these versions:
 
 - MCP server {VERSION}: tag `agents-v{VERSION}`, commit {ADAPTER_COMMIT}, folder `integrations/mcp`.
   The JavaScript in `node_modules/{ADAPTER}` is that source as npm publishes it.
@@ -505,7 +507,7 @@ def self_test():
     real = inputs_at("HEAD")
     try:
         real_packages = check_lock(real.files, ADAPTER_INTEGRITY)
-        if license_expression(real_packages) != "AGPL-3.0-or-later AND Apache-2.0 AND MIT":
+        if license_expression(real_packages) != "Apache-2.0 AND MIT":
             failures.append(f"the committed lock gives the license {license_expression(real_packages)}")
     except Refused as error:
         failures.append(f"the committed package.json and lock were refused: {error}")
@@ -599,9 +601,12 @@ def self_test():
         lock, lambda d: d["packages"]["node_modules/zod"].update(resolved="https://example.com/zod-4.6.7.tgz"))}),
         "not the registry's archive")
     refused("an adapter range in package.json", lambda: attempt(**{"package.json": edited(
-        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.1"}))}), "exactly")
+        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.2"}))}), "exactly")
     refused("a manifest at another version", lambda: attempt(**{"manifest.json": edited(
-        manifest, lambda d: d.update(version="0.3.2"))}), "manifest.json version")
+        manifest, lambda d: d.update(version="0.3.3"))}), "manifest.json version")
+    refused("the adapter locked under its earlier AGPL license", lambda: attempt(**{"package-lock.json": edited(
+        lock, lambda d: d["packages"][f"node_modules/{ADAPTER}"].update(license="AGPL-3.0-or-later"))}),
+        f"not {VERSION} (MIT)")
     refused("folders passed through env, which a host leaves unexpanded", lambda: attempt(**{"manifest.json": edited(
         manifest, lambda d: d["server"]["mcp_config"].update(
             env={"QRSCAN_MCP_ALLOWED_DIRECTORIES": "${user_config.allowed_directories}"}))}), "server must be exactly")
@@ -609,7 +614,7 @@ def self_test():
         manifest, lambda d: d["tools"][0].update(inputSchema={"type": "object"}))}), "name and a description only")
     refused("a folder granted by default", lambda: attempt(**{"manifest.json": edited(
         manifest, lambda d: d["user_config"]["allowed_directories"].update(default=["${HOME}"]))}), "no default")
-    refused("a license field that hides the AGPL parts", lambda: attempt(**{"manifest.json": edited(
+    refused("a license field that hides the Apache-2.0 parts", lambda: attempt(**{"manifest.json": edited(
         manifest, lambda d: d.update(license="MIT"))}), "manifest.json license")
     refused("a Node range other than the adapter's", lambda: attempt(**{"manifest.json": edited(
         manifest, lambda d: d["compatibility"]["runtimes"].update(node=">=18"))}), "compatibility")
@@ -624,9 +629,10 @@ def self_test():
         refused(label, lambda files=files, links=links: members("x", tarball(files, links)), needle)
     refused("a file twice up to letter case", lambda: members("x", tarball(
         {"package.json": b"{}", "LICENSE": b"a", "license": b"b"})), "twice")
-    refused("a tag of another version", lambda: gate("refs/tags/mcpb-v0.3.2"), "is not refs/tags/mcpb-v0.3.1")
-    refused("the engine's tag", lambda: gate("refs/tags/v0.3.1"), "is not refs/tags/mcpb-v0.3.1")
-    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.1")
+    refused("the tag of the previous bundle", lambda: gate("refs/tags/mcpb-v0.3.1"), "is not refs/tags/mcpb-v0.3.2")
+    refused("the adapter's tag", lambda: gate("refs/tags/agents-v0.3.2"), "is not refs/tags/mcpb-v0.3.2")
+    refused("the engine's tag", lambda: gate("refs/tags/v0.12.0"), "is not refs/tags/mcpb-v0.3.2")
+    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.2")
     try:
         gate(TAG_PREFIX + VERSION)
     except Refused as error:
