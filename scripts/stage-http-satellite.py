@@ -17,13 +17,13 @@ from one commit of this repository (scripts/satellite_stage.py says how), with:
     `.do/deploy.template.yaml`, the app spec of the Deploy to DigitalOcean button;
   - the mixed fixture its tests scan, as `test/fixtures/mixed-code128-qr.png`;
   - `SOURCE.json`: the commit and the sha256 of every staged file. The image copies it, and the
-    service names that commit as its source (AGPL section 13).
+    service names that commit as its source.
 
 The image of .github/workflows/http-service.yml is built from this staged tree, so the image that
 CI judges and the one a host builds come from the same files. Before writing, the stage checks the
-service: one version in package.json, server.mjs and the Dockerfile label; the engine 0.11.0 pinned
+service: one version in package.json, server.mjs and the Dockerfile label; the engine 0.12.0 pinned
 with its six native packages and their sha512 in package-lock.json; a base image pinned by digest;
-the engine's notices byte-equal to tag v0.11.0; the MIT LICENSE equal to this repository's. Exit 0
+the engine's notices byte-equal to tag v0.12.0; the MIT LICENSE equal to this repository's. Exit 0
 when the step passes, 1 when it fails, 2 for usage. Stdlib only.
 """
 import hashlib
@@ -35,14 +35,14 @@ from satellite_stage import ROOT, Refused, Satellite
 
 PACKAGE = "distribution/http"
 FIXTURE = "fixtures/symbology/mixed-code128-qr.png"
-ENGINE = "0.11.0"
+ENGINE = "0.12.0"
 ENGINE_PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner"
 NATIVES = ("darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu", "linux-x64-musl", "win32-x64-msvc")
 BASE = "node:22.22.2-bookworm-slim@sha256:9f6d5975c7dca860947d3915877f85607946403fc55349f39b4bc3688448bb6e"
-# crates/qrcode-ai-scanner/<name> at tag v0.11.0 (commit 176ac96), the engine the image runs.
+# crates/qrcode-ai-scanner/<name> at tag v0.12.0 (commit 897dd50), the engine the image runs.
 NOTICES = {
-    "licenses/engine-0.11.0/THIRD-PARTY.md": "e3c3e5d7b5f2e2d880fa39216658df0f84f0de297dd211b65d38373e8e7c6a4a",
-    "licenses/engine-0.11.0/LICENSE-APACHE-2.0": "865b180617725f20be71aa305e82efaa8e56b3c6936d68089bc63cf91cb23087",
+    "licenses/engine-0.12.0/THIRD-PARTY.md": "542c2d99262bf4215de4de3d7e1a6e8b065b934b61ccb650dd82d2c4f96a71ab",
+    "licenses/engine-0.12.0/LICENSE-APACHE-2.0": "865b180617725f20be71aa305e82efaa8e56b3c6936d68089bc63cf91cb23087",
 }
 
 
@@ -107,7 +107,7 @@ def readme_links(directory):
 def refuses_a_floating_engine(directory):
     files = {path.relative_to(directory).as_posix(): path.read_bytes() for path in directory.rglob("*") if path.is_file()}
     package = json.loads(files["package.json"])
-    package["dependencies"][ENGINE_PACKAGE] = "^0.11.0"
+    package["dependencies"][ENGINE_PACKAGE] = f"^{ENGINE}"
     files["package.json"] = json.dumps(package).encode()
     try:
         check(files, None, ROOT)
@@ -118,7 +118,7 @@ def refuses_a_floating_engine(directory):
 
 def refuses_another_notice(directory):
     files = {path.relative_to(directory).as_posix(): path.read_bytes() for path in directory.rglob("*") if path.is_file()}
-    files["licenses/engine-0.11.0/THIRD-PARTY.md"] += b"\nchanged\n"
+    files[f"licenses/engine-{ENGINE}/THIRD-PARTY.md"] += b"\nchanged\n"
     try:
         check(files, None, ROOT)
     except Refused as error:

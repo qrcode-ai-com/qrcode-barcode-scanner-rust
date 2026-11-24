@@ -145,7 +145,7 @@ The same engine also runs inside an [n8n community node](../n8n/README.md), a [N
 
 ## Licensing
 
-The app's own files are MIT, in [LICENSE](LICENSE). The app holds no engine code: the scan service runs the engine, under the license of the engine version it ships. The tests use the published `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, under its AGPL-3.0-or-later license, and download Make's JSON schemas from the Apps Editor repository, under its own license; neither is part of the app. [LISTING.md](LISTING.md) holds the values and the steps for deploying the app to Make.
+The app's own files are MIT, in [LICENSE](LICENSE). The app holds no engine code: the scan service runs the engine, under the license of the engine version it ships. The tests use the published `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, under its MIT license, and download Make's JSON schemas from the Apps Editor repository, under its own license; neither is part of the app. [LISTING.md](LISTING.md) holds the values and the steps for deploying the app to Make.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**.
 

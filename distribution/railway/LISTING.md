@@ -11,13 +11,13 @@ Railway workspace, so they are the owner's. This kit holds every value to type.
 
 | Item | Value |
 | --- | --- |
-| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit |
-| Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.11.0` from the lockfile's sha512, user `1000:1000` |
+| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Its `package.json` must name service 0.1.1 before the template is created: on 24 November 2026 it still held 0.1.0, staged on 21 November with the engine 0.11.0 |
+| Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0` from the lockfile's sha512, user `1000:1000` |
 | Port | Railway injects `PORT`; the service listens on it, on every address |
-| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.0","engine":"0.11.0"}` |
+| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.1","engine":"0.12.0"}` |
 | Checked in the engine | `http-service.yml`, job `hosts`, entry `railway`: the judged image run with a `PORT` that is not the default one, `QRSCAN_HTTP_MAX_CONCURRENT=1`, `QRSCAN_HTTP_BUDGET_SCALE=2`, 1 vCPU and 512 MB, judged by `test/consumer.mjs` (mixed QR code and Code 128 in fast, frame and full, exact payloads, every refusal); and no `railway.json` or `railway.toml` in the staged tree |
 | Icon | `integrations/vscode/images/icon.png` in the engine repository: 512 by 512 pixels, transparent corners, sha256 `97469c90140c94dc621d3cbfc0df4d0841b35648b2fe77044fecd214a7465af1`. Railway asks for a 1:1 icon with a transparent background |
-| License | the image is AGPL-3.0-or-later (engine 0.11.0); every answer names its source in `X-Source-Code` |
+| License | the image is MIT: the service and the engine 0.12.0 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and Debian keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
 
 ## Composer values
 
@@ -53,11 +53,11 @@ and get back a JSON report of every code it holds, with its format and exact tex
 ## About Hosting QR Code & Barcode Scanner
 
 The service is one container built from the Dockerfile of its repository: Node.js 22 and the
-published engine 0.11.0, with no database, no disk and no secret. Railway builds it, gives it a
+published engine 0.12.0, with no database, no disk and no secret. Railway builds it, gives it a
 public address and checks `GET /healthz` before it takes traffic. Images are read in memory and
 never stored, and the service makes no outbound request. It has no account or key of its own:
 anyone who has its address can use it, so keep the address private or put your own access control
-in front of it. Every answer names the source code of the service, as its AGPL-3.0 license asks.
+in front of it. The service and the engine are MIT, and every answer names the source code it runs.
 
 ## Common Use Cases
 

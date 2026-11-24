@@ -113,7 +113,7 @@ The [integration workflow](../../.github/workflows/integration-make.yml) validat
 `makecomapp.json` and every file it names against Make's Apps Editor schemas, pinned by commit and
 SHA-256. It checks the exact file set, the exact IML expressions and the addresses the app may
 contain. It then evaluates the connection and both modules, sends their requests to a contract
-stub of the scan service backed by the published WebAssembly engine 0.11.0, and checks the mixed
+stub of the scan service backed by the published WebAssembly engine 0.12.0, and checks the mixed
 fixture's two codes in the fast, frame and full profiles, with the error messages Make would show.
 Once `distribution/http` is on the revision under test, the same requests go to that service,
 started in the job; until then the workflow says the live run is pending. It does not prove how

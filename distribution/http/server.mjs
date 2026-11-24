@@ -6,8 +6,8 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-export const SERVICE_VERSION = "0.1.0";
-export const ENGINE_VERSION = "0.11.0";
+export const SERVICE_VERSION = "0.1.1";
+export const ENGINE_VERSION = "0.12.0";
 export const REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust";
 export const ENGINE_SOURCE = `${REPOSITORY}/tree/v${ENGINE_VERSION}`;
 export const PROFILES = Object.freeze(["fast", "frame", "full"]);
@@ -69,7 +69,8 @@ export function profileBudgets(scale) {
 
 /**
  * Where the running code's source is: the satellite tree records the engine commit it was
- * generated from in SOURCE.json. AGPL section 13 asks a network service to offer that source.
+ * generated from in SOURCE.json. Every answer names that source, so a user of a running service
+ * can read the exact code that served them.
  */
 export function sourceFromRecord(directory = new URL(".", import.meta.url)) {
   let revision = null;
@@ -187,7 +188,7 @@ function describe(limits, budgets, source) {
     limits: { inputBytes: limits.inputBytes, dimension: limits.dimension, pixels: limits.pixels, concurrent: limits.concurrent },
     budgetsMs: budgets,
     privacy: "Images are scanned in memory and never stored. The service makes no outbound request and never opens a decoded link.",
-    license: `AGPL-3.0-or-later: this service runs the scanner engine ${ENGINE_VERSION}. Its own source is MIT.`,
+    license: `MIT: this service and the scanner engine ${ENGINE_VERSION}. Two reader parts of the engine keep their Apache-2.0 notice.`,
     source,
   };
 }
@@ -220,7 +221,7 @@ button { justify-self: start; padding: .4rem 1rem; }
 <button type="submit">Scan</button>
 </form>
 <p>From a terminal, with this server's address in place of example.com: <code>curl --data-binary @image.png -H 'content-type: image/png' 'https://example.com/scan?mode=fast'</code></p>
-<p>Source: ${link(source.service, "this service")} and ${link(source.engine, `the engine ${ENGINE_VERSION}`)}, licensed AGPL-3.0-or-later as a whole. Read ${link(`${REPOSITORY}#readme`, "the scanner repository")} for every other way to run it.</p>
+<p>Source: ${link(source.service, "this service")} and ${link(source.engine, `the engine ${ENGINE_VERSION}`)}, both MIT; two reader parts of the engine keep their Apache-2.0 notice. Read ${link(`${REPOSITORY}#readme`, "the scanner repository")} for every other way to run it.</p>
 </body>
 </html>
 `;
