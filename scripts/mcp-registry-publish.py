@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""List the inspected MCP 0.3.1 adapter in the Official MCP Registry."""
+"""List the inspected MCP 0.3.2 adapter in the Official MCP Registry."""
 
 import argparse
 import base64
@@ -17,15 +17,15 @@ from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner"
+REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
 REGISTRY = "https://registry.modelcontextprotocol.io"
 NPM = "https://registry.npmjs.org"
 PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
 SERVER = "io.github.qrcode-ai-com/qrcode-barcode-scanner"
-VERSION = "0.3.1"
-SOURCE_COMMIT = "365585f9db955fd41a6101a3240c4f63436434a3"  # agents-v0.3.1
-SERVER_SHA256 = "6d120fa4c23666a190dc6b061dcd459ae774b8950b07a686f3349422035cdbca"
-NPM_INTEGRITY = "sha512-JLPa1AqFpygcrt/zKMQwhIfD67U9j1DUPnKdBmYYwo8yQoZmwNtd4FH80yllFbONKwxcjpReqLiVrWilWgeEng=="
+VERSION = "0.3.2"
+SOURCE_COMMIT = "3c5e211a6fb31151b13d0801c98ab118f48dcceb"  # agents-v0.3.2
+SERVER_SHA256 = "b9c23db7152497fa15d53934b335b704c4865e4732caccb198a51abfda449b80"
+NPM_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
 PUBLISHER_URL = (
     "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.7/"
     "mcp-publisher_linux_amd64.tar.gz"
@@ -102,7 +102,7 @@ def protected_environment():
 def package_metadata():
     raw_url = f"https://raw.githubusercontent.com/{REPOSITORY}/{SOURCE_COMMIT}/integrations/mcp/server.json"
     source = fetch(raw_url)[1]
-    require(hashlib.sha256(source).hexdigest() == SERVER_SHA256, "server.json digest differs from agents-v0.2.1")
+    require(hashlib.sha256(source).hexdigest() == SERVER_SHA256, f"server.json digest differs from agents-v{VERSION}")
     manifest = json.loads(source)
     require(manifest["name"] == SERVER and manifest["version"] == VERSION and manifest["packages"] == [{
         "registryType": "npm", "registryBaseUrl": NPM, "identifier": PACKAGE,
