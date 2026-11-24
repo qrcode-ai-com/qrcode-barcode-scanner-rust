@@ -28,6 +28,8 @@ Help me understand QR Code & Barcode Scanner MCP server for Glama (distribution/
 
 <!-- /qrcode-ai-readme-actions:v2 -->
 
+[![qrcode-ai-com/qrcode-barcode-scanner-mcp MCP server](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp/badges/score.svg)](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp)
+
 This folder holds what Glama needs to list and inspect the QR Code & Barcode Scanner MCP server, version 0.3.1. The Dockerfile installs the published npm package `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1` from a lockfile that pins every package by integrity, on a Node.js 22 base image pinned by digest. It builds nothing from source. The server speaks MCP over stdio. Its tool `scan_image` reads the QR codes and barcodes in base64 image bytes, offline, and returns the scanner's JSON report. Glama lists the server at [glama.ai](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp) since 20 November 2026.
 
 The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barcode scanner](https://qrcode-ai.com/en-US/barcode-scanner) let you try the engine in a browser first. To connect the server to a client, read the [QR code scanner MCP guide](https://qrcode-ai.com/en-US/qr-code-scanner/mcp) and the [barcode scanner MCP guide](https://qrcode-ai.com/en-US/barcode-scanner/mcp).
@@ -64,7 +66,7 @@ The files are staged into their own repository, [`qrcode-ai-com/qrcode-barcode-s
 
 The server was added from this repository and claimed once, on 20 November 2026; a new stage needs neither step again.
 
-Glama shows this README with its HTML removed, its comments stripped and the link around an image dropped. So it holds plain Markdown only: each picture is a plain image in its dark variant, as Glama's page is dark, and each assistant under Ask AI is a text link. `scripts/build-readme-actions.py` writes that Ask AI block, and `scripts/test-readme-actions.py` refuses any HTML or linked image in this file.
+Glama shows this README with its HTML removed, its comments stripped and the link around an image dropped. So it holds plain Markdown only: each picture is a plain image in its dark variant, as Glama's page is dark, and each assistant under Ask AI is a text link. `scripts/build-readme-actions.py` writes that Ask AI block, and `scripts/test-readme-actions.py` refuses any HTML or linked image in this file, except Glama's score badge under the Ask AI block: on GitHub it links back to the listing, and Glama shows it as a plain image.
 
 ## How it works
 

@@ -15,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('builder', ROOT / 'scripts/build-readme-actions.py')
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
+# Glama's score badge, as Glama gives it. On GitHub it links back to the listing; Glama drops the
+# link around it and shows the image alone. It is not one of the five pictures.
+GLAMA_LISTING = 'https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp'
+GLAMA_BADGE = f'[![qrcode-ai-com/qrcode-barcode-scanner-mcp MCP server]({GLAMA_LISTING}/badges/score.svg)]({GLAMA_LISTING})'
 
 
 def listed_readmes():
@@ -89,6 +93,9 @@ class ReadmeActions(unittest.TestCase):
         for path in builder.TEXT_LINKS:
             with self.subTest(path=path):
                 text = outputs[path]
+                if path == 'distribution/glama/README.md':
+                    self.assertEqual(text.count(GLAMA_BADGE), 1)
+                    text = text.replace(GLAMA_BADGE, '')
                 # Glama removes HTML and the link around an image: neither may carry content here.
                 self.assertEqual(html_tags(text), [])
                 self.assertNotRegex(text, r'\[!\[')
