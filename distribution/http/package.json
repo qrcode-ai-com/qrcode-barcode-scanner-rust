@@ -1,8 +1,8 @@
 {
   "name": "qrcode-barcode-scanner-http",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
-  "description": "A small HTTP service that scans QR codes and barcodes with the published QR Code & Barcode Scanner engine 0.11.0",
+  "description": "A small HTTP service that scans QR codes and barcodes with the published QR Code & Barcode Scanner engine 0.12.0",
   "license": "MIT",
   "type": "module",
   "main": "server.mjs",
@@ -23,6 +23,6 @@
     "test": "node --test test/server.test.mjs"
   },
   "dependencies": {
-    "@qrcode-ai-com/qrcode-barcode-scanner": "0.11.0"
+    "@qrcode-ai-com/qrcode-barcode-scanner": "0.12.0"
   }
 }

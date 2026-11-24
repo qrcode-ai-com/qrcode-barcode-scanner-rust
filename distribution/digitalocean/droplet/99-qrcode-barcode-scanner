@@ -18,7 +18,7 @@ and port 80 only. Put TLS and your own access control in front of it before you 
                    systemctl restart qrscan-http
   Updates:         apt upgrades the system; a new service version is a new Droplet image.
 
-Documentation and source (AGPL-3.0-or-later):
+Documentation and source (MIT):
   https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/distribution/http
 
 MESSAGE

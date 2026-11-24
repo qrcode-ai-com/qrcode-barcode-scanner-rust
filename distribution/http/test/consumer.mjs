@@ -6,7 +6,7 @@
 //
 // The fixture is the mixed QR + Code 128 image of the engine's tests. The service must answer
 // GET /healthz and GET /, and POST /scan must return exactly the two payloads in the fast, frame
-// and full modes, both as a raw body and as a multipart form, with engine 0.11.0. Then each
+// and full modes, both as a raw body and as a multipart form, with engine 0.12.0. Then each
 // refusal is checked: an unknown mode, a body that is not an image, a text body, a GET on
 // /scan, an unknown path and a body one byte over the advertised limit. Node.js 22 or later,
 // no dependency. Exit 0 when every check passes, 1 when one fails, 2 for usage.
@@ -17,7 +17,7 @@ import { request as secureRequest } from "node:https";
 
 const EXPECTED = Object.freeze([["code128", "STOCK-4827"], ["qr_code", "https://qrc-ai.com/76xMa"]]);
 const FIXTURE_SHA256 = "c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8";
-const ENGINE = "0.11.0";
+const ENGINE = "0.12.0";
 const MODES = ["fast", "frame", "full"];
 const SOURCE = /^https:\/\/github\.com\/qrcode-ai-com\/qrcode-barcode-scanner-rust\/tree\/(?:[0-9a-f]{40}|main)\/distribution\/http$/;
 
@@ -109,14 +109,14 @@ async function main() {
 
   let limit = null;
   let source = null;
-  await check("GET /healthz answers ok with engine 0.11.0", async () => {
+  await check("GET /healthz answers ok with engine 0.12.0", async () => {
     const answer = await exchange(base, "GET", "/healthz");
     expectStatus(answer, 200, "healthz");
     const value = parse(answer, "healthz");
     if (value.status !== "ok" || value.engine !== ENGINE) throw new Error(`healthz says ${JSON.stringify(value)}`);
     return `service ${value.service}`;
   });
-  await check("GET / describes the service, its limits and its source (AGPL section 13)", async () => {
+  await check("GET / describes the service, its limits and its source", async () => {
     const answer = await exchange(base, "GET", "/", { headers: { accept: "application/json" } });
     expectStatus(answer, 200, "/");
     const value = parse(answer, "/");
