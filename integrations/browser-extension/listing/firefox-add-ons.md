@@ -1,4 +1,4 @@
-# Firefox Add-ons · QR Code & Barcode Scanner 0.1.0
+# Firefox Add-ons · QR Code & Barcode Scanner 0.1.1
 
 Everything addons.mozilla.org (AMO) asks for, ready to paste or to send with `web-ext sign`.
 Nothing here has been submitted: the account, the agreement, the API keys, the upload and the
@@ -12,14 +12,14 @@ effect on 1 December 2026: open each page again before submitting.
 
 | What | Value |
 |---|---|
-| Add-on | `build/qrcode-barcode-scanner-firefox-0.1.0.zip` |
-| SHA-256 | `b7f58e3d17e92143f0557b7f7affff4640c6f58a8b73be033e56e3fb9b9f60d2` |
-| Source package | `build/qrcode-barcode-scanner-source-0.1.0.zip` |
-| SHA-256 | `daab04820df331bafa63fa88dda27279c6eb7b88321f771c678a5a442e76bda2` |
+| Add-on | `build/qrcode-barcode-scanner-firefox-0.1.1.zip` |
+| SHA-256 | `49083dfc4ae32df65d5e5434be4368a6683be37013262175daea85d037c9ff71` |
+| Source package | `build/qrcode-barcode-scanner-source-0.1.1.zip` |
+| SHA-256 | `700cd6bffd994d003a9e79fbe3e2b46462eb57d953eb4fb39e67884ae6dbd9d9` |
 | Listing metadata | `build/amo-metadata.json`, written by the build from [texts.md](texts.md) |
 | Made by | `npm ci && npm run build` in this folder, or the `browser-extension` artifact of the `integration-browser-extension` workflow |
 | Checked by | `npm run check:pins` (same bytes as [SHA256SUMS](../SHA256SUMS)), `npm run inspect`, `npm run lint:firefox` (no error, warning or notice), `npm run test:firefox-addon` (the zip installed in release Firefox), `npm run test:reproduce` (the source package rebuilds every archive) |
-| Manifest | Manifest V3, version 0.1.0, add-on ID `qrcode-barcode-scanner@qrcode-ai.com`, `strict_min_version` 142.0, `data_collection_permissions` `{"required": ["none"]}`, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*` |
+| Manifest | Manifest V3, version 0.1.1, add-on ID `qrcode-barcode-scanner@qrcode-ai.com`, `strict_min_version` 142.0, `data_collection_permissions` `{"required": ["none"]}`, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*` |
 
 Rebuilding on any system with Node.js 22 or 24 gives the same bytes. If a hash differs, do not
 upload: rebuild from a clean checkout of `main`.
@@ -47,7 +47,7 @@ From this folder, after `npm ci && npm run build`:
 ```sh
 node_modules/.bin/web-ext sign --source-dir build/firefox --channel listed \
   --amo-metadata build/amo-metadata.json \
-  --upload-source-code build/qrcode-barcode-scanner-source-0.1.0.zip \
+  --upload-source-code build/qrcode-barcode-scanner-source-0.1.1.zip \
   --api-key "$AMO_JWT_ISSUER" --api-secret "$AMO_JWT_SECRET"
 ```
 
@@ -59,12 +59,12 @@ factor. web-ext packs `build/firefox` itself; its zip holds the same files as th
 ## Or submit in the Developer Hub
 
 Submit a New Add-on, **On this site**, then upload
-`build/qrcode-barcode-scanner-firefox-0.1.0.zip`. The field names below are those of the current
+`build/qrcode-barcode-scanner-firefox-0.1.1.zip`. The field names below are those of the current
 Developer Hub; the new one may word them differently. Then:
 
 | Question or field | Value |
 |---|---|
-| Do you need to submit source code? | **Yes**: the package holds generated code, the WebAssembly module and its wasm-bindgen glue. Upload `build/qrcode-barcode-scanner-source-0.1.0.zip`. |
+| Do you need to submit source code? | **Yes**: the package holds generated code, the WebAssembly module and its wasm-bindgen glue. Upload `build/qrcode-barcode-scanner-source-0.1.1.zip`. |
 | Name | `QR Code & Barcode Scanner` (from the manifest) |
 | Add-on URL | `qrcode-barcode-scanner` if free |
 | Summary | The summary for Firefox Add-ons in [texts.md](texts.md#summary-for-firefox-add-ons) (at most 250 characters) |
@@ -77,9 +77,10 @@ Developer Hub; the new one may word them differently. Then:
 | Privacy policy | Not required: AMO asks for one "if any data is being transmitted from the user's device", and none is. To show one anyway, paste [PRIVACY.md](PRIVACY.md). |
 | Notes to reviewer | The notes for reviewers in [texts.md](texts.md#notes-for-reviewers) |
 
-**License.** AMO's list has `AGPL-3.0-only` but not `AGPL-3.0-or-later`, the license of the
-bundled engine 0.11.0, and the extension's own files are MIT. Either preset would misstate the
-package, so the license is custom and states both parts.
+**License.** The extension's own files and the bundled engine 0.12.0 are MIT, but two parts of
+the engine's reader derive from rxing and keep their Apache-2.0 notices. AMO's MIT preset would
+not state those notices, so the license is custom: the MIT text, with a paragraph on the engine
+and its Apache-2.0 parts.
 
 **Images.** AMO shows the manifest's icon unless another is uploaded. Screenshots: the four
 `listing/images/screenshot-*-1280x800.png` files (AMO recommends 1280 × 800), added on the
@@ -90,7 +91,7 @@ listing's edit page after the first upload.
 Signing "can take up to 24 hours", and a human review can follow "at any time after
 submission". The reviewer reads [SOURCE.md](../SOURCE.md) in the source package: it rebuilds
 every archive with `npm ci --omit=dev --ignore-scripts` and `npm run build-for-amo`, and gives
-the steps to rebuild the WebAssembly module from its Rust source at tag v0.11.0. The repository's
+the steps to rebuild the WebAssembly module from its Rust source at tag v0.12.0. The repository's
 CI runs those steps on every change (job `wasm-rebuild`) and requires the module's pinned
 SHA-256.
 

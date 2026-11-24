@@ -1,4 +1,4 @@
-# Chrome Web Store · QR Code & Barcode Scanner 0.1.0
+# Chrome Web Store · QR Code & Barcode Scanner 0.1.1
 
 Everything the Chrome Web Store form asks for, ready to paste. Nothing here has been submitted:
 the account, the fee, the agreement, the upload and the submit button belong to the owner.
@@ -11,11 +11,11 @@ without notice.
 
 | What | Value |
 |---|---|
-| File | `build/qrcode-barcode-scanner-chrome-0.1.0.zip` |
-| SHA-256 | `8d85941169527f57f85c4bcaa3c7170c7b01c9c0d5983285a190bfdeaf47d347` |
+| File | `build/qrcode-barcode-scanner-chrome-0.1.1.zip` |
+| SHA-256 | `8e1c63c57eb039d8d3c22ba759fc3f6a5020d0c0e4a53e5dd146b45585b1c59d` |
 | Made by | `npm ci && npm run build` in this folder, or the `browser-extension` artifact of the `integration-browser-extension` workflow |
 | Checked by | `npm run check:pins` (same bytes as [SHA256SUMS](../SHA256SUMS)), `npm run inspect`, and `node test/chromium.mjs --package` on that zip, in Playwright's Chromium and with `--channel chrome` in Google Chrome |
-| Manifest | Manifest V3, version 0.1.0, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`, no `update_url` |
+| Manifest | Manifest V3, version 0.1.1, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`, no `update_url` |
 
 Rebuilding on any system with Node.js 22 or 24 gives the same bytes. If the hash differs, do
 not upload: rebuild from a clean checkout of `main`.
@@ -39,7 +39,7 @@ Web Store.
 
 ## Upload
 
-Dashboard, **Add new item**, **Choose file**, then `qrcode-barcode-scanner-chrome-0.1.0.zip`,
+Dashboard, **Add new item**, **Choose file**, then `qrcode-barcode-scanner-chrome-0.1.1.zip`,
 **Upload**. The item opens with five tabs: Package, Store listing, Privacy, Distribution and
 Test instructions.
 

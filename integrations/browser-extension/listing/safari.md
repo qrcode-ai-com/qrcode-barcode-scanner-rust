@@ -1,4 +1,4 @@
-# Safari · QR Code & Barcode Scanner 0.1.0
+# Safari · QR Code & Barcode Scanner 0.1.1
 
 What is ready for Safari on macOS, what CI proves, and what only the owner can do. Safari
 extensions ship inside an app; this one is a macOS app, with no iOS target. This folder
@@ -11,10 +11,10 @@ The Apple pages below were read on 21 November 2026 (see [Sources](#sources)).
 
 | What | Value |
 |---|---|
-| Extension | `build/qrcode-barcode-scanner-safari-0.1.0.zip`, and the same files unpacked in `build/safari/` |
-| SHA-256 | `94663d26bf7b92b1252239714516a60361e3d39453d98a1641cdf363d7cb463f` |
+| Extension | `build/qrcode-barcode-scanner-safari-0.1.1.zip`, and the same files unpacked in `build/safari/` |
+| SHA-256 | `da4b1c685d35189fd0cd3ba4d38d9081be2dea33725aed90b4e6478606a9bbfa` |
 | Made by | `npm ci && npm run build` in this folder, or the `browser-extension` artifact of the `integration-browser-extension` workflow |
-| Manifest | Manifest V3, version 0.1.0, background service worker, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`, `browser_specific_settings.safari.strict_min_version` 26.0 |
+| Manifest | Manifest V3, version 0.1.1, background service worker, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`, `browser_specific_settings.safari.strict_min_version` 26.0 |
 | App, unsigned | `qrcode-barcode-scanner-safari-macos-unsigned.zip` in the `browser-extension-safari` artifact of each CI run (not pinned: Xcode writes it) |
 | System | macOS 14 Sonoma or later, the first with Safari 26 |
 
@@ -54,7 +54,7 @@ Safari 26 or later:
 1. Safari, Settings, Advanced: tick "Show features for web developers".
 2. Settings, Developer: tick "Allow unsigned extensions" (Safari turns it off again when it quits).
 3. Settings, Developer, **Add Temporary Extension…**, then choose
-   `build/qrcode-barcode-scanner-safari-0.1.0.zip` or the `build/safari` folder.
+   `build/qrcode-barcode-scanner-safari-0.1.1.zip` or the `build/safari` folder.
 4. Settings, Extensions: turn the extension on, and allow it on the sites where you use the menu.
 
 Safari removes a temporary extension after 24 hours or when it quits.
@@ -94,7 +94,7 @@ Three routes, each needing the Apple Developer Program (US$99 per membership yea
 1. **App Store Connect's web packager.** Create the app record in App Store Connect, with macOS
    as its only platform in the New App dialog, then Users and Access, Xcode Cloud, Safari Web
    Extension Packager, Upload, and choose
-   `qrcode-barcode-scanner-safari-0.1.0.zip`. Apple builds the app with Xcode Cloud, from the 25
+   `qrcode-barcode-scanner-safari-0.1.1.zip`. Apple builds the app with Xcode Cloud, from the 25
    hours a month the membership includes, and offers it to TestFlight or App Review. No Mac is
    needed.
 2. **Xcode.** On a Mac with Xcode 26 or later: `npm ci && npm run build && npm run safari`, open

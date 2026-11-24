@@ -46,23 +46,22 @@ export function listingTexts(root = HERE) {
 
 /**
  * The add-on create body of the Firefox Add-ons API v5, without the upload, as `web-ext sign
- * --amo-metadata` takes it. The license is custom: Firefox Add-ons lists AGPL-3.0-only but not
- * AGPL-3.0-or-later, the license of the bundled engine, and neither preset fits the package.
+ * --amo-metadata` takes it. The license is custom: the add-on and its engine are MIT, but two
+ * parts of the engine keep their Apache-2.0 notices, which the MIT preset would not state.
  */
 export function amoMetadata(texts, { license, scanner, homepage }) {
-  const text = `This add-on has two parts under two licenses.
+  const text = `This add-on and the scanner engine it bundles are under the MIT License below.
 
 The extension's own files (manifest.json, background.js, scanner.html, scanner.css, scanner.js, \
-scanner-worker.js, results.js and icons/) are under the MIT License below.
+scanner-worker.js, results.js and icons/) are project-authored source.
 
 The files in vendor/qrcode-barcode-scanner-wasm/ are copied unchanged from the npm package \
-${scanner.name} ${scanner.version}. They are licensed under the GNU Affero General Public \
-License, version 3 or (at your option) any later version (AGPL-3.0-or-later), with Apache-2.0 \
-notices for the parts derived from rxing. Their license texts are \
-vendor/qrcode-barcode-scanner-wasm/LICENSE, LICENSE-APACHE-2.0 and THIRD-PARTY.md in the add-on, \
-and https://www.gnu.org/licenses/agpl-3.0.html. The corresponding source is \
-https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at tag v${scanner.version} \
-(revision ${scanner.source_revision}).
+${scanner.name} ${scanner.version}, published under the MIT License \
+(vendor/qrcode-barcode-scanner-wasm/LICENSE in the add-on). Two isolated parts of the engine's \
+reader derive from rxing, a Rust port of ZXing, and keep their original Apache-2.0 copyright and \
+license notices: vendor/qrcode-barcode-scanner-wasm/LICENSE-APACHE-2.0 and THIRD-PARTY.md. The \
+engine source is https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at tag \
+v${scanner.version} (revision ${scanner.source_revision}).
 
 ${license.trimEnd()}
 `;
@@ -77,7 +76,7 @@ ${license.trimEnd()}
     version: {
       approval_notes: texts.reviewerNotes,
       custom_license: {
-        name: { 'en-US': 'MIT (extension) and AGPL-3.0-or-later (bundled scanner engine)' },
+        name: { 'en-US': 'MIT (extension and scanner engine), with Apache-2.0 notices' },
         text: { 'en-US': text },
       },
     },

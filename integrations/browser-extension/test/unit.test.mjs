@@ -353,8 +353,9 @@ test('each store package holds exactly the expected files, with the pinned modul
     const { wasmSha256 } = inspectStore(target, readZip(writeZip(files)));
     assert.equal(wasmSha256, own.config.wasmSha256);
     const notice = files.get('NOTICE.md').toString();
-    assert.match(notice, /AGPL-3\.0-or-later/);
-    assert.match(notice, /MIT License/);
+    assert.doesNotMatch(notice, /AGPL/);
+    assert.match(notice, /both available under the MIT License/);
+    assert.match(notice, /Apache-2\.0/);
     assert.match(notice, new RegExp(scanner.source_revision));
   }
 });
@@ -434,7 +435,7 @@ test('the store texts fit their fields and carry the six links in sentences', ()
   }
 });
 
-test('the Firefox metadata repeats the listing and states both licenses', () => {
+test('the Firefox metadata repeats the listing and states the MIT license with its notices', () => {
   const texts = listingTexts();
   const scanner = scannerPackage();
   const license = readFileSync(join(HERE, 'LICENSE'), 'utf8');
@@ -446,8 +447,10 @@ test('the Firefox metadata repeats the listing and states both licenses', () => 
   assert.equal(metadata.version.license, undefined);
   const terms = metadata.version.custom_license.text['en-US'];
   assert.ok(terms.includes(license.trimEnd()), 'the MIT text, verbatim');
-  assert.match(terms, /AGPL-3\.0-or-later/);
+  assert.match(terms, /scanner engine it bundles are under the MIT License/);
+  assert.match(terms, /Apache-2\.0/);
+  assert.doesNotMatch(terms, /AGPL/);
+  assert.doesNotMatch(metadata.version.custom_license.name['en-US'], /AGPL/);
   const tag = `tag v${scanner.version} (revision ${scanner.source_revision})`;
   assert.ok(terms.includes(tag), tag);
-  assert.doesNotMatch(terms, /AGPL-3\.0-only/);
 });

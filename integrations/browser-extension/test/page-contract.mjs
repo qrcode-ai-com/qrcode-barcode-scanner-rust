@@ -13,7 +13,7 @@ export const ROOT = resolve(HERE, '..', '..');
 // fixtures/consumer-truth.json), each exactly once, sorted by symbology.
 export const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
 export const PROFILES = ['fast', 'frame', 'full'];
-export const ENGINE = '0.11.0';
+export const ENGINE = '0.12.0';
 
 let checks = 0;
 export function check(condition, what, detail) {
