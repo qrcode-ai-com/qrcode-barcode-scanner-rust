@@ -180,26 +180,28 @@ Start the published adapter with `npx`, an exact version and no install script:
 - To remove it, delete the entry from the client. The files npx kept are
   under `_npx` in npm's cache (`npm config get cache`).
 
-The repository's `Destination acceptance` workflow starts the published 0.3.1
+The repository's `Destination acceptance` workflow starts the published 0.3.2
 through these npx options in an empty home, on Linux with Node.js 22 and 24 and
 on macOS with Node.js 24. It reads the QR code and the Code 128 through
-`scan_image` in the three profiles. Windows is not checked: a client there may
-need to start `npx` through `cmd`. That job moves to 0.3.2 once 0.3.2 is public
-on npm; until its receipts exist, this check covers 0.3.1 only.
+`scan_image` in the three profiles; its three receipts passed on 24 November
+2026. Windows is not checked: a client there may need to start `npx` through
+`cmd`.
 
-The [0.3.1 release workflow](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43208185486)
-qualified its packed archive, published it through GitHub Trusted Publishing,
-then installed and tested the public npm version on Linux x64 with Node.js 22
-and 24. The same workflow runs for 0.3.2 on its tag `agents-v0.3.2`; this README
-was packed before that run, so the 0.3.2 release page records its outcome.
-Bundles keep their own versions until their installed-client checks pass.
+The [0.3.2 release workflow](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45401118512)
+qualified its packed archive, published it through GitHub Trusted Publishing
+on its tag `agents-v0.3.2`, then installed and tested the public npm version on
+Linux x64 with Node.js 22 and 24. The
+[0.3.1 release workflow](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43208185486)
+did the same for 0.3.1. Bundles keep their own versions until their
+installed-client checks pass.
 
 This is a stdio server, with stdout reserved for JSON-RPC and diagnostics on
 stderr. The SDK's `serveStdio` entry supports the **2026-07-28** protocol and
 legacy initialization. No HTTP service or hosted MCP endpoint is included.
 The [Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.1)
-lists version 0.3.1 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`; a
-later version joins that listing only after its own npm publication. The entry
+lists version 0.3.1 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`;
+0.3.2, published on npm, joins that listing when the repository's
+`mcp-registry-publish` workflow runs for it. The entry
 points to the same npm package and stdio transport described here. For a
 specific product client, verify tool discovery and a fixture call after
 installation.
