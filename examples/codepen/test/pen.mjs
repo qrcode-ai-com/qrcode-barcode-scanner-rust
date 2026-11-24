@@ -3,7 +3,7 @@
 //   node pen.mjs URL FIXTURE NOT_AN_IMAGE OUT_DIR [--channel NAME]
 //
 // 1. The page loads the scanner in a module worker, from the pinned jsDelivr files only, and
-//    scans the tagged sample in fast, frame and full: both codes, engine 0.11.0, no budget cut.
+//    scans the tagged sample in fast, frame and full: both codes, engine 0.12.0, no budget cut.
 //    Every request it makes outside URL is one of the pinned addresses.
 // 2. A file dropped on the drop zone is scanned.
 // 3. A file that is not an image gives an input error with its QRS code.
@@ -24,9 +24,9 @@ if (!url || !fixture || !notImage || !out) {
 }
 const { chromium } = createRequire(join(process.cwd(), 'package.json'))('playwright');
 
-const CDN = 'https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0/';
-const SAMPLE = 'https://cdn.jsdelivr.net/gh/qrcode-ai-com/qrcode-barcode-scanner-rust@v0.11.0/fixtures/symbology/mixed-code128-qr.png';
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const CDN = 'https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/';
+const SAMPLE = 'https://cdn.jsdelivr.net/gh/qrcode-ai-com/qrcode-barcode-scanner-rust@v0.12.0/fixtures/symbology/mixed-code128-qr.png';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const CODES = ['code128:STOCK-4827', 'qr_code:https://qrc-ai.com/76xMa'];
 const failures = [];
 const check = (ok, what) => {
@@ -67,10 +67,10 @@ async function judgeSample(page, runtime, label) {
   check(facts.status === 'pass', `${label}: the sample passes (${facts.status}: ${facts.said})`);
   for (const row of facts.rows) {
     check(row.state === 'pass' && row.codes === JSON.stringify(CODES) && row.budget === 'false' &&
-      row.engine === '0.11.0', `${label}: ${row.profile} returns ${row.codes}, budget_exhausted ${row.budget}, engine ${row.engine}`);
+      row.engine === '0.12.0', `${label}: ${row.profile} returns ${row.codes}, budget_exhausted ${row.budget}, engine ${row.engine}`);
   }
   check(facts.rows.map((row) => row.profile).join() === 'fast,frame,full', `${label}: the three profiles`);
-  check(facts.engine === '0.11.0', `${label}: engine version ${facts.engine}`);
+  check(facts.engine === '0.12.0', `${label}: engine version ${facts.engine}`);
   check(facts.runtime === runtime, `${label}: runs in ${facts.runtime}`);
   check(facts.wasm === WASM_SHA256, `${label}: WASM SHA-256 ${facts.wasm}`);
 }

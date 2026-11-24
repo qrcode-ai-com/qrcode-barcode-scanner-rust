@@ -48,7 +48,7 @@ The Pen is not on CodePen yet: the owner creates it from [`prefill.html`](prefil
 [`LISTING.md`](LISTING.md) describes. Until then, the same three files run on any static server.
 
 <p align="center">
-  <img src="screenshot.png" alt="The demo page after loading: the sample read as a QR code and a Code 128 barcode in the fast, frame and full profiles, the drop zone, and the package facts with version 0.11.0 and the module's SHA-256" width="640">
+  <img src="screenshot.png" alt="The demo page after loading: the sample read as a QR code and a Code 128 barcode in the fast, frame and full profiles, the drop zone, and the package facts with version 0.12.0 and the module's SHA-256" width="640">
 </p>
 
 The page in Chrome on a CI runner, captured by
@@ -87,7 +87,7 @@ report it gets back.
    digest is not the pinned one is refused before it runs: nothing is scanned.
 3. It starts a module worker that imports the package's `auto.js` loader and receives the
    checked bytes. When the browser cannot start that worker, the same loader runs on the page.
-4. It downloads the sample from the `v0.11.0` tag of this repository, through jsDelivr, checks
+4. It downloads the sample from the `v0.12.0` tag of this repository, through jsDelivr, checks
    its SHA-256, and scans it with the `fast`, `frame` and `full` profiles. Each row of the table
    shows the codes read, the time and whether the scan ran to its end.
 5. It scans the image you choose or drop on the page, with the profile you select, and shows each
@@ -117,10 +117,10 @@ The Pen lists each code with its symbology, the kind of payload and the decoded 
 **Full report (JSON)** shows the whole report the engine returned.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -189,11 +189,11 @@ The page loads five addresses, and nothing else:
 
 | Address | Pinned by |
 | --- | --- |
-| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0/auto.js` | the exact version |
-| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0/qrcode-barcode-scanner.js`, imported by `auto.js` | the exact version |
-| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0/qrcode-barcode-scanner_bg.wasm` | the version and SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68` |
-| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0/package.json` | the exact version |
-| `https://cdn.jsdelivr.net/gh/qrcode-ai-com/qrcode-barcode-scanner-rust@v0.11.0/fixtures/symbology/mixed-code128-qr.png`, this repository's file at the tag | the tag and SHA-256 `c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8` |
+| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/auto.js` | the exact version |
+| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/qrcode-barcode-scanner.js`, imported by `auto.js` | the exact version |
+| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/qrcode-barcode-scanner_bg.wasm` | the version and SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868` |
+| `https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/package.json` | the exact version |
+| `https://cdn.jsdelivr.net/gh/qrcode-ai-com/qrcode-barcode-scanner-rust@v0.12.0/fixtures/symbology/mixed-code128-qr.png`, this repository's file at the tag | the tag and SHA-256 `c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8` |
 
 The two JavaScript files are pinned by their version only: a browser cannot check the digest of
 a module it imports. The WebAssembly module, which holds the engine, is checked byte for byte;
@@ -227,10 +227,10 @@ itself. The Pen's description, on CodePen's page around the Pen, shows five pict
 ## License
 
 MIT for this folder: the three files, the prefill form and the checks. A public Pen is MIT-licensed
-on CodePen as well. The engine the page loads, the published package 0.11.0, keeps its packaged
-license, AGPL-3.0-or-later; its source is the tag
-[`v0.11.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0) of this
-repository. See [Licensing](../../LICENSING.md).
+on CodePen as well. The engine the page loads, the published package 0.12.0, keeps its packaged
+license, MIT, with the Apache-2.0 notices of the reader code derived from rxing; its source is
+the tag [`v0.12.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0)
+of this repository. See [Licensing](../../LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

@@ -16,8 +16,8 @@ pages below were read on 21 November 2026; read them again before relying on a p
 - **Terms.** The owner accepts CodePen's terms when signing up. Under CodePen's
   [licensing page](https://blog.codepen.io/documentation/licensing/), the code of a public Pen is
   MIT-licensed, which matches this folder's license. The engine the Pen loads is not in the Pen:
-  the published package 0.11.0 is loaded from jsDelivr and keeps its own license,
-  AGPL-3.0-or-later, which the Pen's footer and description state with a link to its source.
+  the published package 0.12.0 is loaded from jsDelivr and keeps its own license, MIT, which
+  the Pen's footer and description state with a link to its source.
 
 ## The values the form fills
 
@@ -38,7 +38,7 @@ The description is [`DESCRIPTION.md`](DESCRIPTION.md), in Markdown, which CodePe
 browser banner, the Ask AI links of the nine assistants with the prompt to copy, the six QR Code AI
 links in sentences, the three steps of the browser package, what the engine returns, the formats
 it reads and the same engine in the other runtimes, then the Pen's source and the engine's
-license, AGPL-3.0-or-later for 0.11.0, with the link to its source. It holds no HTML, so a
+license, MIT for 0.12.0, with the link to its source. It holds no HTML, so a
 renderer that removes HTML still shows all of it.
 
 The prefill API no longer takes tags. If the editor offers tags when saving, add these by hand:
@@ -58,8 +58,8 @@ qr-code, barcode, scanner, webassembly, wasm
 4. Check the preview before saving:
    - the table of the sample fills its three rows, `fast`, `frame` and `full`, each with
      `Code 128: STOCK-4827` and `QR Code: https://qrc-ai.com/76xMa`, and **Complete** reads yes;
-   - **Package version** and **Engine version** read `0.11.0`, and **WASM SHA-256** reads
-     `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68`;
+   - **Package version** and **Engine version** read `0.12.0`, and **WASM SHA-256** reads
+     `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868`;
    - **Runs in** reads `a module worker`. If it reads `the page (no worker)`, the scanner still
      works, on the page; note it for the record.
    - choosing a photo of a QR code shows its content under **Result**.
@@ -81,8 +81,8 @@ cd tests/wasm-browser
 node ../../distribution/acceptance/drivers/web-page.mjs "https://codepen.io/<username>/pen/<id>" \
   "$image" /tmp/codepen-reports --wait 300 --channel chrome
 cd ../..
-python3 scripts/check-demo-page.py /tmp/codepen-reports/page.json --version 0.11.0 \
-  --wasm-sha256 a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68 \
+python3 scripts/check-demo-page.py /tmp/codepen-reports/page.json --version 0.12.0 \
+  --wasm-sha256 298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868 \
   --page-key sdk/javascript --in-frame
 ```
 

@@ -1,8 +1,8 @@
 // QR Code & Barcode Scanner, browser image demo for CodePen. MIT License.
 //
 // This file is glue only. The scanner engine is the published npm package
-// @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.11.0, loaded from jsDelivr at that exact version
-// and licensed AGPL-3.0-or-later (source: tag v0.11.0 of
+// @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.12.0, loaded from jsDelivr at that exact version
+// and licensed MIT (source: tag v0.12.0 of
 // https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust). Nothing of the engine is copied
 // here. The page fetches the WebAssembly module itself, refuses it unless its SHA-256 is the
 // pinned one, and hands those verified bytes to the package's own loader, in a module worker
@@ -17,18 +17,18 @@
   if (window.qrscanCodepenDemo) return;
   window.qrscanCodepenDemo = true;
 
-  var VERSION = '0.11.0';
+  var VERSION = '0.12.0';
   var PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
   var CDN = 'https://cdn.jsdelivr.net/npm/' + PACKAGE + '@' + VERSION + '/';
   var AUTO_URL = CDN + 'auto.js';
   var WASM_URL = CDN + 'qrcode-barcode-scanner_bg.wasm';
   var PACKAGE_JSON_URL = CDN + 'package.json';
-  // wasm.sha256 of the package's build-info.json at 0.11.0.
-  var WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+  // wasm.sha256 of the package's build-info.json at 0.12.0.
+  var WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
   // The tagged sample through jsDelivr's GitHub files, which carry CORS headers and do not answer
   // HTTP 429 to busy shared addresses as raw.githubusercontent.com does.
   var SAMPLE_URL = 'https://cdn.jsdelivr.net/gh/qrcode-ai-com/qrcode-barcode-scanner-rust@' +
-    'v0.11.0/fixtures/symbology/mixed-code128-qr.png';
+    'v0.12.0/fixtures/symbology/mixed-code128-qr.png';
   var SAMPLE_SHA256 = 'c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8';
   var SAMPLE_CODES = ['code128:STOCK-4827', 'qr_code:https://qrc-ai.com/76xMa'];
   var PROFILES = ['fast', 'frame', 'full'];

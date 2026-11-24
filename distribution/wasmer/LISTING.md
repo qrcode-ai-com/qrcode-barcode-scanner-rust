@@ -1,8 +1,8 @@
 # Wasmer registry · the owner's publication kit
 
-Status when this file was written (21 November 2026): **not published**. The registry knew no
-namespace `qrcode-ai-com` and no package `qrcode-ai-com/qrcode-barcode-scanner` (its GraphQL API
-answered `null` for both). No workflow publishes: Wasmer has no publication from CI without a
+Status when this file was written (21 November 2026), and read again on 24 November 2026:
+**not published**. The registry knew no namespace `qrcode-ai-com` and no package
+`qrcode-ai-com/qrcode-barcode-scanner` (its GraphQL API answered `null` for both). No workflow publishes: Wasmer has no publication from CI without a
 stored token, and this repository stores none. The owner publishes from their own machine, from
 the package folder a workflow run built and tested.
 
@@ -11,21 +11,21 @@ the package folder a workflow run built and tested.
 | Field | Value |
 | --- | --- |
 | Package | `qrcode-ai-com/qrcode-barcode-scanner` |
-| Version | `0.11.0` |
+| Version | `0.12.0` |
 | Description | Open-source QR code and barcode scanner: the qrscan command as a WASI module. It reads an image file and prints the JSON report, locally. |
-| License | `AGPL-3.0-or-later`, file `LICENSE` (the text of the 0.11.0 source) |
+| License | `MIT`, file `LICENSE` (the text of the 0.12.0 source) |
 | Readme | `README.md` (the README of this folder) |
 | Homepage | `https://qrcode-ai.com/` |
 | Repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust` |
-| Module | `qrscan.wasm`, ABI `wasi`, built from tag v0.11.0, commit `176ac96ef16ee330dbfc6ada10327d0b4e23a8b2` |
+| Module | `qrscan.wasm`, ABI `wasi`, built from tag v0.12.0, commit `897dd50cdf27cbde54d408bf65e1ca4622035d42` |
 | Command | `qrscan`, runner `wasi`, also the package entrypoint |
 | Mapped directory | `notices/` at `/notices`: the license notes, Apache-2.0 notices, third-party licenses, Rust standard library notice and `SOURCE.json` |
 
 Every value comes from `wasmer.toml`; `package.py verify` refuses a folder whose manifest says
 otherwise. The page of the package will be `https://wasmer.io/qrcode-ai-com/qrcode-barcode-scanner`.
 
-The module is a new build of the immutable tag v0.11.0 for the `wasm32-wasip1` target. It
-republishes none of the 0.11.0 release files, whose bytes stay as they are; the published
+The module is a new build of the immutable tag v0.12.0 for the `wasm32-wasip1` target. It
+republishes none of the 0.12.0 release files, whose bytes stay as they are; the published
 package names the tag as its corresponding source.
 
 ## The artifact to publish
@@ -44,7 +44,7 @@ package names the tag as its corresponding source.
 Take the artifact of the latest green run on `main` for the merged commit: its
 `notices/SOURCE.json` names that commit as the packaging revision. A run on a pull request
 records a temporary merge commit instead. The module sha256 is the same in both, since the
-module depends only on the 0.11.0 source and the toolchain.
+module depends only on the 0.12.0 source and the toolchain.
 
 ## Cost
 
@@ -92,19 +92,19 @@ The owner does each step; none of them runs in CI.
 8. Publish: `wasmer publish ~/Downloads/qrscan-wasmer-package`. A version is immutable once
    published: a fix becomes a new version.
 9. Read the page back at <https://wasmer.io/qrcode-ai-com/qrcode-barcode-scanner>: version
-   0.11.0, the license, the README, the `qrscan` command.
+   0.12.0, the license, the README, the `qrscan` command.
 10. Run it from the registry on a fresh Wasmer home, as a user would:
 
     ```sh
     export WASMER_DIR="$(mktemp -d)"
     mkdir -p /tmp/images && cp fixtures/symbology/mixed-code128-qr.png /tmp/images/label.png
-    wasmer run --volume /tmp/images:/data qrcode-ai-com/qrcode-barcode-scanner@0.11.0 -- /data/label.png
+    wasmer run --volume /tmp/images:/data qrcode-ai-com/qrcode-barcode-scanner@0.12.0 -- /data/label.png
     ```
 
     The report must hold `https://qrc-ai.com/76xMa` and `STOCK-4827`. For the full truth set,
-    run `QRSCAN_WASMER_ONLINE=1 QRSCAN_WASMER_PACKAGE=qrcode-ai-com/qrcode-barcode-scanner@0.11.0
+    run `QRSCAN_WASMER_ONLINE=1 QRSCAN_WASMER_PACKAGE=qrcode-ai-com/qrcode-barcode-scanner@0.12.0
     python3 distribution/wasmer/consume.py --qrscan "$PWD/distribution/wasmer/qrscan-in-wasmer.sh"
-    --version 0.11.0 --receipt /tmp/wasmer-registry-truth.json`.
+    --version 0.12.0 --receipt /tmp/wasmer-registry-truth.json`.
 
 After publication, the README of this folder and `distribution/README.md` get the registry route
 and its first verified run in a follow-up change; until then they give no install command for it.

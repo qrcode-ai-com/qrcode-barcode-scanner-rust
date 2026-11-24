@@ -6,10 +6,10 @@
   package.py packed DIR UNPACKED
   package.py --self-test
 
-The module is built from the source of tag v0.11.0 (commit ENGINE_COMMIT), checked out at
+The module is built from the source of tag v0.12.0 (commit ENGINE_COMMIT), checked out at
 --engine, for the wasm32-wasip1 target of the pinned toolchain. Its engine code and Cargo.lock
-are those of the 0.11.0 release; the module is a new build target of that source, not one of the
-published 0.11.0 files, which stay as they are.
+are those of the 0.12.0 release; the module is a new build target of that source, not one of the
+published 0.12.0 files, which stay as they are.
 
 `assemble` runs where the module was built (it reads `cargo tree`, `cargo metadata` and the
 toolchain, offline) and writes into a new directory the folder `wasmer publish` reads. Wasmer
@@ -19,9 +19,9 @@ packs only the module, the readme, the license file and the directories wasmer.t
   - wasmer.toml and README.md of distribution/wasmer, and its LICENSE-NOTES.md as
     notices/LICENSE-NOTES.md, byte for byte;
   - qrscan.wasm, the module;
-  - LICENSE, the AGPL-3.0 text of the 0.11.0 source (equal to
-    distribution/releases/historical-agpl-3.0.txt), and from that source the Apache-2.0 text and
-    THIRD-PARTY.md of the copied reader code, in notices/;
+  - LICENSE, the MIT text of the 0.12.0 source (equal to the LICENSE of this repository), and
+    from that source the Apache-2.0 text and THIRD-PARTY.md of the copied reader code, in
+    notices/;
   - notices/COPYRIGHT-rust-std.html, the Rust standard library notice the toolchain ships;
   - notices/THIRD-PARTY-LICENSES.txt: every registry crate the CLI links for wasm32-wasip1, with
     its license expression, checksum and license texts, written as scripts/cli-release.py writes
@@ -53,12 +53,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 HERE = ROOT / "distribution/wasmer"
 REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust"
 SCHEMA = "qrscan-wasmer-package/1"
-VERSION = "0.11.0"
-ENGINE_TAG = "v0.11.0"
-ENGINE_COMMIT = "176ac96ef16ee330dbfc6ada10327d0b4e23a8b2"
+VERSION = "0.12.0"
+ENGINE_TAG = "v0.12.0"
+ENGINE_COMMIT = "897dd50cdf27cbde54d408bf65e1ca4622035d42"
 TARGET = "wasm32-wasip1"
+# The MIT text the 0.12.0 source ships as its LICENSE: the same bytes as this repository's.
+MIT = ROOT / "LICENSE"
+# The AGPL-3.0 text of the engine releases up to 0.11.0: a build of that source is refused.
 AGPL = ROOT / "distribution/releases/historical-agpl-3.0.txt"
-# Package path: source path, of the files copied from this folder and from the 0.11.0 source.
+# Package path: source path, of the files copied from this folder and from the 0.12.0 source.
 NOTICES = "notices"
 OWN = {"wasmer.toml": "wasmer.toml", "README.md": "README.md",
        f"{NOTICES}/LICENSE-NOTES.md": "LICENSE-NOTES.md"}
@@ -88,7 +91,7 @@ def manifest_problems(data):
     except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
         return [f"wasmer.toml is not TOML: {error}"]
     package = manifest.get("package", {})
-    expected = {"name": "qrcode-ai-com/qrcode-barcode-scanner", "version": VERSION, "license": "AGPL-3.0-or-later",
+    expected = {"name": "qrcode-ai-com/qrcode-barcode-scanner", "version": VERSION, "license": "MIT",
                 "license-file": "LICENSE", "readme": "README.md", "repository": REPOSITORY, "entrypoint": "qrscan"}
     problems = [f"wasmer.toml [package] {key} is {package.get(key)!r}, not {value!r}"
                 for key, value in expected.items() if package.get(key) != value]
@@ -124,8 +127,8 @@ def package_files(module, engine_files, generated, source_facts, packaging_revis
         raise Refused(f"{MODULE} is not a WebAssembly 1.0 binary module")
     files = {name: (HERE / source).read_bytes() for name, source in OWN.items()}
     problems = manifest_problems(files["wasmer.toml"])
-    if engine_files["LICENSE"] != AGPL.read_bytes():
-        problems.append("the LICENSE of the engine source is not the AGPL-3.0 text of 0.11.0")
+    if engine_files["LICENSE"] != MIT.read_bytes():
+        problems.append("the LICENSE of the engine source is not the MIT text of 0.12.0")
     if problems:
         raise Refused("; ".join(problems))
     files.update(engine_files)
@@ -240,8 +243,8 @@ def verify(directory, module_sha256=None):
     problems += manifest_problems(files["wasmer.toml"])
     problems += [f"{name} differs from distribution/wasmer/{source}" for name, source in OWN.items()
                  if files[name] != (HERE / source).read_bytes()]
-    if files["LICENSE"] != AGPL.read_bytes():
-        problems.append("LICENSE is not the AGPL-3.0 text of 0.11.0")
+    if files["LICENSE"] != MIT.read_bytes():
+        problems.append("LICENSE is not the MIT text of 0.12.0")
     if problems:
         raise Refused("; ".join(problems))
     return sha256(files[MODULE]), len(files)
@@ -266,7 +269,7 @@ def self_test():
     """A synthetic package verifies; each departure from it is refused for its own reason."""
     failures = []
     module = WASM_MAGIC + b"\x00" * 8
-    engine_files = {"LICENSE": AGPL.read_bytes(), f"{NOTICES}/LICENSE-APACHE-2.0": b"apache\n",
+    engine_files = {"LICENSE": MIT.read_bytes(), f"{NOTICES}/LICENSE-APACHE-2.0": b"apache\n",
                     f"{NOTICES}/THIRD-PARTY.md": b"notes\n"}
     generated = {STD_NOTICE: b"<p>std</p>\n", THIRD_PARTY: b"crates\n"}
     good = package_files(module, engine_files, generated, {"cargo_lock_sha256": "0" * 64}, "0" * 40)
@@ -294,7 +297,7 @@ def self_test():
     case("a file added", dict(good, **{"extra.txt": b"x"}), "not part of the package: extra.txt")
     case("a file missing", {k: v for k, v in good.items() if k != "LICENSE"}, "missing LICENSE")
     other = package_files(module, dict(engine_files), generated, {}, "0" * 40)
-    other["wasmer.toml"] = good["wasmer.toml"].replace(b'version = "0.11.0"', b'version = "0.11.1"')
+    other["wasmer.toml"] = good["wasmer.toml"].replace(b'version = "0.12.0"', b'version = "0.12.1"')
     other["SHA256SUMS"] = sums_bytes({k: v for k, v in other.items() if k != "SHA256SUMS"})
     case("another package version", other, "[package] version")
     unmapped = dict(good)
@@ -302,11 +305,17 @@ def self_test():
     unmapped["SHA256SUMS"] = sums_bytes({k: v for k, v in unmapped.items() if k != "SHA256SUMS"})
     case("notices Wasmer would not pack", unmapped, "[fs]")
     try:
-        package_files(module, dict(engine_files, LICENSE=b"MIT\n"), generated, {}, "0" * 40)
-        failures.append("a source whose LICENSE is not the AGPL text: accepted")
+        package_files(module, dict(engine_files, LICENSE=AGPL.read_bytes()), generated, {}, "0" * 40)
+        failures.append("a source whose LICENSE is the AGPL text of 0.11.0: accepted")
     except Refused as error:
-        if "AGPL" not in str(error):
-            failures.append(f"a source whose LICENSE is not the AGPL text: refused with {error}")
+        if "MIT" not in str(error):
+            failures.append(f"a source whose LICENSE is the AGPL text of 0.11.0: refused with {error}")
+    try:
+        package_files(module, dict(engine_files, LICENSE=b"MIT\n"), generated, {}, "0" * 40)
+        failures.append("a source whose LICENSE is not the MIT text: accepted")
+    except Refused as error:
+        if "MIT" not in str(error):
+            failures.append(f"a source whose LICENSE is not the MIT text: refused with {error}")
     try:
         package_files(b"\x7fELF", engine_files, generated, {}, "0" * 40)
         failures.append("a native binary as the module: accepted")
@@ -330,7 +339,7 @@ def self_test():
                 failures.append(f"a webc without the third-party licenses: refused with {error}")
     for failure in failures:
         print(f"SELF-TEST FAILED · {failure}", file=sys.stderr)
-    print(f"self-test: {'FAILED' if failures else 'ok'} (1 package, 8 refusals, 1 webc, 1 refusal)")
+    print(f"self-test: {'FAILED' if failures else 'ok'} (1 package, 9 refusals, 1 webc, 1 refusal)")
     return 1 if failures else 0
 
 
