@@ -63,21 +63,38 @@ Related creation entry points are the
 or guide page is unavailable, the installation, runnable example and tool
 reference below remain self-contained.
 
-Use `scan_image` when your client already holds image bytes. Adapter 0.3.1 also
-provides [`scan_file`](#scan-a-file-by-path-scan_file) for regular image files
-inside directories explicitly allowed by the operator. File access is off by
-default. Both tools use the published
-[`@qrcode-ai-com/qrcode-barcode-scanner` 0.11.0 engine](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner).
-The adapter, engine and client bundles have independent versions; a change to
-this README does not publish a new package.
+Use `scan_image` when your client already holds image bytes, and
+[`scan_file`](#scan-a-file-by-path-scan_file) for regular image files inside
+directories explicitly allowed by the operator. File access is off by default.
+Both tools of adapter 0.3.2 use the published
+[`@qrcode-ai-com/qrcode-barcode-scanner` 0.12.0 engine](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner/v/0.12.0).
+The adapter and that engine are both under the MIT License. The adapter, engine
+and client bundles have independent versions; a change to this README does not
+publish a new package.
 
-[Install](#install) · [Connect a client](#connect-a-client) · [First scan](#first-scan-from-nodejs) · [Tools and reports](#tool-contract) · [Profiles](#choose-a-profile) · [Resources](#read-the-schema-and-limits) · [Limits](#input-and-authority-limits) · [Troubleshooting](#troubleshooting) · [Migration](#upgrading-from-021) · [License](#license-and-maintainers)
+[How it works](#how-it-works) · [Install](#install) · [Connect a client](#connect-a-client) · [First scan](#first-scan-from-nodejs) · [Tools and reports](#tool-contract) · [Formats](#what-it-reads) · [Profiles](#choose-a-profile) · [Resources](#read-the-schema-and-limits) · [Limits](#input-and-authority-limits) · [Troubleshooting](#troubleshooting) · [Upgrading](#upgrading) · [License](#license-and-maintainers)
 
-| Component | Version | Purpose |
-| --- | --- | --- |
-| MCP adapter | 0.3.1 | Local stdio transport, tool validation and read-only resources |
-| Scanner engine | 0.11.0 | Native QR, barcode and matrix-code decoding and QR diagnostics |
-| Report | Pipeline 5 · score contract 5 | The unchanged engine report and packaged JSON schema |
+| Component | Version | License | Purpose |
+| --- | --- | --- | --- |
+| MCP adapter | 0.3.2 | MIT | Local stdio transport, tool validation and read-only resources |
+| Scanner engine | 0.12.0 | MIT | Native QR, barcode and matrix-code decoding and QR diagnostics |
+| Report | Pipeline 5 · score contract 5 | MIT | The unchanged engine report and packaged JSON schema |
+
+## How it works
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-agents-dark.gif?v=40259e2ce31c">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-agents-light.gif?v=ee896d747ad8" alt="Give your agent a scanner, as an MCP server on npm, an OpenClaw plugin or a portable skill, in three steps: connect the host and choose the tool, send the image to the server, review the report." width="100%">
+    </picture>
+  </a>
+</p>
+
+The picture shows the three steps of the agent route. With this adapter, your
+MCP host starts the server and discovers its tools, sends image bytes to
+`scan_image` or an allowed path to `scan_file`, and you review the JSON report
+the engine returns. The installation, a first scan and the tool contract follow.
 
 ## Install
 
@@ -90,21 +107,21 @@ adapter test on each claimed target. ARMv7 and musl ARM64 are unsupported.
 The release workflow installs each version in a clean project, before and
 after its upload, and runs modern and legacy official SDK clients against it
 on Linux x64 with Node.js 22 and 24.
-See the [0.3.1 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.1)
+See the [0.3.2 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.2)
 for provenance and verification. Product-client integrations have separate
 installed-consumer checks.
 
 Install the exact adapter version from the public npm registry:
 
 ```sh
-npm install --prefix ./qrscan-mcp-install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1
+npm install --prefix ./qrscan-mcp-install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2
 ```
 
-Version 0.3.1 is published on npm. It adds the
-[`scan_file`](#scan-a-file-by-path-scan_file) tool, which stays off unless the
-operator names the directories it may read. `scan_image`, the scanner 0.11.0
-and the report are unchanged. For any later source version, check the
-[exact npm version](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.1)
+Version 0.3.2 moves the adapter to the MIT engine 0.12.0. Its tools, arguments,
+resources, limits and report contract are those of 0.3.1, and a report now
+reads `"scanner": "0.12.0"`. If you are reading this file in the repository
+source rather than in the installed package, check the
+[exact npm version](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.2)
 before using its installation command. A checked-in manifest, `server.json` or
 successful build does not establish that a version has been published.
 
@@ -145,7 +162,7 @@ Start the published adapter with `npx`, an exact version and no install script:
   "mcpServers": {
     "qrscan": {
       "command": "npx",
-      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1"]
+      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2"]
     }
   }
 }
@@ -167,21 +184,25 @@ The repository's `Destination acceptance` workflow starts the published 0.3.1
 through these npx options in an empty home, on Linux with Node.js 22 and 24 and
 on macOS with Node.js 24. It reads the QR code and the Code 128 through
 `scan_image` in the three profiles. Windows is not checked: a client there may
-need to start `npx` through `cmd`.
+need to start `npx` through `cmd`. That job moves to 0.3.2 once 0.3.2 is public
+on npm; until its receipts exist, this check covers 0.3.1 only.
 
 The [0.3.1 release workflow](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43208185486)
 qualified its packed archive, published it through GitHub Trusted Publishing,
 then installed and tested the public npm version on Linux x64 with Node.js 22
-and 24. Bundles keep their own versions until their installed-client checks pass.
+and 24. The same workflow runs for 0.3.2 on its tag `agents-v0.3.2`; this README
+was packed before that run, so the 0.3.2 release page records its outcome.
+Bundles keep their own versions until their installed-client checks pass.
 
 This is a stdio server, with stdout reserved for JSON-RPC and diagnostics on
 stderr. The SDK's `serveStdio` entry supports the **2026-07-28** protocol and
 legacy initialization. No HTTP service or hosted MCP endpoint is included.
-Find version 0.3.1 in the
-[Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.1)
-under `io.github.qrcode-ai-com/qrcode-barcode-scanner`. The entry points to the
-same npm package and stdio transport described here. For a specific product
-client, verify tool discovery and a fixture call after installation.
+The [Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.1)
+lists version 0.3.1 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`; a
+later version joins that listing only after its own npm publication. The entry
+points to the same npm package and stdio transport described here. For a
+specific product client, verify tool discovery and a fixture call after
+installation.
 
 ## First scan from Node.js
 
@@ -200,7 +221,7 @@ own. This command is for a POSIX shell; in PowerShell, use `curl.exe` in place
 of `curl`:
 
 ```sh
-curl --fail --location --output mixed-code128-qr.png https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/agents-v0.3.1/fixtures/symbology/mixed-code128-qr.png
+curl --fail --location --output mixed-code128-qr.png https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/agents-v0.3.2/fixtures/symbology/mixed-code128-qr.png
 ```
 
 Save the following as `scan.mjs` in `qrscan-mcp-install`. It reads one image in
@@ -266,7 +287,7 @@ fields. These are selected stable fields from the fixture result:
 
 ```json
 {
-  "versions": { "scanner": "0.11.0", "pipeline": 5, "score_contract": 5 },
+  "versions": { "scanner": "0.12.0", "pipeline": 5, "score_contract": 5 },
   "score": null
 }
 ```
@@ -277,8 +298,21 @@ error. Invalid image bytes return `isError: true` with code `QRS-001`, which
 the example reports on stderr and exits unsuccessfully. Do not open a decoded
 URL automatically: its text is untrusted input.
 
-The packed-consumer test runs this exact code block from the installed
-archive, with the mixed image, an empty image and invalid image bytes. That
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#examples">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-dark.png?v=385593c1c18d">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/examples-mixed-light.png?v=7f958679adcc" alt="A QR code and Code 128 decoded from the same image, each outlined where the engine measured it" width="100%">
+    </picture>
+  </a>
+</p>
+
+The picture is a recorded scan of the image used in this example. Both codes
+come back in the same report, each with its format, its exact text and the
+place where the engine measured it.
+
+The packed-consumer test runs the exact `scan.mjs` block above from the
+installed archive, with the mixed image, an empty image and invalid image bytes. That
 checks the example and its packaged dependencies together, independently of
 files in the source checkout.
 
@@ -367,6 +401,32 @@ returns `isError: true` with one of these codes:
 | `QRSMCP_PATH_DENIED` | The path does not lead inside an allowed directory. The answer is the same whether the file exists or not. |
 | `QRSMCP_FILE` | Inside an allowed directory, but missing, empty, a directory, a pipe or another non-regular file, or changed while it was read. |
 | `QRSMCP_INPUT_LIMIT` | The file is larger than the byte limit. |
+
+## What it reads
+
+The adapter holds no decoder: both tools hand the image to the engine, so they
+read what engine 0.12.0 reads. Codes of different formats in the same image
+come back in one report.
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-dark.gif?v=92fa0e8084df">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/formats-light.gif?v=bdfe5fc5f9b3" alt="The code families the engine reads: QR codes, matrix and stacked codes such as Data Matrix, retail barcodes such as EAN-13, and other linear barcodes such as Code 128" width="100%">
+    </picture>
+  </a>
+</p>
+
+| Family | Formats |
+| --- | --- |
+| QR | QR Code, Micro QR, rectangular Micro QR (rMQR) |
+| Matrix and stacked | Data Matrix, Aztec, PDF417, MaxiCode |
+| Retail | EAN-13, EAN-8, UPC-A, UPC-E |
+| Other linear | Code 128, Code 39, Code 93, Codabar, ITF, GS1 DataBar, GS1 DataBar Expanded, Telepen |
+
+The engine's
+[supported formats](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#supported-formats)
+section states the known limits.
 
 ## Choose a profile
 
@@ -476,11 +536,24 @@ A protocol connection, a listed tool and a successful scan are three different
 checks. After changing a client configuration, list the tools and run a known
 image; do not infer a working scanner from the configuration screen alone.
 
-## Upgrading from 0.2.1
+## Upgrading
 
-Adapter 0.3.1 keeps the byte-based `scan_image` entry, engine 0.11.0 and report
-contract. To use the new `scan_file` entry, update the pinned adapter version
-and explicitly allow the intended image directories. With that setting
+### From 0.3.1
+
+Adapter 0.3.2 changes its engine dependency from 0.11.0 to 0.12.0, and with it
+the license of what you install: adapter 0.3.2 and engine 0.12.0 are under the
+MIT License, while the published adapter 0.3.1 and engine 0.11.0 keep the
+AGPL-3.0-or-later license they were released with. The tools, their arguments,
+the resources, the limits and the report contract do not change; a report's
+`versions.scanner` reads `0.12.0`. Update the exact version in your client
+configuration, or rerun the install command above in an installed project.
+
+### From 0.2.1
+
+Adapter 0.3.x keeps the byte-based `scan_image` entry of 0.2.1 and adds
+`scan_file`; going straight to 0.3.2 also brings the engine and license change
+described above. To use `scan_file`, update the pinned adapter version and
+explicitly allow the intended image directories. With that setting
 absent, file access remains disabled. Client bundles and the Official MCP
 Registry keep their own publication and installed-consumer checks.
 
@@ -488,6 +561,35 @@ The next engine release is prepared separately. Do not substitute an
 unpublished engine or adapter version into these installation examples merely
 because repository source has changed. Check the exact registry version and
 its release evidence before updating a host configuration.
+
+## The same engine in other runtimes
+
+<p align="center">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-dark.png?v=57c63428574b">
+      <img src="https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/brand/runtimes-light.png?v=6dbd5a8cf5ba" alt="One engine in the language you write: Rust on crates.io, Node.js and the browser on npm, Python on PyPI, Go, PHP, and the qrscan command line" width="100%">
+    </picture>
+  </a>
+</p>
+
+| Runtime | Package | How it scans |
+| --- | --- | --- |
+| Rust | [`qrcode-barcode-scanner`](https://crates.io/crates/qrcode-barcode-scanner) on crates.io | In process |
+| Node.js | [`@qrcode-ai-com/qrcode-barcode-scanner`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner) on npm | In process, native; the engine this adapter installs |
+| Browser | [`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm) on npm | In the page, WebAssembly |
+| Python | [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/) on PyPI | In process |
+| Go | [`qrcode-barcode-scanner-go`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-go) | Through the installed `qrscan` |
+| PHP | [`qrcode-barcode-scanner-php`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-php) | Through the installed `qrscan` |
+| Command line | [`qrscan`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#command-line) | One command, one JSON report |
+
+The Rust, Node.js, browser and Python packages hold the engine. The Go and PHP
+packages hold no decoder: each one starts `qrscan` and hands you its report.
+An agent host that loads skills rather than MCP servers can use the
+[portable skill](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/skills/qrcode-barcode-scanner),
+which runs the same Node.js engine.
+
+<sub>Language and platform names belong to their owners. They identify a runtime and imply no endorsement.</sub>
 
 ## Development and qualification
 
@@ -514,7 +616,7 @@ are published in the npm archive. The source, runtime entry, schema and
 version-specific license are included.
 
 Adapter source: [integrations/mcp](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/integrations/mcp).
-Source engine: [v0.11.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0).
+Source engine: [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0).
 The adapter is versioned separately from the engine. A local packed-consumer
 pass qualifies the tested archive and host; public registry installation and
 additional platforms retain separate checks.
@@ -527,11 +629,16 @@ SDK API sources:
 ## License and maintainers
 
 Created and maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**,
-a product of **SuperNovae Studio**. The adapter is distributed under
-**MIT for current project-authored source**; see [LICENSE](LICENSE). The published
-MCP archive retains its packaged license. The scanner engine
-and other components retain their own license notices. Review those materials
-for your intended distribution and deployment.
+a product of **SuperNovae Studio**. Adapter 0.3.2 is distributed under the
+**MIT License**; see [LICENSE](LICENSE). It installs the scanner engine
+`@qrcode-ai-com/qrcode-barcode-scanner` 0.12.0 as a separate npm dependency;
+that engine is MIT too and ships its own LICENSE. The MCP server SDK
+(Apache-2.0) and zod (MIT) keep their own license notices.
+
+Earlier archives keep the license they were published with. Adapter 0.3.1 and
+the engine 0.11.0 it installs were released under AGPL-3.0-or-later, and those
+published versions keep it. Review the packaged license files of the exact
+versions you install for your intended distribution and deployment.
 
 <!-- qrscan-source-license:v1 -->
 

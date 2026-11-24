@@ -192,13 +192,14 @@ await check('the paths the manifests name exist', async () => {
   return `${paths.length} paths`;
 });
 
-// The skill: the copy every client reads and the Junie copy are the same skill 0.2.0.
-await check('the skill copies are skill 0.2.0 and equal', async () => {
+// The skill: the copy every client reads and the Junie copy are the same skill 0.2.1, the source
+// skill of this commit (the stage copies it byte for byte).
+await check('the skill copies are skill 0.2.1 and equal', async () => {
   const root = await read(`skills/${NAME}/SKILL.md`);
   const front = /^---\n([\s\S]*?)\n---\n/.exec(root)?.[1] ?? '';
   expect(/^name: qrcode-barcode-scanner$/m.test(front), 'SKILL.md is not named qrcode-barcode-scanner');
-  expect(/^ {2}version: "0\.2\.0"$/m.test(front), 'SKILL.md is not version 0.2.0');
-  expect(/^ {2}engine: "@qrcode-ai-com\/qrcode-barcode-scanner@0\.11\.0"$/m.test(front), 'SKILL.md does not pin engine 0.11.0');
+  expect(/^ {2}version: "0\.2\.1"$/m.test(front), 'SKILL.md is not version 0.2.1');
+  expect(/^ {2}engine: "@qrcode-ai-com\/qrcode-barcode-scanner@0\.12\.0"$/m.test(front), 'SKILL.md does not pin engine 0.12.0');
   const list = async (folder) => (await readdir(folder, { recursive: true }))
     .filter((file) => statSync(join(folder, file)).isFile()).sort();
   const files = await list(join(stage, 'skills', NAME));
@@ -210,12 +211,18 @@ await check('the skill copies are skill 0.2.0 and equal', async () => {
   return `${files.length} files, twice`;
 });
 
-// Every client configuration and install link starts the reviewed launch and nothing else.
+// Every client configuration and install link starts the reviewed launch and nothing else. That
+// launch names a published adapter and moves only after a publication (RELEASING.md), so the
+// adapter source may be ahead of it, never behind.
 await check('every launch is the reviewed pinned launch', async () => {
   const reviewed = JSON.parse(await readFile(join(ENGINE, 'distribution/readme-actions.json'), 'utf8')).mcpLaunch;
   const adapter = JSON.parse(await readFile(join(ENGINE, 'integrations/mcp/package.json'), 'utf8'));
   const want = [reviewed.command, ...reviewed.args];
-  expect(want.at(-1) === `${adapter.name}@${adapter.version}`, `the reviewed launch pins ${want.at(-1)}, the adapter is ${adapter.version}`);
+  const pinned = /^(.+)@(\d+)\.(\d+)\.(\d+)$/.exec(want.at(-1));
+  expect(pinned?.[1] === adapter.name, `the reviewed launch pins ${want.at(-1)}, not an exact version of ${adapter.name}`);
+  const source = adapter.version.split('.').map(Number);
+  const order = pinned.slice(2).map(Number).map((part, index) => Math.sign(part - source[index])).find((sign) => sign !== 0) ?? 0;
+  expect(order <= 0, `the reviewed launch pins ${want.at(-1)}, ahead of the adapter source ${adapter.version}`);
   const found = await launches(stage);
   for (const [where, got] of Object.entries(found)) expect(same(got, want), `${where} starts ${JSON.stringify(got)}`);
   return `${Object.keys(found).length} configurations start ${want.join(' ')}`;

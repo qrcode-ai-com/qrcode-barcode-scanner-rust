@@ -1,6 +1,6 @@
 {
   "name": "@qrcode-ai-com/qrcode-barcode-scanner-mcp",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Local MCP server for QR code and barcode image scanning, preserved payload bytes and QR scannability reports",
   "type": "module",
   "license": "MIT",
@@ -19,13 +19,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner.git",
+    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust.git",
     "directory": "integrations/mcp"
   },
   "homepage": "https://qrcode-ai.com/en-US/qr-code-scanner/mcp",
   "mcpName": "io.github.qrcode-ai-com/qrcode-barcode-scanner",
   "bugs": {
-    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner/issues"
+    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues"
   },
   "keywords": [
     "mcp",
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.3.1",
-    "@qrcode-ai-com/qrcode-barcode-scanner": "0.11.0",
+    "@qrcode-ai-com/qrcode-barcode-scanner": "0.12.0",
     "zod": "4.6.7"
   },
   "devDependencies": {

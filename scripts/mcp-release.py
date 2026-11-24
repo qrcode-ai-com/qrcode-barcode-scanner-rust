@@ -23,9 +23,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
-ENGINE_VERSION = "0.11.0"
+ENGINE_VERSION = "0.12.0"
 MCP_NAME = "io.github.qrcode-ai-com/qrcode-barcode-scanner"
-REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner"
+REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
 REPOSITORY_ID = "1126991539"
 ENVIRONMENT = "npm-agents"
 SCHEMA_SHA256 = "101f84b2888bea2ba617dd4a1d97593bd1a7c7e37e4bd57da6767e944e21fcad"
