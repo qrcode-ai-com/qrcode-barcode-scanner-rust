@@ -39,8 +39,10 @@ source and registry crates. Keep this material with redistributed archives. AUR,
 container recipes pinned to older public CLI bytes retain that CLI's actual license until a
 new qualified artifact replaces the pin.
 The MCP Bundle built from `distribution/mcpb` holds the published MCP server, engine and native
-packages unchanged, under their published AGPL-3.0-or-later terms, with the Apache-2.0 and MIT
-dependencies they install; its LICENSE.md lists each part, and its SOURCE.md names their source.
+packages unchanged, under their published terms, with the Apache-2.0 and MIT dependencies they
+install: bundle 0.3.2 holds the MIT server 0.3.2 and engine 0.12.0, and bundle 0.3.1 keeps the
+AGPL-3.0-or-later terms of the server 0.3.1 and the engine it was released with. Its LICENSE.md
+lists each part, and its SOURCE.md names their source.
 
 ## Ask AI artwork
 

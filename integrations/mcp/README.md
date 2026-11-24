@@ -198,10 +198,9 @@ installed-client checks pass.
 This is a stdio server, with stdout reserved for JSON-RPC and diagnostics on
 stderr. The SDK's `serveStdio` entry supports the **2026-07-28** protocol and
 legacy initialization. No HTTP service or hosted MCP endpoint is included.
-The [Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.1)
-lists version 0.3.1 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`;
-0.3.2, published on npm, joins that listing when the repository's
-`mcp-registry-publish` workflow runs for it. The entry
+The [Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.2)
+lists version 0.3.2 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`
+as its latest version since 24 November 2026, beside 0.3.1. The entry
 points to the same npm package and stdio transport described here. For a
 specific product client, verify tool discovery and a fixture call after
 installation.
