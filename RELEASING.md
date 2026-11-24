@@ -1395,11 +1395,13 @@ run summary. Future adapter versions need their own reviewed pins.
 
 ### MCP Bundle
 
-`distribution/mcpb` holds the MCP Bundle of the published adapter 0.3.1: one
-`.mcpb` file with the adapter, the engine 0.11.0 and its six native packages,
-taken from their npm archives by `scripts/build-mcpb-bundle.py` and pinned by
-the lockfile's sha512. It is a packaging release: it rebuilds nothing, and the
-`agents-v0.3.1` release and the npm packages stay as published. Its tag is
+`distribution/mcpb` holds the MCP Bundle of the published adapter 0.3.2: one
+`.mcpb` file with the adapter, the MIT engine 0.12.0 and its six native
+packages, taken from their npm archives by `scripts/build-mcpb-bundle.py` and
+pinned by the lockfile's sha512. It is a packaging release: it rebuilds nothing,
+and the `agents-v0.3.2` release and the npm packages stay as published. The
+bundle 0.3.1 on `mcpb-v0.3.1` keeps the adapter 0.3.1 and engine 0.11.0 it was
+released with, and their AGPL-3.0-or-later terms. A bundle's tag is
 `mcpb-v<adapter>`; a new bundle follows a new adapter version, with its pins,
 its lockfile and the constants of the builder changed in one commit.
 
@@ -1433,17 +1435,17 @@ bypass. Add `mcpb-v*` to the tag ruleset of distribution tags.
 
 1. Merge the change to `main`, with `mcpb.yml` green on its pull request.
 2. Tag the merged commit and push the tag:
-   `git tag -a mcpb-v0.3.1 <commit> -m 'MCP Bundle 0.3.1'`, then
-   `git push origin mcpb-v0.3.1`.
+   `git tag -a mcpb-v0.3.2 <commit> -m 'MCP Bundle 0.3.2'`, then
+   `git push origin mcpb-v0.3.2`.
 3. Approve `attest` in the environment once the consumers are green, and wait
    for the attestation.
 4. Download the artifact `mcpb-bundle` of that run into an empty directory.
    Check it there: `shasum -a 256 -c ./*-SHA256SUMS`, then
-   `gh attestation verify qrcode-barcode-scanner-0.3.1.mcpb --repo
+   `gh attestation verify qrcode-barcode-scanner-0.3.2.mcpb --repo
    qrcode-ai-com/qrcode-barcode-scanner-rust`, then
-   `python3 scripts/build-mcpb-bundle.py verify <file> --revision mcpb-v0.3.1`
+   `python3 scripts/build-mcpb-bundle.py verify <file> --revision mcpb-v0.3.2`
    from a checkout.
-5. Create the release `mcpb-v0.3.1` on that tag, not marked as the latest,
+5. Create the release `mcpb-v0.3.2` on that tag, not marked as the latest,
    with the `.mcpb` file and its `SHA256SUMS` file only, and its digest in the
    notes. A published release is immutable: a mistake is a new adapter
    version and a new tag, never a replaced file.

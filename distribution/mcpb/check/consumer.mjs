@@ -25,8 +25,8 @@ if (!bundlePath || !fixturePath || (rest.length && !receiptPath) || rest.length 
 }
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const FIXTURE_SHA256 = "c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8";
-const SERVER = { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.1" };
-const VERSIONS = { scanner: "0.11.0", pipeline: 5, score_contract: 5 };
+const SERVER = { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.2" };
+const VERSIONS = { scanner: "0.12.0", pipeline: 5, score_contract: 5 };
 const MIXED = [
   { symbology: "code128", text: "STOCK-4827", raw: Buffer.from("STOCK-4827").toString("base64") },
   { symbology: "qr_code", text: "https://qrc-ai.com/76xMa", raw: Buffer.from("https://qrc-ai.com/76xMa").toString("base64") },
@@ -36,7 +36,7 @@ const TIMEOUT_MS = 120_000;
 
 const bundle = readFileSync(bundlePath);
 const fixture = readFileSync(fixturePath);
-assert.equal(sha256(fixture), FIXTURE_SHA256, "the mixed QR and Code 128 fixture of tag v0.11.0");
+assert.equal(sha256(fixture), FIXTURE_SHA256, "the mixed QR and Code 128 fixture of tags v0.11.0 and v0.12.0");
 for (const key of Object.keys(process.env)) {
   assert.ok(!/^(QRSCAN_|NAPI_RS_)/.test(key), `${key} would reach the server`);
 }
@@ -68,7 +68,7 @@ assert.equal(refusedSchema.status, 1, "mcpb validate refuses inputSchema in tool
 assert.match(refusedSchema.stdout + refusedSchema.stderr, /inputSchema/);
 
 assert.equal(manifest.name, "qrcode-barcode-scanner");
-assert.equal(manifest.version, "0.3.1");
+assert.equal(manifest.version, "0.3.2");
 assert.equal(manifest.server.entry_point, "server/launch.mjs");
 assert.deepEqual(manifest.tools.map(({ name }) => name), ["scan_image", "scan_file"]);
 assert.deepEqual(manifest.compatibility.platforms, ["darwin", "win32", "linux"]);
