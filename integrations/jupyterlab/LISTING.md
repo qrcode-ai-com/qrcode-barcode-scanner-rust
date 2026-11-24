@@ -1,9 +1,10 @@
 # JupyterLab Extension Manager listing: jupyterlab-qrcode-barcode-scanner
 
 What JupyterLab's Extension Manager will show for this extension, where each value comes from, and
-the owner's steps to publish it. The extension is ready for PyPI. It is not on PyPI yet, so the
-Extension Manager does not list it. The project name `jupyterlab-qrcode-barcode-scanner` is
-proposed: it was free on PyPI on 21 November 2026, and nothing reserves it.
+the owner's steps to publish it. Version 0.1.0 goes to PyPI from the tag `jupyterlab-v0.1.0`; the
+Extension Manager does not list the extension before PyPI serves it. The project name
+`jupyterlab-qrcode-barcode-scanner` was free on PyPI on 21 and 24 November 2026, and nothing
+reserves it.
 
 Since JupyterLab 4, the Extension Manager reads its catalogue from PyPI and installs with pip. It
 lists every PyPI project with the classifier
@@ -16,7 +17,7 @@ form and no review: the listing follows the PyPI release.
 The Extension Manager installs Python packages that carry a built frontend. A kernel-side widget
 would be a library to import in a notebook, not something the manager lists. The extension is
 therefore a prebuilt labextension: one `py3-none-any` wheel whose frontend bundles the published
-browser engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0`. It needs no rebuild of
+browser engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0`. It needs no rebuild of
 JupyterLab, no Node.js on the user's machine, no server extension and no kernel. The scan runs in
 the browser tab.
 
@@ -27,13 +28,13 @@ the browser tab.
 | PyPI project | `jupyterlab-qrcode-barcode-scanner` |
 | Version | 0.1.0, tag `jupyterlab-v0.1.0` |
 | Labextension | `@qrcode-ai-com/jupyterlab-qrcode-barcode-scanner`, installed to `share/jupyter/labextensions/` by the wheel; not published to npm |
-| Engine | `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0`, bundled; module SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68` |
-| Licence | `MIT AND AGPL-3.0-or-later`: the extension's code is MIT, the bundled engine AGPL-3.0-or-later ([LICENSE-NOTES.md](LICENSE-NOTES.md)) |
+| Engine | `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0`, bundled; module SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868`, the one `distribution/releases/v0.12.0.json` records |
+| Licence | `MIT`: the extension's code and the bundled engine 0.12.0, whose two rxing-derived reader parts keep their Apache-2.0 notices ([LICENSE-NOTES.md](LICENSE-NOTES.md)) |
 | Wheel | `jupyterlab_qrcode_barcode_scanner-0.1.0-py3-none-any.whl`, about 1 MB |
 | sdist | `jupyterlab_qrcode_barcode_scanner-0.1.0.tar.gz`, with the built labextension |
 
-The workflow `integration-jupyterlab` built pull request #143 at head `637393f9` (merge commit
-`c7500ff0`) in
+With engine 0.11.0, before the move to engine 0.12.0, the workflow `integration-jupyterlab` built
+pull request #143 at head `637393f9` (merge commit `c7500ff0`) in
 [run 44895450468](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44895450468),
 checked both files with `twine check --strict`, uploaded them as the artifact `jupyterlab-dist`
 and printed:
@@ -60,7 +61,7 @@ the ones PyPI must serve.
 | Description (PyPI) | this folder's README, with every image and link by absolute URL | `pyproject.toml` `readme` |
 | Version | 0.1.0 | `package.json` `version` |
 | Authors | Thibaut Mélen, Nicolas Cella | `pyproject.toml` `authors` |
-| Licence | MIT AND AGPL-3.0-or-later | `pyproject.toml` `license` |
+| Licence | MIT | `pyproject.toml` `license` |
 | Classifiers | Framework :: Jupyter :: JupyterLab :: 4, Extensions :: Prebuilt and their parents | `pyproject.toml` `classifiers` |
 | Python | >= 3.9; no Python dependency, JupyterLab 4 is the user's | `pyproject.toml` |
 | Homepage | <https://qrcode-ai.com/en-US/qr-code-scanner/integrations/jupyterlab> | `[project.urls]` |
@@ -78,13 +79,19 @@ of a PyPI release cannot change after its upload.
 ![The QR Code & Barcode Scanner panel in JupyterLab beside the file browser: the sample image scanned with the full profile lists a QR code with https://qrc-ai.com/76xMa and a Code 128 barcode with STOCK-4827](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/integrations/jupyterlab/media/scanner-panel.png)
 
 `media/scanner-panel.png` is a real JupyterLab 4.6.6 in Chrome 158, 1360 by 860 at device scale 2,
-with this extension's wheel installed in a new environment. `tests/file-browser.mjs` right-clicked
-the sample in the file browser, chose **Scan for QR codes and barcodes**, switched the profile to
-`full`, checked that both codes were listed and saved the page.
+with this extension's wheel, bundling engine 0.12.0, installed in a new environment, on
+24 November 2026. `tests/file-browser.mjs` right-clicked the sample in the file browser, chose
+**Scan for QR codes and barcodes**, switched the profile to `full`, checked that both codes were
+listed and saved the page; JupyterLab's news prompt was turned off for the picture, and the PNG
+was reduced to 256 colours.
 
 ## The owner's steps
 
-Nothing here has been done: no environment, rule, tag or PyPI project exists for this extension
+Steps 2 and 3 were in place when the GitHub API was read on 24 November 2026: the environment
+`pypi-jupyterlab` has the owner as its required reviewer, no administrator bypass, no secret, no
+variable and the one deployment rule `jupyterlab-v*` (tag), and `refs/tags/jupyterlab-v*` is in
+the ruleset `distribution-tags-maintainer-only`. Step 1 is on PyPI and cannot be read from the
+repository: the owner confirms it before the tag. No tag `jupyterlab-v*` and no PyPI project exist
 yet.
 
 ### Once
@@ -124,8 +131,9 @@ yet.
    **Status** into the published wording and adds to **Install** the two ways a published
    extension installs: pip with the project name, and JupyterLab's Extension Manager. The README is
    the PyPI description of the version: it cannot change once uploaded. Check that the Homepage
-   page answers: it answered 404 on 21 November 2026. Wait for `integration-jupyterlab` to pass on
-   that pull request.
+   page answers. It answered 404 on 21 November 2026; the owner chose to release 0.1.0, with the
+   MIT engine 0.12.0, under that Homepage, the definitive address, which goes live with the
+   website's JupyterLab pages. Wait for `integration-jupyterlab` to pass on that pull request.
 
 5. **The tag.** Tag the merged commit and push the tag:
    `git tag -a jupyterlab-v0.1.0 <commit> -m 'JupyterLab extension 0.1.0'`, then

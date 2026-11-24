@@ -5,10 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "jupyterlab-qrcode-barcode-scanner"
 readme = "README.md"
-# The extension's own code is MIT; the WebAssembly engine bundled in the labextension is the
-# published @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.11.0, AGPL-3.0-or-later. LICENSE-NOTES.md
-# says which file is which; licenses/ is written by the build from the engine package itself.
-license = "MIT AND AGPL-3.0-or-later"
+# The extension's own code is MIT, and so is the WebAssembly engine bundled in the labextension, the
+# published @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.12.0; two of its reader parts keep their
+# Apache-2.0 notices. LICENSE-NOTES.md says which file is which; licenses/ is written by the build
+# from the engine package itself.
+license = "MIT"
 license-files = ["LICENSE", "LICENSE-NOTES.md", "licenses/*"]
 requires-python = ">=3.9"
 authors = [{ name = "Thibaut Mélen" }, { name = "Nicolas Cella" }]

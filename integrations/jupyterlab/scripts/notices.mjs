@@ -3,7 +3,7 @@
 //
 // The labextension's static folder must hold exactly one .wasm file, whose SHA-256 is the one the
 // npm package @qrcode-ai-com/qrcode-barcode-scanner-wasm records in build-info.json. licenses/
-// then receives that package's LICENSE (AGPL-3.0-or-later), LICENSE-APACHE-2.0 and THIRD-PARTY.md,
+// then receives that package's LICENSE (MIT), LICENSE-APACHE-2.0 and THIRD-PARTY.md,
 // unchanged, under names that say whose they are, and ENGINE.json, the record of the bundled
 // module. pyproject.toml lists them as license files of the wheel. The labextension folder, which
 // JupyterLab serves from share/jupyter/labextensions, gets the same files and the extension's own

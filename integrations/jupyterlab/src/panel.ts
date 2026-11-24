@@ -144,7 +144,7 @@ export class ScannerPanel extends Widget {
     source.target = '_blank';
     source.rel = 'noopener noreferrer';
     const sourceLine = element('p', '', 'jp-qrscan-muted');
-    sourceLine.append(source, ' · MIT for the extension, AGPL-3.0-or-later for the bundled engine 0.11.0.');
+    sourceLine.append(source, ' · MIT for the extension and for the bundled engine 0.12.0.');
     about.append(element('h3', 'What runs here'), list, sourceLine);
 
     root.append(intro, input, output, about);

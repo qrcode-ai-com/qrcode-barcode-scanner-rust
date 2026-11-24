@@ -50,9 +50,18 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 
 ## Status
 
-The extension is built and tested in the engine repository. It is not yet published on PyPI, so
-JupyterLab's Extension Manager does not list it yet. Its Python package name will be
-`jupyterlab-qrcode-barcode-scanner`.
+The extension is on PyPI as
+[`jupyterlab-qrcode-barcode-scanner`](https://pypi.org/project/jupyterlab-qrcode-barcode-scanner/) 0.1.0.
+The engine repository published that version from its tag `jupyterlab-v0.1.0`, after the owner's
+review, through PyPI trusted publishing: no token is stored. The files on PyPI are the sdist and
+the wheel that the tag's run built, checked with `twine check --strict`, installed with JupyterLab
+4.6.6 in a new environment and scanned on the sample through the panel in the three profiles and
+from the file browser. The wheel bundles the published engine
+`@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0.
+
+JupyterLab's Extension Manager reads its catalogue from PyPI, so it lists the extension once PyPI
+serves it; the manager caches its list for up to five minutes. What the listing shows, and where
+each value comes from, are in [LISTING.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LISTING.md).
 
 ## Install
 
@@ -60,8 +69,17 @@ It is a prebuilt extension: one Python wheel that holds the built frontend, the 
 installs extensions with pip and lists them in its Extension Manager. JupyterLab needs no rebuild,
 Node.js is not needed to use it, and it adds no server or kernel code.
 
-Until it is on PyPI, build the wheel from this folder. That needs Node.js 22 and Python 3.9 or
-later:
+Install it from PyPI in the environment that runs JupyterLab 4, then reload the JupyterLab page:
+
+```sh
+python -m pip install jupyterlab-qrcode-barcode-scanner
+```
+
+Or, in JupyterLab, open the **Extension Manager** in the left sidebar (enable it if asked), search
+for `qrcode`, install **jupyterlab-qrcode-barcode-scanner** and reload the page.
+
+To try a change to the extension, build the wheel from this folder in a checkout of this
+repository instead. That needs Node.js 22 and Python 3.9 or later:
 
 ```sh
 cd integrations/jupyterlab
@@ -72,8 +90,8 @@ python -m build
 python -m pip install dist/jupyterlab_qrcode_barcode_scanner-0.1.0-py3-none-any.whl
 ```
 
-Install the wheel in the environment that runs JupyterLab 4, then reload the JupyterLab page.
-`jupyter labextension list` shows it as `@qrcode-ai-com/jupyterlab-qrcode-barcode-scanner`.
+Either way, `jupyter labextension list` shows it as
+`@qrcode-ai-com/jupyterlab-qrcode-barcode-scanner`.
 
 ## Use
 
@@ -129,7 +147,7 @@ how refused inputs and cut scans are reported. The workflow `integration-jupyter
 repository then builds the wheel, installs it with JupyterLab 4.6.6 in a clean environment, opens
 `/lab?qrcode-barcode-scanner` in Chrome, scans the sample through the panel's own file input with
 each profile and checks every code and link, then uninstalls the wheel and checks that JupyterLab no
-longer has the extension. [LISTING.md](LISTING.md) holds the publication kit.
+longer has the extension. [LISTING.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LISTING.md) holds the publication kit.
 
 ## How it works
 
@@ -164,10 +182,10 @@ Both come back in one report, each with its format, its exact text and the place
 measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -219,7 +237,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-The wheel holds two kinds of code. The extension's own code, from `src/` and `style/`, is MIT; see [LICENSE](LICENSE). The engine it bundles, the labextension's WebAssembly module and its JavaScript glue, is the published npm package `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0`, which stays under AGPL-3.0-or-later. Its corresponding source is the [`v0.11.0` tag](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0) of the scanner repository. The package therefore declares `MIT AND AGPL-3.0-or-later`, and [LICENSE-NOTES.md](LICENSE-NOTES.md) says which file is which. The wheel carries the engine's license, its Apache-2.0 notices and its build record. Whoever distributes the wheel also distributes that AGPL engine.
+The wheel's code is all under the MIT License. The extension's own code, from `src/` and `style/`, is MIT; see [LICENSE](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LICENSE). The engine it bundles, the labextension's WebAssembly module and its JavaScript glue, is the published npm package `@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0`, which is MIT too; two of its reader parts keep their Apache-2.0 notices. Its source is the [`v0.12.0` tag](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0) of the scanner repository. The package therefore declares `MIT`, and [LICENSE-NOTES.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LICENSE-NOTES.md) says which file is which. The wheel carries the engine's license, its Apache-2.0 notices and its build record. Engine 0.11.0 keeps its AGPL-3.0-or-later license in its own published archives; no release of this extension bundles it.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 
