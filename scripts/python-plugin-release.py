@@ -40,8 +40,9 @@ classifier, and whose listing has the SHA-256 the build job recorded. A swapped 
 A labextension wheel must also hold, under share/jupyter/labextensions/<package>, its package.json
 at this version, the install.json that names the project, one WebAssembly module and the
 licenses/ENGINE.json record of it: the engine package and version package.json pins, and that
-module's file and SHA-256. The wheel's license files carry the same record, its metadata names no
-engine wheel and its License-Expression includes AGPL-3.0-or-later, the engine's license.
+module's file and SHA-256, and the engine's license, MIT. The wheel's license files carry the same
+record, its metadata names no engine wheel and its License-Expression includes MIT, the engine's
+license.
 
 `pypi-live` reads PyPI's public JSON for the project at this version, with no credential. A 404
 means nothing is live. Otherwise every file PyPI serves there must be in DIR with the same SHA-256,
@@ -73,7 +74,9 @@ VERSION = re.compile(r"\d+\.\d+\.\d+")
 PIN = re.compile(rf"^{re.escape(ENGINE)}==(\d+\.\d+\.\d+)$")
 NAMES_ENGINE = re.compile(rf"^{re.escape(ENGINE)}\b(?!-)")
 WASM_ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner-wasm"
-ENGINE_LICENSE = "AGPL-3.0-or-later"
+# The license of the WebAssembly engine a labextension bundles. A record naming another license,
+# such as the AGPL-3.0-or-later of an earlier engine release, is a different engine.
+ENGINE_LICENSE = "MIT"
 LABEXTENSIONS = "share/jupyter/labextensions"
 
 # One row per plugin package. `classifier` is the one its listing reads. A `python` row names the
@@ -416,13 +419,14 @@ def _fake_labextension(root, name, version, engine, row, *, broken=None):
     out = pathlib.Path(root) / "dist"
     out.mkdir()
     norm = normalized(name)
-    license_expression = "MIT" if broken == "license" else f"MIT AND {ENGINE_LICENSE}"
+    license_expression = "Apache-2.0" if broken == "license" else ENGINE_LICENSE
     requires = f"Requires-Dist: {ENGINE}=={engine}\n" if broken == "requires" else ""
     meta = (f"Metadata-Version: 2.5\nName: {name}\nVersion: {version}\nLicense-Expression: {license_expression}\n"
             f"Classifier: {row['classifier']}\n{requires}\n")
     served = f"{norm}-{version}.data/data/{LABEXTENSIONS}/{row['package']}/"
     module = "static/0123456789abcdef.wasm"
-    record = {"package": WASM_ENGINE, "version": "0.0.1" if broken == "engine" else engine, "license": ENGINE_LICENSE,
+    record = {"package": WASM_ENGINE, "version": "0.0.1" if broken == "engine" else engine,
+              "license": "AGPL-3.0-or-later" if broken == "engine-license" else ENGINE_LICENSE,
               "wasm": {"file": module, "sha256": hashlib.sha256(LAB_WASM).hexdigest()}}
     record_text = json.dumps(record, indent=2) + "\n"
     with zipfile.ZipFile(out / f"{norm}-{version}-py3-none-any.whl", "w") as archive:
@@ -584,8 +588,8 @@ def self_test():
                lambda: inspect(ns(directory=lab_good, folder=lab_key, sha256=lab_digest)), True)
         expect("inspect the labextension set as the napari plugin",
                lambda: inspect(ns(directory=lab_good, folder=real_key, sha256=lab_digest)), False)
-        for broken in ("module", "two-modules", "engine", "install", "served-version", "requires", "license",
-                       "license-record"):
+        for broken in ("module", "two-modules", "engine", "engine-license", "install", "served-version", "requires",
+                       "license", "license-record"):
             bad = lab_release(broken, broken)
             _, bad_digest = listing(sorted(bad.iterdir()))
             expect(f"inspect a labextension wheel with a wrong {broken}",

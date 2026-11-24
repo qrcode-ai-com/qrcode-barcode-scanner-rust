@@ -1,4 +1,4 @@
-// The panel's report logic, on reports of the published engine itself: the 0.11.0 WebAssembly
+// The panel's report logic, on reports of the published engine itself: the 0.12.0 WebAssembly
 // module the extension bundles scans the repository's mixed fixture under Node, with each profile,
 // and src/report.ts must turn each report into the exact rows and sentence the panel shows.
 import assert from 'node:assert/strict';
@@ -19,7 +19,7 @@ const engine = await import(join(engineDir, 'qrcode-barcode-scanner.js'));
 const buildInfo = JSON.parse(readFileSync(join(engineDir, 'build-info.json'), 'utf8'));
 const wasm = readFileSync(join(engineDir, 'qrcode-barcode-scanner_bg.wasm'));
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
-assert.equal(sha256(wasm), 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68');
+assert.equal(sha256(wasm), '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868');
 assert.equal(buildInfo.wasm.sha256, sha256(wasm));
 engine.initSync({ module: wasm });
 
@@ -35,7 +35,7 @@ const pairs = (rows) => rows.map(({ symbology, text }) => ({ symbology, text }))
 for (const profile of ['fast', 'frame', 'full']) {
   test(`the ${profile} profile: both codes, a complete scan, the panel's sentence and score`, () => {
     const report = engine.scan_image(fixture, profile, undefined, undefined, 0);
-    assert.equal(engine.version(), '0.11.0');
+    assert.equal(engine.version(), '0.12.0');
     assert.equal(isComplete(report), true);
     const view = summarize(report, 'mixed-code128-qr.png', profile);
     assert.equal(view.state, 'result');

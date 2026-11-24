@@ -1462,8 +1462,8 @@ its own; its tag is `napari-vX.Y.Z`. The JupyterLab extension
 `jupyterlab-qrcode-barcode-scanner` is a prebuilt labextension: one wheel that
 holds the built frontend, which bundles the published WebAssembly module of
 `@qrcode-ai-com/qrcode-barcode-scanner-wasm` at the exact version its
-`package.json` pins, so it installs no engine wheel and is distributed under
-`MIT AND AGPL-3.0-or-later`; its version is the one of its `package.json` and
+`package.json` pins, so it installs no engine wheel; with engine 0.12.0 it is
+distributed under `MIT`. Its version is the one of its `package.json` and
 its tag is `jupyterlab-vX.Y.Z`. Each folder's `LISTING.md` lists what its
 listing reads (the napari hub, JupyterLab's Extension Manager) and the steps
 below with every value filled in.
