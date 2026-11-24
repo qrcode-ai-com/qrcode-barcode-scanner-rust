@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "qrcode-barcode-scanner/scanner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "QR Code & Barcode Scanner",
   "category": "widgets",
   "description": "Let visitors read the QR codes and barcodes in an image or a photo. The image is read in their browser and is never uploaded.",

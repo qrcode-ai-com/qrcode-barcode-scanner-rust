@@ -35,9 +35,9 @@ export class BuildError extends Error {}
 
 export function banner(version) {
   return `/*! QR Code & Barcode Scanner for Photoshop ${version}, by QR Code AI: the panel script.
- * It holds the scanner engine 0.11.0 (AGPL-3.0-or-later, with Apache-2.0 notices) and this
- * plugin's own code (MIT). The plugin as a whole is distributed under AGPL-3.0-or-later;
- * NOTICE.md beside this file lists each part and its source.
+ * It holds the scanner engine ${own().dependencies[PACKAGE]} and this plugin's own code, both under
+ * the MIT License, with Apache-2.0 notices for two parts of the engine. NOTICE.md beside this
+ * file lists each part and its source.
  */`;
 }
 
@@ -69,15 +69,15 @@ export async function bundle(entry = join(HERE, 'src', 'index.js')) {
 export function notice(version, inline) {
   return `# QR Code & Barcode Scanner for Photoshop ${version}
 
-This plugin, by QR Code AI, is distributed under the GNU Affero General Public License, version 3
-or any later version (AGPL-3.0-or-later), in LICENSE.
+This plugin, by QR Code AI, is distributed under the MIT License, in LICENSE. Two parts of the
+engine derive from rxing and keep their Apache-2.0 notices.
 
 ## Its parts
 
 | Files | What they are | License |
 | --- | --- | --- |
 | manifest.json, index.html, styles.css, icons/ | the plugin's panel | MIT, in LICENSE-MIT.txt |
-| index.js | the plugin's code (MIT) with the scanner engine inlined | AGPL-3.0-or-later for the engine, with Apache-2.0 notices in LICENSE-APACHE-2.0 and THIRD-PARTY.md |
+| index.js | the plugin's code (MIT) with the scanner engine inlined | MIT for the engine, in LICENSE, with Apache-2.0 notices in LICENSE-APACHE-2.0 and THIRD-PARTY.md |
 
 The engine is the published npm package ${inline.package} ${inline.version}. Its WebAssembly
 module is inlined in index.js as base64, byte for byte: ${inline.wasm_bytes} bytes, SHA-256
@@ -86,7 +86,7 @@ of fetching it.
 
 ## Source
 
-The corresponding source of the engine is revision ${inline.source_revision} of
+The source of the engine is revision ${inline.source_revision} (tag v${inline.version}) of
 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust, and the source of this plugin is
 integrations/photoshop-uxp in the same repository. Photoshop's APIs are not part of this plugin:
 it asks Photoshop for them with require('photoshop') and require('uxp') when it runs.
@@ -103,6 +103,12 @@ export async function pluginFiles() {
   const files = new Map([['manifest.json', Buffer.from(manifestText)]]);
   for (const name of COPIED) files.set(name, readFileSync(join(HERE, 'src', name)));
   const { code, inline } = await bundle();
+  if (inline.license !== 'MIT') {
+    throw new BuildError(`the engine ${inline.version} is licensed ${inline.license}: review NOTICE.md and LICENSE-NOTES.md`);
+  }
+  if (!/^MIT License\n/.test(readFileSync(enginePath('LICENSE'), 'utf8'))) {
+    throw new BuildError(`the engine ${inline.version} does not ship the MIT License text`);
+  }
   files.set('index.js', code);
   for (const [name, bytes] of panelIcons()) files.set(name, bytes);
   files.set('LICENSE', readFileSync(enginePath('LICENSE')));

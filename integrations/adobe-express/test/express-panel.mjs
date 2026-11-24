@@ -45,7 +45,7 @@ const shots = resolve(option('--shots', join(HERE, 'build', 'screenshots')));
 const headed = process.argv.includes('--headed');
 
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const SDK_URL = 'https://express.adobe.com/static/add-on-sdk/sdk.js';
 const ORIGIN = 'https://addon.example.com';
 const PANEL = { width: 320, height: 640 };
@@ -176,10 +176,10 @@ mkdirSync(out, { recursive: true });
 mkdirSync(shots, { recursive: true });
 
 // ------------------------------------------------------------------ load
-await page.waitForSelector('#about[data-engine-version="0.11.0"]', { state: 'attached', timeout: 60000 });
+await page.waitForSelector('#about[data-engine-version="0.12.0"]', { state: 'attached', timeout: 60000 });
 await page.waitForSelector('#result[data-state="ready"]', { state: 'attached' });
 const about = await page.evaluate(() => ({ ...document.querySelector('#about').dataset }));
-check('load: the worker starts the engine from the package', about.engineVersion === '0.11.0'
+check('load: the worker starts the engine from the package', about.engineVersion === '0.12.0'
   && about.wasmSha256 === WASM_SHA256, JSON.stringify(about));
 check('load: the buttons are enabled once the engine is ready', !(await page.isDisabled('#scan-page'))
   && !(await page.isDisabled('#scan-document')) && !(await page.isDisabled('#file')));

@@ -8,8 +8,8 @@
 	<packagerurl>https://qrcode-ai.com/</packagerurl>
 	<creationDate>2026-11</creationDate>
 	<copyright>(C) 2026 SuperNovae Studio, QR Code AI</copyright>
-	<license>GNU General Public License version 3 or later; the bundled scanner engine files in media/mod_qrcodebarcodescanner/vendor are AGPL-3.0-or-later, see LICENSE-ENGINE.txt</license>
-	<version>0.1.0</version>
+	<license>GNU General Public License version 3 or later; the bundled scanner engine files in media/mod_qrcodebarcodescanner/vendor are MIT, see LICENSE-ENGINE.txt</license>
+	<version>0.1.1</version>
 	<description>A site module that reads the QR codes and barcodes in an image or a photo, in the visitor's browser. The image is never uploaded and no other server is called. Open source.</description>
 	<blockChildUninstall>true</blockChildUninstall>
 	<files folder="packages">

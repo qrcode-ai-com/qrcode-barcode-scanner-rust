@@ -3,13 +3,13 @@
  * Plugin Name:       QR Code & Barcode Scanner
  * Plugin URI:        https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust
  * Description:       A block and a shortcode that read QR codes and barcodes from an image or a photo, in the visitor's browser. The image is never uploaded.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            QR Code AI
  * Author URI:        https://qrcode-ai.com/
- * License:           AGPL-3.0-or-later
- * License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+ * License:           MIT
+ * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       qrcode-barcode-scanner
  *
  * @package QRCodeBarcodeScanner
@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'QRCODE_BARCODE_SCANNER_VERSION', '0.1.0' );
+define( 'QRCODE_BARCODE_SCANNER_VERSION', '0.1.1' );
 define( 'QRCODE_BARCODE_SCANNER_FILE', __FILE__ );
 
 require_once __DIR__ . '/includes/markup.php';

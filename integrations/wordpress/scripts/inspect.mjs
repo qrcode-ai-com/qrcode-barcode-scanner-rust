@@ -24,7 +24,7 @@ const VENDOR = 'assets/vendor/qrcode-barcode-scanner-wasm';
 const MAX_BYTES = 10 * 1024 * 1024;
 
 export const EXPECTED_FILES = [
-  'LICENSE', 'LICENSE-MIT', 'LICENSE-NOTES.txt', 'PROVENANCE.json',
+  'LICENSE', 'LICENSE-NOTES.txt', 'PROVENANCE.json',
   'assets/scanner/engine.js', 'assets/scanner/results.js', 'assets/scanner/scanner.css',
   'assets/scanner/view.js', 'assets/scanner/worker.js',
   ...['LICENSE', 'LICENSE-APACHE-2.0', 'THIRD-PARTY.md', 'auto.js', 'build-info.json',

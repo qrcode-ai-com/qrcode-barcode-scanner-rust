@@ -113,7 +113,7 @@ test('the header, readme.txt, block.json and package.json agree', () => {
   assert.equal(version, own.version);
   const header = headers(source('qrcode-barcode-scanner.php'));
   assert.equal(header['Plugin Name'], 'QR Code & Barcode Scanner');
-  assert.equal(header.License, 'AGPL-3.0-or-later');
+  assert.equal(header.License, 'MIT');
   assert.equal(header['Text Domain'], 'qrcode-barcode-scanner');
   const readme = headers(source('readme.txt'));
   assert.equal(readme['Stable tag'], own.version);
@@ -125,7 +125,7 @@ test('the engine is the pinned npm package', () => {
   assert.equal(scanner.version, own.dependencies['@qrcode-ai-com/qrcode-barcode-scanner-wasm']);
   assert.equal(scanner.wasm_sha256, own.config.wasmSha256);
   assert.match(scanner.integrity, /^sha512-/);
-  assert.equal(scanner.license, 'AGPL-3.0-or-later');
+  assert.equal(scanner.license, 'MIT');
 });
 
 test('the built zip passes the inspection, and the inspection catches changes', { skip: !existsSync(ZIP) }, () => {

@@ -35,9 +35,9 @@ export class BuildError extends Error {}
 
 export function workerBanner(version) {
   return `/*! QR Code & Barcode Scanner for Adobe Express ${version}, by QR Code AI: the scanner worker.
- * It holds the scanner engine 0.11.0 (AGPL-3.0-or-later, with Apache-2.0 notices) and this
- * add-on's worker code (MIT). The add-on package as a whole is distributed under
- * AGPL-3.0-or-later; NOTICE.md beside this file lists each part and its source.
+ * It holds the scanner engine ${own().dependencies[PACKAGE]} and this add-on's worker code, both
+ * under the MIT License, with Apache-2.0 notices for two parts of the engine. NOTICE.md beside
+ * this file lists each part and its source.
  */`;
 }
 
@@ -67,15 +67,15 @@ export async function bundleWorker() {
 export function notice(version, inline) {
   return `# QR Code & Barcode Scanner for Adobe Express ${version}
 
-This add-on package, by QR Code AI, is distributed under the GNU Affero General Public License,
-version 3 or any later version (AGPL-3.0-or-later), in LICENSE.
+This add-on package, by QR Code AI, is distributed under the MIT License, in LICENSE. Two parts
+of the engine derive from rxing and keep their Apache-2.0 notices.
 
 ## Its parts
 
 | Files | What they are | License |
 | --- | --- | --- |
 | index.html, index.js, image.js, results.js, styles.css, manifest.json | the add-on's panel | MIT, in LICENSE-MIT.txt |
-| scanner-worker.js | the add-on's worker code (MIT) with the scanner engine inlined | AGPL-3.0-or-later for the engine, with Apache-2.0 notices in LICENSE-APACHE-2.0 and THIRD-PARTY.md |
+| scanner-worker.js | the add-on's worker code (MIT) with the scanner engine inlined | MIT for the engine, in LICENSE, with Apache-2.0 notices in LICENSE-APACHE-2.0 and THIRD-PARTY.md |
 
 The engine is the published npm package ${inline.package} ${inline.version}. Its WebAssembly
 module is inlined in scanner-worker.js as base64, byte for byte: ${inline.wasm_bytes} bytes,
@@ -84,7 +84,7 @@ file instead of fetching it.
 
 ## Source
 
-The corresponding source of the engine is revision ${inline.source_revision} of
+The source of the engine is revision ${inline.source_revision} (tag v${inline.version}) of
 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust, and the source of this add-on is
 integrations/adobe-express in the same repository. The Adobe Express add-on SDK is not part of
 this package: the panel loads it from ${SDK_URL} when it runs.
@@ -101,6 +101,12 @@ export async function packageFiles() {
   const files = new Map([['manifest.json', Buffer.from(manifestText)]]);
   for (const name of PANEL_FILES) files.set(name, readFileSync(join(HERE, 'src', name)));
   const { code, inline } = await bundleWorker();
+  if (inline.license !== 'MIT') {
+    throw new BuildError(`the engine ${inline.version} is licensed ${inline.license}: review NOTICE.md and LICENSE-NOTES.md`);
+  }
+  if (!/^MIT License\n/.test(readFileSync(enginePath('LICENSE'), 'utf8'))) {
+    throw new BuildError(`the engine ${inline.version} does not ship the MIT License text`);
+  }
   files.set('scanner-worker.js', code);
   files.set('LICENSE', readFileSync(enginePath('LICENSE')));
   files.set('LICENSE-APACHE-2.0', readFileSync(enginePath('LICENSE-APACHE-2.0')));
