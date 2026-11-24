@@ -81,7 +81,9 @@ display (xvfb, 1600 by 1000). The job `napari-window` of `integration-python-hos
 plugin's built wheel in a new environment, added its widget as the Plugins menu does, ran a `full`
 scan of the mixed sample and checked that both codes were outlined before saving the window
 (`tests/capture_window.py`). It comes from the same run, [44886529397](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44886529397): 1440 by 900
-pixels, sha256 `a047712e60529ebded32f47d336c8836b960952ae3e2970f258848628b146f9f`.
+pixels, sha256 `a047712e60529ebded32f47d336c8836b960952ae3e2970f258848628b146f9f`. That was version
+0.1.0 on engine 0.11.0. With version 0.1.1 on engine 0.12.0, the same job of pull request #224
+(run [45388448905](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45388448905), 24 November 2026) saved a picture with the same sha256.
 
 ## The owner's steps
 
