@@ -2,9 +2,10 @@
 
 State on 21 November 2026: source and tests in this folder, **not deployed to Make**. No Make
 account, app or origin exists for it yet, and `makecomapp.json` holds no origin. **Blocked on a
-hosted endpoint, owner decision 11**: the app calls a scan service, the HTTP service of this
-repository is not released yet, and no scan service is hosted for Make users. Nothing here hosts
-one. Every step below is the owner's: an account, an API key, a deployment to Make, a publication
+hosted endpoint, owner decision 11**: the app calls a scan service. The HTTP service of this
+repository is released since 24 November 2026, as the public image
+`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, but no scan service is hosted for Make
+users. Nothing here hosts one. Every step below is the owner's: an account, an API key, a deployment to Make, a publication
 and a review request are not done by automation.
 
 ## Verdict
@@ -52,7 +53,7 @@ and a review request are not done by automation.
 | Modules | `scanImage` (Scan an Image, action), `makeApiCall` (Make an API call, universal). |
 | Category | Productivity, or the category Make proposes for image tools in its review form. |
 | Service URL | `https://qrcode-ai.com/` |
-| API documentation link | The scan service's guide in this repository, once the service is released. |
+| API documentation link | The scan service's guide in this repository, `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/http/README.md`. |
 | Support contact | The owner's support address at `qrcode-ai.com`. |
 | Privacy policy | `https://qrcode-ai-com.github.io/privacy/`, live after the owner's review. |
 | Terms | `https://qrcode-ai-com.github.io/terms/`, live after the owner's review. |
@@ -62,7 +63,8 @@ and a review request are not done by automation.
 
 ### 1. A scan service
 
-1. Run the scanner's HTTP service once it is released, on a server you control, behind HTTPS.
+1. Run the scanner's HTTP service, the public image
+   `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, on a server you control, behind HTTPS.
    It has no authentication of its own: keep it on a private network, or behind a gateway that
    only your Make organization can reach.
 2. Check it answers: `curl https://scan.example.com/healthz` with your own address must return
