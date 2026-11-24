@@ -116,8 +116,8 @@ test('the connection is validated against GET /healthz', async () => {
   const answer = await send({ communication: read(connection.codeFiles.communication), connection: {}, parameters: { baseUrl: service } });
   assert.equal(answer.statusCode, 200);
   assert.equal(answer.body.status, 'ok');
-  assert.equal(answer.body.engine, '0.11.0');
-  assert.deepEqual(answer.metadata, { type: 'text', value: `scan service ${answer.body.service}, engine 0.11.0` });
+  assert.equal(answer.body.engine, '0.12.0');
+  assert.deepEqual(answer.metadata, { type: 'text', value: `scan service ${answer.body.service}, engine 0.12.0` });
 });
 
 test('a connection to an address with no scan service fails', async () => {
@@ -145,7 +145,7 @@ for (const mode of ['fast', 'frame', 'full']) {
     const qr = output.detections.find((code) => code.symbology === 'qr_code');
     assert.equal(Buffer.from(qr.content.raw, 'base64').toString('utf8'), EXPECTED.qr_code);
     assert.deepEqual(qr.payload, { kind: 'url', url: EXPECTED.qr_code });
-    assert.equal(output.versions.scanner, '0.11.0');
+    assert.equal(output.versions.scanner, '0.12.0');
     assert.equal(output.trace.engine_panics, 0);
     assert.deepEqual(Object.keys(output).sort(), Object.keys(read(scanModule.codeFiles.samples)).sort());
     const declared = read(scanModule.codeFiles.interface).map((field) => field.name).sort();
@@ -175,5 +175,5 @@ test('Make an API call reaches the same service under the connection', async () 
   });
   assert.equal(answer.output.statusCode, 200);
   assert.equal(answer.output.body.status, 'ok');
-  assert.equal(answer.output.body.engine, '0.11.0');
+  assert.equal(answer.output.body.engine, '0.12.0');
 });
