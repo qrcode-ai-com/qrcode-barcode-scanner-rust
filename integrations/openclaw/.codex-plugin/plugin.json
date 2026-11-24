@@ -1,13 +1,13 @@
 {
   "name": "qrcode-barcode-scanner",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Local QR and barcode scanning with a portable skill and stdio MCP tools.",
   "author": {
     "name": "QR Code AI",
     "url": "https://qrcode-ai.com/"
   },
   "homepage": "https://qrcode-ai.com/en-US/qr-code-scanner/integrations/openclaw",
-  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner",
+  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
   "license": "MIT",
   "keywords": [
     "qr",
