@@ -365,7 +365,7 @@ pulled anonymously and ran the exact-content regression checks. The earlier AGPL
 image stays available; see the [0.11 container guide](docker/v0.11/README.md#run-the-public-image). The public
 0.10 GHCR and Docker Hub images and 0.1 agent archives remain available below.
 
-To scan over HTTP, the [HTTP service](http/README.md) runs the engine's npm package 0.11.0 behind
+To scan over HTTP, the [HTTP service](http/README.md) runs the engine's npm package 0.12.0 behind
 `POST /scan` and answers with its report, unchanged. You build its image from that folder: no
 registry serves it yet. Its workflow builds the image on Linux AMD64 and ARM64 and judges each one
 fresh, read-only and with no route out, on the mixed sample in the three profiles.
