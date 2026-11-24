@@ -123,9 +123,9 @@ published to npm or crates.io.
 
 ## Published agent integrations
 
-These independently versioned integrations reuse the published native engine:
+These independently versioned integrations reuse a published native engine:
 the MCP adapter 0.3.2 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
-the skill and bundle that ClawHub serves at 0.2.0 run engine 0.11.0. Choose the
+the skill and bundle that ClawHub serves at 0.2.0 run the 0.11.0 native engine. Choose the
 interface your application or agent already supports:
 
 | Integration | Public package | Install |
@@ -140,7 +140,7 @@ Node.js 22 and 24** in its
 Its [release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.2)
 was published through GitHub Trusted Publishing; the public bytes match the
 qualified archive, and npm serves provenance metadata. The adapter 0.3.2, the
-skill 0.2.1 and engine 0.12.0 are MIT; adapter 0.3.1 and engine 0.11.0 keep
+skill 0.2.1 and engine 0.12.0 are MIT; adapter 0.3.1 with engine 0.11.0 keeps
 AGPL-3.0-or-later, and skill and bundle 0.2.0 keep MIT-0. The npx acceptance
 workflow also checks Linux and macOS from an empty home.
 The skill and bundle passed registry installation and real
