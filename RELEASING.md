@@ -1371,12 +1371,15 @@ fixed `TZ`: `TZ=Etc/GMT-4` rebuilds it byte for byte
 
 ### Official MCP Registry listing
 
-`mcp-registry-publish.yml` lists the already published npm adapter 0.2.1 as
+`mcp-registry-publish.yml` lists the already published npm adapter 0.3.2 as
 `io.github.qrcode-ai-com/qrcode-barcode-scanner`. It runs only by manual
 dispatch from canonical `main`. It checks the exact npm archive and the
-`server.json` from `agents-v0.2.1`, whose commit and digests are pinned in the
-helper. A matching active version is a successful read-only result. A
-conflicting or inactive version stops the workflow for review.
+`server.json` from `agents-v0.3.2` (commit `3c5e211a`), whose commit and
+digests are pinned in the helper with the repository's current name,
+`qrcode-ai-com/qrcode-barcode-scanner-rust`. A matching active version is a
+successful read-only result. A conflicting or inactive version stops the
+workflow for review. The Registry keeps 0.3.1 as published; listing 0.3.2
+adds a version beside it.
 
 Before dispatch, confirm that the reviewed `mcp-registry` environment admits
 only the `main` branch, requires `ThibautMelen` as its sole reviewer and
@@ -1387,7 +1390,7 @@ OIDC, clears the short-lived publisher token file, then reads back the
 public Registry record.
 
 ```bash
-gh workflow run mcp-registry-publish.yml --ref main --repo qrcode-ai-com/qrcode-barcode-scanner
+gh workflow run mcp-registry-publish.yml --ref main --repo qrcode-ai-com/qrcode-barcode-scanner-rust
 ```
 
 Review the protected deployment and verify the active public record in the

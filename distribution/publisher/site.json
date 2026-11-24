@@ -40,11 +40,11 @@
   ],
   "skill": {
     "name": "qrcode-barcode-scanner",
-    "version": "0.2.0",
-    "release": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.2.1",
-    "archive": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/agents-v0.2.1/qrcode-barcode-scanner-skill-0.2.0.tar.gz",
-    "sha256": "e73e7b5fe8c6da40ce5c1971e35d1f27d923aa8bf574eeb5c70b55e7a18899a8",
-    "revision": "610879c31302337a2b409b21bd18324e2fece178",
+    "version": "0.2.1",
+    "release": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.2",
+    "archive": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/agents-v0.3.2/qrcode-barcode-scanner-skill-0.2.1.tar.gz",
+    "sha256": "e2d7aa22512c507794ab9167e43b565e2edc682f1f582f1744faf14079e01fdf",
+    "revision": "3c5e211a6fb31151b13d0801c98ab118f48dcceb",
     "path": "skills/qrcode-barcode-scanner"
   },
   "integrations": {
