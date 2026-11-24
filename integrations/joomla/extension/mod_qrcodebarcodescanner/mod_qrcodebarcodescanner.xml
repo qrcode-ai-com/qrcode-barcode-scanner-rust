@@ -5,8 +5,8 @@
 	<authorUrl>https://qrcode-ai.com/</authorUrl>
 	<creationDate>2026-11</creationDate>
 	<copyright>(C) 2026 SuperNovae Studio, QR Code AI</copyright>
-	<license>GNU General Public License version 3 or later; the bundled scanner engine files in media/mod_qrcodebarcodescanner/vendor are AGPL-3.0-or-later, see LICENSE-ENGINE.txt</license>
-	<version>0.1.0</version>
+	<license>GNU General Public License version 3 or later; the bundled scanner engine files in media/mod_qrcodebarcodescanner/vendor are MIT, see LICENSE-ENGINE.txt</license>
+	<version>0.1.1</version>
 	<description>MOD_QRCODEBARCODESCANNER_XML_DESCRIPTION</description>
 	<namespace path="src">QRCodeAI\Module\QrcodeBarcodeScanner</namespace>
 	<files>

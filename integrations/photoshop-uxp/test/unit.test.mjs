@@ -25,13 +25,13 @@ import { describeDetections, finalState } from '../src/results.js';
 const HERE = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const ROOT = resolve(HERE, '..', '..');
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const contents = (report) => report.detections.map((row) => [row.symbology, row.content.text]).sort();
 const fixturePath = execFileSync('python3', [join(ROOT, 'scripts/destination-acceptance.py'), 'stage',
   mkdtempSync(join(tmpdir(), 'qrscan-photoshop-'))], { encoding: 'utf8' }).trim();
 const fixture = readFileSync(fixturePath);
-const zipPath = join(HERE, 'build', 'qrcode-barcode-scanner-photoshop-0.1.0.zip');
+const zipPath = join(HERE, 'build', 'qrcode-barcode-scanner-photoshop-0.1.1.zip');
 
 test('the UTF-8 decoder agrees with the standard one, fatal or not', () => {
   const samples = ['', 'STOCK-4827', 'https://qrc-ai.com/76xMa', 'é', '€', '𝄞 and 😀', 'a‮b', '﻿bom',
@@ -216,8 +216,11 @@ test('the zip holds dist/ at its root with the same bytes each time', async () =
   const receipt = JSON.parse(readFileSync(join(HERE, 'build', 'build-receipt.json'), 'utf8'));
   assert.equal(receipt.zip.sha256, sha256(zip));
   assert.equal(receipt.engine.wasm_sha256, WASM_SHA256);
-  assert.match(entries.get('NOTICE.md').toString('utf8'), /176ac96ef16ee330dbfc6ada10327d0b4e23a8b2/);
-  assert.match(entries.get('LICENSE').toString('utf8'), /GNU AFFERO GENERAL PUBLIC LICENSE/);
+  const notice = entries.get('NOTICE.md').toString('utf8');
+  assert.match(notice, /distributed under the MIT License/);
+  assert.doesNotMatch(notice, /AGPL/);
+  assert.match(notice, /897dd50cdf27cbde54d408bf65e1ca4622035d42/);
+  assert.match(entries.get('LICENSE').toString('utf8'), /^MIT License\n/);
 });
 
 test('the listing kit stays within Adobe\'s limits and names the plugin that was built', () => {
@@ -262,7 +265,7 @@ test('the engine starts and reads the fixture in a context shaped like UXP', asy
   vm.runInContext(code.toString('utf8'), context, { filename: 'engine-entry.js' });
   const engine = context.engine;
   const started = engine.startEngine();
-  assert.equal(started.version, '0.11.0');
+  assert.equal(started.version, '0.12.0');
   assert.equal(started.engine.wasm_sha256, WASM_SHA256);
   assert.deepEqual([...started.polyfills], ['TextDecoder', 'TextEncoder', 'performance']);
   const image = decodePng(fixture);

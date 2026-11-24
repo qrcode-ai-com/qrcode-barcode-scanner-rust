@@ -27,13 +27,13 @@ panel says the scanner could not start, stop: the next route is a WebView panel,
 | What | Value |
 | --- | --- |
 | Folder | `integrations/photoshop-uxp/dist/`, from the `photoshop-uxp-plugin` artifact of the `integration-photoshop-uxp` workflow run on `main`, or from `npm ci --ignore-scripts && npm run build` in this folder |
-| Zip of the folder | `build/qrcode-barcode-scanner-photoshop-0.1.0.zip`, to compare a build with the workflow's; Adobe takes the `.ccx`, not this zip |
-| Size | 3,057,794 bytes |
-| SHA-256 | `7d845a2df8739005a887aa3fde9997159811217b1ec4642acf15ca4458425912` |
+| Zip of the folder | `build/qrcode-barcode-scanner-photoshop-0.1.1.zip`, to compare a build with the workflow's; Adobe takes the `.ccx`, not this zip |
+| Size | 3,024,329 bytes |
+| SHA-256 | `32afa41a4e7fed508c140f54d378c7927d6d4d5ebe69717350865d54ef48d01e` |
 | Contents | 13 files, `manifest.json` first, the four panel icons in `icons/`; no hidden file |
-| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, module SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68` |
+| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, module SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868` |
 | Host | Photoshop 25.0 or later, manifest version 5 |
-| License | AGPL-3.0-or-later as a whole, see [LICENSE-NOTES.md](LICENSE-NOTES.md) |
+| License | MIT as a whole, with Apache-2.0 notices for two parts of the engine, see [LICENSE-NOTES.md](LICENSE-NOTES.md) |
 
 The ID in `src/manifest.json`, `qrcode-barcode-scanner`, is a placeholder for development. The
 Marketplace takes a plugin only under the ID its Developer Distribution portal generates for the
@@ -70,9 +70,9 @@ end-user license agreement, which the terms page is.
 
 > Read every QR code and barcode in your Photoshop document, in a selection, or in an image file from your computer. The panel lists each code with its format, such as QR Code, Code 128, EAN-13 or Data Matrix, and its exact text. Invisible characters are shown by their code point, so you can see them. Type the text you expect, and each code shows whether it matches, character for character, before you send a file to print or publish it. The document is read as you see it, with every visible layer merged, and is never changed. Choose Full to read the most, Fast for clear images or Frame for the quickest scan. The open-source QR Code & Barcode Scanner engine by QR Code AI runs inside the panel, on your computer: your documents and files are not sent anywhere, no link is opened for you, and nothing is kept after you close the panel. The plugin asks for no network access; it only opens the file you choose. It reads 19 formats, among them QR Code, Micro QR Code, Data Matrix, Aztec, PDF417, EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39 and ITF. Large documents are read at up to 4096 x 4096 pixels; select an area to read a small code at full size.
 
-**Version details** (version 0.1.0):
+**Version details** (version 0.1.1):
 
-> First version. Scan the document, Scan the selection and Scan an image file read the QR codes and barcodes with the scanner engine 0.11.0, in the plugin's panel. Each code shows its format and exact text, and can be compared with the text you expect. Follows Photoshop's light and dark themes.
+> First version. Scan the document, Scan the selection and Scan an image file read the QR codes and barcodes with the scanner engine 0.12.0, in the plugin's panel. Each code shows its format and exact text, and can be compared with the text you expect. Follows Photoshop's light and dark themes.
 
 ## Media
 

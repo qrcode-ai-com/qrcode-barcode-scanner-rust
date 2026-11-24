@@ -47,7 +47,7 @@ const shots = resolve(option('--shots', join(HERE, 'build', 'screenshots')));
 const headed = process.argv.includes('--headed');
 
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const ORIGIN = 'https://plugin.example.com';
 const PANEL = { width: 300, height: 720 };
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -249,11 +249,11 @@ mkdirSync(out, { recursive: true });
 mkdirSync(shots, { recursive: true });
 
 // ------------------------------------------------------------------ load
-await page.waitForSelector('#about[data-engine-version="0.11.0"]', { state: 'attached', timeout: 60000 });
+await page.waitForSelector('#about[data-engine-version="0.12.0"]', { state: 'attached', timeout: 60000 });
 await page.waitForSelector('#result[data-state="ready"]', { state: 'attached' });
 const about = await page.evaluate(() => Object.fromEntries(['data-package', 'data-version', 'data-wasm-sha256',
   'data-engine-version'].map((name) => [name, document.querySelector('#about').getAttribute(name)])));
-check('load: the engine starts from index.js', about['data-engine-version'] === '0.11.0'
+check('load: the engine starts from index.js', about['data-engine-version'] === '0.12.0'
   && about['data-wasm-sha256'] === WASM_SHA256, JSON.stringify(about));
 const globals = await page.evaluate(() => [TextDecoder.name, TextEncoder.name, typeof performance.now, typeof Worker, typeof fetch]);
 check('load: the plugin brings its own TextDecoder, TextEncoder and performance; no worker, no fetch',

@@ -62,7 +62,7 @@ test('the versions agree and the engine is the pinned npm package', () => {
   assert.equal(scanner.version, own.dependencies['@qrcode-ai-com/qrcode-barcode-scanner-wasm']);
   assert.equal(scanner.wasm_sha256, own.config.wasmSha256);
   assert.match(scanner.integrity, /^sha512-/);
-  assert.equal(scanner.license, 'AGPL-3.0-or-later');
+  assert.equal(scanner.license, 'MIT');
 });
 
 test('manifestFiles reads files, media and languages', () => {

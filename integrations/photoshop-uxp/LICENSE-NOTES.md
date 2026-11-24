@@ -1,7 +1,7 @@
 # License notes for the Photoshop plugin
 
-The source in this folder and the plugin built from it are under different terms. This note lists
-each part.
+The source in this folder and the plugin built from it are both under the MIT License. This note
+lists each part.
 
 ## The source in this folder
 
@@ -20,18 +20,19 @@ plugin.
 
 | Files in the plugin | What they are | Version | License |
 | --- | --- | --- | --- |
-| `manifest.json`, `index.html`, `styles.css`, `icons/` | the plugin's panel, copied from `src/`, and its icons drawn by `scripts/icons.mjs` | 0.1.0 | MIT, in `LICENSE-MIT.txt` |
-| `index.js` | the plugin's code from `src/`, with the scanner engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` inlined by [integrations/wasm-inline](../wasm-inline/) | 0.1.0, engine 0.11.0 | MIT for the plugin's code; AGPL-3.0-or-later for the engine, with Apache-2.0 notices for the code derived from rxing |
-| `LICENSE`, `LICENSE-APACHE-2.0`, `THIRD-PARTY.md` | the engine package's own license files, copied byte for byte | 0.11.0 | |
-| `LICENSE-MIT.txt`, `NOTICE.md` | the MIT License of the plugin's code, and the list of parts with the engine's source revision | 0.1.0 | |
+| `manifest.json`, `index.html`, `styles.css`, `icons/` | the plugin's panel, copied from `src/`, and its icons drawn by `scripts/icons.mjs` | 0.1.1 | MIT, in `LICENSE-MIT.txt` |
+| `index.js` | the plugin's code from `src/`, with the scanner engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` inlined by [integrations/wasm-inline](../wasm-inline/) | 0.1.1, engine 0.12.0 | MIT for the plugin's code and for the engine, with Apache-2.0 notices for the code derived from rxing |
+| `LICENSE`, `LICENSE-APACHE-2.0`, `THIRD-PARTY.md` | the engine package's own license files, copied byte for byte | 0.12.0 | |
+| `LICENSE-MIT.txt`, `NOTICE.md` | the MIT License of the plugin's code, and the list of parts with the engine's source revision | 0.1.1 | |
 
-The plugin as a whole is distributed under AGPL-3.0-or-later, the working default for a bundle that
-holds engine 0.11.0 (decision 12, pending the owner). The MIT parts allow that.
+The plugin as a whole is distributed under the MIT License: the plugin's code and the engine 0.12.0
+are both MIT, and two parts of the engine keep the Apache-2.0 notices of rxing. Version 0.1.0,
+prepared with the engine 0.11.0 under AGPL-3.0-or-later, was never submitted.
 
 The engine module inside `index.js` is the one of the published npm package, byte for byte:
-SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68`, built from revision
-`176ac96ef16ee330dbfc6ada10327d0b4e23a8b2` of this repository. Only its loader changes, so that it
-takes the module from the file instead of fetching it. The engine's corresponding source is that
+SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868`, built from revision
+`897dd50cdf27cbde54d408bf65e1ca4622035d42` (tag `v0.12.0`) of this repository. Only its loader changes, so that it
+takes the module from the file instead of fetching it. The engine's source is that
 revision of <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust>, named in `NOTICE.md`.
 
 The `TextDecoder`, `TextEncoder` and `performance` stand-ins in `src/polyfills.js` are this
@@ -45,18 +46,17 @@ answers when the panel runs. The build keeps both outside `index.js` and refuses
 engine is started (the module inlined, then started synchronously) follows the pattern Adobe shows
 in its `wasm-rust-sample`; the code here is written for this plugin.
 
-So the plugin combines no code under another vendor's license, and AGPL-3.0-or-later applies to it
+So the plugin combines no code under another vendor's license, and the MIT License applies to it
 as it is. Adobe's Developer Terms of Use, which the owner accepts before using the UXP Developer
 Tool and the Developer Distribution portal, govern packaging and the Marketplace listing; they are
 not a license of the plugin. As read on 10 November 2026, those terms forbid putting Adobe's
 developer tools under AGPL-type terms (clause 6.6), which is why none of them is in the plugin, and
 ask for an end-user license agreement (clause 6.15), which is why the listing gives a terms URL.
 
-## If the owner chooses another license
+## If the engine's license changes
 
-The engine's source is under the MIT License since 14 November 2026. Once a version built from it
-is published to npm, pinning it here instead of 0.11.0 makes the plugin MIT as a whole. That changes
-the pinned version, `banner()` and `notice()` in `scripts/build.mjs`, the footer of
-`src/index.html` and this file, not the code.
+`scripts/build.mjs` refuses an engine that is not MIT or does not ship the MIT text, so a future
+engine under other terms needs `banner()` and `notice()`, the footer of `src/index.html` and this
+file reviewed before it can be built.
 
 This note describes the licenses as written. It is not legal advice.

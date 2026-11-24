@@ -1,6 +1,6 @@
 // The plugin zip on a new WordPress site, installed and removed the way a site owner does it.
 //
-//   node test/playground.mjs [--zip build/qrcode-barcode-scanner-0.1.0.zip] [--wp latest]
+//   node test/playground.mjs [--zip build/qrcode-barcode-scanner-0.1.1.zip] [--wp latest]
 //       [--php 8.3] [--out build/acceptance] [--port 9400] [--screenshots DIR] [--headed]
 //
 // It starts WordPress Playground (WordPress on PHP compiled to WebAssembly, with SQLite) with
@@ -320,7 +320,7 @@ try {
   check(loadedBefore.length === 0, 'block: the engine is not downloaded with the page', loadedBefore);
   const blockReports = await threeScans(visit, 'block');
   const blockFacts = await pageFacts(visit, blockUrl);
-  check(blockFacts.package.engine_version === '0.11.0', 'block: the engine 0.11.0 is loaded', blockFacts.package);
+  check(blockFacts.package.engine_version === '0.12.0', 'block: the engine 0.12.0 is loaded', blockFacts.package);
   check(await visit.locator('[data-qrbs-root] .qrbs__credit').count() === 0, 'block: no credit line by default');
   // The only links in the scanner are the decoded link's own button, never opened by itself.
   check(blockFacts.links.every((link) => link.href === 'https://qrc-ai.com/76xMa'
@@ -433,7 +433,7 @@ try {
       '--fast', join(reports, 'fast.json'), '--frame', join(reports, 'frame.json'),
       '--full', join(reports, 'full.json'),
       '--destination', `WordPress plugin zip, ${record}, WordPress ${wp} on PHP ${php} (Playground)`,
-      '--identifier', `${SLUG}-${VERSION}.zip`, '--version', '0.11.0', '--url', sourceUrl,
+      '--identifier', `${SLUG}-${VERSION}.zip`, '--version', '0.12.0', '--url', sourceUrl,
       '--install', 'wp-admin Plugins > Add New > Upload Plugin, then Activate',
       ...(runUrl ? ['--run-url', runUrl] : []), '--receipt', receipt);
     await judge('destination-acceptance.py', 'removed', '--gone', `${process.execPath} ${SERVED} ${wasmUrl} ${WASM_SHA256}`,

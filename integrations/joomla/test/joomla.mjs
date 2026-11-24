@@ -1,6 +1,6 @@
 // The package on a new Joomla site, installed and removed the way a site administrator does it.
 //
-//   node test/joomla.mjs [--zip build/pkg_qrcodebarcodescanner-0.1.0.zip]
+//   node test/joomla.mjs [--zip build/pkg_qrcodebarcodescanner-0.1.1.zip]
 //       [--image joomla:6.2.0-php8.4-apache] [--db-image mariadb:11.8] [--port 8090]
 //       [--out build/acceptance] [--screenshots DIR] [--headed] [--keep]
 //
@@ -377,7 +377,7 @@ try {
   check(loadedBefore.length === 0, 'visitor: the engine is not downloaded with the page', loadedBefore);
   const moduleReports = await threeScans(visit, 'visitor');
   const moduleFacts = await pageFacts(visit, `${base}/`);
-  check(moduleFacts.package.engine_version === '0.11.0', 'visitor: the engine 0.11.0 is loaded', moduleFacts.package);
+  check(moduleFacts.package.engine_version === '0.12.0', 'visitor: the engine 0.12.0 is loaded', moduleFacts.package);
   check(await visit.locator('[data-qrbs-root] .qrbs__credit').count() === 0, 'visitor: no credit line by default');
   check(moduleFacts.links.every((link) => link.href === 'https://qrc-ai.com/76xMa'
     && link.rel === 'noopener noreferrer nofollow'), 'visitor: the only link is the decoded one, marked nofollow',
@@ -476,7 +476,7 @@ try {
     '--fast', join(reports, 'fast.json'), '--frame', join(reports, 'frame.json'),
     '--full', join(reports, 'full.json'),
     '--destination', `Joomla package, site module, Joomla ${joomla} on PHP ${php} (${image})`,
-    '--identifier', `pkg_qrcodebarcodescanner-${VERSION}.zip`, '--version', '0.11.0', '--url', sourceUrl,
+    '--identifier', `pkg_qrcodebarcodescanner-${VERSION}.zip`, '--version', '0.12.0', '--url', sourceUrl,
     '--install', 'System > Install > Extensions > Upload Package File, then Content > Site Modules > New',
     ...(runUrl ? ['--run-url', runUrl] : []), '--receipt', receipt);
   judge('destination-acceptance.py', 'removed', '--gone', `${process.execPath} ${SERVED} ${wasmUrl} ${WASM_SHA256}`,

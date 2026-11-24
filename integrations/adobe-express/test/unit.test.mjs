@@ -19,13 +19,13 @@ import { combinedState, describeDetections, finalState, visibleText } from '../s
 const HERE = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const ROOT = resolve(HERE, '..', '..');
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const contents = (report) => report.detections.map((row) => [row.symbology, row.content.text]).sort();
 const fixturePath = execFileSync('python3', [join(ROOT, 'scripts/destination-acceptance.py'), 'stage',
   mkdtempSync(join(tmpdir(), 'qrscan-express-'))], { encoding: 'utf8' }).trim();
 const fixture = readFileSync(fixturePath);
-const zipPath = join(HERE, 'build', 'qrcode-barcode-scanner-adobe-express-0.1.0.zip');
+const zipPath = join(HERE, 'build', 'qrcode-barcode-scanner-adobe-express-0.1.1.zip');
 
 /** The built worker in its own context, as a browser runs a classic worker script. */
 function startWorker() {
@@ -106,9 +106,10 @@ test('the zip holds dist/ at its root, under the limit, with the same bytes each
   assert.equal(receipt.zip.sha256, sha256(zip));
   assert.equal(receipt.engine.wasm_sha256, WASM_SHA256);
   const notice = entries.get('NOTICE.md').toString('utf8');
-  assert.match(notice, /AGPL-3\.0-or-later/);
-  assert.match(notice, /176ac96ef16ee330dbfc6ada10327d0b4e23a8b2/);
-  assert.match(entries.get('LICENSE').toString('utf8'), /GNU AFFERO GENERAL PUBLIC LICENSE/);
+  assert.match(notice, /distributed under the MIT License/);
+  assert.doesNotMatch(notice, /AGPL/);
+  assert.match(notice, /897dd50cdf27cbde54d408bf65e1ca4622035d42/);
+  assert.match(entries.get('LICENSE').toString('utf8'), /^MIT License\n/);
   assert.throws(() => writeZip([{ name: '../x', bytes: Buffer.from('x') }]), /relative/);
 });
 
@@ -134,7 +135,7 @@ test('the built worker starts the engine and reads the fixture in fast, frame an
   const send = startWorker();
   const init = await send({ type: 'init' });
   assert.equal(init.ok, true);
-  assert.equal(init.version, '0.11.0');
+  assert.equal(init.version, '0.12.0');
   assert.equal(init.engine.wasm_sha256, WASM_SHA256);
   for (const profile of ['fast', 'frame', 'full']) {
     const bytes = new Uint8Array(fixture).buffer;

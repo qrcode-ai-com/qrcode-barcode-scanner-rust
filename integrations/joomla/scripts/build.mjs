@@ -70,6 +70,12 @@ export function scannerPackage(root = HERE) {
     fail(`${ENGINE_PACKAGE} is not installed: run npm ci --ignore-scripts first`);
   }
   if (installed.version !== pinned) fail(`${ENGINE_PACKAGE} ${installed.version} installed, ${pinned} pinned`);
+  // LICENSE-ENGINE.txt and the manifests' <license> tags state the engine's license: a change of it
+  // needs a review of those texts before a build.
+  if (installed.license !== 'MIT') fail(`${ENGINE_PACKAGE} ${pinned} is licensed ${installed.license}, not MIT`);
+  if (!/^MIT License\n/.test(readFileSync(join(directory, 'LICENSE'), 'utf8'))) {
+    fail(`${ENGINE_PACKAGE} ${pinned} does not ship the MIT License text`);
+  }
   const info = JSON.parse(readFileSync(join(directory, 'build-info.json'), 'utf8'));
   const wasm = readFileSync(join(directory, 'qrcode-barcode-scanner_bg.wasm'));
   const actual = sha256(wasm);
@@ -147,11 +153,11 @@ media/mod_qrcodebarcodescanner/vendor/qrcode-barcode-scanner-wasm/:
   qrcode-barcode-scanner_bg.wasm       the compiled engine (WebAssembly)
   build-info.json, package.json        how the module was built, and its SHA-256
 
-They are licensed under the GNU Affero General Public License version 3 or (at your option) any
-later version (AGPL-3.0-or-later), in vendor/qrcode-barcode-scanner-wasm/LICENSE, with
-Apache-2.0 notices for two parts that derive from rxing (LICENSE-APACHE-2.0, THIRD-PARTY.md).
+They are licensed under the MIT License, in vendor/qrcode-barcode-scanner-wasm/LICENSE, a
+licence compatible with the GNU GPL, with Apache-2.0 notices for two parts that derive from
+rxing (LICENSE-APACHE-2.0, THIRD-PARTY.md).
 
-The compiled engine is not encoded or obfuscated. Its corresponding source is the public
+The compiled engine is not encoded or obfuscated. Its source is the public
 repository ${REPOSITORY}
 at revision ${scanner.source_revision} (tag v${scanner.version}), and its build script is
 ${REPOSITORY}/blob/v${scanner.version}/scripts/build-wasm.sh

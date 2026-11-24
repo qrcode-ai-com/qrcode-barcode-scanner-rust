@@ -3,9 +3,9 @@ Tags: qr code, barcode, scanner, qr code reader, barcode reader
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.0
-License: AGPL-3.0-or-later
-License URI: https://www.gnu.org/licenses/agpl-3.0.html
+Stable tag: 0.1.1
+License: MIT
+License URI: https://opensource.org/licenses/MIT
 
 Read QR codes and barcodes from an image or a photo, in the visitor's browser. The image is never uploaded. Open source.
 
@@ -30,7 +30,7 @@ A decoded link is shown as text with an explicit button, and is never opened by 
 
 The plugin and its scanner engine are open source. The source of this plugin, with the script that builds this zip, is at [github.com/qrcode-ai-com/qrcode-barcode-scanner-rust](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/integrations/wordpress). The editor script in `build/` is compiled from `src/` with @wordpress/scripts; both are in the plugin.
 
-The WebAssembly module `assets/vendor/qrcode-barcode-scanner-wasm/qrcode-barcode-scanner_bg.wasm` is compiled from the engine's Rust source, at tag [v0.11.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0), by the script [scripts/build-wasm.sh](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/scripts/build-wasm.sh). The file is copied unchanged from the npm package `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0. Its `build-info.json` records the compiler, the settings and the SHA-256 of the module.
+The WebAssembly module `assets/vendor/qrcode-barcode-scanner-wasm/qrcode-barcode-scanner_bg.wasm` is compiled from the engine's Rust source, at tag [v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0), by the script [scripts/build-wasm.sh](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/scripts/build-wasm.sh). The file is copied unchanged from the npm package `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0. Its `build-info.json` records the compiler, the settings and the SHA-256 of the module.
 
 = Server-side scanning =
 
@@ -42,7 +42,7 @@ The plugin collects no personal data and sends nothing anywhere. The chosen imag
 
 = Licenses =
 
-The plugin as a whole is distributed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later), because it includes the scanner engine 0.11.0, which is published under that license. The plugin's own files are also available under the MIT License (`LICENSE-MIT`). Two parts of the engine derive from rxing and keep their Apache-2.0 notices (`assets/vendor/qrcode-barcode-scanner-wasm/THIRD-PARTY.md`). `LICENSE-NOTES.txt` lists each part.
+The plugin and the scanner engine 0.12.0 it includes are distributed under the MIT License (`LICENSE`). Two parts of the engine derive from rxing and keep their Apache-2.0 notices (`assets/vendor/qrcode-barcode-scanner-wasm/LICENSE-APACHE-2.0` and `THIRD-PARTY.md`). `LICENSE-NOTES.txt` lists each part.
 
 == Frequently Asked Questions ==
 
@@ -73,10 +73,13 @@ Nothing. It creates no option, no table and no file, so deleting the plugin remo
 
 == Changelog ==
 
+= 0.1.1 =
+* First release: the scanner block and the `[qrcode_barcode_scanner]` shortcode, with the scanner engine 0.12.0. The plugin and its engine are under the MIT License.
+
 = 0.1.0 =
-* First release: the scanner block and the `[qrcode_barcode_scanner]` shortcode, with the scanner engine 0.11.0.
+* Prepared with the scanner engine 0.11.0 and never released.
 
 == Upgrade Notice ==
 
-= 0.1.0 =
+= 0.1.1 =
 First release.

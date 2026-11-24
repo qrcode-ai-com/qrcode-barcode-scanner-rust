@@ -15,12 +15,12 @@ Adobe's pages behind these values, read on 21 November 2026:
 
 | What | Value |
 | --- | --- |
-| File | `integrations/adobe-express/build/qrcode-barcode-scanner-adobe-express-0.1.0.zip`, from the `adobe-express-add-on` artifact of the `integration-adobe-express` workflow run on `main`, or from `npm ci --ignore-scripts && npm run build` in this folder |
-| Size | 3,050,268 bytes; Adobe's limit is 50 MB |
-| SHA-256 | `83e21fb2504518465a917483ef6a24b130d3591cd2798f1f392926ad62e0a0e8` |
+| File | `integrations/adobe-express/build/qrcode-barcode-scanner-adobe-express-0.1.1.zip`, from the `adobe-express-add-on` artifact of the `integration-adobe-express` workflow run on `main`, or from `npm ci --ignore-scripts && npm run build` in this folder |
+| Size | 3,016,795 bytes; Adobe's limit is 50 MB |
+| SHA-256 | `a7f7202b2bb70030ea58efd80e270668c38ab917b0006a30a26a119236592b78` |
 | Contents | 12 files at the root, `manifest.json` first; no hidden file; relative paths only |
-| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, module SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68` |
-| License | AGPL-3.0-or-later as a whole, see [LICENSE-NOTES.md](LICENSE-NOTES.md) |
+| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, module SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868` |
+| License | MIT as a whole, with Apache-2.0 notices for two parts of the engine, see [LICENSE-NOTES.md](LICENSE-NOTES.md) |
 
 The build stores the files uncompressed with one fixed date, so the same lockfile gives the same
 bytes on any machine; `build/build-receipt.json` of the run records the hash of the zip and of each
@@ -49,9 +49,9 @@ to this README.
 
 > Read every QR code and barcode on a page of your design, on every page of your document, or in an image file from your computer. The panel lists each code with its format, such as QR Code, Code 128, EAN-13 or Data Matrix, and its exact text. Invisible characters are shown by their code point, so you can see them. Type the text you expect, and each code shows whether it matches, character for character, before you print or publish. Choose Full to read the most, Fast for clear images or Frame for the quickest scan. The open-source QR Code & Barcode Scanner engine by QR Code AI runs inside the add-on, in your browser: your pages and files are not sent to any other service, no link is opened for you, and nothing is kept after you close the panel. It reads 19 formats, among them QR Code, Micro QR Code, Data Matrix, Aztec, PDF417, EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39 and ITF.
 
-**Release notes** (version 0.1.0):
+**Release notes** (version 0.1.1):
 
-> First version. Scan this page, Scan all pages (the first 20) and Scan an image file read the QR codes and barcodes with the scanner engine 0.11.0, in the add-on's panel. Each code shows its format and exact text, and can be compared with the text you expect. Light and dark themes.
+> First version. Scan this page, Scan all pages (the first 20) and Scan an image file read the QR codes and barcodes with the scanner engine 0.12.0, in the add-on's panel. Each code shows its format and exact text, and can be compared with the text you expect. Light and dark themes.
 
 ## Media
 

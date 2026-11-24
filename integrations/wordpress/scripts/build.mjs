@@ -67,6 +67,12 @@ export function scannerPackage(root = HERE) {
     fail(`${PACKAGE} is not installed: run npm ci --ignore-scripts first`);
   }
   if (installed.version !== pinned) fail(`${PACKAGE} ${installed.version} installed, ${pinned} pinned`);
+  // The plugin is MIT as a whole because its engine is: a change of the engine's license needs a
+  // review of the plugin header, readme.txt and LICENSE-NOTES.txt before a build.
+  if (installed.license !== 'MIT') fail(`${PACKAGE} ${pinned} is licensed ${installed.license}, not MIT`);
+  if (!/^MIT License\n/.test(readFileSync(join(directory, 'LICENSE'), 'utf8'))) {
+    fail(`${PACKAGE} ${pinned} does not ship the MIT License text`);
+  }
   const info = JSON.parse(readFileSync(join(directory, 'build-info.json'), 'utf8'));
   const wasm = readFileSync(join(directory, 'qrcode-barcode-scanner_bg.wasm'));
   const actual = sha256(wasm);
@@ -172,18 +178,16 @@ function licenseNotes(scanner, version) {
   return `Licenses in this plugin
 =======================
 
-QR Code & Barcode Scanner for WordPress ${version}. The plugin as a whole is distributed under the
-GNU Affero General Public License, version 3 or (at your option) any later version
-(AGPL-3.0-or-later), in LICENSE, because it includes the scanner engine below.
+QR Code & Barcode Scanner for WordPress ${version}. The plugin, with the scanner engine it
+includes, is distributed under the MIT License, in LICENSE.
 
 - The plugin's own files (${SLUG}.php, includes/, assets/scanner/, src/ and
-  build/, compiled from src/) are project-authored source of QR Code AI, also available
-  under the MIT License in LICENSE-MIT.
+  build/, compiled from src/) are project-authored source of QR Code AI, under the MIT License.
 - assets/vendor/qrcode-barcode-scanner-wasm/ holds files copied unchanged from the published
   npm package ${scanner.name} ${scanner.version}. That package is licensed
   ${scanner.license} (assets/vendor/qrcode-barcode-scanner-wasm/LICENSE), with Apache-2.0
   notices for the parts that derive from rxing (LICENSE-APACHE-2.0, THIRD-PARTY.md).
-- qrcode-barcode-scanner_bg.wasm is compiled code. Its corresponding source is the public
+- qrcode-barcode-scanner_bg.wasm is compiled code. Its source is the public
   repository https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at revision
   ${scanner.source_revision} (tag v${scanner.version}); build-info.json records the compiler,
   the settings and the SHA-256 of the module, and the build script is
@@ -214,8 +218,7 @@ export function pluginFiles(scanner, version, editor, root = HERE) {
     add(`assets/vendor/qrcode-barcode-scanner-wasm/${name}`, readFileSync(join(scanner.directory, name)));
   }
   add('includes/engine.php', engineFile(scanner));
-  add('LICENSE', readFileSync(join(scanner.directory, 'LICENSE')));
-  add('LICENSE-MIT', readFileSync(join(root, 'LICENSE')));
+  add('LICENSE', readFileSync(join(root, 'LICENSE')));
   add('LICENSE-NOTES.txt', licenseNotes(scanner, version));
   add('PROVENANCE.json', json({
     schema: 'qrscan-wordpress-plugin-provenance/1',
