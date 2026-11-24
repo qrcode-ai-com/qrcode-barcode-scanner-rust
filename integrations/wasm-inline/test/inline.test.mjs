@@ -33,9 +33,9 @@ test('the pinned package is checked: version, module SHA-256, lockfile entry', (
   assert.equal(scanner.name, PACKAGE);
   assert.equal(scanner.version, ENGINE);
   assert.equal(scanner.wasm_sha256, WASM_SHA256);
-  assert.equal(scanner.wasm_bytes, 2220640);
-  assert.equal(scanner.license, 'AGPL-3.0-or-later');
-  assert.equal(scanner.source_revision, '176ac96ef16ee330dbfc6ada10327d0b4e23a8b2');
+  assert.equal(scanner.wasm_bytes, 2220631);
+  assert.equal(scanner.license, 'MIT');
+  assert.equal(scanner.source_revision, '897dd50cdf27cbde54d408bf65e1ca4622035d42');
   assert.match(scanner.integrity, /^sha512-/);
 });
 
@@ -48,12 +48,12 @@ test('the generated module holds the module bytes and no reference to a file nex
   const decoded = Buffer.from(base64, 'base64');
   assert.equal(sha256(decoded), WASM_SHA256, 'the base64 is the pinned module');
   assert.equal(receipt.base64_bytes, base64.length);
-  assert.equal(receipt.base64_bytes, 2960856, 'about 2.96 MB of base64 for the 2,220,640-byte module');
+  assert.equal(receipt.base64_bytes, 2960844, 'about 2.96 MB of base64 for the 2,220,631-byte module');
   assert.equal(receipt.output_bytes, Buffer.byteLength(code));
   assert.equal(receipt.output_sha256, sha256(Buffer.from(code)));
-  assert.match(code, /^\/\*! QR Code & Barcode Scanner engine 0\.11\.0/, 'the license banner first');
-  assert.match(code, /License of this part: AGPL-3\.0-or-later/);
-  assert.match(code, /revision 176ac96ef16ee330dbfc6ada10327d0b4e23a8b2/);
+  assert.match(code, /^\/\*! QR Code & Barcode Scanner engine 0\.12\.0/, 'the license banner first');
+  assert.match(code, /License of this part: MIT,/);
+  assert.match(code, /revision 897dd50cdf27cbde54d408bf65e1ca4622035d42/);
 });
 
 test('only the default input line differs from the package glue', () => {
@@ -84,8 +84,8 @@ test('initInline (asynchronous) reads the mixed fixture in fast, frame and full'
   await engine.initInline();
   assert.equal(engine.version(), ENGINE);
   assert.deepEqual(engine.INLINE_MODULE, {
-    package: PACKAGE, version: ENGINE, license: 'AGPL-3.0-or-later', wasm_sha256: WASM_SHA256,
-    wasm_bytes: 2220640, source_revision: '176ac96ef16ee330dbfc6ada10327d0b4e23a8b2',
+    package: PACKAGE, version: ENGINE, license: 'MIT', wasm_sha256: WASM_SHA256,
+    wasm_bytes: 2220631, source_revision: '897dd50cdf27cbde54d408bf65e1ca4622035d42',
   });
   for (const profile of PROFILES) {
     const report = engine.scan_image(new Uint8Array(fixture), profile, undefined, undefined, 0);
@@ -153,10 +153,10 @@ test('a package that is not the pinned one is refused', () => {
       /differs from the pin/],
     ['no-hash', (root) => editJson(join(root, 'package.json'), (p) => { delete p.config; }),
       /config\.wasmSha256/],
-    ['range', (root) => editJson(join(root, 'package.json'), (p) => { p.devDependencies[PACKAGE] = '^0.11.0'; }),
+    ['range', (root) => editJson(join(root, 'package.json'), (p) => { p.devDependencies[PACKAGE] = '^0.12.0'; }),
       /one exact version/],
     ['other-version', (root) => editJson(join(root, 'package.json'), (p) => { p.devDependencies[PACKAGE] = '0.10.9'; }),
-      /0\.11\.0 installed, 0\.10\.9 pinned/],
+      /0\.12\.0 installed, 0\.10\.9 pinned/],
     ['lock', (root) => editJson(join(root, 'package-lock.json'), (l) => { delete l.packages[`node_modules/${PACKAGE}`]; }),
       /package-lock\.json does not pin/],
   ];

@@ -45,8 +45,8 @@ const shots = resolve(option('--shots', join(HERE, 'build', 'screenshots')));
 const headed = process.argv.includes('--headed');
 
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const ENGINE = { package: '@qrcode-ai-com/qrcode-barcode-scanner-wasm', version: '0.11.0',
-  wasm_sha256: 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68' };
+const ENGINE = { package: '@qrcode-ai-com/qrcode-barcode-scanner-wasm', version: '0.12.0',
+  wasm_sha256: '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868' };
 const SOURCE_URL = 'https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust';
 const APP_ORIGIN = 'https://app.example.com';
 const PAGE_URL = `${APP_ORIGIN}/canva/index.html`;
@@ -294,11 +294,11 @@ mkdirSync(shots, { recursive: true });
 // ------------------------------------------------------------------ load
 const panel = await openPanel();
 const { page } = panel;
-await page.waitForSelector('#about[data-engine-version="0.11.0"]', { state: 'attached', timeout: 60000 });
+await page.waitForSelector(`#about[data-engine-version="${ENGINE.version}"]`, { state: 'attached', timeout: 60000 });
 await page.waitForSelector('#result[data-state="ready"]', { state: 'attached' });
 let seen = await host(page);
 const about = await page.evaluate(() => ({ ...document.querySelector('#about').dataset }));
-check('load: the engine starts under the policy', about.engineVersion === '0.11.0'
+check('load: the engine starts under the policy', about.engineVersion === ENGINE.version
   && about.package === ENGINE.package && about.wasmSha256 === ENGINE.wasm_sha256, JSON.stringify(about));
 check('load: render is called once through prepareDesignEditor', seen.rendered === 1);
 check('load: the App UI Kit registers its version', seen.uiKitVersion === '5.16.1', seen.uiKitVersion);

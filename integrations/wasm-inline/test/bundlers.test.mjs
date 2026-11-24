@@ -64,7 +64,7 @@ test('esbuild with the plugin: one IIFE script, under 5 MB, that reads the fixtu
   const code = readFileSync(join(directory, 'dist', 'entry.js'), 'utf8');
   assert.ok(code.length < CANVA_LIMIT, `${code.length} bytes`);
   assert.equal(code.includes('import.meta'), false);
-  assert.match(code, /QR Code & Barcode Scanner engine 0\.11\.0/, 'the license banner survives minifying');
+  assert.match(code, /QR Code & Barcode Scanner engine 0\.12\.0/, 'the license banner survives minifying');
   assert.equal(receipts.length, 1);
   judgeRun(await runClassic(code), 'esbuild');
 });

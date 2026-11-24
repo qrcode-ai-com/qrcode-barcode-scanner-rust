@@ -19,7 +19,7 @@ import { combinedState, describeDetections, finalState, visibleText } from '../s
 const HERE = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const ROOT = resolve(HERE, '..', '..');
 const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
-const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const scratch = (name) => mkdtempSync(join(tmpdir(), `qrscan-canva-${name}-`));
 const contents = (report) => report.detections.map((row) => [row.symbology, row.content.text]).sort();
@@ -132,7 +132,7 @@ test('the controller listens to image selections and reads the fixture in fast, 
   assert.deepEqual(host.calls.registered, ['image'], 'one registration, scope image');
   assert.equal(await scanner.loaded, true);
   assert.equal(scanner.getState().phase, 'ready');
-  assert.equal(scanner.getState().engineVersion, '0.11.0');
+  assert.equal(scanner.getState().engineVersion, '0.12.0');
   await scanner.scan('full');
   assert.deepEqual(scanner.getState().error, { kind: 'no-selection' }, 'nothing selected yet');
   host.select(['img-1']);
@@ -201,8 +201,10 @@ test('dist/app.js is one file under 5 MB with the engine inside and nothing load
   assert.ok(existsSync(path), 'run npm run build first');
   const code = readFileSync(path, 'utf8');
   assert.ok(code.length <= 5_000_000, `${code.length} bytes`);
-  assert.match(code, /^\/\*! QR Code & Barcode Scanner for Canva 0\.1\.0/);
-  assert.match(code, /QR Code & Barcode Scanner engine 0\.11\.0/, 'the engine license banner is kept');
+  assert.match(code, /^\/\*! QR Code & Barcode Scanner for Canva 0\.1\.1/);
+  assert.match(code, /the scanner engine 0\.12\.0 \(MIT, with\n/, 'the banner names the MIT engine');
+  assert.match(code, /QR Code & Barcode Scanner engine 0\.12\.0/, 'the engine license banner is kept');
+  assert.match(code, /License of this part: MIT,/, 'the engine banner names its MIT license');
   // Code built from text, a worker or a module loaded from elsewhere would break under Canva's
   // policy: these strings must not appear in the bundle.
   for (const needle of ['import.meta', '_bg.wasm', 'new Worker', 'importScripts', 'eval(']) {
@@ -232,7 +234,9 @@ test('dist/app.js ends with the license text of every package it holds', () => {
   for (const item of receipt.bundled) {
     assert.ok(footer.includes(`${item.name} ${item.version} (${item.license})`), item.name);
   }
-  for (const phrase of ['GNU AFFERO GENERAL PUBLIC LICENSE', 'Apache License', 'Canva Pty Ltd',
+  assert.ok(footer.includes('==== @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.12.0 (MIT)'), 'the engine is MIT');
+  assert.equal(footer.includes('GNU AFFERO GENERAL PUBLIC LICENSE'), false, 'no AGPL part');
+  for (const phrase of ['Copyright (c) 2026 SuperNovae Studio', 'Apache License', 'Canva Pty Ltd',
     'You must only use the Software Components and any Derivative on the Canva']) {
     assert.ok(footer.includes(phrase), phrase);
   }

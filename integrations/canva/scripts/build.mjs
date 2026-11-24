@@ -36,7 +36,7 @@ export function banner(version) {
   return `/*! QR Code & Barcode Scanner for Canva ${version}, by QR Code AI.
  * This file combines parts under different licenses; LICENSE-NOTES in
  * https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/integrations/canva
- * lists each part: the app's own code (MIT), the scanner engine 0.11.0 (AGPL-3.0-or-later, with
+ * lists each part: the app's own code (MIT), the scanner engine ${own().dependencies[PACKAGE]} (MIT, with
  * Apache-2.0 notices), Canva's SDK and App UI Kit components (Canva's licence), React and the
  * other npm packages (their licenses, kept below).
  */`;
@@ -142,6 +142,13 @@ export async function bundle({ minify = true } = {}) {
   for (const warning of result.warnings) console.warn(`build: warning: ${warning.text}`);
   if (result.outputFiles.length !== 1) fail(`${result.outputFiles.length} output files, not one`);
   if (!inline) fail('the engine was not inlined');
+  // The banner, the panel's license line and LICENSE-NOTES.md state an MIT engine.
+  if (inline.license !== 'MIT') {
+    fail(`the engine ${inline.version} is licensed ${inline.license}: review the banner, src/messages.js and LICENSE-NOTES.md`);
+  }
+  if (!/^MIT License\n/.test(readFileSync(join(HERE, 'node_modules', ...PACKAGE.split('/'), 'LICENSE'), 'utf8'))) {
+    fail(`the engine ${inline.version} does not ship the MIT License text`);
+  }
   const packages = bundledPackages(result.metafile);
   const footer = new TextEncoder().encode(licenseFooter(packages));
   const bundled = result.outputFiles[0].contents;

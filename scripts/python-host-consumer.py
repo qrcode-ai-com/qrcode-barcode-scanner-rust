@@ -12,7 +12,7 @@
   1. create a virtual environment outside the checkout (`python -m venv`, or DIR when --venv
      names a folder that does not exist yet), with PYTHON (default: this interpreter);
   2. install into it with its own pip, once per --install (each value is split like a shell
-     line: `qrcode-barcode-scanner==0.11.0`, `dist/plugin-0.1.0-py3-none-any.whl napari==0.10.0`,
+     line: `qrcode-barcode-scanner==0.12.0`, `dist/plugin-0.1.0-py3-none-any.whl napari==0.10.0`,
      `-r examples/streamlit/requirements.txt`), then `pip check`;
   3. copy the checked mixed fixture outside the checkout (`destination-acceptance.py stage`);
   4. run the host's scan command inside the environment, from --cwd (default: the checkout).

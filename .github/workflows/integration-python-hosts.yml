@@ -76,9 +76,9 @@ jobs:
           mkdir -p receipt
           python scripts/python-host-consumer.py run \
             --destination "PyPI wheel through the Python host kit" \
-            --identifier qrcode-barcode-scanner --version 0.11.0 \
-            --url https://pypi.org/project/qrcode-barcode-scanner/0.11.0/ \
-            --install "qrcode-barcode-scanner==0.11.0" \
+            --identifier qrcode-barcode-scanner --version 0.12.0 \
+            --url https://pypi.org/project/qrcode-barcode-scanner/0.12.0/ \
+            --install "qrcode-barcode-scanner==0.12.0" \
             --uninstall qrcode-barcode-scanner --gone-import qrcode_barcode_scanner \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             --receipt "receipt/acceptance-kit-${RUNNER_OS}.json"

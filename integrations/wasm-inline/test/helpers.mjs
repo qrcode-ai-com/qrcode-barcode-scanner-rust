@@ -8,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 export const HERE = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const ROOT = resolve(HERE, '..', '..');
-export const ENGINE = '0.11.0';
-export const WASM_SHA256 = 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68';
+export const ENGINE = '0.12.0';
+export const WASM_SHA256 = '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868';
 // The two codes of fixtures/symbology/mixed-code128-qr.png (case qr-and-code128 of
 // fixtures/consumer-truth.json), each exactly once, sorted by symbology.
 export const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76xMa']];
@@ -26,7 +26,7 @@ export function stageFixture(directory = scratch('fixture')) {
     directory], { encoding: 'utf8' }).trim();
 }
 
-/** Assert one report of the fixture: the two codes, uncut, from engine 0.11.0. */
+/** Assert one report of the fixture: the two codes, uncut, from engine 0.12.0. */
 export function assertMixed(assert, report, label) {
   assert.deepEqual(contents(report), EXPECTED, `${label}: the two exact payloads, nothing else`);
   assert.equal(report.trace.budget_exhausted, false, `${label}: not cut by a budget`);

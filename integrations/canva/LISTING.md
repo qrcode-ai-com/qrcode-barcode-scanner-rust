@@ -12,22 +12,22 @@ Canva's pages behind these values, read on 21 November 2026:
 [submission checklist](https://www.canva.dev/docs/apps/submission-checklist/),
 [submitting apps](https://www.canva.dev/docs/apps/submitting-apps/).
 
-## Before anything: the license decision
+## The licenses in the file
 
-`dist/app.js` combines engine 0.11.0 (AGPL-3.0-or-later) with Canva's packages, whose license
-allows their use on the Canva Platform only. [LICENSE-NOTES.md](LICENSE-NOTES.md) explains why
-this needs the owner's decision and the two routes that settle it. Do not upload the file before
-that decision.
+`dist/app.js` combines engine 0.12.0 (MIT, with Apache-2.0 notices) with Canva's packages, whose
+license allows their use on the Canva Platform only. [LICENSE-NOTES.md](LICENSE-NOTES.md) lists
+every part. The license decision that version 0.1.0 needed, with the AGPL engine 0.11.0, no longer
+applies.
 
 ## The file to upload
 
 | What | Value |
 | --- | --- |
 | File | `integrations/canva/dist/app.js`, from the `canva-app` artifact of the `integration-canva` workflow run on `main`, or from `npm ci --ignore-scripts && npm run build` in this folder |
-| Size | 4,143,587 bytes; Canva's limit is 5 MB |
-| SHA-256 | `242c16264ea9d8fb594dcafbab464f7f23cb6f2cd62c5b19a48cc42233e00757` |
-| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, module SHA-256 `a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68` |
-| Strings for translation | `integrations/canva/dist/messages_en.json`, 51 strings, SHA-256 `7f6b4db5b4fc0a8fb063f70722fa935e1e370ae8124d6a849f95ec05abf96577` |
+| Size | 4,108,332 bytes; Canva's limit is 5 MB |
+| SHA-256 | `6fb9d252ef3acda6d6ee083857483cc24c39a6248ba7c6e7beb9e45ee43d0e6c` |
+| Engine inside | `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, module SHA-256 `298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868` |
+| Strings for translation | `integrations/canva/dist/messages_en.json`, 51 strings, SHA-256 `909b1c749288e3e25ebb9c2a26411967cd764caf5b6c1607583cad40901af6b7` |
 
 The build gives the same bytes from the same lockfile; `build/build-receipt.json` of the run
 records both hashes. Compare them with the file before uploading it.
@@ -104,8 +104,8 @@ Paste into **Release > Testing instructions**:
 
 ## The owner's steps, in order
 
-1. Take the license decision in [LICENSE-NOTES.md](LICENSE-NOTES.md), and update the notice if
-   the first route is chosen.
+1. Read [LICENSE-NOTES.md](LICENSE-NOTES.md), which lists the parts of the file and their
+   licenses.
 2. Publish the terms, privacy and support pages listed above.
 3. Sign in to the [Canva Developer Portal](https://www.canva.com/developers/apps) with the account that
    will own the app, and read the

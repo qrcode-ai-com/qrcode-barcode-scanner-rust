@@ -110,7 +110,8 @@ test('a corrupt image stops the node with the engine code, or becomes an error i
 		assert.equal(error.description, 'Scanner error QRS-001');
 		return true;
 	});
-	const [output] = await run([...items, { json: {}, binary: binary(fixture) }], {}, { continueOnFail: true });
+	// Unbounded, so a loaded machine cannot cut the scan of the good item: this checks behaviour, not speed.
+	const [output] = await run([...items, { json: {}, binary: binary(fixture) }], { options: { budgetMs: 0 } }, { continueOnFail: true });
 	// The json n8n gives an error item, and the item's own error, which n8n reads to send it to the
 	// error output.
 	assert.deepEqual(Object.keys(output[0].json), ['error']);
