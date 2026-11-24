@@ -1180,8 +1180,9 @@ stays by hand).
 ## Independent MCP npm releases
 
 The MCP adapter has its own SemVer in `integrations/mcp/package.json`, its lock
-and `server.json`. It uses the published scanner `0.11.0`; publishing an adapter
-version does not rebuild or republish the Rust, Node, Python or WASM engine.
+and `server.json`. Adapter 0.3.2 uses the published scanner `0.12.0`; publishing
+an adapter version does not rebuild or republish the Rust, Node, Python or WASM
+engine.
 Published versions and tags are immutable.
 
 The adapter source on `main` may be ahead of the published version: the
@@ -1266,10 +1267,16 @@ publisher:
 | --- | --- |
 | Package | `@qrcode-ai-com/qrcode-barcode-scanner-mcp` |
 | GitHub organization | `qrcode-ai-com` |
-| Repository | `qrcode-barcode-scanner` |
+| Repository | `qrcode-barcode-scanner-rust` |
 | Workflow | `npm-mcp-publish.yml` |
 | Environment | `npm-agents` |
 | Allowed operation | `npm publish` |
+
+The repository was named `qrcode-barcode-scanner` until 18 November 2026, and
+adapter 0.3.1 was published under that name. npm cannot edit a trusted-publisher
+connection: add a new one with the values above, publish the release, then
+delete the connection that names the old repository. `scripts/mcp-release.py`
+and the `publish` job both require the current name.
 
 New npm names still need the owner's initial archive upload before a trust
 relationship can be configured. Configure new trust near an actual qualified
