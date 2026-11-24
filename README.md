@@ -213,7 +213,10 @@ The Dify tool plugin has been on the [Dify Marketplace](https://marketplace.dify
 Dify, open **Plugins**, then **Marketplace**, and install **QR Code & Barcode Scanner**. Its
 [guide](integrations/dify/README.md) gives its tool, its options and its limits.
 
-n8n, Node-RED, Activepieces, Raycast, Apify, napari and the browser extension are built and tested in
+The Node-RED node is listed in the [Node-RED Flow Library](https://flows.nodered.org/node/@qrcode-ai-com/node-red-qrcode-barcode-scanner),
+and its [guide](integrations/node-red/README.md) gives the two ways to install it.
+
+n8n, Activepieces, Raycast, Apify, napari and the browser extension are built and tested in
 [`integrations/`](integrations/) and wait for their stores. The [distribution guide](distribution/README.md) gives the
 state of each package and recipe.
 

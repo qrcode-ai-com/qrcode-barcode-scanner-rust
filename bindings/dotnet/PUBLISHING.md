@@ -1,8 +1,14 @@
 # Publishing the .NET package
 
-`QRCodeAI.QRCodeBarcodeScanner` is not published yet. An inspected archive and an implemented
-publisher are preparation, not a nuget.org release. The package keeps `net8.0` and five native
-platforms; the CLI's musl targets do not add Alpine support to this package.
+`QRCodeAI.QRCodeBarcodeScanner` has been on
+[nuget.org](https://www.nuget.org/packages/QRCodeAI.QRCodeBarcodeScanner) since 22 November 2026.
+Its first version came from an engine tag, whose
+[run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45033138079)
+uploaded the qualified archive through OIDC in the protected `nuget` environment, then passed
+the five public installs below. Each later version needs its own engine tag and approval: an
+inspected archive on a branch is preparation, not a nuget.org release. The package keeps
+`net8.0` and five native platforms; the CLI's musl targets do not add Alpine support to this
+package.
 
 ## Account and trust setup, by the owner
 
@@ -13,7 +19,7 @@ platforms; the CLI's musl targets do not add Alpine support to this package.
 2. Set repository variable `NUGET_USER` to the **actual individual NuGet username**. This is not
    an email address, a GitHub username inferred by automation, or the organization name.
 3. In nuget.org, add a trusted publishing policy scoped to this exact package and its selected
-   owner. Repository owner: `qrcode-ai-com`; repository: `qrcode-barcode-scanner`; workflow:
+   owner. Repository owner: `qrcode-ai-com`; repository: `qrcode-barcode-scanner-rust`; workflow:
    **`dotnet.yml`** (file name only); GitHub environment: **`nuget`**.
 4. Create GitHub environment `nuget`, with `ThibautMelen` as the sole required reviewer and one
    custom deployment policy: tags `v*`. Permit no branch policy. Do not add a permanent NuGet
@@ -28,7 +34,7 @@ Sources: [individual accounts](https://learn.microsoft.com/en-us/nuget/nuget-org
 [organizations](https://learn.microsoft.com/en-us/nuget/nuget-org/organizations-on-nuget-org),
 [trusted publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing).
 
-## Before the first tag
+## Before a tag
 
 Run `.github/workflows/dotnet.yml` on the exact proposed source commit. Require the binding
 checks (.NET 8 and 10), all five native-library floors, archive inspection and all five clean
@@ -65,5 +71,5 @@ Both archive hashes are kept in `publication.json`; crypto verification and scan
 must pass before this destination is counted as published and qualified.
 
 [NuGet signed packages](https://learn.microsoft.com/en-us/nuget/reference/signed-packages-reference)
-describes the repository signature. The first actual OIDC upload and public installation remain
-unexercised until the owner completes account setup and approves a release.
+describes the repository signature. The run of the first published engine tag, linked at the
+top of this page, exercised the OIDC upload and the five public installs for the first time.
