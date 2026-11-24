@@ -106,7 +106,7 @@ jobs:
               python -m pip install -r integrations/comfyui/requirements.txt &&
               python -m pip install -r integrations/comfyui/tests/requirements.txt
               --extra-index-url https://download.pytorch.org/whl/cpu
-            identifier: qrcode-barcode-scanner-nodes@0.1.0
+            identifier: qrcode-barcode-scanner-nodes@0.1.1
             uninstall: python -m pip uninstall -y qrcode-barcode-scanner
             gone: python -c "import qrcode_barcode_scanner"
           # The Dify plugin runtime is Python 3.12.
@@ -237,7 +237,7 @@ jobs:
           mkdir -p receipt
           python scripts/python-host-consumer.py run \
             --destination "napari plugin from this checkout (not published)" \
-            --identifier napari-qrcode-barcode-scanner@0.1.0 --version "$ENGINE_VERSION" \
+            --identifier napari-qrcode-barcode-scanner@0.1.1 --version "$ENGINE_VERSION" \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/integrations/napari" \
             --install "$(ls dist/napari_qrcode_barcode_scanner-*-py3-none-any.whl)" \
             --install "-r integrations/napari/tests/requirements.txt" \

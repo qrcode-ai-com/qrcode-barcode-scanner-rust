@@ -58,7 +58,7 @@ def test_the_mixed_sample_is_outlined_with_both_codes(mixed_rgb, notes, profile)
     assert layer.shape_type == ["polygon", "line"]
     report = layer.metadata["qrcode_barcode_scanner"]
     assert report["trace"]["budget_exhausted"] is False and report["trace"]["engine_panics"] == 0
-    assert report["versions"]["scanner"] == "0.11.0"
+    assert report["versions"]["scanner"] == "0.12.0"
     assert (report["score"] is None) == (profile == "frame")
     # The outline is the engine's geometry in napari's (row, column) order.
     quad = report["detections"][0]["occurrences"][0]["geometry"]["points"]
@@ -143,7 +143,7 @@ def test_napari_discovers_the_installed_manifest():
     manifest = PluginManifest.from_distribution("napari-qrcode-barcode-scanner")
     source = PluginManifest.from_file(PLUGIN_ROOT / "src/napari_qrcode_barcode_scanner/napari.yaml")
     assert manifest.name == source.name == "napari-qrcode-barcode-scanner"
-    assert manifest.package_version == plugin.__version__ == "0.1.0"
+    assert manifest.package_version == plugin.__version__ == "0.1.1"
     [command] = manifest.contributions.commands
     assert command.python_name == "napari_qrcode_barcode_scanner._widget:scan_codes"
     assert import_python_name(command.python_name) is plugin.scan_codes
@@ -177,7 +177,7 @@ def test_the_package_metadata_follows_the_napari_hub_rules():
     assert "Framework :: napari" in project["classifiers"]
     assert project["entry-points"]["napari.manifest"] == {
         "napari-qrcode-barcode-scanner": "napari_qrcode_barcode_scanner:napari.yaml"}
-    assert "qrcode-barcode-scanner==0.11.0" in project["dependencies"]
+    assert "qrcode-barcode-scanner==0.12.0" in project["dependencies"]
     assert not any(dep.split("[")[0].startswith(("napari", "PyQt", "PySide")) for dep in project["dependencies"])
     assert project["license"] == "MIT"
     # The hub's GitHub link is read from Homepage or "Source Code", a repository root only.

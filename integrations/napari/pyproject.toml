@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "napari-qrcode-barcode-scanner"
-version = "0.1.0"
+version = "0.1.1"
 description = "Read the QR codes and barcodes of a napari image layer with the QR Code & Barcode Scanner engine."
 readme = "README.md"
 license = "MIT"
@@ -15,7 +15,7 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.24",
     "magicgui>=0.8",
-    "qrcode-barcode-scanner==0.11.0",
+    "qrcode-barcode-scanner==0.12.0",
 ]
 keywords = ["napari", "qr-code", "barcode", "scanner", "decoder"]
 classifiers = [
