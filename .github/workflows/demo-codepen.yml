@@ -2,7 +2,7 @@ name: Demo · CodePen
 
 # The CodePen demo of examples/codepen, checked the way a visitor uses it: its three files served
 # from one local origin, the engine loaded from the pinned jsDelivr files of the published WASM
-# package 0.11.0 and the sample from the v0.11.0 tag, scanned in Chrome. The prefill form the
+# package 0.12.0 and the sample from the v0.12.0 tag, scanned in Chrome. The prefill form the
 # owner uses to create the Pen is submitted too, but every request to codepen.io is answered on
 # the runner: nothing is sent to CodePen, and nothing is published.
 on:
@@ -63,8 +63,8 @@ jobs:
           driver="$PWD/distribution/acceptance/drivers/web-page.mjs"
           (cd tests/wasm-browser && node "$driver" http://127.0.0.1:4174/ "$image" "$RUNNER_TEMP/reports" \
             --wait 180 --channel chrome)
-          python3 scripts/check-demo-page.py "$RUNNER_TEMP/reports/page.json" --version 0.11.0 \
-            --wasm-sha256 a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68 \
+          python3 scripts/check-demo-page.py "$RUNNER_TEMP/reports/page.json" --version 0.12.0 \
+            --wasm-sha256 298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868 \
             --page-key sdk/javascript
           python3 scripts/destination-acceptance.py reports --kind page \
             --produced-by "node web-page.mjs http://127.0.0.1:4174/ --channel chrome" \
@@ -72,7 +72,7 @@ jobs:
             --frame "$RUNNER_TEMP/reports/frame.json" \
             --full "$RUNNER_TEMP/reports/full.json" \
             --destination "examples/codepen, served on the runner" \
-            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-wasm" --version 0.11.0 \
+            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-wasm" --version 0.12.0 \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/examples/codepen" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             --receipt "$RUNNER_TEMP/reports/receipt.json"

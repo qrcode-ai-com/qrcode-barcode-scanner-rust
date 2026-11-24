@@ -2,26 +2,24 @@
 
 The Wasmer package `qrcode-ai-com/qrcode-barcode-scanner` holds one WebAssembly module,
 `qrscan.wasm`: the `qrscan` command of the QR Code & Barcode Scanner, compiled for the
-`wasm32-wasip1` target from the source of engine tag `v0.11.0`, commit
-`176ac96ef16ee330dbfc6ada10327d0b4e23a8b2` of
+`wasm32-wasip1` target from the source of engine tag `v0.12.0`, commit
+`897dd50cdf27cbde54d408bf65e1ca4622035d42` of
 <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust>.
 
 ## The module
 
-That source is licensed **AGPL-3.0-or-later**, so the module and the package are distributed
-under the GNU Affero General Public License, version 3 or any later version. `LICENSE` holds its
-text, as the 0.11.0 source ships it. The corresponding source is the tag above:
+That source is licensed under the **MIT License**, and so are the module and the package.
+`LICENSE` holds its text, as the 0.12.0 source ships it. The corresponding source is the tag
+above:
 
-<https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0>
+<https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0>
 
 `notices/SOURCE.json` records that revision, the target, the Rust release that compiled the
 module and the sha256 of every file of the package. The build command is in the README of
 `distribution/wasmer` in that repository, and the workflow `.github/workflows/wasmer.yml` runs it.
 
 The module is a new build of that source for a new target. It is not one of the files published
-for 0.11.0, which keep their own bytes and licenses. The project chose the MIT License for its
-source on 14 November 2026; that choice applies to later source and later qualified versions and
-does not relabel a build of the 0.11.0 source.
+for 0.12.0, which keep their own bytes.
 
 ## Code the module contains
 
@@ -39,7 +37,7 @@ package maps that directory to `/notices` inside the module's filesystem.
 ## The package files
 
 `wasmer.toml`, `README.md` and this file (`notices/LICENSE-NOTES.md`) are project source of the
-repository above, available under the MIT License:
+repository above, available under the same MIT License:
 
 ```text
 MIT License
@@ -65,5 +63,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-They do not change the license of the module. The QR Code AI name and logo are trademarks; no
-license of the package grants a trademark right.
+The QR Code AI name and logo are trademarks; no license of the package grants a trademark right.

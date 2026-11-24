@@ -198,7 +198,7 @@ paths = [
 ]
 
 [[file]]
-held = "the Wasmer package, built from the source of tag v0.11.0 and published by the owner: moved when a later source is packaged"
+held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
 paths = ["distribution/wasmer/**", ".github/workflows/wasmer.yml"]
 
 [[file]]
@@ -312,7 +312,7 @@ paths = ["distribution/README.md"]
 match = '^These recipes package the \S+ CLI for other systems'
 
 [[line]]
-held = "the Wasmer package, built from the source of tag v0.11.0 and published by the owner: moved when a later source is packaged"
+held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
 paths = ["distribution/README.md"]
 match = '^WASI \(`wasm32-wasip1`\) from the source of tag|^Wasmer on the shared truth set beside the native'
 

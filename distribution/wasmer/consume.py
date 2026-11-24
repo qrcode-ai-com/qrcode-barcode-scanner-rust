@@ -12,7 +12,7 @@ and unsaturated trace, trace.engine_panics 0 and the engine version given. A cas
 must exit 1 with an empty report, the bytes that are not an image exit 2 with the error code of
 the truth on stderr, every other case exits 0.
 
-With --native (the qrscan 0.11.0 release binary of the runner) every case runs there too, and
+With --native (the qrscan release binary of the same version, on the runner) every case runs there too, and
 both must give the same exit code and the same identity for each case: the same symbologies,
 contents and occurrence kinds (consumer_truth.identity). Scores and coordinates can differ in
 their last digits between a native and a WebAssembly build of the same source, so they are judged
@@ -155,7 +155,7 @@ def self_test():
             if "error" in case:
                 table[digest] = {"exit": 2, "stderr": f"✖ not an image [{case['error']}]\n"}
             else:
-                report = lib.conforming_report(case, {"scanner": "0.11.0", "pipeline": 5, "score_contract": 5})
+                report = lib.conforming_report(case, {"scanner": "0.12.0", "pipeline": 5, "score_contract": 5})
                 report["trace"]["engine_panics"] = 0
                 table[digest] = {"exit": expected_exit(case), "report": report}
         (box / "table.json").write_text(json.dumps(table))
@@ -171,13 +171,13 @@ def self_test():
                             "print(json.dumps(report)) if report else sys.stderr.write(row['stderr'])\n"
                             "sys.exit(row['exit'])\n")
             stub.chmod(0o755)
-        if consume(str(box / "qrscan-good"), str(box / "qrscan-good"), "0.11.0", box / "good.json", lib):
+        if consume(str(box / "qrscan-good"), str(box / "qrscan-good"), "0.12.0", box / "good.json", lib):
             failures.append("a conforming stand-in failed")
-        if not consume(str(box / "qrscan-dropping"), None, "0.11.0", box / "bad.json", lib):
+        if not consume(str(box / "qrscan-dropping"), None, "0.12.0", box / "bad.json", lib):
             failures.append("a stand-in that drops a code passed")
         if not consume(str(box / "qrscan-good"), None, "9.9.9", box / "version.json", lib):
             failures.append("another engine version passed")
-        if not consume(str(box / "qrscan-good"), str(box / "qrscan-dropping"), "0.11.0", box / "native.json", lib):
+        if not consume(str(box / "qrscan-good"), str(box / "qrscan-dropping"), "0.12.0", box / "native.json", lib):
             failures.append("a native binary with other detections passed")
     for failure in failures:
         print(f"SELF-TEST FAILED · {failure}", file=sys.stderr)

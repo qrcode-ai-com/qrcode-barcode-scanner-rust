@@ -64,7 +64,7 @@ try {
     try { data = JSON.parse(fields.get('data') ?? ''); } catch (error) { check(false, `form ${index + 1}: data is not JSON (${error.message})`); }
     check(data.title === TITLE, `form ${index + 1}: title ${JSON.stringify(data.title)}`);
     check(data.private === false, `form ${index + 1}: private ${data.private}`);
-    check(typeof data.description === 'string' && data.description.includes('github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0'),
+    check(typeof data.description === 'string' && data.description.includes('github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0'),
       `form ${index + 1}: the description links the engine source`);
     for (const key of ['html', 'css', 'js']) {
       check(data[key] === files[key], `form ${index + 1}: ${key} equals the file byte for byte (${Buffer.byteLength(data[key] ?? '')} bytes)`);
