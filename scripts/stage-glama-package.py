@@ -14,7 +14,7 @@ whose content is never edited by hand: `stage` writes it from one commit of this
 and writes into an empty DIR: every file of that folder byte for byte (glama.json, Dockerfile,
 package.json, package-lock.json, README.md), LICENSE (this repository's, which covers those
 files) and SOURCE.json, the commit and the sha256 of every staged file. The Dockerfile installs
-the published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.1; nothing is built from
+the published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.2; nothing is built from
 this source.
 
 `verify` stages the commit that DIR's SOURCE.json names and compares: same files, same bytes,
@@ -34,8 +34,8 @@ PACKAGE = "distribution/glama"
 SCHEMA = "qrscan-glama-stage/1"
 REQUIRED = ("glama.json", "Dockerfile", "package.json", "package-lock.json", "README.md")
 ADAPTER = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
-ADAPTER_VERSION = "0.3.1"
-ADAPTER_INTEGRITY = "sha512-JLPa1AqFpygcrt/zKMQwhIfD67U9j1DUPnKdBmYYwo8yQoZmwNtd4FH80yllFbONKwxcjpReqLiVrWilWgeEng=="
+ADAPTER_VERSION = "0.3.2"
+ADAPTER_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
 
 
 class Refused(Exception):
@@ -189,7 +189,7 @@ def self_test():
             wider = dict(original, **{"glama.json": json.dumps({"$schema": "https://glama.ai/mcp/schemas/server.json",
                                                                  "maintainers": ["a"], "name": "x"}).encode()})
             refused("a glama.json with a field Glama's schema lacks", lambda: check_contents(wider), "may hold only")
-            floating = dict(original, **{"package.json": json.dumps({"dependencies": {ADAPTER: "^0.3.1"}}).encode()})
+            floating = dict(original, **{"package.json": json.dumps({"dependencies": {ADAPTER: f"^{ADAPTER_VERSION}"}}).encode()})
             refused("an adapter range instead of the exact version", lambda: check_contents(floating), "exactly")
         refused("a revision that does not exist",
                 lambda: stage("0000000000000000000000000000000000000000", box / "none"), "is not a commit")

@@ -280,8 +280,8 @@ def check_hosts(root, report):
                  "glama: glama.json has only $schema and distinct maintainers",
                  "glama: glama.json holds a key Glama's schema does not define, or no maintainer")
     package = json.loads(read(root, "distribution/glama/package.json"))
-    report.check(package.get("dependencies") == {"@qrcode-ai-com/qrcode-barcode-scanner-mcp": "0.3.1"},
-                 "glama: the container installs MCP 0.3.1 exactly", "glama: package.json does not pin MCP 0.3.1")
+    report.check(package.get("dependencies") == {"@qrcode-ai-com/qrcode-barcode-scanner-mcp": "0.3.2"},
+                 "glama: the container installs MCP 0.3.2 exactly", "glama: package.json does not pin MCP 0.3.2")
     repo = read(root, "distribution/artifacthub/artifacthub-repo.yml")
     keys = set(re.findall(r"^([A-Za-z]+):", repo, re.M))
     report.check(keys <= {"repositoryID", "owners", "ignore"} and "repositoryID" in keys,
