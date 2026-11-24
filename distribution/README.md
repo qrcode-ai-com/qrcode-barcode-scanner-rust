@@ -182,20 +182,22 @@ the connection, delete `qrscan` from your OpenCode configuration.
 
 ### Install the portable skill from Git in a Codex project
 
-From the project directory, install all five files of the 0.2.0 skill from
-the pinned GitHub tree:
+From the project directory, install all five files of the 0.2.1 skill from
+the GitHub tree of the release `agents-v0.3.2`, pinned by its commit:
 
 ```sh
 DISABLE_TELEMETRY=1 npx --yes skills@1.7.6 add \
-  https://github.com/qrcode-ai-com/qrcode-barcode-scanner/tree/610879c31302337a2b409b21bd18324e2fece178/skills/qrcode-barcode-scanner \
+  https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/3c5e211a6fb31151b13d0801c98ab118f48dcceb/skills/qrcode-barcode-scanner \
   --skill qrcode-barcode-scanner --agent codex --copy --yes
 ```
 
-The [pinned skill README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/610879c31302337a2b409b21bd18324e2fece178/skills/qrcode-barcode-scanner/README.md)
-shows how to install the native engine and run the helper. On macOS ARM64 with
-Node.js 22.22.2, this install matched all five source files. Its helper used
-engine 0.11.0 and returned the QR payload and Code 128 `STOCK-4827` together
-in `fast`, `frame`, and `full`. This route installs directly from GitHub.
+The [pinned skill README](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/3c5e211a6fb31151b13d0801c98ab118f48dcceb/skills/qrcode-barcode-scanner/README.md)
+shows how to install the native engine and run the helper. On 24 November 2026,
+on macOS ARM64 with Node.js 22.22.2, this install matched all five source files.
+Its helper used engine 0.12.0 and returned the QR payload and Code 128
+`STOCK-4827` together in `fast`, `frame`, and `full`, and its 26 checks passed.
+This route installs directly from GitHub. The earlier 0.2.0 skill stays at
+[`610879c`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/610879c31302337a2b409b21bd18324e2fece178/skills/qrcode-barcode-scanner).
 
 To remove the skill from the project:
 
@@ -203,9 +205,10 @@ To remove the skill from the project:
 DISABLE_TELEMETRY=1 npx --yes skills@1.7.6 remove qrcode-barcode-scanner --agent codex --yes
 ```
 
-On 11 November 2026 the same install put the five files in
+On 24 November 2026 the same install put the five files in
 `.agents/skills/qrcode-barcode-scanner`, and this command deleted that folder.
-It leaves `skills-lock.json` in the project, with no skill listed.
+It leaves an empty `.agents/skills` folder and `skills-lock.json` in the project,
+with no skill listed.
 
 ### Install the portable skill in Hermes
 
