@@ -1,16 +1,21 @@
 # JupyterLab Extension Manager listing: jupyterlab-qrcode-barcode-scanner
 
-What JupyterLab's Extension Manager will show for this extension, where each value comes from, and
-the owner's steps to publish it. Version 0.1.0 goes to PyPI from the tag `jupyterlab-v0.1.0`; the
-Extension Manager does not list the extension before PyPI serves it. The project name
-`jupyterlab-qrcode-barcode-scanner` was free on PyPI on 21 and 24 November 2026, and nothing
-reserves it.
+What JupyterLab's Extension Manager reads for this extension, where each value comes from, and
+the owner's steps to publish it. Version 0.1.0 has been on PyPI since 24 November 2026, from the
+tag `jupyterlab-v0.1.0`.
 
-Since JupyterLab 4, the Extension Manager reads its catalogue from PyPI and installs with pip. It
-lists every PyPI project with the classifier
-`Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt`, and the `install.json` of the
-installed extension tells it which Python package to update or uninstall. There is no submission
-form and no review: the listing follows the PyPI release.
+Since JupyterLab 4, the Extension Manager reads its catalogue from PyPI and installs with pip; the
+`install.json` of the installed extension tells it which Python package to update or uninstall.
+There is no submission form and no review. JupyterLab 4.0 to 4.6, 4.7.0b0 and 4.7.0b1 build that
+catalogue by asking PyPI's XML-RPC `browse` method for every project with the classifier
+`Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt`. PyPI has removed that method: on
+24 November 2026 it answered the call with the fault "PyPI no longer supports the XMLRPC browse
+method", and the manager's search fails
+([jupyterlab/jupyterlab#19932](https://github.com/jupyterlab/jupyterlab/issues/19932), open).
+4.7.0b2 lists only language packs. JupyterLab's `main` branch, for 4.7.0, lists a fixed set of
+known extensions and looks up a prebuilt extension whose exact project name is typed
+([jupyterlab/jupyterlab#20511](https://github.com/jupyterlab/jupyterlab/pull/20511)); no release
+held that change on 24 November 2026. Until a release does, pip is the install route.
 
 ## Why a prebuilt extension
 
@@ -91,8 +96,8 @@ Steps 2 and 3 were in place when the GitHub API was read on 24 November 2026: th
 `pypi-jupyterlab` has the owner as its required reviewer, no administrator bypass, no secret, no
 variable and the one deployment rule `jupyterlab-v*` (tag), and `refs/tags/jupyterlab-v*` is in
 the ruleset `distribution-tags-maintainer-only`. Step 1 is on PyPI and cannot be read from the
-repository: the owner confirms it before the tag. No tag `jupyterlab-v*` and no PyPI project exist
-yet.
+repository; the upload of 0.1.0 through it shows that it was in place. The tag `jupyterlab-v0.1.0`
+and the PyPI project have existed since 24 November 2026.
 
 ### Once
 
@@ -128,8 +133,9 @@ yet.
 ### Each release
 
 4. **The release commit.** Before the tag, merge a change to `main` that turns the README's
-   **Status** into the published wording and adds to **Install** the two ways a published
-   extension installs: pip with the project name, and JupyterLab's Extension Manager. The README is
+   **Status** into the published wording and gives in **Install** the way a published extension
+   installs, pip with the project name. Name JupyterLab's Extension Manager only as a route that
+   depends on its PyPI search, as the top of this file explains. The README is
    the PyPI description of the version: it cannot change once uploaded. Check that the Homepage
    page answers. It answered 404 on 21 November 2026; the owner chose to release 0.1.0, with the
    MIT engine 0.12.0, under that Homepage, the definitive address, which goes live with the
@@ -148,10 +154,12 @@ yet.
    **Download files** lists the wheel and the sdist with the digests the run printed, and each
    file's **Provenance** names the workflow `python-plugins-publish.yml`.
 
-8. **Read back the Extension Manager.** In a new environment with JupyterLab 4, open JupyterLab,
-   then the **Extension Manager** in the left sidebar, and enable it if asked. Search for
-   `qrcode`: **jupyterlab-qrcode-barcode-scanner** appears, since the manager reads PyPI (its list
-   is cached for up to five minutes). Install it, reload the page, open the **QR Code & Barcode
-   Scanner** card of the launcher and scan the sample: both codes are listed.
+8. **Read back the install.** In a new environment with JupyterLab 4, run
+   `python -m pip install jupyterlab-qrcode-barcode-scanner`, check that
+   `jupyter labextension list` shows `@qrcode-ai-com/jupyterlab-qrcode-barcode-scanner`, open
+   JupyterLab, open the **QR Code & Barcode Scanner** card of the launcher and scan the sample:
+   both codes are listed. The Extension Manager's search is not a read-back while it cannot reach
+   PyPI's catalogue (see the top of this file). Once a JupyterLab release searches another way, try
+   it there, and count the extension as listed only when it appears.
 
 A file on PyPI is immutable. A mistake is a new extension version and a new tag.

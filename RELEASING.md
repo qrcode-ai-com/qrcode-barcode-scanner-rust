@@ -1529,7 +1529,8 @@ on PyPI. Tag the merged commit and push the tag
 `'JupyterLab extension 0.1.0'` the same way), approve the publishing job once
 its build job is green, then read back the project page on PyPI and the
 listing as `LISTING.md` says (the napari hub and napari's plugin manager;
-JupyterLab's Extension Manager). A file on PyPI is immutable: a mistake is a
+for JupyterLab, a pip install, since the search of its Extension Manager
+depends on a PyPI method that PyPI removed). A file on PyPI is immutable: a mistake is a
 new plugin version and a new tag.
 
 ## PHP package — its own repository
@@ -1957,8 +1958,9 @@ dtolnay/rust-toolchain, the branch and the date) in a comment.
 
 ## .NET / NuGet
 
-The `QRCodeAI.QRCodeBarcodeScanner` package remains unpublished. Its archive pipeline and
-future engine-tag publisher live in `.github/workflows/dotnet.yml`. Branch and manual runs
+The `QRCodeAI.QRCodeBarcodeScanner` package has been on nuget.org since 22 November 2026, uploaded
+by the run of an engine tag. Its archive pipeline and engine-tag publisher live in
+`.github/workflows/dotnet.yml`. Branch and manual runs
 inspect only. Tags require the existing protected `nuget` environment, an actual individual
 `NUGET_USER`, five native floors, archive inspection and all five clean installed consumers.
 The owner approves the environment; `NuGet/login` then uses OIDC without a persistent API key.

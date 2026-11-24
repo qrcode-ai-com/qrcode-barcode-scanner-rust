@@ -59,24 +59,27 @@ the wheel that the tag's run built, checked with `twine check --strict`, install
 from the file browser. The wheel bundles the published engine
 `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0.
 
-JupyterLab's Extension Manager reads its catalogue from PyPI, so it lists the extension once PyPI
-serves it; the manager caches its list for up to five minutes. What the listing shows, and where
-each value comes from, are in [LISTING.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LISTING.md).
+JupyterLab's Extension Manager finds extensions with a PyPI search. In JupyterLab 4.0 to 4.6, that
+search calls PyPI's XML-RPC `browse` method, which PyPI has removed, so it fails
+([jupyterlab/jupyterlab#19932](https://github.com/jupyterlab/jupyterlab/issues/19932)). Install
+the extension with pip. What a listing reads, and where each value comes from, are in
+[LISTING.md](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/jupyterlab/LISTING.md).
 
 ## Install
 
 It is a prebuilt extension: one Python wheel that holds the built frontend, the way JupyterLab 4
-installs extensions with pip and lists them in its Extension Manager. JupyterLab needs no rebuild,
-Node.js is not needed to use it, and it adds no server or kernel code.
+installs extensions with pip. JupyterLab needs no rebuild, Node.js is not needed to use it, and it
+adds no server or kernel code.
 
-Install it from PyPI in the environment that runs JupyterLab 4, then reload the JupyterLab page:
+Install it from PyPI with pip in the environment that runs JupyterLab 4, then reload the
+JupyterLab page:
 
 ```sh
 python -m pip install jupyterlab-qrcode-barcode-scanner
 ```
 
-Or, in JupyterLab, open the **Extension Manager** in the left sidebar (enable it if asked), search
-for `qrcode`, install **jupyterlab-qrcode-barcode-scanner** and reload the page.
+JupyterLab's **Extension Manager** installs only what its PyPI search finds, so whether it offers
+this extension depends on that search; see **Status** above.
 
 To try a change to the extension, build the wheel from this folder in a checkout of this
 repository instead. That needs Node.js 22 and Python 3.9 or later:
