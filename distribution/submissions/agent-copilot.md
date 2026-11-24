@@ -2,6 +2,12 @@
 
 Prepared on 2026-11-21 for the owner to review and send. Nothing has been submitted.
 
+Updated on 2026-11-24: the plugin's next release, `v0.3.1`, starts the MCP server 0.3.2 on the
+MIT engine 0.12.0 and carries skill 0.2.1. The values to send below name it. Send them once
+`v0.3.1` is on the plugin repository, and replace any commit named below with the one that tag
+and `main` then carry (`git ls-remote https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`).
+The checks under "What exists" are dated and ran on `v0.3.0`.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -27,7 +33,7 @@ immutable ref or SHA.
 
 ## Submission: the issue form, field by field
 
-Submit the SHA only. The tag `v0.3.0` names another commit, so giving both would fail the
+Submit the SHA only. When `main` and the tag name different commits, giving both fails the
 consistency check.
 
 | Field | Value |
@@ -37,14 +43,14 @@ consistency check.
 | GitHub repository | `qrcode-ai-com/qrcode-barcode-scanner-plugin` |
 | Plugin path inside the repository | leave empty (root) |
 | Ref to review | leave empty |
-| Commit SHA to review | `f37ab720795a7a15f27d5a00c302afdb321b9b3d` |
-| Version | `0.3.0` |
+| Commit SHA to review | the commit of tag `v0.3.1` (see the note above) |
+| Version | `0.3.1` |
 | License identifier | `MIT` |
 | Author name | `QR Code AI` |
 | Author URL | `https://qrcode-ai.com/` |
 | Homepage URL | `https://qrcode-ai.com/` |
 | Keywords | `qr-code`, `barcode`, `qr-scanner`, `barcode-scanner`, `mcp`, `agent-skill` (one per line) |
-| Additional notes for reviewers | Scanning runs on the user's computer. The MCP server is started with `npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1`, pinned to an exact version. The plugin source is MIT; the published engine 0.11.0 and MCP 0.3.1 packages are AGPL-3.0-or-later. |
+| Additional notes for reviewers | Scanning runs on the user's computer. The MCP server is started with `npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2`, pinned to an exact version. The plugin source is MIT, and so are the published MCP server 0.3.2 and engine 0.12.0 it starts. |
 
 The keywords are lowercase and hyphenated because the form asks for lowercase tags. The manifest
 keeps its own spaced keywords.

@@ -28,6 +28,7 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -196,7 +197,9 @@ def self_test():
                 return target
 
             edited = copy("edited")
-            (edited / "mcp.json").write_text((edited / "mcp.json").read_text().replace("@0.3.1", "@latest"))
+            # Whatever exact version the launch pins, a hand edit to a floating tag must be refused.
+            (edited / "mcp.json").write_text(re.sub(r"-mcp@\d+\.\d+\.\d+", "-mcp@latest",
+                                                    (edited / "mcp.json").read_text()))
             refused("a launcher edited by hand", lambda: verify(edited), "differs from the stage: mcp.json")
             skill = copy("skill")
             (skill / "skills/qrcode-barcode-scanner/SKILL.md").write_text("---\nname: other\n---\n")

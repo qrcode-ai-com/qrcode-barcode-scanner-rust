@@ -6,7 +6,7 @@ extensions:
     name: qrscan
     enabled: true
     cmd: npx
-    args: ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.1"]
+    args: ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2"]
     env_keys: []
     envs: {}
     timeout: 300

@@ -234,7 +234,7 @@ await check('no unpinned adapter reference', async () => {
     `junie/${NAME}/mcp/.mcp.json`, 'goose/qrscan-extension.yaml', 'opencode/plugin.mjs', 'pi/extension.js', 'package.json'];
   for (const path of own) {
     for (const match of (await read(path)).matchAll(/@qrcode-ai-com\/qrcode-barcode-scanner-mcp(@\d+\.\d+\.\d+(?:-[\w.]+)?|@[A-Za-z][\w.-]*)?/g)) {
-      expect(match[1] === '@0.3.1', `${path} names ${match[0]}`);
+      expect(match[1] === '@0.3.2', `${path} names ${match[0]}`);
     }
     expect(!(await read(path)).includes('@latest'), `${path} names @latest`);
   }

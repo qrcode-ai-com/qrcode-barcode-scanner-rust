@@ -36,8 +36,8 @@ Help me understand QR Code & Barcode Scanner MCP (integrations/mcp/README.md) fo
 
 </details>
 
-[![Add to Cursor](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/cursor-v1.svg)](https://cursor.com/install-mcp?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuMSJdfQ%3D%3D)
-[![Add to VS Code](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/vscode-v1.svg)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522qrscan%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522--yes%2522%252C%2522--ignore-scripts%2522%252C%2522%2540qrcode-ai-com%252Fqrcode-barcode-scanner-mcp%25400.3.1%2522%255D%257D)
+[![Add to Cursor](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/cursor-v1.svg)](https://cursor.com/install-mcp?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuMiJdfQ%3D%3D)
+[![Add to VS Code](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/vscode-v1.svg)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522qrscan%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522--yes%2522%252C%2522--ignore-scripts%2522%252C%2522%2540qrcode-ai-com%252Fqrcode-barcode-scanner-mcp%25400.3.2%2522%255D%257D)
 
 Open your editor to review the pinned MCP configuration before adding it. Node.js must already be installed; local file access remains disabled by default.
 
