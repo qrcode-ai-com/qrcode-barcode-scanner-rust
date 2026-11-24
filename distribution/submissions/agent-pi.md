@@ -2,6 +2,12 @@
 
 Prepared on 2026-11-21 for the owner. Nothing has been published.
 
+Updated on 2026-11-24: the plugin's next release, `v0.3.1`, starts the MCP server 0.3.2 on the
+MIT engine 0.12.0 and carries skill 0.2.1. The values to send below name it. Send them once
+`v0.3.1` is on the plugin repository, and replace any commit named below with the one that tag
+and `main` then carry (`git ls-remote https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`).
+The checks under "What exists" are dated and ran on `v0.3.0`.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -25,13 +31,13 @@ Mechanism: no form and no pull request. The gallery indexes npm packages that ca
 
 ## What the listing needs
 
-A first npm publication of `@qrcode-ai-com/qrcode-barcode-scanner-plugin` 0.3.0 by the owner.
+A first npm publication of `@qrcode-ai-com/qrcode-barcode-scanner-plugin` 0.3.1 by the owner.
 Publishing is outside what this preparation may do, and the scope's npm account needs the owner's
 OTP. No publish workflow exists for this package in either repository.
 
 If the owner decides to publish:
 
-1. From a clean clone of `qrcode-ai-com/qrcode-barcode-scanner-plugin` at tag `v0.3.0`, check the
+1. From a clean clone of `qrcode-ai-com/qrcode-barcode-scanner-plugin` at tag `v0.3.1`, check the
    file list with `npm pack --dry-run`.
 2. Run `npm publish --access public` and enter the OTP.
 3. Optionally, on npmjs.com, add a trusted publisher for a future release workflow so that later

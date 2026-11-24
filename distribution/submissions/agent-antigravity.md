@@ -2,6 +2,12 @@
 
 Prepared on 2026-11-21 for the owner to review and send. Nothing has been submitted.
 
+Updated on 2026-11-24: the plugin's next release, `v0.3.1`, starts the MCP server 0.3.2 on the
+MIT engine 0.12.0 and carries skill 0.2.1. The values to send below name it. Send them once
+`v0.3.1` is on the plugin repository, and replace any commit named below with the one that tag
+and `main` then carry (`git ls-remote https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`).
+The checks under "What exists" are dated and ran on `v0.3.0`.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -34,7 +40,7 @@ validated with `agy plugin validate`.
 | Primary Contact Name | the owner |
 | Primary Contact Email | the owner's address |
 | Public-facing support email or helpdesk URL | https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues |
-| Plugin Description | Read QR codes and barcodes in local images. The plugin adds the QR Code & Barcode Scanner skill and a local MCP server pinned to version 0.3.1. Both return the engine's JSON report: the exact payload, the format of each code and, for QR codes, a scannability judgment. Scanning runs on the user's computer. Source: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin |
+| Plugin Description | Read QR codes and barcodes in local images. The plugin adds the QR Code & Barcode Scanner skill and a local MCP server pinned to version 0.3.2. Both return the engine's JSON report: the exact payload, the format of each code and, for QR codes, a scannability judgment. Scanning runs on the user's computer. Source: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin |
 | Documentation URL | https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin |
 
 ## The owner's next action

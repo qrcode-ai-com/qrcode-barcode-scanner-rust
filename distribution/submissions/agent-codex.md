@@ -3,6 +3,12 @@
 Prepared on 2026-11-21 for the owner. Nothing has been submitted, and the route needs decisions
 before a package can be prepared.
 
+Updated on 2026-11-24: the plugin's next release, `v0.3.1`, starts the MCP server 0.3.2 on the
+MIT engine 0.12.0 and carries skill 0.2.1. The values to send below name it. Send them once
+`v0.3.1` is on the plugin repository, and replace any commit named below with the one that tag
+and `main` then carry (`git ls-remote https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`).
+The checks under "What exists" are dated and ran on `v0.3.0`.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |

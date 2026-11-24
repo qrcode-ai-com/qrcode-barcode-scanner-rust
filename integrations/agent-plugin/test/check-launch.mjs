@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Start what a staged plugin tree tells each client to start, and scan the mixed test image.
 //
-//   node check-launch.mjs STAGE OUT [--version 0.11.0]
+//   node check-launch.mjs STAGE OUT [--version 0.12.0]
 //
 // --version is the engine the reviewed MCP launch (distribution/readme-actions.json) brings with
 // it. That launch names the published adapter and moves only after a publication, so the adapter
@@ -29,7 +29,7 @@ const NAME = 'qrcode-barcode-scanner';
 
 const args = process.argv.slice(2);
 const at = args.indexOf('--version');
-const version = at === -1 ? '0.11.0' : args.splice(at, 2)[1];
+const version = at === -1 ? '0.12.0' : args.splice(at, 2)[1];
 if (args.length !== 2) {
   console.error('usage: node check-launch.mjs STAGE OUT [--version X.Y.Z]');
   process.exit(2);
