@@ -172,8 +172,8 @@ export const messages = defineMessages({
   },
   license: {
     id: 'scanner.license',
-    defaultMessage: 'The engine is licensed AGPL-3.0-or-later; its source code is public.',
-    description: 'Footer license notice. AGPL-3.0-or-later is the name of a license and stays as it is.',
+    defaultMessage: 'The engine is licensed under the MIT License; its source code is public.',
+    description: 'Footer license notice. MIT License is the name of a license and stays as it is.',
   },
   source: {
     id: 'scanner.source',

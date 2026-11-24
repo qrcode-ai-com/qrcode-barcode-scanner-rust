@@ -1,7 +1,7 @@
 # License notes for the Canva app
 
-The source in this folder and the file built from it, `dist/app.js`, are under different terms.
-This note lists each part, and the decision the owner takes before the file is submitted to Canva.
+The source in this folder is under the MIT License. The file built from it, `dist/app.js`, also
+holds Canva's packages under Canva's own license. This note lists each part.
 
 ## The source in this folder
 
@@ -20,16 +20,16 @@ package, and `build/build-receipt.json` lists them with their versions.
 
 | Part | Version | License |
 | --- | --- | --- |
-| The app's own code, from `src/` | 0.1.0 | MIT |
-| The scanner engine, `@qrcode-ai-com/qrcode-barcode-scanner-wasm`, inlined by [integrations/wasm-inline](../wasm-inline/) | 0.11.0 | AGPL-3.0-or-later, with Apache-2.0 notices for the code derived from rxing |
+| The app's own code, from `src/` | 0.1.1 | MIT |
+| The scanner engine, `@qrcode-ai-com/qrcode-barcode-scanner-wasm`, inlined by [integrations/wasm-inline](../wasm-inline/) | 0.12.0 | MIT, with Apache-2.0 notices for the code derived from rxing |
 | Canva's packages: `@canva/app-ui-kit`, `@canva/app-i18n-kit`, `@canva/design`, `@canva/asset`, `@canva/platform`, `@canva/intents` | as pinned | Canva's license, quoted below |
 | React, React DOM, react-intl, FormatJS, MobX, Floating UI and their helpers | as pinned | MIT, BSD-3-Clause or 0BSD, each named in the file |
 
 The engine module inside the file is the one of the published npm package, byte for byte: SHA-256
-`a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68`, built from revision
-`176ac96ef16ee330dbfc6ada10327d0b4e23a8b2` of this repository. Only its loader changes, so that it
-takes the module from the file instead of fetching it. The engine's corresponding source is that
-revision of <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust>.
+`298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868`, built from revision
+`897dd50cdf27cbde54d408bf65e1ca4622035d42` (tag `v0.12.0`) of this repository. Only its loader
+changes, so that it takes the module from the file instead of fetching it. The engine's source is
+that revision of <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust>.
 
 ## Canva's license
 
@@ -46,30 +46,21 @@ build keeps the license in the file, as term 3 asks. The tests run the built fil
 that stands in for Canva's panel, only to build and check this app, as Canva's own testing
 documentation does with its packages.
 
-## The decision the owner takes before submission
+## The engine and Canva's terms
 
-The working default for a bundle that holds engine 0.11.0 is AGPL-3.0-or-later (decision 12,
-pending the owner). That default does not fit this file on its own. AGPL-3.0 lets anyone who
-receives the combined work use, change and pass it on anywhere, and Canva's terms 1 and 2 restrict
-the Canva parts of the same file to the Canva Platform. The combined file cannot meet both sets of
-terms unless the engine's copyright holder allows the combination.
+Version 0.1.0 of the app was prepared with engine 0.11.0, under AGPL-3.0-or-later, and was never
+submitted. AGPL-3.0 lets anyone who receives the combined work use, change and pass it on anywhere,
+and Canva's terms 1 and 2 restrict the Canva parts of the same file to the Canva Platform, so that
+file could not meet both sets of terms without an additional permission from the engine's copyright
+holder.
 
-The owner holds the copyright of the engine's own code, so the owner can settle this. Two routes
-are open:
+Version 0.1.1 pins engine 0.12.0, built from the source that is under the MIT License since
+14 November 2026, which is the second route this note described. The file combines the MIT code of
+the app and the engine, the Apache-2.0 notices of rxing, Canva's license and the permissive licenses
+above with no conflict, so no additional permission is needed.
 
-1. **An additional permission for the engine 0.11.0 module.** Under section 7 of the AGPL, the owner
-   adds a permission like this one to the notice of this app: "As an additional permission under
-   section 7 of the GNU Affero General Public License, the copyright holders of the QR Code & Barcode
-   Scanner engine allow you to combine the engine with Canva's software components in an app
-   offered on the Canva Platform, and to convey the combination, without the Canva components
-   becoming subject to the AGPL. The engine itself stays under the AGPL." The Apache-2.0 code
-   derived from rxing allows this combination already.
-2. **An engine release built from the MIT source.** The engine's source is under the MIT License
-   since 14 November 2026. Once a version built from it is published to npm, pinning it here makes
-   the bundle MIT, Canva's license and the permissive licenses above, with no conflict.
-
-Until the owner chooses, `dist/app.js` is built and tested here but not submitted. Neither route
-changes the code: the first changes the notice in the banner of `scripts/build.mjs` and this file,
-the second changes the pinned engine version.
+`scripts/build.mjs` refuses an engine that is not MIT or does not ship the MIT text, so a future
+engine under other terms needs the banner, the panel's license line in `src/messages.js` and this
+file reviewed before it can be built.
 
 This note describes the licenses as written. It is not legal advice.
