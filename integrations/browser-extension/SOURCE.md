@@ -1,6 +1,6 @@
 # Rebuilding the QR Code & Barcode Scanner add-on from source
 
-This is the source package of the QR Code & Barcode Scanner browser extension, version 0.1.0.
+This is the source package of the QR Code & Barcode Scanner browser extension, version 0.1.1.
 It builds the Firefox add-on and the Chrome, Edge and Safari packages. These notes are written for a
 Firefox Add-ons reviewer who wants to rebuild the uploaded add-on and compare it.
 
@@ -24,13 +24,13 @@ npm run build-for-amo
 ```
 
 `npm ci` installs exactly one package from `package-lock.json`:
-`@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, checked against its `sha512` integrity.
+`@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, checked against its `sha512` integrity.
 `--omit=dev` leaves out the test tools (Playwright and web-ext), and `--ignore-scripts` runs no
 install script. `npm run build-for-amo` runs `node scripts/build.mjs`. It writes:
 
-- `build/firefox/`, the unpacked add-on, and `build/qrcode-barcode-scanner-firefox-0.1.0.zip`;
+- `build/firefox/`, the unpacked add-on, and `build/qrcode-barcode-scanner-firefox-0.1.1.zip`;
 - the same for `chrome`, `edge` and `safari`;
-- `build/qrcode-barcode-scanner-source-0.1.0.zip`, this source package;
+- `build/qrcode-barcode-scanner-source-0.1.1.zip`, this source package;
 - `build/build-receipt.json`, with the size and SHA-256 of every archive.
 
 Compare `build/firefox/` with the files of the uploaded add-on: they are the same files, and the
@@ -50,20 +50,20 @@ WebAssembly module, and that no script builds code from text or loads it from th
 | `LICENSE`, `NOTICE.md`, `PROVENANCE.json` | `LICENSE`, and written by `scripts/build.mjs` |
 | `vendor/qrcode-barcode-scanner-wasm/*` | copied unchanged from `node_modules/@qrcode-ai-com/qrcode-barcode-scanner-wasm/` |
 
-The build stops if the installed scanner package is not version 0.11.0, if its lockfile entry
-differs, or if the SHA-256 of its WebAssembly module is not
-`a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68`. That value is in
+The build stops if the installed scanner package is not version 0.12.0 under the MIT License, if
+its lockfile entry differs, or if the SHA-256 of its WebAssembly module is not
+`298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868`. That value is in
 `package.json` (`config.wasmSha256`) and in the package's own `build-info.json`.
 
 ## The WebAssembly module
 
 `qrcode-barcode-scanner_bg.wasm` is the scanner engine. It is the file of the published npm
 package, not a file built here. The package is the official release of the engine at
-<https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.11.0>.
+<https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.12.0>.
 
 Its Rust source is the public repository
-<https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust> at tag `v0.11.0`, revision
-`176ac96ef16ee330dbfc6ada10327d0b4e23a8b2`. That repository's `scripts/build-wasm.sh` is the
+<https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust> at tag `v0.12.0`, revision
+`897dd50cdf27cbde54d408bf65e1ca4622035d42`. That repository's `scripts/build-wasm.sh` is the
 recipe. `build-info.json` in the package records the revision, the SHA-256 of the compiled
 inputs, and the toolchain: rustc 1.99.1, wasm-pack 0.13.1, wasm-bindgen 0.2.126 and wasm-opt
 version 130, for `wasm32-unknown-unknown` without SIMD. `qrcode-barcode-scanner.js` and
@@ -83,8 +83,8 @@ of the package's own tests. Then:
 ```sh
 git clone https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust
 cd qrcode-barcode-scanner-rust
-git checkout v0.11.0
-git rev-parse HEAD        # 176ac96ef16ee330dbfc6ada10327d0b4e23a8b2
+git checkout v0.12.0
+git rev-parse HEAD        # 897dd50cdf27cbde54d408bf65e1ca4622035d42
 
 rustup toolchain install 1.99.1 --profile minimal --target wasm32-unknown-unknown
 cargo +1.99.1 install wasm-pack --version 0.13.1 --locked
@@ -138,5 +138,6 @@ The browser tests need Playwright's browsers:
 ## License
 
 The extension's own files are under the MIT License (`LICENSE`). The scanner package in
-`vendor/qrcode-barcode-scanner-wasm/` keeps its own license, AGPL-3.0-or-later, with Apache-2.0
-notices for code derived from rxing. `NOTICE.md` in each built package states that boundary.
+`vendor/qrcode-barcode-scanner-wasm/` is MIT too (its own `LICENSE`); two isolated parts of its
+reader derive from rxing and keep their Apache-2.0 notices (`LICENSE-APACHE-2.0`,
+`THIRD-PARTY.md`). `NOTICE.md` in each built package states the license of both parts.

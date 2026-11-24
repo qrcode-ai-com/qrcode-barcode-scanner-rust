@@ -85,6 +85,14 @@ export function scannerPackage(root = HERE) {
   if (installed.version !== pinned) {
     fail(`${PACKAGE} ${installed.version} installed, ${pinned} pinned`);
   }
+  // NOTICE.md, the Firefox license text and the README state an MIT engine: a package published
+  // under another license, or without the MIT text, needs those reviewed before it is bundled.
+  if (installed.license !== 'MIT') {
+    fail(`${PACKAGE} ${pinned} is licensed ${installed.license}: review the notices first`);
+  }
+  if (!/^MIT License\n/.test(readFileSync(join(directory, 'LICENSE'), 'utf8'))) {
+    fail(`${PACKAGE} ${pinned} does not ship the MIT License text`);
+  }
   const info = JSON.parse(readFileSync(join(directory, 'build-info.json'), 'utf8'));
   const wasm = readFileSync(join(directory, 'qrcode-barcode-scanner_bg.wasm'));
   const actual = sha256(wasm);
@@ -116,15 +124,17 @@ function notice(scanner, version) {
 
 QR Code & Barcode Scanner browser extension ${version}.
 
+The extension and the scanner engine it bundles are both available under the MIT License.
+
 - The extension's own files (\`manifest.json\`, \`background.js\`, \`scanner.*\`, \`results.js\`,
   \`scanner-worker.js\`, \`icons/\`) are project-authored source under the MIT License in
   \`LICENSE\`.
 - \`vendor/qrcode-barcode-scanner-wasm/\` holds files copied unchanged from the published npm
-  package ${scanner.name} ${scanner.version}. That archive is licensed ${scanner.license}
-  (\`vendor/qrcode-barcode-scanner-wasm/LICENSE\`), with Apache-2.0 notices for the parts that
-  derive from rxing (\`LICENSE-APACHE-2.0\`, \`THIRD-PARTY.md\`). The MIT License of the
-  extension does not relicense it.
-- The corresponding engine source is the public repository
+  package ${scanner.name} ${scanner.version}, licensed ${scanner.license}
+  (\`vendor/qrcode-barcode-scanner-wasm/LICENSE\`). Two isolated parts of the engine's reader
+  derive from rxing, a Rust port of ZXing, and keep their original Apache-2.0 copyright and
+  license notices (\`LICENSE-APACHE-2.0\`, \`THIRD-PARTY.md\`).
+- The engine source is the public repository
   https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at revision
   ${scanner.source_revision} (tag v${scanner.version}); \`build-info.json\` records how the
   WebAssembly module was built and its SHA-256.

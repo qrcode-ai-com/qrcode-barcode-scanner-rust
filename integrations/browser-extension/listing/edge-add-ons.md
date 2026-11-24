@@ -1,4 +1,4 @@
-# Microsoft Edge Add-ons · QR Code & Barcode Scanner 0.1.0
+# Microsoft Edge Add-ons · QR Code & Barcode Scanner 0.1.1
 
 Everything the Partner Center form asks for, ready to paste. Nothing here has been submitted:
 the account, the agreement, the upload and the publish button belong to the owner.
@@ -11,11 +11,11 @@ without notice.
 
 | What | Value |
 |---|---|
-| File | `build/qrcode-barcode-scanner-edge-0.1.0.zip` |
-| SHA-256 | `6b9f3e52ca4d567582192c2b118555d31e9d69cb02849fc57cc4c0dcfc94a614` |
+| File | `build/qrcode-barcode-scanner-edge-0.1.1.zip` |
+| SHA-256 | `3733e90c0e705278760a765c740ac17573c8a4dc7eb21d5146d1ea707c5ca659` |
 | Made by | `npm ci && npm run build` in this folder, or the `browser-extension` artifact of the `integration-browser-extension` workflow |
 | Checked by | `npm run check:pins` (same bytes as [SHA256SUMS](../SHA256SUMS)), `npm run inspect`, and `node test/chromium.mjs --package` on that zip, in Playwright's Chromium and with `--channel msedge` in Microsoft Edge |
-| Manifest | Manifest V3, version 0.1.0, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`; no `update_url`, and neither the name nor the description names another browser (`npm run inspect` checks both) |
+| Manifest | Manifest V3, version 0.1.1, permissions `contextMenus` and `activeTab`, optional host permissions `https://*/*` and `http://*/*`; no `update_url`, and neither the name nor the description names another browser (`npm run inspect` checks both) |
 
 Rebuilding on any system with Node.js 22 or 24 gives the same bytes. If the hash differs, do
 not upload: rebuild from a clean checkout of `main`.
@@ -39,7 +39,7 @@ No token, environment or tag is needed: no workflow in this repository uploads t
 ## Upload
 
 Partner Center, Microsoft Edge, **Create new extension**, then drop
-`qrcode-barcode-scanner-edge-0.1.0.zip`. The pages on the left then follow in this order:
+`qrcode-barcode-scanner-edge-0.1.1.zip`. The pages on the left then follow in this order:
 Availability, Properties, Privacy and Store listings; **Save & Continue** moves to the next.
 
 ## Availability

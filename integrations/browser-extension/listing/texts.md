@@ -1,4 +1,4 @@
-# Store listings · QR Code & Barcode Scanner 0.1.0
+# Store listings · QR Code & Barcode Scanner 0.1.1
 
 The texts every store shows. This file is the one copy of them: the build writes
 `build/amo-metadata.json` for Firefox Add-ons from it, and `npm test` checks their lengths and
@@ -136,5 +136,5 @@ How to test: open the toolbar popup and choose a PNG or JPEG that holds a QR cod
 
 Permissions: contextMenus for the menu item; activeTab to fetch the clicked image from the page's own site. Host access is optional and requested for one site only, when the user clicks "Allow" for an image of another site that refuses cross-site reads.
 
-Code: no remote code and no minified code. The extension's own files are written by hand. vendor/qrcode-barcode-scanner-wasm/ is copied unchanged from the npm package @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.11.0: a WebAssembly module built from https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at tag v0.11.0, and its generated wasm-bindgen glue. auto.js validates two small inline WebAssembly byte arrays to check browser support; they are validated, never run. The module is compiled in a worker under script-src 'self' 'wasm-unsafe-eval'. SOURCE.md in the source package gives the rebuild steps: npm ci --omit=dev --ignore-scripts, then npm run build-for-amo.
+Code: no remote code and no minified code. The extension's own files are written by hand. vendor/qrcode-barcode-scanner-wasm/ is copied unchanged from the npm package @qrcode-ai-com/qrcode-barcode-scanner-wasm 0.12.0: a WebAssembly module built from https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust at tag v0.12.0, and its generated wasm-bindgen glue. auto.js validates two small inline WebAssembly byte arrays to check browser support; they are validated, never run. The module is compiled in a worker under script-src 'self' 'wasm-unsafe-eval'. SOURCE.md in the source package gives the rebuild steps: npm ci --omit=dev --ignore-scripts, then npm run build-for-amo.
 ```

@@ -42,4 +42,4 @@ no code from the network. Its source is public:
 QR Code AI, a product of SuperNovae Studio: <https://qrcode-ai.com/>. Questions and reports:
 <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues>.
 
-Effective 20 November 2026, for version 0.1.0.
+Effective 20 November 2026, for version 0.1.1.
