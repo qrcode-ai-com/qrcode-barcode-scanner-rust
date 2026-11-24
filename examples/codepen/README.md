@@ -52,7 +52,7 @@ The Pen is not on CodePen yet: the owner creates it from [`prefill.html`](prefil
 </p>
 
 The page in Chrome on a CI runner, captured by
-[run 44882425338](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44882425338)
+[run 45404796609](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45404796609)
 of the workflow below.
 
 ## Run it on your machine

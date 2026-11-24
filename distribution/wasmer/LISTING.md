@@ -33,13 +33,12 @@ package names the tag as its corresponding source.
 - Workflow: **Wasmer · WASI module** (`.github/workflows/wasmer.yml`).
 - Artifact: `qrscan-wasmer-package`, a folder with `wasmer.toml`, `README.md`, `LICENSE`,
   `qrscan.wasm`, `notices/` and `SHA256SUMS`.
-- `qrscan.wasm` sha256: `65c4436f2ac461bd94696c9daaf7fce40bf5a6c26203f1a7115a8d9201c45460`. Both
-  builds of run [44883180229](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44883180229),
-  in two directories, gave it; every later run of the same source and toolchain must give it too.
-- Run that verified it under Wasmer: [44885967740](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44885967740).
-  The truth set, the native comparison, the acceptance, the notices check and the removal
-  receipt passed there; its last assertion, on the Wasmer home after the removal probe, was
-  reordered in the next commit.
+- `qrscan.wasm` sha256: `643009edfca35c7460dd807137cb9f9894689d57ccd1f593e970665a216618ef`. Both
+  builds of run [45404796632](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45404796632),
+  in two directories, gave it from the v0.12.0 source; every later run of the same source and
+  toolchain must give it too.
+- The same run verified it under Wasmer: the truth set, the native comparison with qrscan
+  0.12.0, the acceptance, the notices check and the removal receipt passed there.
 
 Take the artifact of the latest green run on `main` for the merged commit: its
 `notices/SOURCE.json` names that commit as the packaging revision. A run on a pull request

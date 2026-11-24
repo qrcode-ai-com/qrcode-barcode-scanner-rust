@@ -112,7 +112,7 @@ The workflow `.github/workflows/wasmer.yml` of the [engine repository](https://g
 
 The receipts of each run are kept as the artifact `qrscan-wasmer-receipts`.
 
-When this folder was written, run [44885967740](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44885967740) built the same module twice, sha256 `65c4436f2ac461bd94696c9daaf7fce40bf5a6c26203f1a7115a8d9201c45460`. Under Wasmer 7.5.0 on Ubuntu 24.04 x64, all 35 truth cases passed with the same exit codes and detections as the native command, and the acceptance on the mixed sample passed in the three profiles. The package Wasmer built held every notice, and `wasmer publish --dry-run` answered that no user was logged in.
+When the package moved to the 0.12.0 source, run [45404796632](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45404796632) built the same module twice, sha256 `643009edfca35c7460dd807137cb9f9894689d57ccd1f593e970665a216618ef`. Under Wasmer 7.5.0 on Ubuntu 24.04 x64, all 35 truth cases passed with the same exit codes and detections as the native qrscan 0.12.0, and the acceptance on the mixed sample passed in the three profiles. The package Wasmer built held every notice, and `wasmer publish --dry-run` answered that no user was logged in.
 
 ## Publish it
 
