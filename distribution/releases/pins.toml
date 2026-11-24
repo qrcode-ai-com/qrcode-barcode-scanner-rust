@@ -123,6 +123,7 @@ paths = [
   "distribution/chocolatey/*",
   "distribution/debian/*",
   "distribution/rpm/*",
+  "distribution/termux/**",
   ".github/workflows/appimage.yml",
   ".github/workflows/destination-acceptance.yml",
   ".github/workflows/go-adapter.yml",
@@ -239,7 +240,6 @@ paths = [
   "distribution/obs/**",
   "distribution/ppa/**",
   "distribution/snap/**",
-  "distribution/termux/**",
   "scripts/check-packaging-recipes.py",
   "scripts/stage-glama-package.py",
   ".github/workflows/integration-glama.yml",
@@ -488,6 +488,11 @@ match = "\\$sourceSha = '([0-9a-f]{64})'"
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
 paths = ["distribution/debian/README.md"]
 match = '^`([0-9a-f]{64})`\.'
+
+[[value]]
+fact = "release > assets > qrcode-barcode-scanner-cli-{version}-source.tar.gz > sha256"
+paths = ["distribution/termux/qrcode-barcode-scanner/build.sh"]
+match = '^TERMUX_PKG_SHA256=([0-9a-f]{64})$'
 
 [[value]]
 fact = "release > assets > qrcode-barcode-scanner-cli-{version}-x86_64-pc-windows-msvc.zip > sha256"
