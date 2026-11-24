@@ -3,6 +3,11 @@
 //
 //   node check-launch.mjs STAGE OUT [--version 0.11.0]
 //
+// --version is the engine the reviewed MCP launch (distribution/readme-actions.json) brings with
+// it. That launch names the published adapter and moves only after a publication, so the adapter
+// source in integrations/mcp may already be ahead of it. The skill helper runs on the engine its
+// staged SKILL.md pins, which can be another version.
+//
 // For every client configuration (launches.mjs) it starts the server with that exact command,
 // through distribution/acceptance/drivers/mcp-server.mjs, and lets the destination-acceptance
 // contract judge the three profiles. The pinned server also runs once with an allowed directory,
@@ -52,15 +57,21 @@ const shell = (argv) => argv.map((part) => (/^[\w@%+=:,./-]+$/.test(part) ? part
 
 const image = run('python3', [ACCEPTANCE, 'stage', join(out, 'input')]).stdout.trim();
 if (!existsSync(image)) throw new Error(`the fixture was not staged: ${image}`);
-const adapter = JSON.parse(await readFile(join(ENGINE, 'integrations/mcp/package.json'), 'utf8'));
-const pinned = `${adapter.name}@${adapter.version}`;
+// The adapter every client configuration starts is the reviewed public launch, not the source.
+const pinned = JSON.parse(await readFile(join(ENGINE, 'distribution/readme-actions.json'), 'utf8')).mcpLaunch.args.at(-1);
+const adapter = { name: pinned.slice(0, pinned.lastIndexOf('@')), version: pinned.slice(pinned.lastIndexOf('@') + 1) };
+// The skill helper's own version and engine, from the copy the stage holds.
+const front = /^---\n([\s\S]*?)\n---\n/.exec(await readFile(join(stage, 'skills', NAME, 'SKILL.md'), 'utf8'))?.[1] ?? '';
+const skillVersion = /^ {2}version: "(\d+\.\d+\.\d+)"$/m.exec(front)?.[1];
+const skillEngine = /^ {2}engine: "@qrcode-ai-com\/qrcode-barcode-scanner@(\d+\.\d+\.\d+)"$/m.exec(front)?.[1];
+if (!skillVersion || !skillEngine) throw new Error('the staged SKILL.md names no exact version or engine');
 const results = [];
 
-async function judge(id, kind, producedBy, reports, extra) {
+async function judge(id, kind, producedBy, reports, extra, engineVersion = version) {
   const receipt = join(receipts, `${slug(id)}.json`);
   const judged = run('python3', [ACCEPTANCE, 'reports', '--kind', kind, '--produced-by', producedBy,
     '--fast', join(reports, 'fast.json'), '--frame', join(reports, 'frame.json'), '--full', join(reports, 'full.json'),
-    '--destination', `Agent plugin · ${id}`, '--version', version, ...extra, '--receipt', receipt]);
+    '--destination', `Agent plugin · ${id}`, '--version', engineVersion, ...extra, '--receipt', receipt]);
   results.push({ id, receipt, judged: judged.status === 0, note: judged.stderr.trim() || judged.stdout.trim() });
 }
 
@@ -103,7 +114,7 @@ for (const [id, argv] of Object.entries(found)) {
 
 // 3. The skill's helper, from both copies, with the engine installed as SKILL.md says.
 const runtime = join(work, '.qrcode-barcode-scanner-runtime');
-const engine = `@qrcode-ai-com/qrcode-barcode-scanner@${version}`;
+const engine = `@qrcode-ai-com/qrcode-barcode-scanner@${skillEngine}`;
 const install = ['install', '--prefix', runtime, '--ignore-scripts', '--no-audit', '--no-fund', '--save-exact', engine];
 const installed = run('npm', install);
 if (installed.status !== 0) throw new Error(`npm ${install.join(' ')} failed: ${installed.stderr.slice(-800)}`);
@@ -119,7 +130,8 @@ for (const [id, folder] of Object.entries(helpers)) {
   }
   if (ok) {
     await judge(id, 'package', `node scan.mjs --engine-root .qrcode-barcode-scanner-runtime --profile PROFILE --budget-ms 0 -- IMAGE`, reports,
-      ['--identifier', `${NAME} skill 0.2.0`, '--url', 'https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin', '--install', `npm ${install.join(' ')}`]);
+      ['--identifier', `${NAME} skill ${skillVersion}`, '--url', 'https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin', '--install', `npm ${install.join(' ')}`],
+      skillEngine);
   }
 }
 

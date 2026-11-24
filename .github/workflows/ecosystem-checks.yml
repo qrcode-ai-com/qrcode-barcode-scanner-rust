@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           npm install --prefix "$RUNNER_TEMP/skill-engine" --ignore-scripts --no-audit --no-fund \
-            --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.11.0
+            --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0
           node skills/qrcode-barcode-scanner/scripts/test.mjs --engine-root "$RUNNER_TEMP/skill-engine" \
             --fixture fixtures/clean/gen_v5_q.png --mixed-fixture fixtures/symbology/mixed-code128-qr.png \
             > "$RUNNER_TEMP/ecosystem-qualified/skill.json"

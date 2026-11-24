@@ -48,7 +48,7 @@ class ReleaseBoundaries(unittest.TestCase):
     def test_exact_archive(self):
         value = release.archive_info(self.archive)
         self.assertEqual(value["package"], release.PACKAGE)
-        self.assertEqual(value["engine"]["version"], "0.11.0")
+        self.assertEqual(value["engine"]["version"], "0.12.0")
         self.assertEqual(set(value["files"]), set(release.FILES))
 
     def test_product_links_precede_installation(self):
@@ -125,7 +125,7 @@ class ReleaseBoundaries(unittest.TestCase):
         package_file = root / "integrations/mcp/package.json"
         original = package_file.read_bytes()
         package = json.loads(original)
-        package["dependencies"][release.ENGINE] = "^0.11.0"
+        package["dependencies"][release.ENGINE] = "^0.12.0"
         package_file.write_text(json.dumps(package))
         with self.assertRaisesRegex(ValueError, "exact qualified pins"):
             release.metadata(root)
@@ -141,7 +141,7 @@ class ReleaseBoundaries(unittest.TestCase):
         version = release.metadata()["version"]
         self.assertEqual(release.gate(f"refs/tags/agents-v{version}")["version"], version)
         self.assertEqual(release.gate("refs/heads/rehearsal")["version"], version)
-        for ref in ("refs/tags/v0.11.0", "refs/tags/agents-v999.0.0", f"refs/tags/agents-v{version}-wrong"):
+        for ref in ("refs/tags/v0.12.0", "refs/tags/agents-v999.0.0", f"refs/tags/agents-v{version}-wrong"):
             with self.subTest(ref=ref), self.assertRaisesRegex(ValueError, "independent adapter version"):
                 release.gate(ref)
 
@@ -154,13 +154,20 @@ class ReleaseBoundaries(unittest.TestCase):
         return {"total_count": 1, "branch_policies": [{"name": "agents-v*", "type": "tag"}]}
 
     def test_protected_environment(self):
+        requested = []
         def get(url):
+            requested.append(url)
             return json.dumps(self.policies() if url.endswith("deployment-branch-policies") else self.environment()).encode()
         self.assertEqual(release.protected_environment(get)["tagPolicy"], "agents-v*")
+        # The repository answers at its current name; the API redirects the old name, and the
+        # readback refuses redirects, so a stale name fails every tag.
+        base = "https://api.github.com/repos/qrcode-ai-com/qrcode-barcode-scanner-rust/environments/npm-agents"
+        self.assertEqual(requested, [base, base + "/deployment-branch-policies"])
 
     def test_fork_and_same_name_replacement_cannot_reach_environment_lookup(self):
         version = release.metadata()["version"]
-        for context in ({}, {"GITHUB_REPOSITORY": "someone/qrcode-barcode-scanner", "GITHUB_REPOSITORY_ID": "1"}, {"GITHUB_REPOSITORY": release.REPOSITORY, "GITHUB_REPOSITORY_ID": "1"}):
+        for context in ({}, {"GITHUB_REPOSITORY": "someone/qrcode-barcode-scanner", "GITHUB_REPOSITORY_ID": "1"}, {"GITHUB_REPOSITORY": release.REPOSITORY, "GITHUB_REPOSITORY_ID": "1"},
+                        {"GITHUB_REPOSITORY": "qrcode-ai-com/qrcode-barcode-scanner", "GITHUB_REPOSITORY_ID": release.REPOSITORY_ID}):
             with self.subTest(context=context), self.assertRaises(ValueError):
                 release.publishing_preflight(f"refs/tags/agents-v{version}", "push", "inspect", context, lambda url: self.fail("fork must be rejected before any canonical-environment lookup"))
 

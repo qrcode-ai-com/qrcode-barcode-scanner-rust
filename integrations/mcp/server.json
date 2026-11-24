@@ -5,16 +5,16 @@
   "description": "Local MCP server for QR and barcode image scanning, preserved payload bytes and QR diagnostics.",
   "websiteUrl": "https://qrcode-ai.com/en-US/qr-code-scanner/mcp",
   "repository": {
-    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner",
+    "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
     "source": "github",
     "subfolder": "integrations/mcp"
   },
-  "version": "0.3.1",
+  "version": "0.3.2",
   "packages": [{
     "registryType": "npm",
     "registryBaseUrl": "https://registry.npmjs.org",
     "identifier": "@qrcode-ai-com/qrcode-barcode-scanner-mcp",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "transport": { "type": "stdio" }
   }]
 }
