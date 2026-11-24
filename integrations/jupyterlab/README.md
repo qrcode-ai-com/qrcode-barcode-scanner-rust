@@ -180,10 +180,6 @@ The picture is a recorded scan of the sample image, which holds a QR code and a 
 Both come back in one report, each with its format, its exact text and the place where the engine
 measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 
-The picture is a recorded scan of the sample image, which holds a QR code and a Code 128 barcode.
-Both come back in one report, each with its format, its exact text and the place where the engine
-measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
-
 The report itself is described field by field in the
 [report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
