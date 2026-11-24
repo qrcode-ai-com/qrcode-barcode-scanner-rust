@@ -61,7 +61,7 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 Every file is generated from the folder `distribution/publisher` of the engine repository,
 <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust>, by its program
 `scripts/stage-publisher-site.py`. That folder is the only source edited by hand. The skill
-archive is the published file of the engine's `agents-v0.2.1` release, byte for byte; the
+archive is the skill 0.2.1 file of the engine's `agents-v0.3.2` release, byte for byte; the
 program checks its SHA-256 and that its files equal the skill's source at the release commit.
 
 `SOURCE.json` names the engine commit and the SHA-256 of every file. The `Check` workflow fetches
