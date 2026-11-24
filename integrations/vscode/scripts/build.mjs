@@ -26,13 +26,13 @@ const enginePackage = dirname(require.resolve(`${engineName}/package.json`));
 const engine = JSON.parse(readFileSync(join(enginePackage, 'package.json'), 'utf8'));
 // The pin is exact, and the installed package must be that version under its published license.
 assert.equal(engine.version, manifest.devDependencies[engineName], 'The installed engine is not the pinned version');
-assert.equal(engine.license, 'AGPL-3.0-or-later', 'Engine license changed: review the bundle notices before building');
+assert.equal(engine.license, 'MIT', 'Engine license changed: review the bundle notices before building');
 const buildInfo = JSON.parse(readFileSync(join(enginePackage, 'build-info.json'), 'utf8'));
 const wasm = readFileSync(join(enginePackage, buildInfo.wasm.path));
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 assert.equal(sha256(wasm), buildInfo.wasm.sha256, 'The WASM module does not match its build record');
 const engineLicense = readFileSync(join(enginePackage, 'LICENSE'), 'utf8');
-assert.match(engineLicense, /^\s*GNU AFFERO GENERAL PUBLIC LICENSE\s*\n\s*Version 3, 19 November 2007/, 'The engine package no longer ships the AGPL text');
+assert.match(engineLicense, /^MIT License\n/, 'The engine package no longer ships the MIT text');
 
 rmSync(stage, { recursive: true, force: true });
 mkdirSync(join(stage, 'dist', 'engine'), { recursive: true });
@@ -67,7 +67,9 @@ writeFileSync(join(stage, 'README.md'), marketplaceReadme(text(join(here, 'READM
 const mit = text(join(here, 'LICENSE'));
 writeFileSync(join(stage, 'LICENSE.md'), `# Licenses of this extension
 
-This extension holds two kinds of code under two licenses.
+This extension holds its own code and the scanner engine it bundles. Both are available under the
+MIT License. Two isolated parts of the engine's reader derive from rxing, a Rust port of ZXing,
+and keep their original Apache-2.0 copyright and license notices.
 
 ## The extension's own code: MIT
 
@@ -78,11 +80,11 @@ under the MIT License:
 ${mit.trim()}
 \`\`\`
 
-## The bundled scanner engine: AGPL-3.0-or-later
+## The bundled scanner engine: MIT
 
 \`dist/qrcode-barcode-scanner_bg.wasm\` and the JavaScript glue bundled in \`dist/worker.js\` are the
-published npm package \`${engineName}@${engine.version}\`, distributed under
-${engine.license}. Its corresponding source is revision \`${buildInfo.source_revision}\` of
+published npm package \`${engineName}@${engine.version}\`, distributed under the MIT License. Its
+source is revision \`${buildInfo.source_revision}\` of
 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust (tag \`v${engine.version}\`);
 \`dist/engine/build-info.json\` records how the module was built and its SHA-256. The package's
 license file is \`dist/engine/LICENSE\`, and the Apache-2.0 notices it retains are

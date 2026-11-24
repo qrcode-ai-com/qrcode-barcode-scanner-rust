@@ -37,7 +37,7 @@ stores no publishing token.
 # in a clean engine checkout, at the commit to publish
 node integrations/vscode/scripts/stage-distribution.mjs stage --out /tmp/vscode-lane
 # copy /tmp/vscode-lane over a clean checkout of this repository, review, commit, then
-git tag vscode-v0.1.0 && git push origin vscode-v0.1.0
+git tag vscode-v0.1.1 && git push origin vscode-v0.1.1
 ```
 
 `node integrations/vscode/scripts/stage-distribution.mjs verify <checkout of this repository>`
