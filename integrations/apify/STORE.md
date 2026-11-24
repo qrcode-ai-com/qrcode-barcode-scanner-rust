@@ -81,6 +81,6 @@ No. Convert each page to a PNG or JPEG image first.
 
 ### Where is the source?
 
-The Actor and the engine are open source, in the [scanner repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust), where issues and questions are welcome. The Actor's own files are MIT. The image it runs holds the engine 0.11.0, under AGPL-3.0-or-later. You can also scan in a browser with the [online demo](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/).
+The Actor and the engine are open source, in the [scanner repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust), where issues and questions are welcome. The Actor's own files are MIT. The image runs the engine 0.12.0, which is MIT too. You can also scan in a browser with the [online demo](https://qrcode-ai-com.github.io/qrcode-barcode-scanner-rust/).
 
 Maintained for [QR Code AI](https://qrcode-ai.com/).

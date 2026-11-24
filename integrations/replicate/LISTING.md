@@ -35,7 +35,7 @@ commit the version was pushed from.
 # QR Code & Barcode Scanner
 
 Read every QR code and barcode in an image. The model returns the complete JSON report of the
-open-source QR Code & Barcode Scanner engine, version 0.11.0: each code's format, decoded text,
+open-source QR Code & Barcode Scanner engine, version 0.12.0: each code's format, decoded text,
 raw bytes and measured position, with a quality score for QR codes in the fast and full profiles.
 
 It reads QR Code, Micro QR, rMQR, Data Matrix, Aztec, PDF417, MaxiCode, EAN-13, EAN-8, UPC-A,
@@ -63,15 +63,14 @@ or the `qrscan` command line. The model never opens what a code points to.
 
 ## Source code and licence
 
-This model is open source. You may get its complete corresponding source, as
-AGPL-3.0-or-later section 13 provides for users of a network service:
+This model is open source. Its source:
 
-- the engine 0.11.0: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0
-  and its source distribution on https://pypi.org/project/qrcode-barcode-scanner/0.11.0/
+- the engine 0.12.0: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0
+  and its source distribution on https://pypi.org/project/qrcode-barcode-scanner/0.12.0/
 - this model version: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/<commit>/integrations/replicate
 
-The model's own source is MIT. The image embeds the engine wheel 0.11.0, published under
-AGPL-3.0-or-later, so the model as a whole is distributed under AGPL-3.0-or-later. Details:
+The model's own source is MIT, and so is the engine wheel 0.12.0 its image embeds. Two reader
+parts of the engine keep their Apache-2.0 notices, which the image carries. Details:
 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/replicate/LICENSE-NOTES.md
 
 Home page: https://qrcode-ai.com/ · Issues:
@@ -87,7 +86,7 @@ the model's example.
 
 ```json
 {
-  "image": "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png",
+  "image": "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png",
   "profile": "full",
   "budget_ms": 0
 }
@@ -95,7 +94,7 @@ the model's example.
 
 The report must hold two detections: `symbology` `qr_code` with `content.text`
 `https://qrc-ai.com/76xMa`, and `symbology` `code128` with `content.text` `STOCK-4827`. Its
-`versions.scanner` must be `0.11.0`.
+`versions.scanner` must be `0.12.0`.
 
 A prediction made on the website is kept until it is deleted, so the example stays on the page.
 The example image is the scanner's own test fixture, which holds no personal data.
@@ -181,7 +180,7 @@ three times through the API with `"version": "<version id>"` and the profiles `f
 python3 scripts/destination-acceptance.py reports --kind server \
   --produced-by "Replicate prediction, version <version id>" \
   --fast fast.json --frame frame.json --full full.json \
-  --destination "Replicate model qrcode-ai-com/qrcode-barcode-scanner" --version 0.11.0 \
+  --destination "Replicate model qrcode-ai-com/qrcode-barcode-scanner" --version 0.12.0 \
   --url https://replicate.com/qrcode-ai-com/qrcode-barcode-scanner \
   --identifier "r8.im/qrcode-ai-com/qrcode-barcode-scanner:<version id>" \
   --receipt acceptance-replicate-live.json
@@ -193,9 +192,9 @@ python3 scripts/destination-acceptance.py check acceptance-replicate-live.json
 
 - The data-handling paragraph of the README is required: elsewhere the scanner keeps images on
   the user's machine, and on Replicate it does not.
-- The source offer must name the commit of each pushed version.
-- The licence of the image follows working default decision 12 (the image embeds the AGPL
-  0.11.0 wheel), which waits for the owner's confirmation.
+- The source links must name the commit of each pushed version.
+- Working default decision 12 covered an image that embeds the AGPL 0.11.0 wheel. This image
+  embeds the MIT 0.12.0 wheel instead; [LICENSE-NOTES.md](LICENSE-NOTES.md) states its licence.
 - Privacy, terms and support pages are planned at `https://qrcode-ai-com.github.io/privacy/`,
   `https://qrcode-ai-com.github.io/terms/` and `https://qrcode-ai-com.github.io/support/`, live
   after the owner's review. Link them from the README of the model page once they are live.

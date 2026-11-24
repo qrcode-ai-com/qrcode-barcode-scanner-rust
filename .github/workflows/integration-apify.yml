@@ -35,7 +35,7 @@ defaults:
 env:
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   IMAGE: qrscan-apify-actor:ci
-  ENGINE_VERSION: 0.11.0
+  ENGINE_VERSION: 0.12.0
 
 jobs:
   image:
@@ -78,11 +78,11 @@ jobs:
           docker build --pull -t "$IMAGE" integrations/apify
           docker image inspect "$IMAGE" --format 'image {{.Id}} · {{.Size}} bytes · {{.Architecture}}'
           docker image inspect "$IMAGE" --format '{{index .Config.Labels "org.opencontainers.image.licenses"}}' |
-            grep -Fx AGPL-3.0-or-later
+            grep -Fx MIT
           docker run --rm --entrypoint python "$IMAGE" -c \
             "import importlib.metadata as m; print(m.version('qrcode-barcode-scanner'))" | grep -Fx "$ENGINE_VERSION"
-          docker run --rm --entrypoint sha256sum "$IMAGE" licenses/engine-0.11.0/THIRD-PARTY.md \
-            licenses/engine-0.11.0/LICENSE-APACHE-2.0
+          docker run --rm --entrypoint sha256sum "$IMAGE" licenses/engine-0.12.0/THIRD-PARTY.md \
+            licenses/engine-0.12.0/LICENSE-APACHE-2.0
       - name: Run the image on the mixed fixture in the three profiles, then the daily test input
         run: |
           image=$(python scripts/destination-acceptance.py stage "$RUNNER_TEMP/input")

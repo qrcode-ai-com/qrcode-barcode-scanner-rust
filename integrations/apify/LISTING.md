@@ -14,9 +14,9 @@ monetization, Actor README, automated testing, `actor.json`).
   the title as H1), more than 300 words, and the sections it lists: what the Actor does, how to use
   it, its cost, input and output examples, and a FAQ. Its only links are the scanner repository,
   QR Code AI and the online demo; its example addresses use example.com.
-- [LICENSE-NOTES.md](LICENSE-NOTES.md): the Actor's files are MIT; the image runs the engine
-  0.11.0 under AGPL-3.0-or-later, so the image as a whole is AGPL-3.0-or-later, and it carries the
-  engine's third-party notices. The `Dockerfile` labels the image with that license.
+- [LICENSE-NOTES.md](LICENSE-NOTES.md): the Actor's files are MIT, and the image runs the engine
+  0.12.0, MIT too, with the Apache-2.0 notices of two of its reader parts, which it carries. The
+  `Dockerfile` labels the image `MIT`.
 
 The workflow `integration-apify.yml` proves it on every pull request that touches the Actor:
 

@@ -3,6 +3,7 @@
 `Runner.run` is called the way Cog's server calls it, with every input given. The image build and
 the predictions through `cog run` are the workflow integration-replicate.yml's other job.
 """
+import hashlib
 import json
 import pathlib
 import struct
@@ -16,6 +17,8 @@ from cog import BaseRunner, Path
 from conftest import MODEL_ROOT, kit
 
 PROFILES = ("fast", "frame", "full")
+# The engine wheel requirements.txt pins; every report must name it.
+ENGINE_VERSION = "0.12.0"
 
 
 def png(width, height, value=255):
@@ -43,14 +46,29 @@ def test_the_runner_is_the_class_cog_yaml_names(model):
 
 
 def test_the_requirements_pin_the_published_engine():
-    assert (MODEL_ROOT / "requirements.txt").read_text().split() == ["qrcode-barcode-scanner==0.11.0"]
-    assert qrcode_barcode_scanner.__version__ == kit.ENGINE_VERSION == "0.11.0"
+    assert (MODEL_ROOT / "requirements.txt").read_text().split() == [f"qrcode-barcode-scanner=={ENGINE_VERSION}"]
+    assert qrcode_barcode_scanner.__version__ == ENGINE_VERSION
+
+
+def test_the_image_carries_the_engine_notices_of_its_version():
+    """The wheel ships only the MIT LICENSE: the folder carries the engine's Apache-2.0 notices."""
+    notes = (MODEL_ROOT / "LICENSE-NOTES.md").read_text()
+    folder = MODEL_ROOT / "licenses" / f"engine-{ENGINE_VERSION}"
+    assert sorted(path.name for path in (MODEL_ROOT / "licenses").iterdir()) == [folder.name]
+    assert sorted(path.name for path in folder.iterdir()) == ["LICENSE-APACHE-2.0", "THIRD-PARTY.md"]
+    for name in ("THIRD-PARTY.md", "LICENSE-APACHE-2.0"):
+        assert hashlib.sha256((folder / name).read_bytes()).hexdigest() in notes, name
+    assert "First-party scanner source is licensed under MIT." in (folder / "THIRD-PARTY.md").read_text()
+    prose = " ".join(notes.split())
+    assert f"wheel `qrcode-barcode-scanner` {ENGINE_VERSION} from PyPI. That wheel is published under the **MIT License**" in prose
+    ignored = (MODEL_ROOT / ".dockerignore").read_text().split()
+    assert "licenses/" not in ignored and "licenses" not in ignored and "LICENSE-NOTES.md" not in ignored
 
 
 @pytest.mark.parametrize("profile", PROFILES)
 def test_the_mixed_fixture_gives_both_codes_in_each_profile(runner, mixed_path, profile):
     report = run(runner, mixed_path, profile)
-    kit.assert_mixed(report, profile)
+    kit.assert_mixed(report, profile, ENGINE_VERSION)
     assert kit.found(report) == list(kit.EXPECTED)
 
 
@@ -66,7 +84,7 @@ def test_the_report_is_the_engine_report_unchanged_and_json(runner, mixed_path, 
 
 def test_the_profile_budget_is_kept_when_no_budget_is_given(runner, mixed_path):
     report = runner.run(image=Path(mixed_path), profile="full", budget_ms=None)
-    assert report["versions"]["scanner"] == "0.11.0"
+    assert report["versions"]["scanner"] == ENGINE_VERSION
     assert isinstance(report["trace"]["budget_exhausted"], bool)
     if not report["trace"]["budget_exhausted"]:
         assert kit.found(report) == list(kit.EXPECTED)
@@ -154,4 +172,4 @@ def test_the_acceptance_reports_are_written_through_the_runner(runner, mixed_pat
         pytest.skip("QRSCAN_ACCEPTANCE_DIR is not set")
     assert [path.name for path in written] == ["fast.json", "frame.json", "full.json"]
     for path, profile in zip(written, PROFILES):
-        kit.assert_mixed(json.loads(pathlib.Path(path).read_text()), profile)
+        kit.assert_mixed(json.loads(pathlib.Path(path).read_text()), profile, ENGINE_VERSION)

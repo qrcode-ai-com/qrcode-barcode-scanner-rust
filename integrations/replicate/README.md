@@ -46,7 +46,7 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 
 [`run.py`](run.py) is the model: one `Runner` whose `run` takes an image and returns the report.
 [`cog.yaml`](cog.yaml) tells Cog to build it on Python 3.13 without a GPU, with the published
-package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0
+package [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0
 pinned in [`requirements.txt`](requirements.txt). Nothing is compiled from the engine's Rust
 source.
 
@@ -73,7 +73,7 @@ inputs, outputs and logs of a prediction made through the API are removed after 
 of a prediction made on the website are kept until you delete them.
 
 Send only images you may share with Replicate. To keep an image on your machine, use the
-[Python package](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/), the
+[Python package](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/), the
 [command line](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#command-line) or the
 same Cog folder on your own computer, as shown below. The model never opens what a code points to.
 
@@ -89,7 +89,7 @@ Once the model is published, a prediction's input is a JSON object like this one
 
 ```json
 {
-  "image": "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png",
+  "image": "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png",
   "profile": "full",
   "budget_ms": 0
 }
@@ -136,7 +136,7 @@ the engine. They check the empty report of a blank image, the failure of a file 
 image, of an empty file, of an oversized file and of an oversized image, the refused options, and
 the inputs Cog publishes. The workflow `integration-replicate` of the engine repository runs them
 in a new environment through the scanner's Python host kit. Its second job builds the image,
-checks that the engine inside it is the published 0.11.0 wheel, runs the three predictions with
+checks that the engine inside it is the published 0.12.0 wheel, runs the three predictions with
 `cog run`, checks that a text file fails its prediction, and removes the image.
 
 ## A recorded CI run
@@ -215,9 +215,9 @@ Both come back in one report, each with its format, its exact text and the place
 measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 
 The report is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx),
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx),
 and its errors in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -269,7 +269,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored model source in this folder is MIT; see [LICENSE](LICENSE). The image that `cog build` makes installs the engine wheel `qrcode-barcode-scanner` 0.11.0 from PyPI. The published engine 0.11.0 keeps the license it shipped with, AGPL-3.0-or-later, so the built image, and the model on Replicate once it is pushed, are distributed under AGPL-3.0-or-later. Because people use the hosted model over a network, its page offers them the corresponding source: the [engine at v0.11.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.11.0) and this folder at the commit each version was pushed from. [LICENSE-NOTES.md](LICENSE-NOTES.md) gives the details, and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) explains the boundaries.
+Project-authored model source in this folder is MIT; see [LICENSE](LICENSE). The image that `cog build` makes installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI. Engine 0.12.0 is MIT too: its wheel ships the MIT `LICENSE`, and the image carries the Apache-2.0 notices of two of its reader parts in `licenses/engine-0.12.0/`. Earlier preparations of this model pinned engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later; none was pushed. The model page links the source of what runs: the [engine at v0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0) and this folder at the commit each version was pushed from. [LICENSE-NOTES.md](LICENSE-NOTES.md) gives the details, and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) explains the boundaries.
 
 Replicate and Cog are names of Replicate, Inc. They identify the destination and imply no endorsement.
 

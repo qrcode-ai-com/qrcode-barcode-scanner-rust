@@ -2,7 +2,7 @@
 
 Cog builds this folder into a container image (cog.yaml) and serves `Runner.run` as one
 prediction: an image file in, the engine's scan report out, unchanged. The engine is the published
-wheel `qrcode-barcode-scanner` 0.11.0 from PyPI, running inside the container. On Replicate the
+wheel `qrcode-barcode-scanner` 0.12.0 from PyPI, running inside the container. On Replicate the
 image is uploaded to Replicate's servers and scanned there, not on the caller's machine.
 
 The limits are those of the scanner's MCP adapter (integrations/mcp/src/server.mjs, HARD_LIMITS
