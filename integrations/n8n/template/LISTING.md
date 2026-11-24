@@ -12,7 +12,7 @@ the submit button. Nothing here has been submitted. The rules are n8n's
 | File | What it is | sha256 |
 |---|---|---|
 | [qr-barcode-label-check.json](qr-barcode-label-check.json) | The workflow to submit, exactly as committed | `614acd340f7d09f03375528d5616d447c759887a7b9b263d8d4bd611da7823a7` |
-| `n8n-canvas.png` in the CI artifact | The image of the workflow, 1878 × 978 pixels, from the n8n 2.48.7 editor | `2247cc66252a9a250f286745cf5d836d852af376d6cca971456a21e34b511f07` |
+| `n8n-canvas.png` in the CI artifact | The image of the workflow, 1878 × 978 pixels, from the n8n 2.48.7 editor | `450bf6ba6a513d1ba8a1f9a9866cbbd96b356f4706535593d7af6500febb7581` |
 
 The workflow's name is `Check QR codes and barcodes in label images against an expected value`.
 The Creator portal writes the library title and description itself, so no other text is needed.
