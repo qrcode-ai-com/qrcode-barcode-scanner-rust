@@ -46,7 +46,7 @@ The workflow fits a print or packaging check: make the codes with the [QR code g
 
 ## Requirements
 
-You need a self-hosted n8n with the community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.0 installed, as its [README](../README.md#install) explains. n8n Cloud cannot install that node, so the template runs on self-hosted n8n only. The other nodes are n8n core nodes: Manual Trigger, Edit Fields (Set) 3.4, Read/Write Files from Disk 1.1 and Switch 3.2. The workflow was tested on n8n 2.48.7.
+You need a self-hosted n8n with the community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.1 installed, as its [README](../README.md#install) explains. n8n Cloud cannot install that node, so the template runs on self-hosted n8n only. The other nodes are n8n core nodes: Manual Trigger, Edit Fields (Set) 3.4, Read/Write Files from Disk 1.1 and Switch 3.2. The workflow was tested on n8n 2.48.7.
 
 ## Set up and run
 
@@ -137,7 +137,7 @@ The same engine runs in a [Node-RED node](../../node-red/README.md), an [Activep
 
 ## Licensing
 
-The workflow file is MIT, like the [node source](../LICENSE). The community node it needs installs the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.11.0, which keeps its AGPL-3.0-or-later license.
+The workflow file is MIT, like the [node source](../LICENSE). Version 0.1.1 of the community node it needs installs the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, which is MIT too; two of its reader parts keep their Apache-2.0 notices, which the engine package ships. Version 0.1.0 of the node installed engine 0.11.0, which keeps its AGPL-3.0-or-later license.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**.
 
