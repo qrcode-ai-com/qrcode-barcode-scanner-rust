@@ -1,7 +1,7 @@
 name: Integrations · Replicate model
 
 # The Replicate model under integrations/replicate, a Cog folder on the published engine wheel
-# qrcode-barcode-scanner 0.11.0. The runner job runs the model's tests in a new virtual environment
+# qrcode-barcode-scanner 0.12.0. The runner job runs the model's tests in a new virtual environment
 # through the Python host kit: they call Runner.run on the mixed fixture in the fast, frame and full
 # profiles, the destination acceptance driver judges the three reports, then the scanner is removed
 # and must be gone. The image job installs the pinned Cog CLI (checked by SHA-256), builds the
@@ -55,7 +55,7 @@ jobs:
           mkdir -p receipt
           python scripts/python-host-consumer.py run \
             --destination "Replicate model runner from this checkout (not published)" \
-            --identifier r8.im/qrcode-ai-com/qrcode-barcode-scanner --version 0.11.0 \
+            --identifier r8.im/qrcode-ai-com/qrcode-barcode-scanner --version 0.12.0 \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/integrations/replicate" \
             --install "-r integrations/replicate/requirements.txt -r integrations/replicate/tests/requirements.txt" \
             --scan "{python} -m pytest -q -p no:cacheprovider integrations/replicate/tests" \
@@ -80,9 +80,9 @@ jobs:
       COG_URL: https://github.com/replicate/cog/releases/download/v0.23.1/cog_Linux_x86_64
       COG_SHA256: c6bf4f89278609b4fcde28a59808bd2b51b559022a9178b08492c910d9dc115d
       IMAGE: qrcode-barcode-scanner-cog
-      # The native module of the PyPI wheel qrcode_barcode_scanner-0.11.0, manylinux x86_64
+      # The native module of the PyPI wheel qrcode_barcode_scanner-0.12.0, manylinux x86_64
       # (examples/notebooks/scan-images.ipynb lists the module of every published wheel).
-      MODULE_SHA256: de30ac77aee57c90ec4552af10e075fbd83aa1f775b53031cf5acf84fc117e34
+      MODULE_SHA256: 7c9f3eb312df472c539a91f4ec1ecf671acdfe676b36615408ca129709a29ceb
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -160,13 +160,13 @@ jobs:
           echo "Python $python, qrcode-barcode-scanner $version, native module SHA-256 $digest"
           echo "Engine licence $licence, in $files; model folder $folder: $model"
           case "$python" in 3.13.*) ;; *) echo "::error::the image runs Python $python, not 3.13"; exit 1 ;; esac
-          [ "$version" = 0.11.0 ] || { echo "::error::the image holds the engine $version, not 0.11.0"; exit 1; }
+          [ "$version" = 0.12.0 ] || { echo "::error::the image holds the engine $version, not 0.12.0"; exit 1; }
           [ "$digest" = "$MODULE_SHA256" ] || {
             echo "::error::the native module in the image is not the one of the published wheel"; exit 1; }
-          [ "$licence" = AGPL-3.0-or-later ] && [ "$files" != - ] || {
+          [ "$licence" = MIT ] && [ "$files" != - ] || {
             echo "::error::the engine's licence text is not in the image"; exit 1; }
-          case ",$model," in *,LICENSE,*LICENSE-NOTES.md,*run.py,*) ;; *)
-            echo "::error::the model folder in the image lacks run.py or a licence file"; exit 1 ;; esac
+          case ",$model," in *,LICENSE,*LICENSE-NOTES.md,*licenses,*run.py,*) ;; *)
+            echo "::error::the model folder in the image lacks run.py, a licence file or the engine notices"; exit 1 ;; esac
           case ",$model," in *,tests,*) echo "::error::the tests were copied into the image"; exit 1 ;; esac
       - name: Three predictions with cog run, judged as a server's reports
         env:
@@ -184,7 +184,7 @@ jobs:
             --produced-by "cog run $IMAGE -i image=@<staged fixture> -i profile=<profile> -i budget_ms=0" \
             --fast receipt/reports/fast.json --frame receipt/reports/frame.json \
             --full receipt/reports/full.json \
-            --destination "Replicate model image, built by cog build (not pushed)" --version 0.11.0 \
+            --destination "Replicate model image, built by cog build (not pushed)" --version 0.12.0 \
             --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA/integrations/replicate" \
             --identifier r8.im/qrcode-ai-com/qrcode-barcode-scanner \
             --install "cog build -t $IMAGE (Cog 0.23.1)" --run-url "$RUN_URL" \

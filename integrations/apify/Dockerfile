@@ -4,7 +4,7 @@
 FROM apify/actor-python:3.12
 LABEL org.opencontainers.image.title="QR Code & Barcode Scanner" \
       org.opencontainers.image.source="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust" \
-      org.opencontainers.image.licenses="AGPL-3.0-or-later"
+      org.opencontainers.image.licenses="MIT"
 
 # Dependencies first, so a source change rebuilds only the last layers.
 COPY --chown=myuser:myuser requirements.txt ./

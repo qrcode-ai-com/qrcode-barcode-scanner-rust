@@ -7,7 +7,7 @@ The fixture is served over HTTP from this process. For each profile (fast, frame
 runs once with `docker run`, against a fresh local storage whose INPUT record holds the fixture's
 address and an address that answers 404. Each run must end with status 0 and give two dataset
 items in input order: the fixture with the QR code `https://qrc-ai.com/76xMa` and the Code 128
-`STOCK-4827`, in the engine's order and uncut, from engine 0.11.0, a score except in frame; then an
+`STOCK-4827`, in the engine's order and uncut, from engine 0.12.0, a score except in frame; then an
 item with ok false for the missing image. The fixture's report is written to DIR/<profile>.json for
 scripts/destination-acceptance.py.
 
@@ -35,7 +35,7 @@ import time
 
 QR = "https://qrc-ai.com/76xMa"
 CODE128 = "STOCK-4827"
-ENGINE = "0.11.0"
+ENGINE = "0.12.0"
 PROFILES = ("fast", "frame", "full")
 DAILY_TEST_SECONDS = 300
 

@@ -40,7 +40,7 @@ def test_the_mixed_sample_by_url_gives_both_codes(run_actor, web, mixed_image, p
     assert item["codes"] == [{"symbology": "qr_code", "text": QR}, {"symbology": "code128", "text": CODE128}]
     report = item["report"]
     assert report["trace"]["budget_exhausted"] is False and report["trace"]["engine_panics"] == 0
-    assert report["versions"]["scanner"] == "0.11.0"
+    assert report["versions"]["scanner"] == "0.12.0"
     assert (report["score"] is None) == (profile == "frame")
     # The item's report is the engine's, unchanged.
     direct = qrcode_barcode_scanner.scan(mixed_image.read_bytes(), profile, budget_ms=0)
@@ -179,10 +179,10 @@ def test_the_actor_definition_is_consistent():
     assert set(view["transformation"]["fields"]) == set(view["display"]["properties"]) <= ITEM_KEYS
     dockerfile = (ACTOR_ROOT / "Dockerfile").read_text()
     assert [line for line in dockerfile.splitlines() if line.startswith("FROM ")] == ["FROM apify/actor-python:3.12"]
-    assert 'org.opencontainers.image.licenses="AGPL-3.0-or-later"' in dockerfile
+    assert 'org.opencontainers.image.licenses="MIT"' in dockerfile
     assert 'CMD ["python", "-m", "qrscan_actor"]' in dockerfile
     assert (ACTOR_ROOT / "requirements.txt").read_text().split() == [
-        "apify==4.3.0", "httpx==0.28.1", "qrcode-barcode-scanner==0.11.0"]
+        "apify==4.3.0", "httpx==0.28.1", "qrcode-barcode-scanner==0.12.0"]
 
 
 def test_the_definition_files_match_apify_published_schemas():
@@ -249,14 +249,14 @@ def test_the_store_page_follows_apify_readme_guidance():
     assert set(json.loads(blocks[1])) == ITEM_KEYS
 
 
-def test_the_engine_notices_are_the_v0_11_0_copies():
+def test_the_engine_notices_are_the_v0_12_0_copies():
     """LICENSE-NOTES.md names the two engine notices the image carries, by their sha256."""
     notes = (ACTOR_ROOT / "LICENSE-NOTES.md").read_text()
-    folder = ACTOR_ROOT / "licenses" / "engine-0.11.0"
+    folder = ACTOR_ROOT / "licenses" / "engine-0.12.0"
     assert sorted(path.name for path in folder.iterdir()) == ["LICENSE-APACHE-2.0", "THIRD-PARTY.md"]
     for name in ("THIRD-PARTY.md", "LICENSE-APACHE-2.0"):
         digest = hashlib.sha256((folder / name).read_bytes()).hexdigest()
         assert digest in notes, name
-    assert "AGPL-3.0-or-later" in notes and "176ac96ef16ee330dbfc6ada10327d0b4e23a8b2" in notes
+    assert "| 0.12.0 | MIT |" in notes and "897dd50cdf27cbde54d408bf65e1ca4622035d42" in notes
     dockerignore = (ACTOR_ROOT / ".dockerignore").read_text().split()
     assert "licenses" not in dockerignore and "LICENSE-NOTES.md" not in dockerignore

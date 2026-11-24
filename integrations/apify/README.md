@@ -60,7 +60,7 @@ is a JSON object:
 
 ```json
 {
-  "imageUrls": ["https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png"],
+  "imageUrls": ["https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png"],
   "profile": "fast",
   "budgetMs": 0
 }
@@ -87,7 +87,7 @@ cd integrations/apify
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 mkdir -p storage/key_value_stores/default
-echo '{"imageUrls": ["https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png"]}' > storage/key_value_stores/default/INPUT.json
+echo '{"imageUrls": ["https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png"]}' > storage/key_value_stores/default/INPUT.json
 .venv/bin/python -m qrscan_actor
 ```
 
@@ -120,7 +120,7 @@ good image, a missing one, a file that is not an image, a refused address, two o
 oversized image, a blank image and a second code: each gets its own item, in order. They also
 check that unusable input fails the run, that the input and dataset schemas match the code, that
 the Store page follows Apify's README guidance, and that the engine notices are the copies of
-v0.11.0. The workflow `integration-python-hosts` of the engine repository runs them.
+v0.12.0. The workflow `integration-python-hosts` of the engine repository runs them.
 
 The workflow `integration-apify` builds the image from the `Dockerfile` and runs it as the platform
 starts an Actor, with a local storage holding the run's input:
@@ -168,10 +168,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 Each dataset item holds `source`, `input` (the field it came from), `ok`, `count`, `texts`, `codes` (each code's format and text), `complete`, `error` and `report`, the engine's full report. `complete` is false when the time budget cut the scan or the image was not read. The dataset's overview table shows the image, the texts and the error.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -223,7 +223,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored Actor source is MIT; see [LICENSE](LICENSE). The Actor's image installs the engine wheel `qrcode-barcode-scanner` 0.11.0 from PyPI. The published engine 0.11.0 keeps the license it shipped with, AGPL-3.0-or-later; read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md). Because the image runs that engine, the image as a whole is distributed under AGPL-3.0-or-later; [LICENSE-NOTES.md](LICENSE-NOTES.md) lists each part of the image, its license and its source, and the image carries the engine's third-party notices in `licenses/engine-0.11.0/`.
+Project-authored Actor source is MIT; see [LICENSE](LICENSE). The Actor's image installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI. Engine 0.12.0 is MIT too: its wheel ships the MIT `LICENSE`, and two of its reader parts keep their Apache-2.0 notices, which the image carries in `licenses/engine-0.12.0/`. Earlier preparations of this Actor installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md); [LICENSE-NOTES.md](LICENSE-NOTES.md) lists each part of the image, its license and its source.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

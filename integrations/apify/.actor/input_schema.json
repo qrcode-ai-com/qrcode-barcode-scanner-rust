@@ -11,7 +11,7 @@
             "description": "Public http or https addresses of PNG, JPEG, WebP or GIF images, up to 8 MiB each. A key-value store record address is read with the run's own access.",
             "editor": "stringList",
             "prefill": [
-                "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.11.0/fixtures/symbology/mixed-code128-qr.png"
+                "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png"
             ]
         },
         "imageFiles": {
