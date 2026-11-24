@@ -44,7 +44,7 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and the [barc
 
 To make a test image, encode a known text with the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator), commit the picture, and list the text as an expected payload. The action then proves on every push that the image still says what you meant.
 
-The action has been public since 20 November 2026 in its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-action`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-action), with the release [`v1.0.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-action/releases/tag/v1.0.0) and the tag `v1`. Since 20 November 2026 it is listed on [GitHub Marketplace](https://github.com/marketplace/actions/qr-code-barcode-scanner), in the Testing and Utilities categories. A workflow of the engine repository also runs it from its folder, `./integrations/github-action`.
+The action has been public since 20 November 2026 in its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-action`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-action), and listed on [GitHub Marketplace](https://github.com/marketplace/actions/qr-code-barcode-scanner) in the Testing and Utilities categories. Version 1.1.0 installs `qrscan` 0.12.0 by default, whose archives are MIT. The first release, [`v1.0.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-action/releases/tag/v1.0.0) of 20 November 2026, installed `qrscan` 0.11.0. The [releases page](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-action/releases) lists every version, and the tag `v1` names the newest 1.x release. A workflow of the engine repository also runs the action from its folder, `./integrations/github-action`.
 
 ## How it works
 
@@ -86,7 +86,7 @@ jobs:
 
 Pin the action to a full commit SHA rather than a tag, as GitHub advises for third-party actions. In the engine repository, `uses: ./integrations/github-action` runs it from its folder.
 
-It runs on GitHub-hosted Linux (x64 and arm64, glibc 2.28 or later), macOS (Apple silicon and Intel) and Windows x64 runners. It needs no token and no secret: the download is anonymous, and the action asks for no permission.
+It runs on GitHub-hosted Linux (x64 and arm64, glibc 2.28 or later), macOS (Apple silicon and Intel) and Windows x64 runners. On Linux it installs the glibc build: a job in an Alpine or other musl container stops with that reason before anything is downloaded. It needs no token and no secret: the download is anonymous, and the action asks for no permission.
 
 ### Inputs
 
@@ -98,10 +98,14 @@ It runs on GitHub-hosted Linux (x64 and arm64, glibc 2.28 or later), macOS (Appl
 | `budget-ms` | `0` | The time budget of one scan in milliseconds. `0` means no budget, the reproducible choice for CI. |
 | `fail-on` | `missing` | `missing` fails when an expected payload is not found, `no-code` also fails when a file holds no code, `never` only reports. |
 | `max-files` | `100` | The most files one run may scan. |
-| `version` | `0.11.0` | The `qrscan` release to install. |
+| `version` | `0.12.0` | The `qrscan` release to install. The action pins 0.12.0 and 0.11.0. |
 | `sums-sha256` | empty | For a version the action does not pin, the sha256 of that release's SHA256SUMS file. |
 
 A fault, an image `qrscan` cannot read and a pattern that matches no file always fail the step, whatever `fail-on` says.
+
+### Choose the engine version
+
+With no `version` input, the action installs `qrscan` 0.12.0, checked against the hashes it pins. `version: 0.11.0` installs the previous release, also pinned. A later release can be installed without a new action version when you give its `sums-sha256`: the action then holds the SHA256SUMS file to that hash, and the archive to its line in the file. The inputs, the outputs and the report schema, `qrcode-barcode-scanner-action/1`, are the same in 1.0.0 and 1.1.0. What changed in the engine itself is in its [0.12.0 changelog](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/CHANGELOG.md#0120--2026-11-22).
 
 ### Outputs
 
@@ -132,7 +136,7 @@ The picture is a recorded scan of one image that holds a QR code and a Code 128 
 ```json
 {
   "schema": "qrcode-barcode-scanner-action/1",
-  "qrscan": { "version": "0.11.0", "target": "aarch64-apple-darwin" },
+  "qrscan": { "version": "0.12.0", "target": "aarch64-apple-darwin" },
   "profile": "full",
   "budget_ms": 0,
   "fail_on": "missing",
@@ -207,7 +211,7 @@ npm test
 QRSCAN_ACTION_LIVE=1 npm test
 ```
 
-`npm test` checks the archive reader, the installer and its refusals (a wrong SUMS file, archive or executable, an unsafe archive member, a download from another host), the file patterns, the verdicts and the log and summary escaping. With `QRSCAN_ACTION_LIVE=1`, it also downloads and checks the pinned `qrscan`, and scans the mixed fixture in the fast, frame and full profiles. The workflow `integration-github-action.yml` runs the action from its local path on five kinds of hosted runner, in the three profiles, with two cases that must fail: a payload that is not in the image, and a file that is not an image.
+`npm test` checks the archive reader, the installer and its refusals (a wrong SUMS file, archive or executable, an unsafe archive member, a download from another host), the file patterns, the verdicts and the log and summary escaping. With `QRSCAN_ACTION_LIVE=1`, it also downloads and checks the pinned `qrscan`, and scans the mixed fixture in the fast, frame and full profiles. With `QRSCAN_ARCHIVES` set to a folder of downloaded release archives, it opens each one and holds its executable to the pinned hash. The workflow `integration-github-action.yml` runs the action from its local path on five kinds of hosted runner, in the three profiles, with two cases that must fail: a payload that is not in the image, and a file that is not an image.
 
 ## Its own repository
 
@@ -222,7 +226,9 @@ The stage reads one commit, checks that the hashes pinned in `src/releases.mjs` 
 
 ## Licenses of what you install
 
-The action source is MIT, in [LICENSE](LICENSE). It downloads `qrscan` 0.11.0, whose published archives keep the license they shipped with, AGPL-3.0-or-later, in the `LICENSE` file inside each archive. The action runs `qrscan` as a separate program and does not change that license.
+The action source is MIT, in [LICENSE](LICENSE). By default it downloads `qrscan` 0.12.0, whose published archives are MIT as well: each one holds the MIT `LICENSE`, the Apache-2.0 license and notices of two reader parts derived from rxing, a Rust port of ZXing, and the license texts of the crates and Rust standard library linked into the executable. The action runs `qrscan` as a separate program and changes none of these terms.
+
+History: release v1.0.0 installed `qrscan` 0.11.0 by default. The 0.11.0 archives, which `version: 0.11.0` still installs, keep the license they shipped with, AGPL-3.0-or-later, in the `LICENSE` file inside each archive.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

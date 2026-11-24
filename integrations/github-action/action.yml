@@ -36,9 +36,9 @@ inputs:
     required: false
     default: '100'
   version:
-    description: The qrscan release to install. Versions pinned in this action need nothing else.
+    description: The qrscan release to install. Versions pinned in this action (0.12.0 and 0.11.0) need nothing else.
     required: false
-    default: 0.11.0
+    default: 0.12.0
   sums-sha256:
     description: The sha256 of the SHA256SUMS file of a version this action does not pin.
     required: false
