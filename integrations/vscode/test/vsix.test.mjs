@@ -90,13 +90,14 @@ test('the manifest names one universal extension of the proposed publisher', () 
   assert.deepEqual([...read('extension/images/icon.png').subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 });
 
-test('the bundled engine is the published 0.11.0 module, byte for byte', () => {
+test('the bundled engine is the published 0.12.0 module, byte for byte', () => {
   const info = JSON.parse(text('extension/dist/engine/build-info.json'));
   assert.deepEqual(info, engineInfo);
   const wasm = read('extension/dist/qrcode-barcode-scanner_bg.wasm');
   assert.equal(sha256(wasm), info.wasm.sha256);
-  assert.equal(info.wasm.sha256, 'a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68');
-  assert.equal(info.source_revision, '176ac96ef16ee330dbfc6ada10327d0b4e23a8b2');
+  // The SHA-256 that distribution/releases/v0.12.0.json records, built at the v0.12.0 tag commit.
+  assert.equal(info.wasm.sha256, '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868');
+  assert.equal(info.source_revision, '897dd50cdf27cbde54d408bf65e1ca4622035d42');
   for (const file of ['LICENSE', 'LICENSE-APACHE-2.0', 'THIRD-PARTY.md']) {
     assert.ok(read(`extension/dist/engine/${file}`).equals(readFileSync(join(engineRoot, file))), file);
   }
@@ -124,17 +125,30 @@ test('the README holds no SVG image, only absolute links, and the six links in s
   for (const path of six) assert.ok(prose.some((paragraph) => paragraph.includes(`](${root}${path})`)), path);
   assert.match(readme, /Maintained by \*\*Thibaut Mélen & Nicolas Cella\*\* for \*\*QR Code AI\*\*, a product of \*\*SuperNovae Studio\*\*\./);
   assert.ok(readme.includes('[Ask ChatGPT](https://chatgpt.com/?q='), 'the Ask AI badges become text links');
+  assert.ok(readme.includes('<!-- qrcode-ai-readme-actions:v2 -->'));
+  const ask = [...readme.matchAll(/\[Ask ([^\]]+)\]\(https:\/\/[^)\s]+\)/g)].map((match) => match[1]);
+  assert.deepEqual(ask, ['ChatGPT', 'Claude', 'Gemini', 'Grok', 'Perplexity', 'Copilot', 'DeepSeek', 'Meta AI', 'Qwen']);
+  // The five pictures the listings show: each one a light image and its dark variant.
+  assert.equal(readme.match(/<picture>/g).length, 5);
+  const pictures = [...readme.matchAll(/<img src="https:\/\/[^"]+\/([a-z-]+)-light\.(?:gif|png)\?v=[0-9a-f]+"/g)].map((match) => match[1]);
+  assert.deepEqual(pictures, ['banner-vscode', 'journey-packages', 'examples-mixed', 'formats', 'runtimes']);
+  assert.equal(readme.match(/<source media="\(prefers-color-scheme: dark\)" srcset="https:\/\//g).length, 5);
+  // The extension and its engine are MIT; AGPL is named only for the history of version 0.1.0.
+  for (const paragraph of readme.split('\n\n').filter((part) => /AGPL/.test(part))) {
+    assert.match(paragraph, /\b0\.1\.0\b/, paragraph);
+  }
 });
 
-test('LICENSE.md states the boundary: MIT extension code, AGPL engine 0.11.0', () => {
+test('LICENSE.md states the licenses: MIT extension code, MIT engine 0.12.0 with its Apache-2.0 notices', () => {
   const license = text('extension/LICENSE.md');
   assert.match(license, /## The extension's own code: MIT\n/);
-  assert.match(license, /MIT License\n\nCopyright \(c\) \d{4}/);
-  assert.match(license, /## The bundled scanner engine: AGPL-3\.0-or-later\n/);
-  assert.ok(license.includes('`@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.11.0`'));
-  assert.ok(license.includes('176ac96ef16ee330dbfc6ada10327d0b4e23a8b2'));
-  assert.match(license, /GNU AFFERO GENERAL PUBLIC LICENSE\s*\n\s*Version 3, 19 November 2007/);
-  assert.equal(manifest.license, 'MIT AND AGPL-3.0-or-later');
+  assert.match(license, /## The bundled scanner engine: MIT\n/);
+  assert.equal(license.match(/MIT License\n\nCopyright \(c\) \d{4}/g).length, 2, 'the MIT text of the extension and of the engine package');
+  assert.ok(license.includes('`@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0`'));
+  assert.ok(license.includes('897dd50cdf27cbde54d408bf65e1ca4622035d42'));
+  assert.ok(license.includes('`dist/engine/LICENSE-APACHE-2.0`'));
+  assert.ok(!/AGPL|AFFERO/i.test(license), 'no AGPL text or name');
+  assert.equal(manifest.license, 'MIT');
 });
 
 test('the unpacked VSIX passes the extension tests', () => {

@@ -58,7 +58,7 @@ test('the manifest declares the command, its menus on the six image types and th
   assert.equal(manifest.main, './dist/extension.js');
   assert.equal(manifest.engines.vscode, '^1.74.0');
   assert.deepEqual(manifest.activationEvents, []);
-  assert.equal(manifest.license, 'MIT AND AGPL-3.0-or-later');
+  assert.equal(manifest.license, 'MIT');
   assert.equal(manifest.icon, 'images/icon.png');
   assert.equal(manifest.browser, undefined, 'no web extension entry until a web host has run it');
   assert.deepEqual(manifest.contributes.commands, [{ command: COMMAND, title: 'Scan QR codes and barcodes', category: 'QR Code & Barcode Scanner' }]);
@@ -104,7 +104,7 @@ for (const profile of ['fast', 'frame', 'full']) {
 
     const lines = channel().lines;
     assert.ok(lines.includes('mixed.png'));
-    assert.ok(lines.includes(`  Profile ${profile} · budget none · scanner 0.11.0`));
+    assert.ok(lines.includes(`  Profile ${profile} · budget none · scanner 0.12.0`));
     assert.ok(lines.some((line) => /^ {2}\d\. QR Code: https:\/\/qrc-ai\.com\/76xMa$/.test(line)));
     assert.ok(lines.some((line) => /^ {2}\d\. Code 128: STOCK-4827$/.test(line)));
     assert.equal(lines.includes('  QR quality score: not measured by the frame profile.'), profile === 'frame');

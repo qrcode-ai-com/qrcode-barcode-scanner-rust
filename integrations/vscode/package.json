@@ -2,9 +2,9 @@
   "name": "qrcode-barcode-scanner",
   "displayName": "QR Code & Barcode Scanner",
   "description": "Read QR codes and barcodes in image files on your machine, with the open-source QR Code & Barcode Scanner engine. No network, no native binary.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "qrcode-ai-com",
-  "license": "MIT AND AGPL-3.0-or-later",
+  "license": "MIT",
   "private": true,
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -123,7 +123,7 @@
     "test:vsix": "node --test test/vsix.test.mjs"
   },
   "devDependencies": {
-    "@qrcode-ai-com/qrcode-barcode-scanner-wasm": "0.11.0",
+    "@qrcode-ai-com/qrcode-barcode-scanner-wasm": "0.12.0",
     "@vscode/vsce": "4.1.1",
     "esbuild": "0.28.2"
   }
