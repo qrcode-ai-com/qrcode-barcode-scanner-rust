@@ -145,6 +145,19 @@ test('the workflow template uses only real node parameters', () => {
 	assert.doesNotMatch(text, /"credentials"|"pinData"|"webhookId"|\/Users\//, 'no credential, pinned data, webhook id or local path');
 });
 
+test('the template and its texts name the node version this package carries', () => {
+	const template = JSON.parse(readFileSync(new URL('../template/qr-barcode-label-check.json', import.meta.url), 'utf8'));
+	const overview = template.nodes.find((node) => node.name === 'Overview').parameters.content;
+	const pinned = `\`${manifest.name}\` ${manifest.version}`;
+	assert.ok(overview.includes(pinned), `the overview note names ${pinned}`);
+	for (const name of ['README.md', 'LISTING.md']) {
+		const text = readFileSync(new URL(`../template/${name}`, import.meta.url), 'utf8');
+		const named = [...text.matchAll(/n8n-nodes-qrcode-barcode-scanner`? (\d+\.\d+\.\d+)/g)].map((match) => match[1]);
+		assert.ok(named.length > 0, `${name} names the node version`);
+		assert.deepEqual([...new Set(named)], [manifest.version], `${name} names only node ${manifest.version}`);
+	}
+});
+
 test('the template routes a scan to the branch its result calls for', () => {
 	const template = JSON.parse(readFileSync(new URL('../template/qr-barcode-label-check.json', import.meta.url), 'utf8'));
 	const router = template.nodes.find((node) => node.type === 'n8n-nodes-base.switch');
