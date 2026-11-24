@@ -50,7 +50,8 @@ The node is built and tested in the engine repository. Its own repository,
 [`qrcode-ai-com/qrcode-barcode-scanner-comfyui`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-comfyui),
 has been public since 20 November 2026, and its tests pass there. Since that day the node is on the
 [Comfy Registry](https://registry.comfy.org/nodes/qrcode-barcode-scanner-nodes) as
-`qrcode-barcode-scanner-nodes`, version 0.1.0, under the publisher QR Code AI (`qrcode-ai-com`).
+`qrcode-barcode-scanner-nodes`, under the publisher QR Code AI (`qrcode-ai-com`). Version 0.1.1
+runs on the MIT engine 0.12.0. Version 0.1.0, the first one on the registry, runs on engine 0.11.0.
 
 ## Install
 
@@ -72,9 +73,9 @@ python -m pip install -r qrcode-barcode-scanner-comfyui/requirements.txt
 
 The portable Windows build has its own Python, `python_embeded\python.exe`; use it for the last
 command. The dependency is the engine wheel
-[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.11.0/) 0.11.0. PyPI
-has prebuilt wheels for macOS, Linux on x86-64 and ARM64, and 64-bit Windows. Anywhere else pip
-builds it from source, which needs a Rust toolchain.
+[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0. PyPI
+has prebuilt wheels for macOS on Apple silicon and Intel, Linux on x86-64 and ARM64, musl Linux on
+x86-64, and 64-bit Windows. Anywhere else pip builds it from source, which needs a Rust toolchain.
 
 ## Use
 
@@ -101,7 +102,7 @@ The node also prints one line per image in the graph, such as
 
 [`workflows/scan-mixed-fixture.json`](workflows/scan-mixed-fixture.json) is a two-node workflow in
 the API format. It loads
-[`mixed-code128-qr.png`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/fixtures/symbology/mixed-code128-qr.png),
+[`mixed-code128-qr.png`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/fixtures/symbology/mixed-code128-qr.png),
 the engine's sample image, and expects `STOCK-4827`. Copy the sample into `ComfyUI/input` before
 you queue it.
 
@@ -171,10 +172,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 The node returns the texts, the reports as JSON, `matches` and `count`. `report_json` holds one report per image of the batch, in order.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.11.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -226,7 +227,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored node source is MIT; see [LICENSE](LICENSE). The node installs the engine wheel `qrcode-barcode-scanner` 0.11.0 from PyPI and does not ship it. The published engine 0.11.0 keeps the license it shipped with, AGPL-3.0-or-later; read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
+Project-authored node source is MIT; see [LICENSE](LICENSE). The node installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI and does not ship it. Engine 0.12.0 is MIT too: its wheel ships the MIT `LICENSE`. Version 0.1.0 of the node installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 
