@@ -132,6 +132,14 @@ class LicensingTests(unittest.TestCase):
         self.assertIn(spelled[license], ' '.join(copyright.split()))
         self.assertNotIn(spelled[other[license]], ' '.join(copyright.split()))
         self.assertIn('retain upstream third-party notices and licenses', ' '.join(copyright.split()))
+        # The Termux recipe builds the source archive of the release it pins, a git archive of the
+        # tagged tree, and installs license files of that tree.
+        termux = 'distribution/termux/qrcode-barcode-scanner/build.sh'
+        license = expected(pinned(termux, r'^TERMUX_PKG_VERSION="(\S+)"$'))
+        self.assertIn(f'\nTERMUX_PKG_LICENSE="{license}"\n', (ROOT / termux).read_text())
+        files = re.search(r'^TERMUX_PKG_LICENSE_FILE="([^"]+)"$', (ROOT / termux).read_text(), re.M)[1]
+        for name in files.split(', '):
+            self.assertTrue((ROOT / name).is_file(), f'{termux} installs {name}, which the tree lacks')
         self.assertIn('GNU AFFERO GENERAL PUBLIC LICENSE', (ROOT / 'distribution/releases/historical-agpl-3.0.txt').read_text())
 
     def test_upstream_notices_are_kept_separate(self):

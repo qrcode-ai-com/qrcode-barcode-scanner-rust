@@ -361,8 +361,9 @@ fresh, read-only and with no route out, on the mixed sample in the three profile
 ## Recipes prepared for other package managers
 
 These recipes package the 0.11.0 CLI for other systems. Each one pins the v0.11.0 release by the
-SHA-256 of its checksum list, and its checks run in this repository. The Glama container and the
-MCP Bundle hold the MCP server 0.3.1 instead, with the engine it was released on, each
+SHA-256 of its checksum list, and its checks run in this repository. The Termux recipe builds the
+0.12.0 source archive instead, and its update function follows each later CLI release. The Glama
+container and the MCP Bundle hold the MCP server 0.3.1 instead, with the engine it was released on, each
 package pinned by its npm integrity. None of these destinations serves the scanner yet, except
 Glama, which lists the MCP server since 20 November 2026. Four destinations received pull requests
 that day (conda-forge two, one per recipe). Three wait for review by their maintainers; MSYS2 closed

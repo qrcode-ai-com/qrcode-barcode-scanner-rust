@@ -4,7 +4,7 @@
   check-packaging-recipes.py [--archive FILE] [--conda-schema FILE]
   check-packaging-recipes.py --self-test
 
-The recipes under distribution/ (snap, alpine, msys2, termux, macports, freebsd, nix, obs, ppa,
+The recipes under distribution/ (snap, alpine, msys2, macports, freebsd, nix, obs, ppa,
 conda-forge, artifacthub, glama, jsr) repack or rebuild the published v0.11.0 release. This check
 reads them as text and refuses:
 
@@ -16,6 +16,10 @@ reads them as text and refuses:
   - panic=abort, a source build of more than the qrscan crate, or a source build that does not
     read the mixed fixture's QR code and Code 128 in the fast, frame and full profiles;
   - a glama.json or an artifacthub-repo.yml with a key its host does not define.
+
+The Termux recipe follows the engine release instead, as distribution/releases/pins.toml says:
+release-fanout.py checks its version and hash, and test-licensing.py its license. This check
+only refuses panic=abort in it and a build of more than the qrscan crate.
 
 With --archive (the downloaded qrcode-barcode-scanner-cli-0.11.0-source.tar.gz) it also checks the
 archive's SHA-256, size, SHA-512 (Alpine) and RIPEMD-160 (MacPorts), that the files the recipes
@@ -77,10 +81,8 @@ RECIPES = {
     "msys2": {"file": "distribution/msys2/mingw-w64-qrcode-barcode-scanner/PKGBUILD",
               "version": r"^pkgver=0\.11\.0$", "license": r"^license=\('spdx:AGPL-3\.0-or-later'\)$",
               "source_build": True},
-    "termux": {"file": "distribution/termux/qrcode-barcode-scanner/build.sh",
-               "version": r'^TERMUX_PKG_VERSION="0\.11\.0"$',
-               "license": r'^TERMUX_PKG_LICENSE="AGPL-3\.0-or-later"$', "source_build": True,
-               "smoke": None},
+    "termux": {"file": "distribution/termux/qrcode-barcode-scanner/build.sh", "version": None,
+               "license": None, "source_build": True, "smoke": None},
     "macports": {"file": "distribution/macports/graphics/qrcode-barcode-scanner/Portfile",
                  "version": r"^version\s+0\.11\.0$", "license": r"^license\s+AGPL-3\+$",
                  "source_build": True},
@@ -101,18 +103,21 @@ RECIPES = {
                      "version": r'^  version: "0\.11\.0"$', "license": r"^  license: AGPL-3\.0-or-later$",
                      "source_build": False},
 }
+# Channels whose recipe follows the engine release (distribution/releases/pins.toml): their files
+# are only read for panic=abort here, not against the v0.11.0 manifest.
+FOLLOWS_ENGINE = {"termux"}
 EXTRA_LICENSE_LINES = {
     "distribution/ppa/debian/copyright": r"^Files: \*\nCopyright: .+\nLicense: AGPL-3\.0-or-later$",
     "distribution/ppa/debian/changelog": r"^qrcode-barcode-scanner \(0\.11\.0-1~ppa1~ubuntu24\.04\.1\) noble;",
     "distribution/artifacthub/compose-index.py": r'"io\.artifacthub\.package\.license": "AGPL-3\.0-or-later"',
     "distribution/jsr/stage-jsr-package.py": r'^LICENSE = "AGPL-3\.0-or-later"$',
 }
-MIT_FIELD = re.compile(r"""(?im)^\s*(?:license|licenses?|TERMUX_PKG_LICENSE|LICENSE)\s*[=:(]\s*['"(]*\s*(?:spdx:)?MIT\b"""
+MIT_FIELD = re.compile(r"""(?im)^\s*(?:license|licenses?|LICENSE)\s*[=:(]\s*['"(]*\s*(?:spdx:)?MIT\b"""
                        r"""|lib\.licenses\.mit\b|"license":\s*"MIT\"""")
 PANIC = re.compile(r"(?i)panic\s*=\s*['\"]?abort|PANIC=abort|-C\s*panic=abort")
 HEX64 = re.compile(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")
 URL = re.compile(r"https://github\.com/qrcode-ai-com/qrcode-barcode-scanner(?:-rust)?/releases/download/[^\s\"')]+")
-VERSION_SPELLINGS = ("${{ version }}", "${finalAttrs.version}", "${TERMUX_PKG_VERSION}", "${DISTVERSION}",
+VERSION_SPELLINGS = ("${{ version }}", "${finalAttrs.version}", "${DISTVERSION}",
                      "${pkgver}", "$pkgver", "%{version}", "${version}", "$version")
 ARCHIVE_SPELLINGS = ("${_archive}", "%{archive}", "${archive}", "$archive", "${distname}")
 # Files whose license words are not a package license: DEP-5 copyright paragraphs name the licenses
@@ -180,6 +185,8 @@ def check_recipes(root, archive=None, conda_schema=None):
             # A README says in prose that panic=abort is never set; only recipe lines can set it.
             if path.suffix != ".md" and PANIC.search(line) and not COMMENT.match(line):
                 report.failures.append(f"{relative}:{number} sets panic=abort")
+        if path.relative_to(root).parts[1] in FOLLOWS_ENGINE:
+            continue
         if relative not in MIT_EXEMPT and path.suffix != ".py" and MIT_FIELD.search(text):
             report.failures.append(f"{relative} has MIT as a license field; the 0.11.0 archives are AGPL-3.0-or-later")
         resolved = text
@@ -402,8 +409,13 @@ def self_test():
          "does not check both payloads"),
         ("another release tag", "distribution/snap/snapcraft.yaml", "releases/download/v0.11.0",
          "releases/download/v0.10.0", "is not a download of tag v0.11.0"),
-        ("another version", "distribution/termux/qrcode-barcode-scanner/build.sh", 'TERMUX_PKG_VERSION="0.11.0"',
-         'TERMUX_PKG_VERSION="0.11.1"', "does not state version 0.11.0"),
+        ("another version", "distribution/alpine/APKBUILD", "pkgver=0.11.0\n", "pkgver=0.11.1\n",
+         "does not state version 0.11.0"),
+        ("panic=abort in the Termux recipe", "distribution/termux/qrcode-barcode-scanner/build.sh",
+         "termux_step_make() {\n", "termux_step_make() {\n\texport CARGO_PROFILE_RELEASE_PANIC=abort\n",
+         "sets panic=abort"),
+        ("a whole-workspace Termux build", "distribution/termux/qrcode-barcode-scanner/build.sh",
+         "\t\t-p qrcode-barcode-scanner-cli\n", "\t\t--workspace\n", "does not limit the build"),
         ("a glama.json key Glama lacks", "distribution/glama/glama.json", '"maintainers"',
          '"name": "x", "maintainers"', "holds a key Glama's schema does not define"),
     ]
