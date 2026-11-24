@@ -1758,6 +1758,8 @@ and holds `contents: read` and `packages: write` only.
 **Owner steps, once.** Create the environment `container-http`: deployment tags
 `http-v*` only, no branch rule, `ThibautMelen` as its required reviewer, no
 administrator bypass. Add `http-v*` to the tag ruleset of distribution tags.
+Both are in place: the environment `container-http` holds these rules, and
+`http-v*` is in the ruleset `distribution-tags-maintainer-only`.
 
 **Each image.**
 
@@ -1774,6 +1776,29 @@ administrator bypass. Add `http-v*` to the tag ruleset of distribution tags.
 5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`
    and compare its index digest with the receipt. Only then may a README name
    the image as published.
+
+**Published: 0.1.1, 24 November 2026.** The annotated tag `http-v0.1.1` is on
+`383aa3d6448678af30e78440b86df7ee623f76de`, the merge of pull request #232. Its
+[run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528)
+passed the service tests, both images, both clean consumers, the three deploy
+host profiles, the 1-Click Droplet on a fresh Ubuntu 24.04 and the local
+registry rehearsal, then `publish`, approved in `container-http`, pushed
+`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http`. Its receipt
+`http-published` records the index `0.1.1`,
+`sha256:548a51fd038b0bbe1f77d0728c8a2d541ab6f8761f2f11cac77ad9450362932a`,
+with the AMD64 manifest
+`sha256:a580cfc0e364e941c31f345c2a03397fdc66e6084d42475bd056f7fee726be2e`
+(config `sha256:8a8ea8769f5c06057b288ab5b0b0c0d4c9bee5414b33bbfaeac222c019a6f99d`)
+and the ARM64 manifest
+`sha256:b2d083897b8684a4c4339f0d608e455bbfa895b9f80edc82fdc71dafd39ab7df`
+(config `sha256:c46923453f0a9525bad37e914c19ff549211816f977843caaff1c098903303f9`),
+engine 0.12.0. The package is public and linked to this repository, and a
+signed-out pull of `0.1.1` returned that index digest with those two
+manifests. The satellite `qrcode-ai-com/qrcode-barcode-scanner-http` was
+staged from that commit the same day; its `SOURCE.json` names the commit of
+its latest stage. The Railway template, the Render
+Blueprint, the App Platform button and the 1-Click Droplet listing are owner
+steps of their kits and are not submitted.
 
 ## Swift package — its own repository
 
