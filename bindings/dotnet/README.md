@@ -48,6 +48,14 @@ install and no network call.
   glibc 2.28 or later, macOS 10.15 or later on Intel and 11 or later on Apple silicon, or
   Windows x64. Alpine and other musl systems are not covered.
 
+## How it works
+
+[![Scan inside your application, in Rust, Node.js, browser WASM or Python, in three steps: install and initialize, pass an image or a camera frame, read the result.](https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/journey-packages-light.gif?v=4ec5c6f31076)](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust#get-started)
+
+The picture shows the three steps of the package route. For .NET they are the next three
+sections: install the package, pass the bytes of an image to `Scanner.Scan`, then read the
+report it returns.
+
 ## Install
 
 The package is published on nuget.org as
