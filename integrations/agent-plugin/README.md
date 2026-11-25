@@ -74,7 +74,7 @@ This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrc
 | Gemini CLI | `gemini-extension.json`, `skills/` |
 | Kiro | `plugin.json`, `mcp.json`, `skills/` |
 | Kimi Code | `kimi.plugin.json`, `skills/` |
-| Junie | `.junie-extension/marketplace.json`, `junie/qrcode-barcode-scanner/` |
+| Junie | `.junie-extension/marketplace.json` or `.claude-plugin/marketplace.json`, then the root `.mcp.json` and `skills/`. Junie CLI 26.11.3 did not use `junie/qrcode-barcode-scanner/` |
 | Antigravity | `.antigravity-plugin/plugin.json`, `mcp_config.json`, `skills/` |
 | goose | `skills/` and the server as a plugin, `goose/qrscan-extension.yaml` for a server that reads files |
 | Pi | `package.json` (`pi.skills`, `pi.extensions`), `pi/extension.js` |
@@ -192,7 +192,27 @@ In a Junie CLI session, add the marketplace and install the extension:
 /extensions install qrcode-barcode-scanner
 ```
 
-Junie clones the default branch: check the commit it records. To remove it, uninstall the extension from `/extensions`. The [Junie QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/junie) and the [Junie barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/junie) cover the same steps.
+Junie then asks for a scope. User level, which is preselected, makes the extension available in all your projects. Project level keeps it in the current project.
+
+Junie CLI 26.11.3 installed the repository root, not the `junie/qrcode-barcode-scanner/` folder. It loaded the root skill and started the server of the root `.mcp.json`, so the `timeout: 300000` of the Junie folder was not used.
+
+Junie clones the default branch and records no commit. Read the commit from the installed copy:
+
+```sh
+git -C ~/.junie/extensions/github-qrcode-ai-com-qrcode-barcode-scanner-plugin/qrcode-barcode-scanner rev-parse HEAD
+```
+
+To let the server read files by path, set `QRSCAN_MCP_ALLOWED_DIRECTORIES` in Junie's environment before you start Junie. Junie passes its environment to the server, which then offers `scan_file` as well as `scan_image`:
+
+```sh
+QRSCAN_MCP_ALLOWED_DIRECTORIES=/absolute/path/to/images junie
+```
+
+Unless Brave mode is on, Junie asks before each MCP tool call. You can allow the call once, always allow that tool or every `qrscan` tool, or deny it. Junie CLI 26.11.3 started with Brave mode set to auto, and Ctrl+B switches it.
+
+An interactive session needs no JetBrains sign-in when it uses a [custom model profile](https://junie.jetbrains.com/docs/custom-llm-models.html) with your own key. Junie's [headless mode](https://junie.jetbrains.com/docs/junie-headless.html) needs a token from JetBrains.
+
+To remove it, open `/extensions`, select the extension in the Installed tab and choose Remove. This leaves the marketplace registered in `~/.junie/extensions/marketplaces.json`, with its clone in `~/.junie/extensions/marketplaces/qrcode-ai-com/qrcode-barcode-scanner-plugin`. To remove the marketplace, [Junie's extension documentation](https://junie.jetbrains.com/docs/junie-cli-extensions.html) says to select it in the Marketplaces tab of `/extensions` and choose Remove. If the clone is still there afterwards, delete that folder. The [Junie QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/junie) and the [Junie barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/junie) cover the same steps.
 
 ### Antigravity
 
@@ -283,7 +303,15 @@ droid plugin marketplace add 'qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
 droid plugin install qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user
 ```
 
-Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.2`, so the install names that marketplace. To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.2`. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
+Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.2`, so the install names that marketplace. `--scope user` installs the plugin for all your projects. `--scope project` installs it in the current project only, in its `.factory/settings.json`. droid 1.20.0 scanned with either scope.
+
+`droid exec` needs no Factory sign-in when it runs a [custom model with your own key](https://docs.factory.com/model-independence/byok). The `droid plugin` commands did not ask for one either. The interactive `droid` screen may ask you to sign in through a browser.
+
+To let the server read files by path, set `QRSCAN_MCP_ALLOWED_DIRECTORIES` in droid's environment before you start droid, for example with `export QRSCAN_MCP_ALLOWED_DIRECTORIES=/absolute/path/to/images`. droid passes its environment to the server, which then offers `scan_file` as well as `scan_image`. droid 1.20.0 lists both tools as read tools, allowed by default.
+
+droid 1.20.0 records the pinned marketplace with auto-update on. Factory's [plugin documentation](https://docs.factory.com/harness/plugins) says to turn it on or off in the Marketplaces tab of `/plugins`, in the interactive `droid` screen.
+
+To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.2`. For a project install, use `--scope project` in the first command. droid 1.20.0 then leaves two empty folders: `~/.factory/plugins/cache/qrcode-barcode-scanner-plugin@v0.3.2-ce31377f7511/` and the `qrcode-barcode-scanner-e08631c4df56/` folder inside it. You can delete them. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
 
 ### Amp
 
