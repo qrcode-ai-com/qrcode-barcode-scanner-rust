@@ -60,7 +60,7 @@ async function connect(era, settings = {}) {
   await client.connect(transport);
   const onmessage = transport.onmessage;
   transport.onmessage = (message, extra) => { wire.push({ direction: "received", message }); return onmessage(message, extra); };
-  assert.deepEqual(client.getServerVersion(), { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.2", websiteUrl: "https://qrcode-ai.com/en-US/qr-code-scanner/mcp" });
+  assert.deepEqual(client.getServerVersion(), { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.3", websiteUrl: "https://qrcode-ai.com/en-US/qr-code-scanner/mcp" });
   if (modern) assert.equal(client.getNegotiatedProtocolVersion(), "2026-07-28");
   else assert.equal(wire[0].message.method, "initialize");
   const pid = transport.pid;
@@ -80,6 +80,16 @@ function errorFrom(result, code) {
   return error;
 }
 const ANNOTATIONS = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
+// Since 0.3.3 a call that names no profile runs fast: frame's 80 ms camera budget could cut a single image's scan.
+const DEFAULT_PROFILE = "fast";
+function assertProfileField(tool) {
+  const { profile } = tool.inputSchema.properties;
+  assert.equal(profile.default, DEFAULT_PROFILE, `${tool.name} advertises the fast profile as its default`);
+  assert.deepEqual(profile.enum, ["frame", "fast", "full"]);
+  assert.equal(profile.type, "string");
+  assert.match(profile.description, /^fast \(default\): /, `${tool.name} names its default first`);
+}
+const fastUnbounded = (bytes) => scan(bytes, { profile: "fast", budgetMs: 0, maxDimension: 4096, maxPixels: 16_000_000 });
 const receipts = [];
 for (const era of ["modern", "legacy"]) {
   const session = await connect(era);
@@ -89,6 +99,7 @@ for (const era of ["modern", "legacy"]) {
     assert.deepEqual(tools.tools[0].inputSchema.required, ["imageBase64"]);
     assert.equal(tools.tools[0].inputSchema.additionalProperties, false);
     assert.deepEqual(tools.tools[0].annotations, ANNOTATIONS);
+    assertProfileField(tools.tools[0]);
     const resources = await session.client.listResources();
     assert.deepEqual(resources.resources.map(({ uri }) => uri).sort(), ["qrscan://limits", "qrscan://scan-report-schema"]);
     const schema = await session.client.readResource({ uri: "qrscan://scan-report-schema" });
@@ -99,6 +110,7 @@ for (const era of ["modern", "legacy"]) {
     assert.equal(limits.pixels, 16_000_000);
     assert.deepEqual(limits.allowedDirectories, [], "no directory is readable unless the operator names one");
     assert.equal(limits.fileAccess, "no client paths");
+    assert.equal(limits.defaultProfile, DEFAULT_PROFILE);
     const absent = await session.client.callTool({ name: "scan_file", arguments: { path: join(allowed, "mixed.png") } }).catch(() => ({ isError: true }));
     assert.equal(absent.isError, true, "scan_file does not exist without allowed directories");
     assert.equal(absent.structuredContent, undefined);
@@ -118,9 +130,17 @@ for (const era of ["modern", "legacy"]) {
     const frame = reportFrom(await call(fixture, { profile: "frame", budgetMs: 0 }));
     assert.equal(frame.score, null);
     assert.equal(frame.detections[0].content.raw, Buffer.from(payload).toString("base64"));
-    assert.equal(reportFrom(await call(fixture)).score, null, "default frame profile is implemented");
     const fast = reportFrom(await call(fixture, { profile: "fast", budgetMs: 0 }));
     assert.equal(fast.detections[0].content.text, payload);
+    assert.equal(fast.score.value, 100);
+    // No profile argument: the fast report, scored where frame would give score null.
+    const byDefault = reportFrom(await call(fixture, { budgetMs: 0 }));
+    assert.equal(byDefault.score.value, 100, "the default profile scores, which frame never does");
+    assert.deepEqual(untimed(byDefault), untimed(fast), "scan_image without a profile runs the fast profile");
+    assert.notDeepEqual(untimed(byDefault), untimed(full), "the default is not the full profile");
+    assert.deepEqual(untimed(byDefault), untimed(await fastUnbounded(fixture)), "the default profile is the engine's fast profile");
+    const mixedByDefault = reportFrom(await call(mixedFixture, { budgetMs: 0 }));
+    assert.deepEqual(untimed(mixedByDefault), untimed(await fastUnbounded(mixedFixture)), "a mixed image without a profile gets the fast report");
     for (const profile of ["fast", "frame", "full"]) {
       const mixed = reportFrom(await call(mixedFixture, { profile, budgetMs: 0 }));
       assert.deepEqual(mixed.versions, { scanner: "0.12.0", pipeline: 5, score_contract: 5 });
@@ -148,7 +168,7 @@ for (const era of ["modern", "legacy"]) {
     }
     const wireFile = join(root, `${era}-wire.json`);
     writeFileSync(wireFile, JSON.stringify(session.wire, null, 2));
-    receipts.push({ era, sdk: era === "modern" ? "@modelcontextprotocol/client@2.3.1" : "@modelcontextprotocol/sdk@1.32.1", protocol: era === "modern" ? "2026-07-28" : session.wire[0].message.params.protocolVersion, fullScore: 100, frameScore: null, binaryRaw: "AP+Afw==", emptySuccess: true, mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], wireSha256: sha256(readFileSync(wireFile)) });
+    receipts.push({ era, sdk: era === "modern" ? "@modelcontextprotocol/client@2.3.1" : "@modelcontextprotocol/sdk@1.32.1", protocol: era === "modern" ? "2026-07-28" : session.wire[0].message.params.protocolVersion, fullScore: 100, frameScore: null, defaultProfile: DEFAULT_PROFILE, defaultScore: 100, binaryRaw: "AP+Afw==", emptySuccess: true, mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], wireSha256: sha256(readFileSync(wireFile)) });
   } finally { await session.close(); }
 }
 
@@ -166,9 +186,12 @@ for (const era of ["modern", "legacy"]) {
     assert.deepEqual(tools.tools[1].inputSchema.required, ["path"]);
     assert.equal(tools.tools[1].inputSchema.additionalProperties, false);
     assert.deepEqual(tools.tools[1].annotations, ANNOTATIONS);
+    for (const tool of tools.tools) assertProfileField(tool);
+    assert.deepEqual(tools.tools[1].inputSchema.properties.profile, tools.tools[0].inputSchema.properties.profile, "both tools share one profile field");
     const limits = JSON.parse((await session.client.readResource({ uri: "qrscan://limits" })).contents[0].text);
     assert.deepEqual(limits.allowedDirectories, [realpathSync(allowed)]);
     assert.match(limits.fileAccess, /scan_file/);
+    assert.equal(limits.defaultProfile, DEFAULT_PROFILE);
     const file = (path, options = {}) => session.client.callTool({ name: "scan_file", arguments: { path, ...options } });
     const refused = async (path, code) => { const error = errorFrom(await file(path), code); refusals[code] += 1; return JSON.stringify(error); };
     for (const profile of ["fast", "frame", "full"]) {
@@ -177,7 +200,10 @@ for (const era of ["modern", "legacy"]) {
       assert.deepEqual(untimed(mixed), untimed(await scan(mixedFixture, { profile, budgetMs: 0, maxDimension: 4096, maxPixels: 16_000_000 })), `${era} ${profile} returns the complete report of the file's bytes`);
       if (profile === "frame") assert.equal(mixed.score, null);
     }
-    assert.equal(reportFrom(await file(join(allowed, "clean.png"))).score, null, "scan_file defaults to the frame profile");
+    const fileByDefault = reportFrom(await file(join(allowed, "clean.png"), { budgetMs: 0 }));
+    assert.equal(fileByDefault.score.value, 100, "scan_file without a profile scores, which frame never does");
+    assert.deepEqual(untimed(fileByDefault), untimed(await fastUnbounded(fixture)), "scan_file without a profile runs the fast profile");
+    assert.deepEqual(untimed(reportFrom(await file(join(allowed, "mixed.png"), { budgetMs: 0 }))), untimed(await fastUnbounded(mixedFixture)), "a mixed file without a profile gets the fast report");
     assert.equal(reportFrom(await file(join(allowed, "clean.png"), { profile: "full", budgetMs: 0 })).score.value, 100);
     assert.deepEqual(reportFrom(await file(join(allowed, "white.png"), { profile: "full", budgetMs: 0 })).detections, []);
     errorFrom(await file(join(allowed, "garbage.png")), "QRS-001");
@@ -217,7 +243,7 @@ try {
   const pending = fileCapacity.client.callTool({ name: "scan_image", arguments: { imageBase64: fixture.toString("base64"), profile: "full", budgetMs: 0 } });
   errorFrom(await fileCapacity.client.callTool({ name: "scan_file", arguments: { path: join(allowed, "clean.png"), profile: "full", budgetMs: 0 } }), "QRSMCP_BUSY");
   assert.equal(reportFrom(await pending).score.value, 100);
-  assert.equal(reportFrom(await fileCapacity.client.callTool({ name: "scan_file", arguments: { path: join(allowed, "clean.png") } })).score, null, "both tools share one capacity, released after completion");
+  assert.equal(reportFrom(await fileCapacity.client.callTool({ name: "scan_file", arguments: { path: join(allowed, "clean.png"), profile: "frame" } })).score, null, "both tools share one capacity, released after completion");
 } finally { await fileCapacity.close(); }
 
 for (const [settings, image, code] of [
@@ -268,6 +294,6 @@ try {
 const loaded = Object.keys(require.cache).filter((file) => file.endsWith(".node"));
 assert.equal(loaded.length, 1);
 assert.ok(!relative(root, loaded[0]).startsWith(".."));
-const receipt = { verdict: "PASS", adapter: "0.3.2", scanner: version(), node: process.version, os: process.platform, arch: process.arch, installedEntry: entry, fixtureSha256: sha256(fixture), loadedNative: { path: loaded[0], sha256: sha256(readFileSync(loaded[0])) }, sessions: receipts, scanFile: { eras: ["modern", "legacy"], mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], refusals, symbolicLinksAndPipeChecked: links }, inputByteCap: true, dimensionCap: true, pixelCap: true, concurrencyCap: true, concurrencyAcrossFactories: true, realProductClients: "NOT VERIFIED" };
+const receipt = { verdict: "PASS", adapter: "0.3.3", scanner: version(), node: process.version, os: process.platform, arch: process.arch, installedEntry: entry, fixtureSha256: sha256(fixture), loadedNative: { path: loaded[0], sha256: sha256(readFileSync(loaded[0])) }, sessions: receipts, scanFile: { eras: ["modern", "legacy"], defaultProfile: DEFAULT_PROFILE, mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], refusals, symbolicLinksAndPipeChecked: links }, inputByteCap: true, dimensionCap: true, pixelCap: true, concurrencyCap: true, concurrencyAcrossFactories: true, realProductClients: "NOT VERIFIED" };
 writeFileSync(join(root, "protocol-receipt.json"), JSON.stringify(receipt, null, 2));
 console.log(JSON.stringify(receipt));

@@ -1,6 +1,6 @@
 {
   "name": "@qrcode-ai-com/qrcode-barcode-scanner-mcp",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Local MCP server for QR code and barcode image scanning, preserved payload bytes and QR scannability reports",
   "type": "module",
   "license": "MIT",
