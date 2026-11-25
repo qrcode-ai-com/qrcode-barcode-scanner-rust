@@ -14,7 +14,7 @@ whose content is never edited by hand: `stage` writes it from one commit of this
 and writes into an empty DIR: every file of that folder byte for byte (glama.json, Dockerfile,
 package.json, package-lock.json, README.md), LICENSE (this repository's, which covers those
 files) and SOURCE.json, the commit and the sha256 of every staged file. The Dockerfile installs
-the published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.2; nothing is built from
+the published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.3; nothing is built from
 this source.
 
 `verify` stages the commit that DIR's SOURCE.json names and compares: same files, same bytes,
@@ -34,8 +34,8 @@ PACKAGE = "distribution/glama"
 SCHEMA = "qrscan-glama-stage/1"
 REQUIRED = ("glama.json", "Dockerfile", "package.json", "package-lock.json", "README.md")
 ADAPTER = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
-ADAPTER_VERSION = "0.3.2"
-ADAPTER_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
+ADAPTER_VERSION = "0.3.3"
+ADAPTER_INTEGRITY = "sha512-vKfTDkQ54hPI16Vt+bWAZa3dbc0O+ocsdpIH+qLyndVe82VhevXBhwhbN2jVwdaF4eu17v4QrVkIq3hPP0Eiiw=="
 
 
 class Refused(Exception):

@@ -25,7 +25,7 @@ if (!bundlePath || !fixturePath || (rest.length && !receiptPath) || rest.length 
 }
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const FIXTURE_SHA256 = "c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8";
-const SERVER = { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.2" };
+const SERVER = { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.3" };
 const VERSIONS = { scanner: "0.12.0", pipeline: 5, score_contract: 5 };
 const MIXED = [
   { symbology: "code128", text: "STOCK-4827", raw: Buffer.from("STOCK-4827").toString("base64") },
@@ -68,7 +68,7 @@ assert.equal(refusedSchema.status, 1, "mcpb validate refuses inputSchema in tool
 assert.match(refusedSchema.stdout + refusedSchema.stderr, /inputSchema/);
 
 assert.equal(manifest.name, "qrcode-barcode-scanner");
-assert.equal(manifest.version, "0.3.2");
+assert.equal(manifest.version, "0.3.3");
 assert.equal(manifest.server.entry_point, "server/launch.mjs");
 assert.deepEqual(manifest.tools.map(({ name }) => name), ["scan_image", "scan_file"]);
 assert.deepEqual(manifest.compatibility.platforms, ["darwin", "win32", "linux"]);

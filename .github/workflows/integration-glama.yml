@@ -2,7 +2,7 @@ name: integration-glama
 
 # Builds the Glama listing's container from the staged listing repository, the way Glama builds
 # it (root Dockerfile), and judges the MCP server inside it with the destination acceptance
-# contract. It installs the published npm adapter 0.3.2 and compiles no Rust. No upload, no
+# contract. It installs the published npm adapter 0.3.3 and compiles no Rust. No upload, no
 # secret; the image is removed at the end.
 on:
   workflow_dispatch:
@@ -64,7 +64,7 @@ jobs:
             --full "$RUNNER_TEMP/reports/full.json" \
             --destination "Glama container (linux/$ARCHITECTURE, before listing)" --version 0.12.0 \
             --url "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-mcp" \
-            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2" \
+            --identifier "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3" \
             --install "docker build of the staged listing repository" --run-url "$RUN_URL" \
             --receipt "receipt/acceptance-glama-$ARCHITECTURE.json"
           docker rmi qrscan-mcp:glama
