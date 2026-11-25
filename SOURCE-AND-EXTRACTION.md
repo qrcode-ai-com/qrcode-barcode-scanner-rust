@@ -37,7 +37,7 @@ scanned a QR code; a scan on an iOS simulator or device is not qualified. It is
 listed on the [Swift Package Index](https://swiftpackageindex.com/qrcode-ai-com/qrcode-barcode-scanner-swift). JSR has no qualified
 publication here. The public ClawHub
 skill and OpenClaw bundle are 0.2.1 on the MIT engine 0.12.0. The MCP adapter is 0.3.3
-on npm, on the MIT engine 0.12.0, and the Official MCP Registry lists 0.3.2. The
+on npm, on the MIT engine 0.12.0, and the Official MCP Registry lists 0.3.3. The
 skill 0.2.1 is also published as files on the release `agents-v0.3.2`, and the MCP Bundle 0.3.2
 on the release `mcpb-v0.3.2`. Homebrew and GHCR distribute the CLI
 0.12.0. See the [distribution guide](distribution/README.md) for coordinates
