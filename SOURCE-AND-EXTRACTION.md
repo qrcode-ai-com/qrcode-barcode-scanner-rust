@@ -38,7 +38,7 @@ listed on the [Swift Package Index](https://swiftpackageindex.com/qrcode-ai-com/
 publication here. The public ClawHub
 skill 0.2.1 and OpenClaw bundle 0.2.2 run the MIT engine 0.12.0. The MCP adapter is 0.3.3
 on npm, on the MIT engine 0.12.0, and the Official MCP Registry lists 0.3.3. The
-skill 0.2.1 is also published as files on the release `agents-v0.3.2`, and the MCP Bundle 0.3.3
+skill 0.2.1 is also published as files on the release `agents-v0.3.3`, and the MCP Bundle 0.3.3
 on the release `mcpb-v0.3.3`. Homebrew and GHCR distribute the CLI
 0.12.0. See the [distribution guide](distribution/README.md) for coordinates
 and platform evidence. The initial engine npm uploads were manual. The adapter
