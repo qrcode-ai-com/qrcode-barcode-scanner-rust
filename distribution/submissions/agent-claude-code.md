@@ -8,6 +8,12 @@ MIT engine 0.12.0 and carries skill 0.2.1. The values to send below name it. Sen
 and `main` then carry (`git ls-remote https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`).
 The checks under "What exists" are dated and ran on `v0.3.0`.
 
+Updated on 2026-11-25: `v0.3.1` has been on the plugin repository since 24 November 2026. The
+next release, `v0.3.2`, starts the MCP server 0.3.3, whose `scan_image` and `scan_file` default to
+the `fast` profile, and keeps skill 0.2.1 and engine 0.12.0. The values to send below now name
+`v0.3.2` and MCP 0.3.3: send them once `v0.3.2` is on the plugin repository, with the commit that
+tag then carries.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -43,10 +49,10 @@ and submit. Requirements stated there:
 | --- | --- | --- |
 | Source | Repository | `qrcode-ai-com/qrcode-barcode-scanner-plugin` |
 | Source | Plugin path | leave empty (root) |
-| Source | Branch or tag | `main`, or the tag `v0.3.1`; a tag stays on its commit until it is moved |
+| Source | Branch or tag | `main`, or the tag `v0.3.2`; a tag stays on its commit until it is moved |
 | Listing details | read from `plugin.json` and the README | display name, description and author come from the manifest |
 | Data handling | personal data | The plugin reads only the image files the user names and keeps nothing. |
-| Data handling | data sent elsewhere | Nothing is sent during a scan. On first start, `npx` downloads `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2` from the npm registry. |
+| Data handling | data sent elsewhere | Nothing is sent during a scan. On first start, `npx` downloads `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3` from the npm registry. |
 | Data handling | retention | None; npm keeps its package cache on the user's computer. |
 | Data handling | intended for people under 18 | the owner decides |
 | Compliance | contact email | the owner's address |
