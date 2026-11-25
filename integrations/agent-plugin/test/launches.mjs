@@ -43,7 +43,8 @@ export function gooseEntry(text) {
 // A scalar of the Continue entry: a quoted string, a whole number or a plain word.
 const scalar = (text) => (text.startsWith('"') ? JSON.parse(text) : /^\d+$/.test(text) ? Number(text) : text);
 
-// The Continue block is a fixed, small YAML shape too: one stdio server under mcpServers.
+// The Continue block is a fixed, small YAML shape too: one stdio server under mcpServers. A key
+// with no value opens a list (`args`), or a map of variables when it is `env`.
 export function continueEntry(text) {
   const lines = text.split('\n').filter((line) => line.trim() && !line.trimStart().startsWith('#'));
   if (!/^name: \S/.test(lines[0]) || !/^version: \d+\.\d+\.\d+$/.test(lines[1]) || lines[2] !== 'schema: v1'
@@ -52,13 +53,18 @@ export function continueEntry(text) {
   }
   const entry = { name: SERVER };
   let list;
+  let map;
   for (const line of lines.slice(5)) {
     const item = /^ {6}- (.+)$/.exec(line);
     if (item && list) { list.push(scalar(item[1])); continue; }
+    const pair = /^ {6}([A-Z][A-Z0-9_]*): (\S.*)$/.exec(line);
+    if (pair && map && !(pair[1] in map)) { map[pair[1]] = scalar(pair[2]); continue; }
     const match = /^ {4}([A-Za-z]+):(?: (.+))?$/.exec(line);
     if (!match || match[1] in entry) throw new Error(`Continue: unexpected line ${JSON.stringify(line)}`);
-    list = match[2] === undefined ? [] : undefined;
-    entry[match[1]] = list ?? scalar(match[2]);
+    const open = match[2] === undefined;
+    list = open && match[1] !== 'env' ? [] : undefined;
+    map = open && match[1] === 'env' ? {} : undefined;
+    entry[match[1]] = list ?? map ?? scalar(match[2]);
   }
   return entry;
 }
@@ -154,9 +160,14 @@ export async function launches(stage) {
   const ampKeys = Object.keys(entries.ampSettings);
   if (ampKeys.length !== 1 || ampKeys[0] !== 'amp.mcpServers') throw new Error(`README.md · Amp settings set ${ampKeys.join(', ')}`);
   found['README.md · Amp settings'] = argv(only(entries.ampSettings['amp.mcpServers'], 'README.md · Amp settings'), 'README.md · Amp settings', ['command', 'args']);
-  const { name, type, connectionTimeout, ...launch } = entries.continueEntry;
+  const { name, type, connectionTimeout, env, ...launch } = entries.continueEntry;
   if (type !== 'stdio') throw new Error(`README.md · Continue: the server type is ${type}, not stdio`);
   if (!Number.isInteger(connectionTimeout) || connectionTimeout < 60000) throw new Error('README.md · Continue: the first npx start needs a connectionTimeout of at least a minute');
+  // Without an allowed directory the server offers scan_image only, and an agent rarely holds image bytes.
+  const variables = Object.keys(env ?? {});
+  if (variables.length !== 1 || variables[0] !== 'QRSCAN_MCP_ALLOWED_DIRECTORIES' || typeof env.QRSCAN_MCP_ALLOWED_DIRECTORIES !== 'string') {
+    throw new Error(`README.md · Continue: env sets ${JSON.stringify(variables)}, not only QRSCAN_MCP_ALLOWED_DIRECTORIES`);
+  }
   found['README.md · Continue'] = argv(launch, 'README.md · Continue', ['command', 'args']);
   const zedKeys = Object.keys(entries.zedSettings);
   if (zedKeys.length !== 1 || zedKeys[0] !== 'context_servers') throw new Error(`README.md · Zed settings set ${zedKeys.join(', ')}`);

@@ -76,13 +76,13 @@ This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrc
 | Kimi Code | `kimi.plugin.json`, `skills/` |
 | Junie | `.junie-extension/marketplace.json`, `junie/qrcode-barcode-scanner/` |
 | Antigravity | `.antigravity-plugin/plugin.json`, `mcp_config.json`, `skills/` |
-| goose | `skills/` as a plugin, `goose/qrscan-extension.yaml` for the server |
+| goose | `skills/` and the server as a plugin, `goose/qrscan-extension.yaml` for a server that reads files |
 | Pi | `package.json` (`pi.skills`, `pi.extensions`), `pi/extension.js` |
 | OpenCode | `package.json` (`exports["./server"]`), `opencode/plugin.mjs` |
 | Devin | `.claude-plugin/plugin.json`, `.mcp.json`, `skills/` |
 | Factory | `.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`, `mcp.json`, `skills/` |
 | Amp | `skills/` copied to `~/.config/agents/skills/`, the server in `~/.config/amp/settings.json` |
-| Continue | no file of this repository, the server in `.continue/mcpServers/qrscan.yaml` |
+| Continue | no file of this repository, the server in `~/.continue/config.yaml` for the CLI, or in `.continue/mcpServers/qrscan.yaml` |
 | Zed | `skills/` copied to `~/.agents/skills/`, the server in `~/.config/zed/settings.json` |
 
 ## Before you install
@@ -207,19 +207,42 @@ Installing the GitHub address directly takes the default branch instead. To remo
 
 ### goose
 
-A goose plugin carries skills, so the skill and the server are added separately. Install the skill as a plugin:
+Install the plugin:
 
 ```sh
 goose plugin install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git
 ```
 
-`goose plugin install` takes no tag and clones the default branch: check the commit it records. Then add the server. Copy the `qrscan` entry of [`goose/qrscan-extension.yaml`](goose/qrscan-extension.yaml) under `extensions:` in `~/.config/goose/config.yaml`, or open this link in a browser to add it from goose Desktop:
+goose 1.60.2 adds the skill and also starts the plugin's own copy of the server, named `qrcode-barcode-scanner:qrscan`. That copy names no allowed directory, so it offers `scan_image` only.
+
+`goose plugin install` takes no tag and clones the default branch. Its install record holds no commit, so read the commit from the clone:
+
+```sh
+git -C ~/.agents/plugins/qrcode-barcode-scanner rev-parse HEAD
+```
+
+To let goose read files by path, add a server entry that names an allowed directory. Copy the `qrscan` entry of [`goose/qrscan-extension.yaml`](goose/qrscan-extension.yaml) under `extensions:` in `~/.config/goose/config.yaml`, then replace its `envs: {}` line with your folder:
+
+```yaml
+    envs:
+      QRSCAN_MCP_ALLOWED_DIRECTORIES: /absolute/path/to/images
+```
+
+goose then runs two copies of the server: the plugin's copy, with `scan_image` only, and this entry, which also offers `scan_file`.
+
+goose waits about 10 seconds for a server's first answer. The entry's `timeout: 300` does not extend that wait, and a server that answers later is left out of the session. The first npx start downloads the package, and npx is slower on a heavily loaded machine, so the first start can miss that window. Make sure it answers within about 10 seconds, for example by installing the package once and starting it with node, as the [MCP server's install steps](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/mcp/README.md#install) show.
+
+goose 1.60.2 also turns on its built-in `developer` extension by default. It lets the model run shell commands and write files. The MCP server does not need it. The skill's helper runs through a shell, so it needs the extension. To turn it off, set `enabled: false` under `developer` in `~/.config/goose/config.yaml`.
+
+To add only the server, without the plugin, open this link in a browser to add it from goose Desktop:
 
 ```text
 goose://extension?cmd=npx&arg=--yes&arg=--ignore-scripts&arg=%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3&id=qrscan&name=QR%20Code%20%26%20Barcode%20Scanner&description=Read%20QR%20codes%20and%20barcodes%20in%20local%20images
 ```
 
-For one session only, run `goose session --with-extension "npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"`. To remove the server, delete its entry or turn it off in goose's extension settings. The [goose QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/goose) and the [goose barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/goose) walk through both halves.
+For one session only, run `goose session --with-extension "npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"`. Neither route names an allowed directory, so both offer `scan_image` only.
+
+goose 1.60.2 has no command that removes a plugin. To remove it, move the folder `~/.agents/plugins/qrcode-barcode-scanner` out of `~/.agents/plugins/`, then delete the entry under `plugins:` in `~/.config/goose/config.yaml` that names that folder. To remove a server you added, delete its entry under `extensions:` or turn it off in goose's extension settings. The [goose QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/goose) and the [goose barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/goose) walk through both halves.
 
 ### Pi
 
@@ -290,7 +313,7 @@ To remove it, run `amp mcp remove qrscan`, then delete the folder `~/.config/age
 
 ### Continue
 
-Continue's documentation describes MCP servers but no skill folder, so Continue gets the server only. In your workspace, save this file as `.continue/mcpServers/qrscan.yaml`:
+Continue's documentation describes MCP servers but no skill folder, so Continue gets the server only. This is the server entry, as a file of its own. Replace the path under `env:` with your image folder, so the server offers `scan_file` as well as `scan_image`:
 
 ```yaml
 name: QR Code and Barcode Scanner
@@ -304,10 +327,17 @@ mcpServers:
       - --yes
       - --ignore-scripts
       - "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"
+    env:
+      QRSCAN_MCP_ALLOWED_DIRECTORIES: /absolute/path/to/images
     connectionTimeout: 60000
 ```
 
-`connectionTimeout` is in milliseconds. It gives the first start, which downloads the server, one minute instead of Continue's default of 20 seconds. Continue calls MCP tools in agent mode only. To use the server in every workspace, add the same `mcpServers` item to `~/.continue/config.yaml` instead. To remove it, delete the file or the item. The [Continue QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/continue) and the [Continue barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/continue) show the same configuration.
+Where it goes depends on the Continue you use:
+
+- The Continue CLI, `cn`, reads the `mcpServers` item from `~/.continue/config.yaml`. Add the item there. `cn` 1.5.47 does not read a `.continue/mcpServers/` folder in your workspace.
+- Continue's documentation also describes a workspace folder: save the file as `.continue/mcpServers/qrscan.yaml` at the top level of your workspace.
+
+`connectionTimeout` is in milliseconds. It gives the first start, which downloads the server, one minute instead of Continue's default of 20 seconds. Continue calls MCP tools in agent mode only. In `cn`, an MCP tool waits for your confirmation, so a headless `cn -p` run needs the tool allowed, for example `cn -p --config ~/.continue/config.yaml --allow scan_file "Scan /absolute/path/to/images/code.png"`. To remove the server, delete the item or the file. The [Continue QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/continue) and the [Continue barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/continue) show the same configuration.
 
 ### Zed
 
