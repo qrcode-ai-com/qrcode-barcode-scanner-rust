@@ -50,9 +50,11 @@ A platform admin installs custom pieces, and the Activepieces edition decides wh
 
 ## Install
 
-In Activepieces, open **Platform Admin**, then **Catalogue**, then **Pieces**, and select **Install Piece**. Choose the npm registry as the source, enter the package name `@qrcode-ai-com/piece-qrcode-barcode-scanner` and the version you want from its npm page, and install. The same dialog also accepts a `.tgz` file with **Upload File**, which installs a reviewed archive without npm.
+In Activepieces, open **Platform Admin**, then **Catalogue**, then **Pieces**, and select **Install Piece**. Choose the npm registry as the source, enter the package name `@qrcode-ai-com/piece-qrcode-barcode-scanner` and the version you want from its npm page, and install. On a plan that allows private pieces, the same dialog also accepts a reviewed `.tgz` file as **Packed Archive (.tgz)**. The community edition shows that option disabled, so it installs from npm only.
 
-In a flow, add the **QR Code & Barcode Scanner** piece and its **Scan Image** action. Removing the piece from the same page removes the action.
+Activepieces installs a piece's dependencies with a minimum release age of three days. A piece version whose engine package was published less than three days earlier fails with `blocked by minimum-release-age`, and the same install succeeds once three days have passed. Activepieces 0.93.0 sets this age in its code, with no setting to change it.
+
+In a flow, add the **QR Code & Barcode Scanner** piece and its **Scan Image** action. To remove the piece, first delete the flows that use it. On a plan that manages pieces, the **Pieces** page removes it. The community edition shows that delete button disabled, so a platform admin reads the piece's `id` with `GET /api/v1/pieces/{name}` and removes it with `DELETE /api/v1/pieces/{id}`.
 
 ## Use
 
