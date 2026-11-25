@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.2, the same bytes on every host.
+"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.3, the same bytes on every host.
 
   build-mcpb-bundle.py build --out DIR [--revision REV] [--cache DIR]
   build-mcpb-bundle.py verify FILE [--revision REV] [--cache DIR]
@@ -8,7 +8,7 @@
 
 An MCP Bundle is a ZIP archive with a manifest.json at its root, which MCPB hosts such as Claude
 Desktop install in one step (https://github.com/modelcontextprotocol/mcpb). This one runs the
-published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.2 with its dependencies, the
+published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.3 with its dependencies, the
 scanner engine 0.12.0 and its six native platform packages included: it installs nothing and
 needs no network. Nothing is compiled.
 
@@ -57,14 +57,14 @@ PACKAGE = "distribution/mcpb"
 SCHEMA = "qrscan-mcpb-build/1"
 NAME = "qrcode-barcode-scanner"
 DISPLAY_NAME = "QR Code & Barcode Scanner"
-VERSION = "0.3.2"
+VERSION = "0.3.3"
 TAG_PREFIX = "refs/tags/mcpb-v"
 BUNDLE = f"{NAME}-{VERSION}.mcpb"
 SUMS = f"{NAME}-mcpb-{VERSION}-SHA256SUMS"
 REGISTRY = "https://registry.npmjs.org/"
 ADAPTER = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
-ADAPTER_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
-ADAPTER_COMMIT = "3c5e211a6fb31151b13d0801c98ab118f48dcceb"  # tag agents-v0.3.2
+ADAPTER_INTEGRITY = "sha512-vKfTDkQ54hPI16Vt+bWAZa3dbc0O+ocsdpIH+qLyndVe82VhevXBhwhbN2jVwdaF4eu17v4QrVkIq3hPP0Eiiw=="
+ADAPTER_COMMIT = "e6675aa55ddeca25a9883df443d61b27fe9db419"  # tag agents-v0.3.3
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
 ENGINE_VERSION = "0.12.0"
 ENGINE_COMMIT = "897dd50cdf27cbde54d408bf65e1ca4622035d42"  # tag v0.12.0
@@ -601,9 +601,9 @@ def self_test():
         lock, lambda d: d["packages"]["node_modules/zod"].update(resolved="https://example.com/zod-4.6.7.tgz"))}),
         "not the registry's archive")
     refused("an adapter range in package.json", lambda: attempt(**{"package.json": edited(
-        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.2"}))}), "exactly")
+        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.3"}))}), "exactly")
     refused("a manifest at another version", lambda: attempt(**{"manifest.json": edited(
-        manifest, lambda d: d.update(version="0.3.3"))}), "manifest.json version")
+        manifest, lambda d: d.update(version="0.3.4"))}), "manifest.json version")
     refused("the adapter locked under its earlier AGPL license", lambda: attempt(**{"package-lock.json": edited(
         lock, lambda d: d["packages"][f"node_modules/{ADAPTER}"].update(license="AGPL-3.0-or-later"))}),
         f"not {VERSION} (MIT)")
@@ -629,10 +629,10 @@ def self_test():
         refused(label, lambda files=files, links=links: members("x", tarball(files, links)), needle)
     refused("a file twice up to letter case", lambda: members("x", tarball(
         {"package.json": b"{}", "LICENSE": b"a", "license": b"b"})), "twice")
-    refused("the tag of the previous bundle", lambda: gate("refs/tags/mcpb-v0.3.1"), "is not refs/tags/mcpb-v0.3.2")
-    refused("the adapter's tag", lambda: gate("refs/tags/agents-v0.3.2"), "is not refs/tags/mcpb-v0.3.2")
-    refused("the engine's tag", lambda: gate("refs/tags/v0.12.0"), "is not refs/tags/mcpb-v0.3.2")
-    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.2")
+    refused("the tag of the previous bundle", lambda: gate("refs/tags/mcpb-v0.3.2"), "is not refs/tags/mcpb-v0.3.3")
+    refused("the adapter's tag", lambda: gate("refs/tags/agents-v0.3.3"), "is not refs/tags/mcpb-v0.3.3")
+    refused("the engine's tag", lambda: gate("refs/tags/v0.12.0"), "is not refs/tags/mcpb-v0.3.3")
+    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.3")
     try:
         gate(TAG_PREFIX + VERSION)
     except Refused as error:

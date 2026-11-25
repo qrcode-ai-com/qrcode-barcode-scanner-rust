@@ -1,4 +1,4 @@
-# The MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.2, as Glama builds and runs it.
+# The MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.3, as Glama builds and runs it.
 # It installs the published npm package from package-lock.json, compiles nothing and speaks MCP
 # over stdio. The native scanner 0.12.0 comes from its pinned linux-x64-gnu or linux-arm64-gnu
 # npm package, so the base is glibc (Debian), not musl. Scans need no network access.
@@ -13,7 +13,7 @@ WORKDIR /opt/qrscan-mcp
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts \
     && npm cache clean --force \
-    && test "$(node -p 'require("@qrcode-ai-com/qrcode-barcode-scanner-mcp/package.json").version')" = 0.3.2
+    && test "$(node -p 'require("@qrcode-ai-com/qrcode-barcode-scanner-mcp/package.json").version')" = 0.3.3
 
 USER node
 ENTRYPOINT ["node", "/opt/qrscan-mcp/node_modules/@qrcode-ai-com/qrcode-barcode-scanner-mcp/src/cli.mjs"]

@@ -1,6 +1,6 @@
 name: mcpb
 
-# The MCP Bundle (.mcpb) of the published MCP server 0.3.2, for Claude Desktop and other MCPB
+# The MCP Bundle (.mcpb) of the published MCP server 0.3.3, for Claude Desktop and other MCPB
 # hosts. scripts/build-mcpb-bundle.py builds it from distribution/mcpb and the npm registry's
 # archives, pinned by the lockfile: the server, the scanner engine 0.12.0 and its six native
 # packages. Nothing is compiled. The bundle is built twice, in two time zones, and the files must
