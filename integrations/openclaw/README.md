@@ -82,11 +82,15 @@ openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.2 --n
 openclaw plugins inspect qrcode-barcode-scanner
 ```
 
-Check the version the bundle page lists first. Until ClawHub lists 0.2.2, it
-serves 0.2.1: install `@0.2.1` instead. Bundle 0.2.1 sets up MCP adapter 0.3.2
-and engine 0.12.0, whose tools run the frame profile when a call names none;
-adapter 0.3.3 runs fast. Bundle 0.2.0 sets up MCP adapter 0.2.0 and engine
-0.11.0 and keeps the licenses it was published with.
+ClawHub has listed 0.2.2 as the latest bundle since 25 November 2026.
+OpenClaw 2026.11.10 stops that install until you consent to the bundle's
+declared capabilities: read them on the bundle page, then run the same command
+again with `--accept-capabilities`. That version reported the bundle as
+enabled even with `--no-enable`, so run the setup below before a session uses
+it. Bundle 0.2.1 sets up MCP adapter 0.3.2 and engine 0.12.0, whose tools run
+the frame profile when a call names none; adapter 0.3.3 runs fast. Bundle 0.2.0
+sets up MCP adapter 0.2.0 and engine 0.11.0 and keeps the licenses it was
+published with.
 
 For a reviewed local archive, use its absolute `.tgz` path in the install
 command. OpenClaw may request `--force` to confirm its source.

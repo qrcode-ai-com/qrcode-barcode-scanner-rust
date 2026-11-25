@@ -125,14 +125,14 @@ published to npm or crates.io.
 
 These independently versioned integrations reuse a published native engine:
 the MCP adapter 0.3.3 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
-the skill and bundle that ClawHub serves at 0.2.1 run that MIT engine too. Choose the
+the skill 0.2.1 and the bundle 0.2.2 that ClawHub serves run that MIT engine too. Choose the
 interface your application or agent already supports:
 
 | Integration | Public package | Install |
 | --- | --- | --- |
 | MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3` |
 | Portable skill | [`qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner) | `clawhub install qrcode-barcode-scanner --version 0.2.1` |
-| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.1` |
+| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.2`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.2` |
 
 MCP adapter 0.3.3 passed fresh public npm installations on **Linux x64 with
 Node.js 22 and 24** in its
@@ -149,13 +149,18 @@ The npx acceptance
 workflow also checks Linux and macOS from an empty home.
 The skill and bundle 0.2.0 passed registry installation and real
 **OpenClaw 2026.11.1** runtime calls on macOS ARM64; their 0.2.1 versions, published on
-ClawHub on 24 November 2026, have not been run in OpenClaw here yet. Other clients and native
-engine targets need their own installed-consumer checks.
+ClawHub on 24 November 2026, have not been run in OpenClaw here yet. Bundle 0.2.2, published
+on ClawHub on 25 November 2026 as a ZIP archive, was downloaded with its digest checked and
+installed from ClawHub by **OpenClaw 2026.11.10** on macOS ARM64, which reads it as a bundle
+with the MCP server `qrscan`. After its setup, the MCP server of that installation, MCP 0.3.3,
+read both payloads of the mixed sample in the three profiles and in the default `fast`; no
+agent model called it. Other clients and native engine targets need their own
+installed-consumer checks.
 
 Read the [MCP installation and stdio configuration](../integrations/mcp/),
 [portable skill instructions](../skills/qrcode-barcode-scanner/) or
-[bundle setup](../integrations/openclaw/) before activation. Bundle 0.2.1 installs
-its exact adapter dependency (MCP 0.3.2) through explicit setup; bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
+[bundle setup](../integrations/openclaw/) before activation. Bundle 0.2.2 installs
+its exact adapter dependency (MCP 0.3.3) through explicit setup; bundle 0.2.1 installs MCP 0.3.2 and bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
 bundle are versioned separately from the engine; adapter patch releases need
 not change the other integration versions.
 
@@ -399,8 +404,9 @@ SHA-256 of its checksum list, and its checks run in this repository. The Termux 
 0.12.0 source archive instead, and its update function follows each later CLI release. The Glama
 container and the MCP Bundle hold the published MCP server instead, with the engine it was released on,
 each package pinned by its npm integrity. None of these destinations serves the scanner yet, except
-Glama, which lists the MCP server since 20 November 2026, and the MCP Bundle, whose 0.3.2 file is on
-the release [`mcpb-v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) since 24 November 2026. Four destinations received pull requests
+Glama, which lists the MCP server since 20 November 2026, and the MCP Bundle, whose 0.3.3 file is on
+the release [`mcpb-v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) since 25 November 2026 and whose 0.3.2 file is
+on the release [`mcpb-v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) since 24 November 2026. Four destinations received pull requests
 that day (conda-forge two, one per recipe). Three wait for review by their maintainers; MSYS2 closed
 its pull request unmerged. The other nine are prepared. Each recipe README says what its registry
 still needs, usually an account or a review in that registry.
@@ -411,7 +417,7 @@ still needs, usually an account or a review in that registry.
 | Artifact Hub | [artifacthub](artifacthub/README.md) | prepared | index composed against the pinned GHCR digests |
 | JSR | [jsr](jsr/README.md) | prepared | `jsr publish --dry-run` and a Deno scan of the staged module |
 | Glama | [glama](glama/README.md) | [listed](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp) | MCP container built and judged offline on amd64 and arm64 |
-| MCP Bundle for Claude for macOS and Windows | [mcpb](mcpb/README.md) | [released: 0.3.2](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) | `mcpb.yml` builds the MCP Bundle twice to the same bytes, runs `mcpb validate` and drives its server over MCP stdio on Linux, macOS and Windows runners and offline in glibc and musl containers |
+| MCP Bundle for Claude for macOS and Windows | [mcpb](mcpb/README.md) | [released: 0.3.3](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) | `mcpb.yml` builds the MCP Bundle twice to the same bytes, runs `mcpb validate` and drives its server over MCP stdio on Linux, macOS and Windows runners and offline in glibc and musl containers |
 | conda-forge | [conda-forge](conda-forge/README.md) | submitted: [CLI](https://github.com/conda-forge/staged-recipes/pull/35745), [Python](https://github.com/conda-forge/staged-recipes/pull/35746) | recipe schema and the test script against the published wheel |
 | Nixpkgs | [nix](nix/README.md) | prepared | evaluated against nixos-unstable, with the crate hash recorded |
 | openSUSE Build Service | [obs](obs/README.md) | prepared | `rpmspec`, `rpmlint` and the service file |
