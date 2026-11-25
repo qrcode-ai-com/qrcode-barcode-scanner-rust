@@ -3,7 +3,7 @@
 // session. Pi keeps no registration between loads, so this runs on every load; a server named
 // `qrscan` in the user's mcp.json takes precedence. The skill comes from this package's `skills/`
 // directory, declared in package.json. Nothing here starts a process.
-const LAUNCH = ["npx", "--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2"];
+const LAUNCH = ["npx", "--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"];
 
 export default function (pi) {
   pi.registerMcpServer("qrscan", {

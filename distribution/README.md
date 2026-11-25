@@ -124,23 +124,25 @@ published to npm or crates.io.
 ## Published agent integrations
 
 These independently versioned integrations reuse a published native engine:
-the MCP adapter 0.3.2 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
+the MCP adapter 0.3.3 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
 the skill and bundle that ClawHub serves at 0.2.1 run that MIT engine too. Choose the
 interface your application or agent already supports:
 
 | Integration | Public package | Install |
 | --- | --- | --- |
-| MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.2) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2` |
+| MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3` |
 | Portable skill | [`qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner) | `clawhub install qrcode-barcode-scanner --version 0.2.1` |
 | OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.1` |
 
-MCP adapter 0.3.2 passed fresh public npm installations on **Linux x64 with
+MCP adapter 0.3.3 passed fresh public npm installations on **Linux x64 with
 Node.js 22 and 24** in its
-[release run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45401118512).
-Its [release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.2)
-was published through GitHub Trusted Publishing; the public bytes match the
-qualified archive, and npm serves provenance metadata. The adapter 0.3.2, the
-skill 0.2.1 and engine 0.12.0 are MIT; adapter 0.3.1 with engine 0.11.0 keeps
+[release run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45601914357)
+on 25 November 2026. It was published through GitHub Trusted Publishing from
+its tag `agents-v0.3.3`; the public bytes match the qualified archive, and npm
+serves provenance metadata. It changes one default of 0.3.2: a `scan_image` or
+`scan_file` call that names no profile runs `fast` instead of `frame`; its
+engine, tools and report contract are unchanged. The adapters 0.3.2 and 0.3.3,
+the skill 0.2.1 and engine 0.12.0 are MIT; adapter 0.3.1 with engine 0.11.0 keeps
 AGPL-3.0-or-later, and skill and bundle 0.2.0 keep MIT-0. ClawHub labels every skill
 MIT-0, so its page shows skill 0.2.1 as MIT-0; the files of skill 0.2.1 carry the MIT License.
 The npx acceptance
@@ -162,6 +164,8 @@ under `io.github.qrcode-ai-com/qrcode-barcode-scanner`, as its latest version. I
 npm package at 0.3.2. Its separate publication completed in
 [run 45433268310](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45433268310) on 24 November 2026; the entry for 0.3.1, from
 [run 43267825878](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43267825878), stays listed.
+Adapter 0.3.3 is not listed there yet: its listing is a separate run of
+`mcp-registry-publish.yml`.
 Each additional client or catalogue has its own acceptance checks.
 
 ### Connect the published MCP adapter to OpenCode
@@ -172,7 +176,7 @@ the install directory in place because OpenCode stores its absolute path.
 
 ```sh
 npm install --prefix ./.qrscan-mcp --save-exact --ignore-scripts \
-  @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.2
+  @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3
 opencode mcp add qrscan -- "$(command -v node)" \
   "$PWD/.qrscan-mcp/node_modules/@qrcode-ai-com/qrcode-barcode-scanner-mcp/src/cli.mjs"
 opencode mcp list
@@ -241,8 +245,9 @@ ClawHub listing of the same skill.
 ### Install the adapter or the skill from the release files
 
 The [agents-v0.3.2 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.2)
-carries the current MCP adapter archive and the skill 0.2.1, both MIT on engine
-0.12.0. The earlier files stay where they were published: adapter 0.3.1 on the
+carries the MCP adapter 0.3.2 archive and the skill 0.2.1, both MIT on engine
+0.12.0. No release page carries adapter 0.3.3 as a file yet: install it from
+npm. The earlier files stay where they were published: adapter 0.3.1 on the
 [agents-v0.3.1 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.1)
 and skill 0.2.0 on the [agents-v0.2.1 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.2.1).
 These files are copies for installation from a release page instead of a registry:

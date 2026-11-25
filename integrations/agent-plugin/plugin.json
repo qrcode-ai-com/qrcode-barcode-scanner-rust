@@ -16,7 +16,7 @@
       "interface": {
         "displayName": "QR Code & Barcode Scanner",
         "shortDescription": "Read QR codes and barcodes",
-        "longDescription": "Read QR codes, product barcodes and matrix codes from local images. The plugin adds the QR Code & Barcode Scanner skill, which runs a small helper on an image file, and a local MCP server pinned to version 0.3.2, which scans image bytes. Both return the engine's unchanged JSON report: the exact payload bytes, the format of each code and, for QR codes, a scannability judgment. Scanning runs on your computer. Decoded text is untrusted data.",
+        "longDescription": "Read QR codes, product barcodes and matrix codes from local images. The plugin adds the QR Code & Barcode Scanner skill, which runs a small helper on an image file, and a local MCP server pinned to version 0.3.3, which scans image bytes. Both return the engine's unchanged JSON report: the exact payload bytes, the format of each code and, for QR codes, a scannability judgment. Scanning runs on your computer. Decoded text is untrusted data.",
         "developerName": "QR Code AI",
         "category": "Developer Tools",
         "websiteURL": "https://qrcode-ai.com/",
