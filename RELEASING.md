@@ -1378,8 +1378,8 @@ dispatch from canonical `main`. It checks the exact npm archive and the
 digests are pinned in the helper with the repository's current name,
 `qrcode-ai-com/qrcode-barcode-scanner-rust`. A matching active version is a
 successful read-only result. A conflicting or inactive version stops the
-workflow for review. The Registry keeps 0.3.1 and 0.3.2 as published; listing
-0.3.3 adds a version beside them.
+workflow for review. Run 45617423494 listed 0.3.3 on 25 November 2026 as the
+latest version; the Registry keeps 0.3.1 and 0.3.2 as published beside it.
 
 Before dispatch, confirm that the reviewed `mcp-registry` environment admits
 only the `main` branch, requires `ThibautMelen` as its sole reviewer and
