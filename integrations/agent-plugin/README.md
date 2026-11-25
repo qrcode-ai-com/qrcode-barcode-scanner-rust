@@ -74,7 +74,7 @@ This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrc
 | Gemini CLI | `gemini-extension.json`, `skills/` |
 | Kiro | `plugin.json`, `mcp.json`, `skills/` |
 | Kimi Code | `kimi.plugin.json`, `skills/` |
-| Junie | `.junie-extension/marketplace.json` or `.claude-plugin/marketplace.json`, then the root `.mcp.json` and `skills/`. Junie CLI 26.11.3 did not use `junie/qrcode-barcode-scanner/` |
+| Junie | `.junie-extension/marketplace.json` by its URL, then `junie/qrcode-barcode-scanner/` (`extension.json`, `mcp/.mcp.json`, `skills/`). Added as a repository, Junie CLI 26.11.3 reads `.claude-plugin/marketplace.json` first and installs the root |
 | Antigravity | `.antigravity-plugin/plugin.json`, `mcp_config.json`, `skills/` |
 | goose | `skills/` and the server as a plugin, `goose/qrscan-extension.yaml` for a server that reads files |
 | Pi | `package.json` (`pi.skills`, `pi.extensions`), `pi/extension.js` |
@@ -185,22 +185,24 @@ To remove it, run `/plugins remove qrcode-barcode-scanner`, then `/reload`. The 
 
 ### Junie
 
-In a Junie CLI session, add the marketplace and install the extension:
+In a Junie CLI session, add the marketplace by the URL of its Junie manifest, then install the extension:
 
 ```text
-/extensions marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin
+/extensions marketplace add https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/main/.junie-extension/marketplace.json
 /extensions install qrcode-barcode-scanner
 ```
 
 Junie then asks for a scope. User level, which is preselected, makes the extension available in all your projects. Project level keeps it in the current project.
 
-Junie CLI 26.11.3 installed the repository root, not the `junie/qrcode-barcode-scanner/` folder. It loaded the root skill and started the server of the root `.mcp.json`, so the `timeout: 300000` of the Junie folder was not used.
+Use the URL, not `qrcode-ai-com/qrcode-barcode-scanner-plugin`. When a repository holds both `.claude-plugin/marketplace.json` and `.junie-extension/marketplace.json`, Junie CLI 26.11.3 reads the Claude file first. Added as a repository, the marketplace therefore installs the whole root and starts the server of the root `.mcp.json`, without the `timeout: 300000` of the Junie folder. From the URL, Junie reads the Junie manifest, whose entry fetches only `junie/qrcode-barcode-scanner/` from the default branch. Junie's extension documentation names no tag for that source, so this route follows the default branch, not `v0.3.2`.
 
-Junie clones the default branch and records no commit. Read the commit from the installed copy:
+Junie records no commit. It keeps a sparse clone of this repository next to the cached manifest, under `~/.junie/extensions/marketplaces/url/`. Read the commit there:
 
 ```sh
-git -C ~/.junie/extensions/github-qrcode-ai-com-qrcode-barcode-scanner-plugin/qrcode-barcode-scanner rev-parse HEAD
+git -C ~/.junie/extensions/marketplaces/url/<marketplace>/ext-repos/qrcode-ai-com/qrcode-barcode-scanner-plugin rev-parse HEAD
 ```
+
+`<marketplace>` is the name the Marketplaces tab shows, without its `url-` prefix.
 
 To let the server read files by path, set `QRSCAN_MCP_ALLOWED_DIRECTORIES` in Junie's environment before you start Junie. Junie passes its environment to the server, which then offers `scan_file` as well as `scan_image`:
 
@@ -212,7 +214,7 @@ Unless Brave mode is on, Junie asks before each MCP tool call. You can allow the
 
 An interactive session needs no JetBrains sign-in when it uses a [custom model profile](https://junie.jetbrains.com/docs/custom-llm-models.html) with your own key. Junie's [headless mode](https://junie.jetbrains.com/docs/junie-headless.html) needs a token from JetBrains.
 
-To remove it, open `/extensions`, select the extension in the Installed tab and choose Remove. This leaves the marketplace registered in `~/.junie/extensions/marketplaces.json`, with its clone in `~/.junie/extensions/marketplaces/qrcode-ai-com/qrcode-barcode-scanner-plugin`. To remove the marketplace, [Junie's extension documentation](https://junie.jetbrains.com/docs/junie-cli-extensions.html) says to select it in the Marketplaces tab of `/extensions` and choose Remove. If the clone is still there afterwards, delete that folder. The [Junie QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/junie) and the [Junie barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/junie) cover the same steps.
+To remove it, open `/extensions`, select the extension in the Installed tab and choose Remove. This leaves the marketplace registered in `~/.junie/extensions/marketplaces.json`, with its cached manifest and sparse clone in `~/.junie/extensions/marketplaces/url/<marketplace>/`. To remove the marketplace, [Junie's extension documentation](https://junie.jetbrains.com/docs/junie-cli-extensions.html) says to select it in the Marketplaces tab of `/extensions` and choose Remove. If that folder is still there afterwards, delete it. The [Junie QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/junie) and the [Junie barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/junie) cover the same steps.
 
 ### Antigravity
 

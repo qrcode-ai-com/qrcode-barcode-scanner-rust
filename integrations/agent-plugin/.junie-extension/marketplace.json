@@ -11,7 +11,11 @@
   "extensions": [
     {
       "name": "qrcode-barcode-scanner",
-      "source": "./junie/qrcode-barcode-scanner",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git",
+        "path": "junie/qrcode-barcode-scanner"
+      },
       "description": "Read QR codes and barcodes in local images with the QR Code & Barcode Scanner skill and its pinned local MCP server.",
       "version": "0.3.2",
       "author": {
