@@ -181,13 +181,14 @@ Start the published adapter with `npx`, an exact version and no install script:
 - To remove it, delete the entry from the client. The files npx kept are
   under `_npx` in npm's cache (`npm config get cache`).
 
-The repository's `Destination acceptance` workflow starts the published 0.3.2
+The repository's `Destination acceptance` workflow starts the published 0.3.3
 through these npx options in an empty home, on Linux with Node.js 22 and 24 and
 on macOS with Node.js 24. It reads the QR code and the Code 128 through
-`scan_image` in the three profiles; its three receipts passed on 24 November
-2026. Windows is not checked: a client there may need to start `npx` through
-`cmd`. That job starts 0.3.3 now that 0.3.3 is public on npm; until its
-receipts exist, this check covers 0.3.2 only.
+`scan_image` in the three profiles; its three receipts for 0.3.3 passed on
+25 November 2026 in
+[run 45610855025](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45610855025),
+as those for 0.3.2 did on 24 November. Windows is not checked: a client there
+may need to start `npx` through `cmd`.
 
 The [0.3.3 release workflow](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45601914357)
 qualified its packed archive, published it through GitHub Trusted Publishing
