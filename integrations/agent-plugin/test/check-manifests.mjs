@@ -174,7 +174,12 @@ await check('one name, version and repository in every manifest', async () => {
   const junie = await json('.junie-extension/marketplace.json');
   expect(junie.name === MARKETPLACE && junie.extensions.length === 1, 'the Junie marketplace is not one qrcode-ai-com entry');
   expect(junie.extensions[0].name === NAME && junie.extensions[0].version === version, 'the Junie entry is not this extension');
-  expect((await json(`${junie.extensions[0].source}/extension.json`)).name === NAME, 'the Junie extension folder names another extension');
+  // Junie reads .claude-plugin/marketplace.json first when a repository holds both, so the README
+  // adds this manifest by URL, and a URL-hosted marketplace accepts a git source, not a relative path.
+  const source = junie.extensions[0].source;
+  expect(same(source, { source: 'git-subdir', url: `${SATELLITE}.git`, path: `junie/${NAME}` }),
+    'the Junie entry is not the git-subdir source of the Junie folder in the plugin repository');
+  expect((await json(`${source.path}/extension.json`)).name === NAME, 'the Junie extension folder names another extension');
   expect(pkg.name === '@qrcode-ai-com/qrcode-barcode-scanner-plugin' && pkg.license === 'MIT', 'package.json is not the scoped MIT package');
   expect(pkg.repository?.url === `git+${SATELLITE}.git`, `package.json names repository ${pkg.repository?.url}`);
   return `${NAME} ${version}`;
