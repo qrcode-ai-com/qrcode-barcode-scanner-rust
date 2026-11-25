@@ -9,8 +9,8 @@ taken seriously.
 
 | Version | Supported |
 |---------|-----------|
-| 0.11.x  | ✅ |
-| < 0.11  | ❌ — please upgrade to the latest 0.11 release |
+| 0.12.x  | ✅ |
+| < 0.12  | ❌ — please upgrade to the latest 0.12 release |
 
 ## Reporting a vulnerability
 
