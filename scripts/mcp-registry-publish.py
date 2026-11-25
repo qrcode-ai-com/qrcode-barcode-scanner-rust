@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""List the inspected MCP 0.3.2 adapter in the Official MCP Registry."""
+"""List the inspected MCP 0.3.3 adapter in the Official MCP Registry."""
 
 import argparse
 import base64
@@ -22,10 +22,10 @@ REGISTRY = "https://registry.modelcontextprotocol.io"
 NPM = "https://registry.npmjs.org"
 PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
 SERVER = "io.github.qrcode-ai-com/qrcode-barcode-scanner"
-VERSION = "0.3.2"
-SOURCE_COMMIT = "3c5e211a6fb31151b13d0801c98ab118f48dcceb"  # agents-v0.3.2
-SERVER_SHA256 = "b9c23db7152497fa15d53934b335b704c4865e4732caccb198a51abfda449b80"
-NPM_INTEGRITY = "sha512-CZU8oMgpTaPgdJH9ifQehQUeY76k+X9KkXVHJdV3eLauAU1tjroJXrUImuEozg2duzsmLq0Df4GtBLUkiCvdmw=="
+VERSION = "0.3.3"
+SOURCE_COMMIT = "e6675aa55ddeca25a9883df443d61b27fe9db419"  # agents-v0.3.3
+SERVER_SHA256 = "ff476aa2e57314e32137a49461b0c8fbb940cbcbe4a8475d6712f858b643c948"
+NPM_INTEGRITY = "sha512-vKfTDkQ54hPI16Vt+bWAZa3dbc0O+ocsdpIH+qLyndVe82VhevXBhwhbN2jVwdaF4eu17v4QrVkIq3hPP0Eiiw=="
 PUBLISHER_URL = (
     "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.7/"
     "mcp-publisher_linux_amd64.tar.gz"

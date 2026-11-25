@@ -38,7 +38,7 @@ defaults:
     shell: bash
 
 env:
-  # The engine the reviewed MCP launch (distribution/readme-actions.json, adapter 0.3.2) brings
+  # The engine the reviewed MCP launch (distribution/readme-actions.json, adapter 0.3.3) brings
   # with it. The skill helper runs on the engine its SKILL.md pins.
   ENGINE_VERSION: 0.12.0
 
