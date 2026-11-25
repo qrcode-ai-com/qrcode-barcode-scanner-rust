@@ -52,7 +52,7 @@ To call the engine from your own code instead of an agent, start from the [QR co
 
 ## Status
 
-This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-plugin`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin), is written from it by [`scripts/stage-agent-plugin-satellite.py`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/scripts/stage-agent-plugin-satellite.py). It has been public since 20 November 2026. The commands below name its release [`v0.3.1`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.1), which starts the MCP server 0.3.2 with skill 0.2.1 and engine 0.12.0. This source starts the MCP server 0.3.3, public on npm since 25 November 2026, and the plugin's next release will carry it; the server entries below that you add by hand already start 0.3.3. If the [releases page](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases) does not show `v0.3.1` yet, use `v0.3.0` in its place, which starts the MCP server 0.3.1 on engine 0.11.0.
+This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-plugin`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin), is written from it by [`scripts/stage-agent-plugin-satellite.py`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/scripts/stage-agent-plugin-satellite.py). It has been public since 20 November 2026. The commands below name its release [`v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.2), which starts the MCP server 0.3.3 with skill 0.2.1 and engine 0.12.0. MCP server 0.3.3, public on npm since 25 November 2026, scans with the `fast` profile when a `scan_image` or `scan_file` call names none. If the [releases page](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases) does not show `v0.3.2` yet, use `v0.3.1` in its place, which starts the MCP server 0.3.2 on the same skill and engine.
 
 [Cursor Directory](https://cursor.directory/plugins/qrcode-barcode-scanner) has listed the plugin since 22 November 2026, with its rule, its MCP server and its skill. It reads the repository's default branch.
 
@@ -112,7 +112,7 @@ The skill tells the agent how to call the helper with that folder. Installing th
 ### Claude Code
 
 ```sh
-claude plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.1
+claude plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
 claude plugin install qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -121,7 +121,7 @@ To remove it, run `claude plugin uninstall qrcode-barcode-scanner@qrcode-ai-com`
 ### Codex
 
 ```sh
-codex plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.1
+codex plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.2
 codex plugin add qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -132,7 +132,7 @@ To remove it, run `codex plugin remove qrcode-barcode-scanner@qrcode-ai-com`, th
 The plugin's [Cursor Directory page](https://cursor.directory/plugins/qrcode-barcode-scanner) adds its rule, its MCP server and its skill from the repository's default branch. For the pinned release instead, clone it into Cursor's local plugin folder and reload the window:
 
 ```sh
-git clone --branch v0.3.1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git ~/.cursor/plugins/local/qrcode-barcode-scanner
+git clone --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git ~/.cursor/plugins/local/qrcode-barcode-scanner
 ```
 
 To remove it, delete that folder and reload the window. The [Cursor QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/cursor) and the [Cursor barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/cursor) show the same steps.
@@ -154,7 +154,7 @@ Both links carry this configuration, encoded in base64:
 ### GitHub Copilot CLI
 
 ```sh
-copilot plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.1
+copilot plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
 copilot plugin install qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -163,7 +163,7 @@ To remove it, run `copilot plugin uninstall qrcode-barcode-scanner`, then `copil
 ### Gemini CLI
 
 ```sh
-gemini extensions install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.1
+gemini extensions install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.2
 ```
 
 To remove it, run `gemini extensions uninstall qrcode-barcode-scanner`. The [Gemini CLI QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/gemini-cli) and the [Gemini CLI barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/gemini-cli) show the same install.
@@ -177,7 +177,7 @@ In Kiro, open Powers, choose Add Custom Power, then Import power from GitHub, an
 In a Kimi Code session, run these two commands:
 
 ```text
-/plugins install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.1
+/plugins install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.2
 /reload
 ```
 
@@ -199,7 +199,7 @@ Junie clones the default branch: check the commit it records. To remove it, unin
 `agy plugin install` takes no tag, so clone the release tag and install the folder:
 
 ```sh
-git clone --depth 1 --branch v0.3.1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 agy plugin install ./qrcode-barcode-scanner-plugin
 ```
 
@@ -224,7 +224,7 @@ For one session only, run `goose session --with-extension "npx --yes --ignore-sc
 ### Pi
 
 ```sh
-pi install git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin@v0.3.1
+pi install git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin@v0.3.2
 ```
 
 Pi loads the skill from `skills/` and the extension `pi/extension.js`, which registers the `qrscan` server. To remove it, run `pi remove git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`. The [Pi QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/pi-agent) and the [Pi barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/pi-agent) cover the same package.
@@ -234,7 +234,7 @@ Pi loads the skill from `skills/` and the extension `pi/extension.js`, which reg
 With OpenCode 2, add the plugin from its repository:
 
 ```sh
-opencode plugin add github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.1
+opencode plugin add github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
 ```
 
 With OpenCode 1, clone the repository at its tag and name the folder in `opencode.json`:
@@ -243,7 +243,7 @@ With OpenCode 1, clone the repository at its tag and name the folder in `opencod
 { "plugin": ["file:///absolute/path/to/qrcode-barcode-scanner-plugin"] }
 ```
 
-The plugin adds the `qrscan` server and the skill folder to OpenCode's configuration when OpenCode starts. A server or skill you already named the same way is left as it is. To remove it, run `opencode plugin remove github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.1` with OpenCode 2, or delete the entry with OpenCode 1. The [OpenCode QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/opencode) and the [OpenCode barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/opencode) show the same step.
+The plugin adds the `qrscan` server and the skill folder to OpenCode's configuration when OpenCode starts. A server or skill you already named the same way is left as it is. To remove it, run `opencode plugin remove github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2` with OpenCode 2, or delete the entry with OpenCode 1. The [OpenCode QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/opencode) and the [OpenCode barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/opencode) show the same step.
 
 ### Devin
 
@@ -256,18 +256,18 @@ Devin installs the default branch and reads `.claude-plugin/plugin.json` and `.m
 ### Factory
 
 ```sh
-droid plugin marketplace add 'qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.1'
-droid plugin install qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.1 --scope user
+droid plugin marketplace add 'qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2'
+droid plugin install qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user
 ```
 
-Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.1`, so the install names that marketplace. To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.1 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.1`. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
+Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.2`, so the install names that marketplace. To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.2`. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
 
 ### Amp
 
 An Amp plugin is a TypeScript file, and this repository ships none, so the skill and the server are added separately. Clone the release tag, copy the skill into Amp's skill folder for this machine, then add the server:
 
 ```sh
-git clone --depth 1 --branch v0.3.1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 mkdir -p ~/.config/agents/skills
 cp -R qrcode-barcode-scanner-plugin/skills/qrcode-barcode-scanner ~/.config/agents/skills/
 amp mcp add qrscan -- npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3
@@ -314,7 +314,7 @@ mcpServers:
 Zed reads skills from `~/.agents/skills/` and MCP servers from `context_servers` in its settings. Clone the release tag and copy the skill:
 
 ```sh
-git clone --depth 1 --branch v0.3.1 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 mkdir -p ~/.agents/skills
 cp -R qrcode-barcode-scanner-plugin/skills/qrcode-barcode-scanner ~/.agents/skills/
 ```
@@ -417,7 +417,7 @@ The engine repository checks this folder on every change with [its own workflow]
 
 The files of this plugin are project source under the MIT License, in [LICENSE](LICENSE). The skill files are copied from skill 0.2.1, which is MIT. The skill archive published as 0.2.0 keeps the MIT-0 license it shipped with.
 
-What the plugin starts keeps its own published license. The MCP server 0.3.3 that this source starts, the MCP server 0.3.2 that release `v0.3.1` starts and the engine 0.12.0 that npm downloads are MIT too. The earlier MCP server 0.3.1 and engine 0.11.0, which plugin `v0.3.0` starts, keep AGPL-3.0-or-later. Installing this MIT plugin does not change their terms. Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) before you redistribute an installation.
+What the plugin starts keeps its own published license. The MCP server 0.3.3 that release `v0.3.2` starts, the MCP server 0.3.2 that release `v0.3.1` starts and the engine 0.12.0 that npm downloads are MIT too. The earlier MCP server 0.3.1 and engine 0.11.0, which plugin `v0.3.0` starts, keep AGPL-3.0-or-later. Installing this MIT plugin does not change their terms. Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) before you redistribute an installation.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. Client names belong to their owners and imply no endorsement.
 
