@@ -51,9 +51,9 @@ geometry and QR scannability diagnostics in a structured report.
 `scan()` runs the Rust scan on libuv workers. `scanSync()` runs it on the calling
 thread. Node.js 18 or later is required.
 
-[Node.js API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/node.mdx) ·
-[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/01-report.md) ·
-[TypeScript declarations](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-node/index.d.ts)
+[Node.js API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/node.mdx) ·
+[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/spec/01-report.md) ·
+[TypeScript declarations](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/crates/qrcode-ai-scanner-node/index.d.ts)
 
 The scanner grew out of QR verification workflows at [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/nodejs).
 Use the Node package for images already in your server or worker.
@@ -79,9 +79,9 @@ Use Node.js 18 or later with npm. From an empty project directory:
 
 ```sh
 npm init --yes
-npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0
+npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.1
 curl -fsSL -o label.png \
-  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.0/fixtures/symbology/mixed-code128-qr.png
+  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.1/fixtures/symbology/mixed-code128-qr.png
 ```
 
 Keep optional dependencies enabled: npm selects one of these six native
@@ -259,9 +259,9 @@ each one starts `qrscan` and hands you its report.
 
 ## Documentation and licensing
 
-[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/SCORING.md) ·
-[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx) ·
-[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/SECURITY.md) ·
+[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/SCORING.md) ·
+[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/errors.mdx) ·
+[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/SECURITY.md) ·
 [Source](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) ·
 [Report a bug](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues)
 

@@ -1,3 +1,17 @@
+## 0.12.1
+
+* The bundled engine is 0.12.1, whose reports carry `versions.score_contract`
+  6. The correction margin of a QR code (`score.uec`) is measured in the image:
+  one design keeps one margin at every size, and a QR code that only one of
+  the two readers decodes now has a margin and its cap. A linear barcode in a
+  frame wider than 512 px is judged at its own width, so a long Code 128 no
+  longer scores a few points. Scores move in both directions; the decoded
+  contents do not change.
+* `PipelineTrace.formats` lists the symbologies a scan was restricted to. It
+  is `null` for every scan this package starts: `scan` and `scanFrame` do not
+  take the engine's `formats` option yet.
+* Calls written for 0.12.0 compile and behave as before.
+
 ## 0.12.0
 
 * `QrcodeAiScanner.scan` and `scanFrame` take an optional `budgetMs`, the

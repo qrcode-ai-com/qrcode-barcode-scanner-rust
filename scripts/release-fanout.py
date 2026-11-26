@@ -573,12 +573,15 @@ def self_test():
     expect("a hash of an earlier release left in a recipe is reported",
            {**released, "recipe/build.sh": released["recipe/build.sh"] + f"old={'a' * 64}\n"}, "no value rule")
 
-    # The real tree, and a rehearsal of its next release, in memory.
+    # The real tree, and a rehearsal of its next release, in memory. In a release commit the
+    # tree is already ahead of the public release: the next release is then the tree's own
+    # version, the only one its tree mentions spell. Otherwise it is the next minor version.
     real = tracked()
     rules, sources, (changed, problems, mentions) = judge(real)
     check("this repository agrees with its sources", not problems and not changed, "; ".join(problems[:5]))
     major, minor, _ = map(int, sources.version["engine"].split("."))
-    nxt = f"{major}.{minor + 1}.0"
+    nxt = (sources.version["tree"] if sources.version["tree"] != sources.version["engine"]
+           else f"{major}.{minor + 1}.0")
     stand_in = json.loads(json.dumps(sources.engine).replace(sources.version["engine"], nxt))
     renamed = {}
 

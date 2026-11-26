@@ -362,7 +362,7 @@ match = '"a second tag line"'
 
 [[line]]
 keep = "What a version brought or ended."
-match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0|not part of the published 0\.11\.0 release'
+match = '[Ff]rom 0\.11\.0|0\.11\.0 onward|0\.11\.0 and later|retired at 0\.11\.0|left at 0\.11\.0|[Uu]p to 0\.11\.0|not part of the published 0\.11\.0 release|[Ff]rom 0\.12\.1|[Bb]efore 0\.12\.1|[Uu]p to 0\.12\.0 every rejection|argument \(0\.12\.1\): a 0\.12\.0'
 
 [[line]]
 keep = "The licence that published archives retain."
@@ -396,7 +396,7 @@ match = '^rqrr = |verified on 0\.11\.0|0\.11\.0 still writes'
 [[line]]
 keep = "The version that added the entry."
 paths = ["crates/qrcode-ai-scanner-wasm/*.js", "crates/qrcode-ai-scanner-wasm/*.d.ts", "crates/qrcode-ai-scanner-wasm/README.md"]
-match = '^// \S+ · @qrcode-ai-com/|^## .*\(0\.11\.0'
+match = '^// \S+ · @qrcode-ai-com/|^## .*\(0\.11\.0|^## .*\(0\.12\.1\)'
 
 [[line]]
 keep = "Sample data of a test, whatever this source's version."
