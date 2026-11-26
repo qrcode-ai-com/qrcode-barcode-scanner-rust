@@ -290,6 +290,12 @@ match = '\[Scoop bucket\]|On Windows x64, install `qrscan`'
 held = "the container image, under its own tag"
 match = 'public GHCR image|\[GitHub Container Registry\]'
 
+# A recipe folder of the image is named after the release it packages, so a path to it names
+# that release wherever it is written: a workflow step, a link, the publish guard.
+[[line]]
+held = "the container image, under its own tag"
+match = 'docker/v\d+\.\d+\.\d+[/)]'
+
 [[line]]
 held = "the hosted examples, under their own tag"
 match = 'demos-v|\[Vite example\]'
