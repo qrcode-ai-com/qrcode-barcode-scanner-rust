@@ -33,16 +33,21 @@ console.log("synced → crates/qrcode-ai-scanner-node/report-types.d.ts");
 if (existsSync(wasmDts)) {
   copyFileSync(CANON, join(ROOT, "crates/qrcode-ai-scanner-wasm/pkg/report-types.d.ts"));
   let dts = readFileSync(wasmDts, "utf8");
+  // The package is an ES module, so a relative import inside its declarations names its file
+  // (`./report-types.js`, which TypeScript reads as report-types.d.ts). Without the extension
+  // the import does not resolve under Node's resolution (`moduleResolution: node16` or
+  // `nodenext`) and, with `skipLibCheck`, every type it names turns into `any` in silence.
   if (!dts.includes("./report-types")) {
     dts = dts.replace(
       "/* eslint-disable */",
-      '/* eslint-disable */\nexport * from "./report-types";\nimport type { ScanReport } from "./report-types";'
+      '/* eslint-disable */\nexport * from "./report-types.js";\nimport type { ScanReport } from "./report-types.js";'
     );
   }
   dts = dts
+    .replaceAll('from "./report-types";', 'from "./report-types.js";')
     .replace(
-      'import type { ScanReport } from "./report-types";',
-      'import type { Capabilities, ScanReport } from "./report-types";'
+      'import type { ScanReport } from "./report-types.js";',
+      'import type { Capabilities, ScanReport } from "./report-types.js";'
     )
     .replace(
       /export function capabilities\(\): any;/,

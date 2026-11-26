@@ -1,4 +1,4 @@
-import type { Detection, Point, ScanReport } from './report-types';
+import type { Detection, Point, ScanReport } from './report-types.js';
 
 // ------------------------------------------------------------------------- limits
 

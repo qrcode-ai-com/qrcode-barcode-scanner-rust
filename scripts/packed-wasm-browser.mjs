@@ -433,6 +433,11 @@ assert.deepEqual({
 }, { otherLibraries: [], typePackages: [], missing: [] },
 'the Node-side program holds both destination declarations, no library beyond ES2022 and no @types file');
 passed.push('Both destination subpaths typecheck by package name under nodenext, and the program holds only the ES2022 libraries (no DOM, no worker, no @types package); the resolver file path is no export');
+// The root, loader, camera and overlay entries under the same resolution. The package is an ES
+// module, so a relative import inside a declaration needs its file extension there; without it
+// the types it brought read as `any` and the fixture's expected errors stop being errors.
+runNode([tsc, '-p', 'tsconfig.node-resolution.json']);
+passed.push('The root, auto, node, scan, camera and camera-overlay declarations keep their types by package name under nodenext: each relative import inside them resolves, and no report, detection, tracker or destination type reads as any');
 // Each name the two declaration files export is imported by its typecheck file, so every one
 // compiles through the installed exports map (tsc refuses a name that no longer exists).
 const ts = require('typescript');

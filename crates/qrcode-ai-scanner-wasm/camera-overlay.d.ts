@@ -1,13 +1,13 @@
 // camera-overlay.d.ts · @qrcode-ai-com/qrcode-barcode-scanner-wasm/camera-overlay (0.11.0)
-import type { Detection, Fnc1Position, Payload, Point, Symbology } from './report-types';
+import type { Detection, Fnc1Position, Payload, Point, Symbology } from './report-types.js';
 import type {
   Clock, ResultId, Track, TrackGeometry, TrackGeometryKind, TrackId, TrackedResult,
   TrackerFrame, TrackerSnapshot,
-} from './camera';
+} from './camera.js';
 import type {
   DestinationCancelReason, DestinationCandidate, DestinationFailureReason,
   DestinationIneligibleReason, DestinationUnavailableReason, DestinationVerifier,
-} from './destination';
+} from './destination.js';
 
 // ----------------------------------------------------------------------- projection
 export type OverlayFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';

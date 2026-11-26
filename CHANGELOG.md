@@ -4,6 +4,22 @@ All notable changes to this workspace. Every surface versions together — the R
 crate + CLI, the npm node + wasm packages, the Python wheel, and the
 Kotlin/Android · Swift/iOS · Flutter bindings.
 
+## Unreleased
+
+### Fixed
+
+- **Browser package: its types under Node's module resolution.** With
+  TypeScript's `moduleResolution: node16` or `nodenext`, the declarations of the
+  root entry, `./camera` and `./camera-overlay` imported sibling files without
+  their file extension. TypeScript reports that inside the package, where
+  `skipLibCheck` hides it, and then types everything the import brought as
+  `any`: the reports of `scan_image` and `scan_frame` and the result of
+  `capabilities` (from the root module and from the module `loadScanner()`
+  resolves to), and the detections, reports and tracker snapshots of the two
+  camera modules. The named `scan` and `scanFrame` of `./auto`, `./node` and
+  `./scan` kept their types, and a bundler's resolution (Vite, webpack,
+  `moduleResolution: bundler`) was never affected. Nothing changes at run time.
+
 ## 0.12.1 — 2026-11-26
 
 ### Added
