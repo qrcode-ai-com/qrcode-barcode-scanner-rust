@@ -197,14 +197,14 @@ await check('the paths the manifests name exist', async () => {
   return `${paths.length} paths`;
 });
 
-// The skill: the copy every client reads and the Junie copy are the same skill 0.2.1, the source
+// The skill: the copy every client reads and the Junie copy are the same skill 0.2.2, the source
 // skill of this commit (the stage copies it byte for byte).
-await check('the skill copies are skill 0.2.1 and equal', async () => {
+await check('the skill copies are skill 0.2.2 and equal', async () => {
   const root = await read(`skills/${NAME}/SKILL.md`);
   const front = /^---\n([\s\S]*?)\n---\n/.exec(root)?.[1] ?? '';
   expect(/^name: qrcode-barcode-scanner$/m.test(front), 'SKILL.md is not named qrcode-barcode-scanner');
-  expect(/^ {2}version: "0\.2\.1"$/m.test(front), 'SKILL.md is not version 0.2.1');
-  expect(/^ {2}engine: "@qrcode-ai-com\/qrcode-barcode-scanner@0\.12\.0"$/m.test(front), 'SKILL.md does not pin engine 0.12.0');
+  expect(/^ {2}version: "0\.2\.2"$/m.test(front), 'SKILL.md is not version 0.2.2');
+  expect(/^ {2}engine: "@qrcode-ai-com\/qrcode-barcode-scanner@0\.12\.1"$/m.test(front), 'SKILL.md does not pin engine 0.12.1');
   const list = async (folder) => (await readdir(folder, { recursive: true }))
     .filter((file) => statSync(join(folder, file)).isFile()).sort();
   const files = await list(join(stage, 'skills', NAME));

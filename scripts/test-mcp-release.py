@@ -48,7 +48,7 @@ class ReleaseBoundaries(unittest.TestCase):
     def test_exact_archive(self):
         value = release.archive_info(self.archive)
         self.assertEqual(value["package"], release.PACKAGE)
-        self.assertEqual(value["engine"]["version"], "0.12.0")
+        self.assertEqual(value["engine"]["version"], "0.12.1")
         self.assertEqual(set(value["files"]), set(release.FILES))
 
     def test_product_links_precede_installation(self):
@@ -125,7 +125,7 @@ class ReleaseBoundaries(unittest.TestCase):
         package_file = root / "integrations/mcp/package.json"
         original = package_file.read_bytes()
         package = json.loads(original)
-        package["dependencies"][release.ENGINE] = "^0.12.0"
+        package["dependencies"][release.ENGINE] = "^0.12.1"
         package_file.write_text(json.dumps(package))
         with self.assertRaisesRegex(ValueError, "exact qualified pins"):
             release.metadata(root)
@@ -141,7 +141,7 @@ class ReleaseBoundaries(unittest.TestCase):
         version = release.metadata()["version"]
         self.assertEqual(release.gate(f"refs/tags/agents-v{version}")["version"], version)
         self.assertEqual(release.gate("refs/heads/rehearsal")["version"], version)
-        for ref in ("refs/tags/v0.12.0", "refs/tags/agents-v999.0.0", f"refs/tags/agents-v{version}-wrong"):
+        for ref in ("refs/tags/v0.12.1", "refs/tags/agents-v999.0.0", f"refs/tags/agents-v{version}-wrong"):
             with self.subTest(ref=ref), self.assertRaisesRegex(ValueError, "independent adapter version"):
                 release.gate(ref)
 

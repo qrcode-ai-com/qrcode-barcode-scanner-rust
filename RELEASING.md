@@ -1181,8 +1181,9 @@ stays by hand).
 
 The MCP adapter has its own SemVer in `integrations/mcp/package.json`, its lock
 and `server.json`. Adapters 0.3.2 and 0.3.3 use the published scanner `0.12.0`;
-publishing an adapter version does not rebuild or republish the Rust, Node,
-Python or WASM engine.
+adapter 0.3.4 and skill 0.2.2 use the published scanner `0.12.1`. Publishing an
+adapter version does not rebuild or republish the Rust, Node, Python or WASM
+engine.
 Published versions and tags are immutable.
 
 The adapter source on `main` may be ahead of the published version: the

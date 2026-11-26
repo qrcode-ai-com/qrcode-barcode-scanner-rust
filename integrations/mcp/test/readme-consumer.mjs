@@ -18,7 +18,7 @@ const exampleMixed = exampleRun("mixed.png");
 assert.equal(exampleMixed.status, 0, exampleMixed.stderr);
 assert.equal(exampleMixed.stderr, "");
 const exampleReport = JSON.parse(exampleMixed.stdout);
-assert.deepEqual(exampleReport.versions, { scanner: "0.12.0", pipeline: 5, score_contract: 5 });
+assert.deepEqual(exampleReport.versions, { scanner: "0.12.1", pipeline: 5, score_contract: 6 });
 assert.equal(exampleReport.score, null);
 assert.equal(exampleReport.trace.budget_exhausted, false);
 assert.deepEqual(exampleReport.detections.map(({ symbology, content }) => ({ symbology, text: content.text, raw: content.raw })).sort((a, b) => a.symbology.localeCompare(b.symbology)), [

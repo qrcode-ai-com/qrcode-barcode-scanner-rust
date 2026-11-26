@@ -23,12 +23,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
-ENGINE_VERSION = "0.12.0"
+ENGINE_VERSION = "0.12.1"
 MCP_NAME = "io.github.qrcode-ai-com/qrcode-barcode-scanner"
 REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
 REPOSITORY_ID = "1126991539"
 ENVIRONMENT = "npm-agents"
-SCHEMA_SHA256 = "101f84b2888bea2ba617dd4a1d97593bd1a7c7e37e4bd57da6767e944e21fcad"
+SCHEMA_SHA256 = "7d18991c1ef5467aa47ee7f23b17c456b0debf83e92dd9dc1ee72b72907a0592"
 FILES = ("LICENSE", "README.md", "package.json", "scan-report.schema.json", "server.json", "src/cli.mjs", "src/server.mjs")
 SEMVER = r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?"
 LIMIT = 2 * 1024 * 1024

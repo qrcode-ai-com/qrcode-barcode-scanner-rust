@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/supernovae-st/qrcode-ai-scanner/spec/scan-report.schema.json",
   "title": "ScanReport",
-  "description": "QR Code & Barcode Scanner wire contract (versions.pipeline=5, score_contract=5). Additive evolution: consumers must tolerate unknown fields and unknown enum/tag values.",
+  "description": "QR Code & Barcode Scanner wire contract (versions.pipeline=5, score_contract=6). Additive evolution: consumers must tolerate unknown fields and unknown enum/tag values.",
   "type": "object",
   "required": [
     "detections",
@@ -1189,6 +1189,15 @@
         "saturation": {
           "$ref": "#/$defs/Saturation",
           "description": "The capacities the scan reached, independent of budget_exhausted. A true flag means something past that capacity is unknown, never absent. Pipeline 5 always writes it; absent on older reports: unknown, never false."
+        },
+        "formats": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Symbology"
+          },
+          "description": "The symbologies the scan was restricted to (the formats option), each once, in Symbology order. Absent: no restriction - every symbology the build reads was looked for; also absent on every report older than this field."
         }
       }
     },
@@ -1231,7 +1240,7 @@
         },
         "score_contract": {
           "type": "integer",
-          "const": 5
+          "const": 6
         }
       }
     },
