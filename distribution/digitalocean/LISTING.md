@@ -8,12 +8,10 @@ owner's. Pages read on 21 November 2026.
   `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http` and builds its `Dockerfile`. There
   is no store; the button is the publication
   ([button page](https://docs.digitalocean.com/products/app-platform/how-to/add-deploy-do-button/)).
-  Since 24 November 2026 that repository holds service 0.1.1 with the engine 0.12.0, the service
-  whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1` is public. Its
-  `package.json` must name service 0.1.2, which scans a request with no mode in `fast`, before the
-  app is deployed: on 26 November 2026 it still held 0.1.1, staged from engine commit `9b4e0176`.
-  App Platform builds its own copy from the `Dockerfile`. No app or button has been deployed or
-  published.
+  Since 26 November 2026 that repository holds service 0.1.2 with the engine 0.12.0, which scans
+  a request with no mode in `fast`, the service whose image
+  `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. App Platform builds its own
+  copy from the `Dockerfile`. No app or button has been deployed or published.
 - **Marketplace 1-Click Droplet** (destination `round2-10`): a vendor program with a review. The
   owner applies as a vendor, builds the image with Packer from `droplet/`, and submits it in the
   Vendor Portal ([vendors](https://marketplace.digitalocean.com/vendors),

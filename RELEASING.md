@@ -1803,6 +1803,29 @@ its latest stage. The Railway template, the Render
 Blueprint, the App Platform button and the 1-Click Droplet listing are owner
 steps of their kits and are not submitted.
 
+**Published: 0.1.2, 26 November 2026.** The annotated tag `http-v0.1.2` is on
+`9160d3afe409bab1c00b867567f53bcedf1baa50`, the merge of pull request #263,
+which scans a request that names no mode with `fast`. Its
+[run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510)
+passed the service tests, both images, both clean consumers, the three deploy
+host profiles, the 1-Click Droplet on a fresh Ubuntu 24.04 and the local
+registry rehearsal, then `publish`, approved in `container-http`, pushed
+`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http`. Its receipt
+`http-published` records the index `0.1.2`,
+`sha256:66b6d22ce7c25b59ba6a9e5223d0e95498a506ca22e6a9621d7e01b3ef277cdb`,
+with the AMD64 manifest
+`sha256:54e25d410be265862173fdbb2226c772cff96b49411baae9fa4844f716401699`
+(config `sha256:3596f3aca86877649aa55b3783ce5502c5d9e25b807eecb64c1af0b3edb1eef2`)
+and the ARM64 manifest
+`sha256:ce9360f97545a715c4a9277333d6b8def5edf278b19917f9c38ec7e5239276f7`
+(config `sha256:4cbef688cb94a5cce48eeae4325481d1e1a6bc481e4ab7bff6433f6d090256d9`),
+version label 0.1.2, revision `9160d3af`, user `1000:1000`, engine 0.12.0. A
+signed-out pull of `0.1.2` returned that index digest with those two
+manifests. The package was already public, so step 4 did not apply. The
+satellite `qrcode-ai-com/qrcode-barcode-scanner-http` was staged from that
+commit the same day; its `SOURCE.json` names the commit of its latest stage.
+The deploy kits' owner steps are unchanged and not submitted.
+
 ## Swift package — its own repository
 
 SwiftPM and the Swift Package Index read a package from the root of a
