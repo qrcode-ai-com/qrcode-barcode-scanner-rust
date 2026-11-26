@@ -125,14 +125,14 @@ published to npm or crates.io.
 
 These independently versioned integrations reuse a published native engine:
 the MCP adapter 0.3.3 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
-the skill 0.2.1 and the bundle 0.2.2 that ClawHub serves run that MIT engine too. Choose the
+the skill 0.2.1 and the bundle 0.2.3 that ClawHub serves run that MIT engine too. Choose the
 interface your application or agent already supports:
 
 | Integration | Public package | Install |
 | --- | --- | --- |
 | MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3` |
 | Portable skill | [`qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner) | `clawhub install qrcode-barcode-scanner --version 0.2.1` |
-| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.2`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.2` |
+| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.3`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.3` |
 
 MCP adapter 0.3.3 passed fresh public npm installations on **Linux x64 with
 Node.js 22 and 24** in its
@@ -154,13 +154,16 @@ on ClawHub on 25 November 2026 as a ZIP archive, was downloaded with its digest 
 installed from ClawHub by **OpenClaw 2026.11.10** on macOS ARM64, which reads it as a bundle
 with the MCP server `qrscan`. After its setup, the MCP server of that installation, MCP 0.3.3,
 read both payloads of the mixed sample in the three profiles and in the default `fast`; no
-agent model called it. Other clients and native engine targets need their own
-installed-consumer checks.
+agent model called it. Bundle 0.2.3, published on ClawHub on 26 November 2026 as an npm-pack
+archive with its OpenClaw compatibility (plugin API `>=2026.11.1`, built with OpenClaw
+2026.11.10), passed the same checks after its installation from ClawHub by OpenClaw 2026.11.10;
+before its upload, the same archive passed them from a local file on OpenClaw 2026.11.1 and
+2026.11.10. Other clients and native engine targets need their own installed-consumer checks.
 
 Read the [MCP installation and stdio configuration](../integrations/mcp/),
 [portable skill instructions](../skills/qrcode-barcode-scanner/) or
-[bundle setup](../integrations/openclaw/) before activation. Bundle 0.2.2 installs
-its exact adapter dependency (MCP 0.3.3) through explicit setup; bundle 0.2.1 installs MCP 0.3.2 and bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
+[bundle setup](../integrations/openclaw/) before activation. Bundles 0.2.3 and 0.2.2 install
+their exact adapter dependency (MCP 0.3.3) through explicit setup; bundle 0.2.1 installs MCP 0.3.2 and bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
 bundle are versioned separately from the engine; adapter patch releases need
 not change the other integration versions.
 
