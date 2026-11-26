@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 const PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
 const PROFILES = ['fast', 'frame', 'full'];
 const LIMITS = { inputBytes: 8 * 1024 * 1024, dimension: 4096, pixels: 16_000_000 };
-export const SERVICE_VERSION = '0.1.1';
+export const SERVICE_VERSION = '0.1.2';
 export const ENGINE_VERSION = '0.12.0';
 
 class Refusal extends Error {
@@ -70,7 +70,7 @@ async function readScan(request, url) {
   } else {
     throw new Refusal(415, 'QRSHTTP_MEDIA_TYPE', 'Send the image as the raw body (image/* or application/octet-stream) or as multipart/form-data');
   }
-  mode ??= 'frame';
+  mode ??= 'fast';
   if (!PROFILES.includes(mode)) throw new Refusal(400, 'QRSHTTP_MODE', `mode must be one of ${PROFILES.join(', ')}`);
   if (bytes.length === 0) throw new Refusal(400, 'QRSHTTP_NO_IMAGE', 'The image is empty');
   return { bytes, mode };

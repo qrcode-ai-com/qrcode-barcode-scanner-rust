@@ -6,12 +6,15 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-export const SERVICE_VERSION = "0.1.1";
+export const SERVICE_VERSION = "0.1.2";
 export const ENGINE_VERSION = "0.12.0";
 export const REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust";
 export const ENGINE_SOURCE = `${REPOSITORY}/tree/v${ENGINE_VERSION}`;
 export const PROFILES = Object.freeze(["fast", "frame", "full"]);
-export const DEFAULT_PROFILE = "frame";
+// A request that names no mode scans with fast. frame's 80 ms budget is sized for one camera frame
+// among many: on a busy server it can stop the scan of a single image before the stage that reads
+// its barcode. frame and full stay available by name.
+export const DEFAULT_PROFILE = "fast";
 export const HARD_LIMITS = Object.freeze({ inputBytes: 8 * 1024 * 1024, dimension: 4096, pixels: 16_000_000, concurrent: 2 });
 // A multipart body carries boundaries and part headers around the image bytes.
 const MULTIPART_OVERHEAD = 64 * 1024;
@@ -181,7 +184,7 @@ function describe(limits, budgets, source) {
     engine: ENGINE_VERSION,
     endpoints: {
       "GET /healthz": "200 once the engine is loaded",
-      "POST /scan": "an image as the raw body or as the multipart field image; ?mode=fast|frame|full",
+      "POST /scan": "an image as the raw body or as the multipart field image; ?mode=fast|frame|full, fast by default",
     },
     modes: PROFILES,
     defaultMode: DEFAULT_PROFILE,
@@ -217,7 +220,7 @@ button { justify-self: start; padding: .4rem 1rem; }
 <p>This server scans the QR codes and barcodes of an image with the open-source scanner engine ${ENGINE_VERSION} and answers with its JSON report. Images are scanned in memory and never stored.</p>
 <form method="post" action="/scan" enctype="multipart/form-data">
 <label>Image (at most ${size(limits.inputBytes)}) <input type="file" name="image" accept="image/*" required></label>
-<label>Mode <select name="mode"><option>fast</option><option selected>frame</option><option>full</option></select></label>
+<label>Mode <select name="mode">${PROFILES.map((profile) => `<option${profile === DEFAULT_PROFILE ? " selected" : ""}>${profile}</option>`).join("")}</select></label>
 <button type="submit">Scan</button>
 </form>
 <p>From a terminal, with this server's address in place of example.com: <code>curl --data-binary @image.png -H 'content-type: image/png' 'https://example.com/scan?mode=fast'</code></p>
@@ -304,7 +307,7 @@ export function createScanServer({ engine, limits = limitsFromEnvironment(), bud
     } finally {
       active -= 1;
     }
-    json(response, 200, report);
+    json(response, 200, report, { "x-scan-mode": read.mode });
   }
 
   // One line per request, once: when the answer is sent, or when the connection closes first.

@@ -55,7 +55,7 @@ The picture is the page the service shows at its root address in a browser, with
 - `server.mjs`: the whole service, on Node.js's own HTTP server and the engine package. No framework and no other dependency.
 - `package.json` and `package-lock.json`: the one dependency, the engine 0.12.0, and its six native packages, each with its npm registry address and sha512.
 - `Dockerfile` and `.dockerignore`: the image, from `node:22.22.2-bookworm-slim` pinned by digest. It runs `npm ci --omit=dev --ignore-scripts`, compiles nothing and runs the service as user `1000:1000`.
-- `test/consumer.mjs`: a client that judges any running copy of the service from outside, in sixteen checks. `test/server.test.mjs`: the service's tests in one process.
+- `test/consumer.mjs`: a client that judges any running copy of the service from outside, in eighteen checks. `test/server.test.mjs`: the service's tests in one process.
 - `LICENSE` (MIT, for these files), `LICENSE-NOTES.md` (what the image holds and under which license) and `licenses/engine-0.12.0/` (the engine's third-party notices at tag `v0.12.0`).
 - `render.yaml` and `.do/deploy.template.yaml`: the Render Blueprint and the DigitalOcean App Platform app spec, described in [Deploy it on a host](#deploy-it-on-a-host).
 - `mirror/test.yml`: the workflow of the service's own repository. It checks that every file comes from the engine, builds the image from the root as a host does and judges it with the consumer.
@@ -106,14 +106,14 @@ Railway reads no file of the repository for this service: its [config as code](h
 
 ## Scan an image
 
-Send the image as the request body, or as the field `image` of a multipart form. `mode` chooses the engine profile: `fast`, `frame` (the default) or `full`.
+Send the image as the request body, or as the field `image` of a multipart form. `mode` chooses the engine profile: `fast` (the default) decodes and gives a reduced QR score within 800 ms, `frame` decodes without scoring within the 80 ms of a camera frame, and `full` gives the full QR score within 4000 ms, for a difficult image. Up to 0.1.1 the default was `frame` ([why it changed](#from-011)).
 
 ```sh
-curl --data-binary @label.png -H 'content-type: image/png' 'http://localhost:8080/scan?mode=fast'
+curl --data-binary @label.png -H 'content-type: image/png' http://localhost:8080/scan
 curl -F mode=full -F image=@label.png http://localhost:8080/scan
 ```
 
-The answer is the engine's report, as `application/json`. Below is an excerpt of the report the service gave for the mixed sample in the `full` mode: the two codes, the engine version and the trace summary. The full report also has where each code was found, the scannability score and hints.
+The answer is the engine's report, as `application/json`, and its `X-Scan-Mode` header names the mode the scan ran in. Below is an excerpt of the report the service gave for the mixed sample in the `full` mode: the two codes, the engine version and the trace summary. The full report also has where each code was found, the scannability score and hints.
 
 <p align="center">
   <img src="media/scan-report.png" alt="An excerpt of the JSON report for the mixed sample: a QR code with the text https://qrc-ai.com/76xMa and a Code 128 with the text STOCK-4827, scanner version 0.12.0, budget not exhausted and no engine panic" width="60%">
@@ -121,8 +121,8 @@ The answer is the engine's report, as `application/json`. Below is an excerpt of
 
 | Request | Answer |
 | --- | --- |
-| `GET /healthz` | `200 {"status":"ok","service":"0.1.1","engine":"0.12.0"}` once the engine is loaded |
-| `GET /` | the service, its limits, its privacy rule and its source, as JSON; the upload page for a browser |
+| `GET /healthz` | `200 {"status":"ok","service":"0.1.2","engine":"0.12.0"}` once the engine is loaded |
+| `GET /` | the service, its modes and `defaultMode`, its limits, its privacy rule and its source, as JSON; the upload page for a browser |
 | `POST /scan` | `200` and the report. An empty report (no code found) is a `200` too |
 
 A refusal is a JSON body `{"error":{"code":…,"message":…}}`:
@@ -150,6 +150,12 @@ A refusal is a JSON body `{"error":{"code":…,"message":…}}`:
 
 The limits are the ones of the [MCP server](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/mcp/README.md). A setting can lower a limit, never raise it: a larger value stops the service at start with a message. A request must arrive within 30 seconds. A scan slot is held only while the engine scans, so a slow upload does not hold one. A scan is bounded by its profile's time budget, 800 ms for `fast`, 80 ms for `frame` and 4000 ms for `full`, and the report says in `trace.budget_exhausted` when the budget cut it short; it is not a hard timeout. On a whole CPU of the CI runners, a scan of the mixed sample takes 490 to 650 ms in the engine, close to `fast`'s budget, and on half a CPU about twice as long. The host files in this folder therefore set `QRSCAN_HTTP_BUDGET_SCALE` to at least twice one over their plan's share of a CPU. `GET /` gives the budgets in use as `budgetsMs`.
 
+## Upgrading
+
+### From 0.1.1
+
+Service 0.1.2 changes the mode of a scan that names none from `frame` to `fast`; `GET /` reports `"defaultMode": "fast"` and the upload page starts on `fast`. A request that names its mode is unchanged. A request that names none can now reach the enhance stage that `frame` skips, returns a reduced QR score where the engine measured one instead of `score: null`, and is bounded by the fast profile's 800 ms budget instead of 80 ms, times `QRSCAN_HTTP_BUDGET_SCALE`. The `frame` budget is sized for one camera frame among many: on a busy server, its deadline can stop the scan of an image before its full-resolution stage, and a barcode only that stage reads is then missing from a report marked `trace.budget_exhausted: true`. Every scan answer now names its mode in the `X-Scan-Mode` header. The engine 0.12.0, the routes, the report, the refusals and the limits do not change. To keep the former behavior, send `mode=frame`. Until the image 0.1.2 is published, the image 0.1.1 in [Run it](#run-it) keeps `frame` as its default: send `mode=fast` to it for this behavior.
+
 ## Privacy and security
 
 - The image stays in the service's memory for the time of the scan. Nothing is written to disk, and the image is not logged.
@@ -169,7 +175,7 @@ The workflow `.github/workflows/http-service.yml` of the [engine repository](htt
 
 - `unit` runs `test/server.test.mjs` on the published engine: the consumer below, a report compared field for field with a direct call of the engine, the limits, the source record, the busy and failure answers, and the log.
 - `image` stages the tree of the service's repository, checks it against the commit, builds the image on Linux x64 and on Linux arm64 runners, and saves it with its sha256 and its config digest.
-- `consume` loads each saved image on its own architecture and checks its user, labels and health check. It runs it with a read-only root filesystem, no Linux capability, and on a Docker network that has no route out. `test/consumer.mjs` then judges it from a second container: health, the JSON and the browser page of `GET /`, the source links, the mixed QR code and Code 128 sample in `fast`, `frame` and `full` as a raw body and as a form, with exactly `https://qrc-ai.com/76xMa` and `STOCK-4827` and engine 0.12.0, then each refusal. The job checks that the service cannot reach the network and that its log holds no query or decoded text, then removes the container, the network and the image and checks that they are gone.
+- `consume` loads each saved image on its own architecture and checks its user, labels and health check. It runs it with a read-only root filesystem, no Linux capability, and on a Docker network that has no route out. `test/consumer.mjs` then judges it from a second container: health, the JSON and the browser page of `GET /`, the source links, the mixed QR code and Code 128 sample in `fast`, `frame` and `full` as a raw body and as a form, and with no mode, which must run `fast`, each answer naming its mode in `X-Scan-Mode`, with exactly `https://qrc-ai.com/76xMa` and `STOCK-4827` and engine 0.12.0, then each refusal. The job checks that the service cannot reach the network and that its log holds no query or decoded text, then removes the container, the network and the image and checks that they are gone.
 - `hosts` checks `render.yaml` in the staged tree against the schema Render publishes on the day of the run, `.do/deploy.template.yaml` with `doctl apps spec validate`, and that no file configures Railway, then runs the judged Linux x64 image as each host would. For Render: `PORT=10000`, the variables of the file, half a CPU and 512 MB. For Railway: an injected `PORT` that is not the default one, the template's variables, 1 vCPU and 512 MB. For App Platform: port 8080, the variables of the app spec, 1 vCPU and 512 MB. It refuses a host file whose budget scale is below twice one over its plan's share of a CPU. The consumer judges each run as above, and the job removes it.
 - `droplet` validates the Packer template of the 1-Click Droplet, runs its `install.sh` on a fresh Ubuntu 24.04 runner, checks the firewall and the unprivileged service user, judges the service on port 80 with the consumer, then removes it and checks that nothing answers.
 - `rehearse` pushes both judged images and their multi-architecture index to a local registry, exactly as the release does, reads the index back and pulls it.
@@ -178,7 +184,7 @@ The same consumer judges a deployed copy: `node test/consumer.mjs https://exampl
 
 ## Release it
 
-[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.1`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.1-amd64`, `0.1.1-arm64` and the index `0.1.1`. Version 0.1.1 is published: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). The owner then made the package public and linked it to this repository.
+[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.2`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.2-amd64`, `0.1.2-arm64` and the index `0.1.2`. Version 0.1.2 is prepared in this folder and not published yet. Version 0.1.1 is published: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). The owner then made the package public and linked it to this repository.
 
 ## What it returns
 
