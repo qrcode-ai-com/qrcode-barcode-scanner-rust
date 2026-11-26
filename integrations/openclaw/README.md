@@ -82,13 +82,13 @@ openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.3 --n
 openclaw plugins inspect qrcode-barcode-scanner
 ```
 
-Check the version the bundle page lists first. Until ClawHub lists 0.2.3, it
-serves 0.2.2: install `@0.2.2` instead. Bundle 0.2.3 holds the same skill and
-setup as 0.2.2, with MCP adapter 0.3.3 and engine 0.12.0, and is published as an
-npm-pack archive where ClawHub stored 0.2.2 as a ZIP. Its `package.json`
-declares OpenClaw 2026.11.1 or later (`openclaw.compat.pluginApi`), which
-OpenClaw checks at install, and the OpenClaw 2026.11.10 it was built against
-(`openclaw.build.openclawVersion`).
+ClawHub has listed 0.2.3 as the latest bundle since 26 November 2026. Bundle
+0.2.3 holds the same skill and setup as 0.2.2, with MCP adapter 0.3.3 and
+engine 0.12.0, and is published as an npm-pack archive where ClawHub stored
+0.2.2 as a ZIP. Its `package.json` declares OpenClaw 2026.11.1 or later
+(`openclaw.compat.pluginApi`), which OpenClaw checks at install, and the
+OpenClaw 2026.11.10 it was built against (`openclaw.build.openclawVersion`);
+ClawHub records both.
 
 OpenClaw 2026.11.10 stops that install until you consent to the bundle's
 declared capabilities: read them on the bundle page, then run the same command
