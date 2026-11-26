@@ -11,10 +11,10 @@ Railway workspace, so they are the owner's. This kit holds every value to type.
 
 | Item | Value |
 | --- | --- |
-| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 24 November 2026 it holds service 0.1.1 with the engine 0.12.0, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1` is public. The template itself is not created or published |
+| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 24 November 2026 it holds service 0.1.1 with the engine 0.12.0, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1` is public. Its `package.json` must name service 0.1.2, which scans a request with no mode in `fast`, before the template is created: on 26 November 2026 it still held 0.1.1, staged from engine commit `9b4e0176`. The template itself is not created or published |
 | Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0` from the lockfile's sha512, user `1000:1000` |
 | Port | Railway injects `PORT`; the service listens on it, on every address |
-| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.1","engine":"0.12.0"}` |
+| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.2","engine":"0.12.0"}` |
 | Checked in the engine | `http-service.yml`, job `hosts`, entry `railway`: the judged image run with a `PORT` that is not the default one, `QRSCAN_HTTP_MAX_CONCURRENT=1`, `QRSCAN_HTTP_BUDGET_SCALE=2`, 1 vCPU and 512 MB, judged by `test/consumer.mjs` (mixed QR code and Code 128 in fast, frame and full, exact payloads, every refusal); and no `railway.json` or `railway.toml` in the staged tree |
 | Icon | `integrations/vscode/images/icon.png` in the engine repository: 512 by 512 pixels, transparent corners, sha256 `97469c90140c94dc621d3cbfc0df4d0841b35648b2fe77044fecd214a7465af1`. Railway asks for a 1:1 icon with a transparent background |
 | License | the image is MIT: the service and the engine 0.12.0 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and Debian keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
@@ -78,7 +78,7 @@ in front of it. The service and the engine are MIT, and every answer names the s
 ### Implementation Details
 
 `POST /scan` takes the image as the request body or as the field `image` of a multipart form.
-`mode` chooses `fast`, `frame` (the default) or `full`. For example:
+`mode` chooses `fast` (the default), `frame` or `full`. For example:
 `curl --data-binary @label.png -H 'content-type: image/png' 'https://example.com/scan?mode=fast'`,
 with your service's address in place of example.com. Images up to 8 MiB and 16 megapixels are
 accepted. `QRSCAN_HTTP_MAX_CONCURRENT` sets how many scans run at once, and
@@ -118,7 +118,7 @@ check, so a private scan endpoint takes one deployment and no server to manage.
 4. From a clone of the repository, with Node.js 22, run the consumer against that domain:
    `node test/consumer.mjs https://<domain> test/fixtures/mixed-code128-qr.png --revision <commit>`,
    where `<commit>` is `engine.revision` in `SOURCE.json`. It must end with
-   `consumer: all 16 checks passed`. Keep its output.
+   `consumer: all 18 checks passed`. Keep its output.
 5. Paste the overview, upload the icon, choose the category and press **Publish**.
 6. From a second, clean project, deploy the published template from its marketplace page, repeat
    step 4, then delete both projects and check that the domains no longer answer.

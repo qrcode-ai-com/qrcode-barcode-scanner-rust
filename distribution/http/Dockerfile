@@ -8,7 +8,7 @@ FROM node:22.22.2-bookworm-slim@sha256:9f6d5975c7dca860947d3915877f85607946403fc
 ARG SOURCE_REVISION=""
 LABEL org.opencontainers.image.title="QR Code & Barcode Scanner HTTP service" \
       org.opencontainers.image.description="Scan QR codes and barcodes over HTTP with the open-source scanner engine 0.12.0. Images are scanned in memory and never stored." \
-      org.opencontainers.image.version="0.1.1" \
+      org.opencontainers.image.version="0.1.2" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust" \
       org.opencontainers.image.url="https://qrcode-ai.com/" \

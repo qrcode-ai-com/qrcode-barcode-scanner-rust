@@ -6,7 +6,8 @@
 //
 // The fixture is the mixed QR + Code 128 image of the engine's tests. The service must answer
 // GET /healthz and GET /, and POST /scan must return exactly the two payloads in the fast, frame
-// and full modes, both as a raw body and as a multipart form, with engine 0.12.0. Then each
+// and full modes, both as a raw body and as a multipart form, with engine 0.12.0, and name the mode
+// in X-Scan-Mode; a scan that names no mode must run fast, the default GET / names. Then each
 // refusal is checked: an unknown mode, a body that is not an image, a text body, a GET on
 // /scan, an unknown path and a body one byte over the advertised limit. Node.js 22 or later,
 // no dependency. Exit 0 when every check passes, 1 when one fails, 2 for usage.
@@ -19,6 +20,7 @@ const EXPECTED = Object.freeze([["code128", "STOCK-4827"], ["qr_code", "https://
 const FIXTURE_SHA256 = "c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8";
 const ENGINE = "0.12.0";
 const MODES = ["fast", "frame", "full"];
+const DEFAULT_MODE = "fast";
 const SOURCE = /^https:\/\/github\.com\/qrcode-ai-com\/qrcode-barcode-scanner-rust\/tree\/(?:[0-9a-f]{40}|main)\/distribution\/http$/;
 
 function usage(message) {
@@ -109,6 +111,7 @@ async function main() {
 
   let limit = null;
   let source = null;
+  let defaultMode = null;
   await check("GET /healthz answers ok with engine 0.12.0", async () => {
     const answer = await exchange(base, "GET", "/healthz");
     expectStatus(answer, 200, "healthz");
@@ -131,6 +134,7 @@ async function main() {
     if (!Number.isSafeInteger(value.limits?.inputBytes) || value.limits.inputBytes < fixture.length) throw new Error("no usable input limit");
     limit = value.limits.inputBytes;
     source = value.source;
+    defaultMode = value.defaultMode;
     return value.source.service;
   });
   await check("GET / in a browser is a page with an upload form and the source links", async () => {
@@ -142,25 +146,35 @@ async function main() {
     if (!/default-src 'none'/.test(answer.headers["content-security-policy"] ?? "")) throw new Error("no restrictive Content-Security-Policy");
   });
   const reports = {};
+  // MODE null sends no mode at all: the service must scan with its default, fast.
+  const scanCheck = (mode, shape) => async () => {
+    if (mode === null && defaultMode !== DEFAULT_MODE) throw new Error(`GET / names the default mode ${defaultMode}, want ${DEFAULT_MODE}`);
+    const query = mode === null ? "" : `?mode=${mode}`;
+    const sent = shape === "raw"
+      ? exchange(base, "POST", `/scan${query}`, { body: fixture, headers: { "content-type": "image/png" } })
+      : (() => { const form = multipart(mode === null ? {} : { mode }, fixture); return exchange(base, "POST", "/scan", { body: form.body, headers: { "content-type": form.type } }); })();
+    const what = `${mode ?? "no mode"} ${shape}`;
+    const answer = await sent;
+    expectStatus(answer, 200, what);
+    if (!/^application\/json/.test(answer.headers["content-type"] ?? "")) throw new Error(`content-type ${answer.headers["content-type"]}`);
+    const ran = mode ?? DEFAULT_MODE;
+    if (answer.headers["x-scan-mode"] !== ran) throw new Error(`X-Scan-Mode ${answer.headers["x-scan-mode"]}, want ${ran}`);
+    const report = parse(answer, what);
+    const got = payloads(report);
+    if (JSON.stringify(got) !== JSON.stringify(EXPECTED)) throw new Error(`payloads ${JSON.stringify(got)}, want ${JSON.stringify(EXPECTED)}`);
+    if (report.versions?.scanner !== ENGINE) throw new Error(`engine ${report.versions?.scanner}, want ${ENGINE}`);
+    if (report.trace?.budget_exhausted !== false) throw new Error(`trace.budget_exhausted is ${report.trace?.budget_exhausted}`);
+    if (report.trace?.engine_panics !== 0) throw new Error(`trace.engine_panics is ${report.trace?.engine_panics}`);
+    reports[`${mode ?? "default"}-${shape}`] = { mode: ran, detections: got, scanner: report.versions.scanner, total_ms: report.trace.total_ms };
+    return `${report.trace.total_ms.toFixed(0)} ms in the engine`;
+  };
   for (const mode of MODES) {
     for (const shape of ["raw", "multipart"]) {
-      await check(`POST /scan ${shape} body, mode ${mode}: exactly the QR code and the Code 128`, async () => {
-        const sent = shape === "raw"
-          ? exchange(base, "POST", `/scan?mode=${mode}`, { body: fixture, headers: { "content-type": "image/png" } })
-          : (() => { const form = multipart({ mode }, fixture); return exchange(base, "POST", "/scan", { body: form.body, headers: { "content-type": form.type } }); })();
-        const answer = await sent;
-        expectStatus(answer, 200, `${mode} ${shape}`);
-        if (!/^application\/json/.test(answer.headers["content-type"] ?? "")) throw new Error(`content-type ${answer.headers["content-type"]}`);
-        const report = parse(answer, `${mode} ${shape}`);
-        const got = payloads(report);
-        if (JSON.stringify(got) !== JSON.stringify(EXPECTED)) throw new Error(`payloads ${JSON.stringify(got)}, want ${JSON.stringify(EXPECTED)}`);
-        if (report.versions?.scanner !== ENGINE) throw new Error(`engine ${report.versions?.scanner}, want ${ENGINE}`);
-        if (report.trace?.budget_exhausted !== false) throw new Error(`trace.budget_exhausted is ${report.trace?.budget_exhausted}`);
-        if (report.trace?.engine_panics !== 0) throw new Error(`trace.engine_panics is ${report.trace?.engine_panics}`);
-        reports[`${mode}-${shape}`] = { detections: got, scanner: report.versions.scanner, total_ms: report.trace.total_ms };
-        return `${report.trace.total_ms.toFixed(0)} ms in the engine`;
-      });
+      await check(`POST /scan ${shape} body, mode ${mode}: exactly the QR code and the Code 128`, scanCheck(mode, shape));
     }
+  }
+  for (const shape of ["raw", "multipart"]) {
+    await check(`POST /scan ${shape} body, no mode: the default ${DEFAULT_MODE}, exactly the QR code and the Code 128`, scanCheck(null, shape));
   }
   await check("an unknown mode is refused", () => expectRefusal("mode slow", 400, "QRSHTTP_MODE", "POST", "/scan?mode=slow", { body: fixture, headers: { "content-type": "image/png" } }));
   await check("bytes that are not an image are refused by the engine", () =>

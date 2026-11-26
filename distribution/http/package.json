@@ -1,6 +1,6 @@
 {
   "name": "qrcode-barcode-scanner-http",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "A small HTTP service that scans QR codes and barcodes with the published QR Code & Barcode Scanner engine 0.12.0",
   "license": "MIT",

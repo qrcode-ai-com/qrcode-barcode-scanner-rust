@@ -1726,11 +1726,12 @@ digest and installs the engine and its six native packages from the lockfile's
 sha512, so it compiles nothing. It is a packaging release with its own version
 (`SERVICE_VERSION` in `server.mjs`, the same in `package.json` and the
 `Dockerfile` label) and its own tag `http-v<version>`. The engine tag `v0.12.0`
-and its packages stay as published. Service 0.1.1 runs the MIT engine 0.12.0,
-and the image's license label is `MIT`; service 0.1.0 ran the engine 0.11.0,
-which keeps its AGPL-3.0-or-later license, and no image of it was published. A
-new engine needs its pins, its lockfile, its notices and the constants of
-`scripts/stage-http-satellite.py` changed in one commit.
+and its packages stay as published. Services 0.1.1 and 0.1.2 run the MIT
+engine 0.12.0, and the image's license label is `MIT`; 0.1.2 scans a request
+that names no mode with `fast` instead of `frame`. Service 0.1.0 ran the engine
+0.11.0, which keeps its AGPL-3.0-or-later license, and no image of it was
+published. A new engine needs its pins, its lockfile, its notices and the
+constants of `scripts/stage-http-satellite.py` changed in one commit.
 
 `scripts/stage-http-satellite.py` writes the folder as the tree of its own
 repository, `qrcode-ai-com/qrcode-barcode-scanner-http`, with the test fixture
@@ -1741,7 +1742,8 @@ digest. Its consumers (`scripts/http-service-release.py consume`) run each
 image fresh with a read-only root filesystem, no capability and no route out,
 judge it from a second container with `distribution/http/test/consumer.mjs`
 (the mixed QR code and Code 128 sample in fast, frame and full, raw and
-multipart, exact payloads, every refusal), check that it cannot reach the
+multipart, and with no mode, which must run fast, exact payloads, every
+refusal), check that it cannot reach the
 network, then remove it. `rehearse` pushes both judged images and their index
 to a local registry and pulls them back, as the release does.
 
@@ -1750,7 +1752,7 @@ On a pull request or a dispatch, nothing more runs. On a tag `http-v*`,
 first (`http-service-release.py gate`: the tag must be `http-v` and the service
 version, and the engine pin 0.12.0), downloads the images the consumers judged,
 requires their sha256 and config digest to be the ones the consumers recorded,
-then pushes them as `0.1.1-amd64` and `0.1.1-arm64` and their index as `0.1.1`
+then pushes them as `0.1.2-amd64` and `0.1.2-arm64` and their index as `0.1.2`
 to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` with the job's own
 `github.token`, and reads each back. It never rebuilds, never moves `latest`
 and holds `contents: read` and `packages: write` only.
@@ -1767,14 +1769,14 @@ Both are in place: the environment `container-http` holds these rules, and
 1. Merge the change to `main`, with `http-service.yml` green on its pull
    request.
 2. Tag the merged commit and push the tag:
-   `git tag -a http-v0.1.1 <commit> -m 'HTTP service 0.1.1'`, then
-   `git push origin http-v0.1.1`.
+   `git tag -a http-v0.1.2 <commit> -m 'HTTP service 0.1.2'`, then
+   `git push origin http-v0.1.2`.
 3. Approve `publish` in the environment once the consumers are green. Its
    artifact `http-published` records the digests it pushed.
 4. A new GitHub package starts private: in the package settings of
    `qrcode-barcode-scanner-http`, link it to this repository and make it
    public.
-5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`
+5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2`
    and compare its index digest with the receipt. Only then may a README name
    the image as published.
 

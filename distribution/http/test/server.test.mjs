@@ -13,8 +13,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import * as engine from "@qrcode-ai-com/qrcode-barcode-scanner";
 import {
-  ENGINE_SOURCE, HARD_LIMITS, MAX_BUDGET_SCALE, PROFILE_BUDGETS_MS, budgetScaleFromEnvironment, createScanServer, limitsFromEnvironment,
-  sourceFromRecord,
+  DEFAULT_PROFILE, ENGINE_SOURCE, HARD_LIMITS, MAX_BUDGET_SCALE, PROFILES, PROFILE_BUDGETS_MS, budgetScaleFromEnvironment, createScanServer,
+  limitsFromEnvironment, sourceFromRecord,
 } from "../server.mjs";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
@@ -73,7 +73,7 @@ describe("the service on the installed engine", () => {
   test("the black-box consumer passes every check", async () => {
     const consumer = fileURLToPath(new URL("consumer.mjs", import.meta.url));
     const { stdout } = await promisify(execFile)(process.execPath, [consumer, base, FIXTURE, "--revision", source.revision], { maxBuffer: 1 << 20 });
-    assert.match(stdout, /consumer: all 16 checks passed/);
+    assert.match(stdout, /consumer: all 18 checks passed/);
   });
 
   test("the report is the engine's own, field for field", async () => {
@@ -229,6 +229,41 @@ describe("what the service refuses before a scan", () => {
       const answer = await exchange(base, "POST", "/scan", { body: fixture, headers: { "content-type": "image/png" } });
       assert.equal(answer.status, 500);
       assert.equal(JSON.parse(answer.body).error.code, "QRSHTTP_ENGINE");
+    } finally { server.close(); }
+  });
+
+  // Up to 0.1.1 the default was frame, whose 80 ms camera-frame budget can stop the scan of a
+  // single image on a busy server before the stage that reads its barcode.
+  test("a scan that names no mode runs fast, and every scan names its mode", async () => {
+    assert.equal(DEFAULT_PROFILE, "fast");
+    const calls = [];
+    const recording = { version: () => "0.12.0", scan: async (bytes, options) => { calls.push(options); return { detections: [] }; } };
+    const server = createScanServer({ engine: recording, limits: limitsFromEnvironment({}), budgetScale: 2, source });
+    const base = await listen(server);
+    try {
+      const boundary = "qrscan-default";
+      const form = Buffer.from(`--${boundary}\r\ncontent-disposition: form-data; name="image"; filename="a.png"\r\n\r\nx\r\n--${boundary}--\r\n`);
+      const sent = [
+        ["no mode, raw", "/scan", { body: fixture, headers: { "content-type": "image/png" } }, "fast"],
+        ["no mode, form", "/scan", { body: form, headers: { "content-type": `multipart/form-data; boundary=${boundary}` } }, "fast"],
+        ["an empty query", "/scan?", { body: fixture, headers: { "content-type": "image/png" } }, "fast"],
+        ...PROFILES.map((mode) => [`mode ${mode}`, `/scan?mode=${mode}`, { body: fixture, headers: { "content-type": "image/png" } }, mode]),
+      ];
+      for (const [what, path, init, mode] of sent) {
+        calls.length = 0;
+        const answer = await exchange(base, "POST", path, init);
+        assert.equal(answer.status, 200, what);
+        assert.equal(answer.headers["x-scan-mode"], mode, what);
+        assert.deepEqual(calls.map((options) => [options.profile, options.budgetMs]), [[mode, PROFILE_BUDGETS_MS[mode] * 2]], what);
+      }
+      const described = JSON.parse((await exchange(base, "GET", "/", { headers: { accept: "application/json" } })).body);
+      assert.equal(described.defaultMode, "fast");
+      assert.deepEqual(described.modes, ["fast", "frame", "full"]);
+      const page = (await exchange(base, "GET", "/", { headers: { accept: "text/html" } })).body;
+      assert.match(page, /<select name="mode"><option selected>fast<\/option><option>frame<\/option><option>full<\/option><\/select>/);
+      const refused = await exchange(base, "POST", "/scan?mode=slow", { body: fixture, headers: { "content-type": "image/png" } });
+      assert.equal(refused.status, 400);
+      assert.equal(refused.headers["x-scan-mode"], undefined, "a refusal names no mode");
     } finally { server.close(); }
   });
 
