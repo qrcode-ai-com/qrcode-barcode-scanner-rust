@@ -157,6 +157,22 @@ pub struct ScanConfig {
     /// argument error. Empty (every profile's default) = the neutral sweep
     /// only.
     pub alpha_palette: Vec<[u8; 3]>,
+    /// The symbologies the scan looks for. Empty (every profile's default)
+    /// = every symbology the build reads. A host that only handles some of
+    /// them names those: no reader of another symbology runs in any stage,
+    /// and the stages that exist for the others are not planned — the
+    /// native-resolution completion after a QR pyramid read when no listed
+    /// symbology is outside the QR family, the deep stage when none is
+    /// inside it. A listed symbology is read by the same readers, judged
+    /// and reported as in an unrestricted scan, with the one difference
+    /// that fewer readers imply: an unrestricted scan sets each symbol it
+    /// reads aside and reads again around it, so a symbol that shares its
+    /// rows with one of an unlisted symbology (two linear codes side by
+    /// side) can need its neighbor listed to be read; and a UPC-A symbol
+    /// read with `ean13` listed and `upc_a` not is the EAN-13 it also is
+    /// (a leading zero). The report says what it looked for
+    /// (`trace.formats`).
+    pub formats: Vec<crate::report::Symbology>,
 }
 
 /// A skippable score SECTION — the same integration seam as
@@ -371,6 +387,35 @@ impl ScanConfig {
         Ok(())
     }
 
+    /// The symbologies named by `names`, for [`ScanConfig::formats`]: wire
+    /// names ([`crate::Symbology::name`]: `qr_code`, `ean13`, …), in the
+    /// order given. One parser for every binding, so they accept and refuse
+    /// the same names.
+    ///
+    /// # Errors
+    /// `QRS-006` naming the first unknown name: a typo never widens the
+    /// scan back to every symbology.
+    pub fn formats_from_names<S: AsRef<str>>(
+        names: &[S],
+    ) -> crate::Result<Vec<crate::report::Symbology>> {
+        names
+            .iter()
+            .map(|name| {
+                let name = name.as_ref();
+                crate::report::Symbology::from_name(name).ok_or_else(|| {
+                    let known: Vec<&str> = crate::report::Symbology::ALL
+                        .iter()
+                        .map(|symbology| symbology.name())
+                        .collect();
+                    crate::ScanError::invalid_option(
+                        "formats",
+                        format!("unknown symbology `{name}`; expected {}", known.join(" | ")),
+                    )
+                })
+            })
+            .collect()
+    }
+
     /// Everything on — the quality-gate profile (~4 s budget).
     #[must_use]
     pub fn full() -> Self {
@@ -387,6 +432,7 @@ impl ScanConfig {
             score_skip_checks: Vec::new(),
             alpha_background: AlphaBackground::Auto,
             alpha_palette: Vec::new(),
+            formats: Vec::new(),
         }
     }
 
@@ -1510,6 +1556,55 @@ pub(crate) fn run(
     run_seeded(planes, config, cancel, deadline, Seed::default())
 }
 
+/// What each stage of a walk reads: everything, or the listed symbologies
+/// and their part inside or outside the QR family (`None`: the stage has
+/// nothing to read and is not planned).
+struct StageFormats {
+    /// The symbologies [`ScanConfig::formats`] lists; `None`: unrestricted.
+    listed: Option<engine::Formats>,
+    /// The stages that read every family.
+    every: engine::FormatFilter,
+    /// The QR-calibrated recovery stage.
+    qr_family: Option<engine::FormatFilter>,
+    /// The native-resolution completion after a pyramid read.
+    #[cfg(feature = "engine-rxing")]
+    non_qr: Option<engine::FormatFilter>,
+}
+
+impl StageFormats {
+    fn of(config: &ScanConfig) -> Self {
+        let listed = (!config.formats.is_empty()).then(|| engine::Formats::of(&config.formats));
+        Self {
+            listed,
+            every: listed.map_or(engine::FormatFilter::All, engine::FormatFilter::Set),
+            qr_family: match listed {
+                None => Some(engine::FormatFilter::QrFamily),
+                Some(set) => (!set.qr_family().is_empty())
+                    .then(|| engine::FormatFilter::Set(set.qr_family())),
+            },
+            #[cfg(feature = "engine-rxing")]
+            non_qr: match listed {
+                None => Some(engine::FormatFilter::NonQr),
+                Some(set) => {
+                    (!set.non_qr().is_empty()).then(|| engine::FormatFilter::Set(set.non_qr()))
+                }
+            },
+        }
+    }
+
+    /// What the scan looked for, as the trace states it: each listed
+    /// symbology once, in declaration order (an unrestricted scan says
+    /// nothing).
+    fn listed(&self) -> Option<Vec<crate::report::Symbology>> {
+        self.listed.map(|set| {
+            crate::report::Symbology::ALL
+                .into_iter()
+                .filter(|symbology| set.contains(*symbology))
+                .collect()
+        })
+    }
+}
+
 /// [`run`], starting from another walk's refusals, the contents its parses
 /// read and the re-reads it spent — the opposite-background walk of an
 /// alpha fallback.
@@ -1533,6 +1628,7 @@ pub(crate) fn run_seeded(
     let mut stages = Vec::new();
     let luma = &work;
     let longest = luma.width().max(luma.height());
+    let reads = StageFormats::of(config);
 
     // Each gate admits a stage the walk reaches and plans (`Run::admit`):
     // one the deadline already prevents is a cut, not a skip.
@@ -1544,7 +1640,7 @@ pub(crate) fn run_seeded(
             let stop = run.stage(
                 "pyramid",
                 vec![Attempt::plain(move || transform::downscale_to(luma, side))],
-                engine::FormatFilter::All,
+                reads.every,
                 &mut stages,
             )?;
             if stop || run.store.settled() {
@@ -1557,7 +1653,8 @@ pub(crate) fn run_seeded(
                 // only other symbologies still ends the walk (07-pipeline
                 // property 2 states the known loss).
                 #[cfg(feature = "engine-rxing")]
-                if !stop
+                if let Some(non_qr) = reads.non_qr
+                    && !stop
                     && config.direct
                     && run
                         .store
@@ -1577,7 +1674,7 @@ pub(crate) fn run_seeded(
                                 .collect();
                             exclude_matrix_regions(luma, &regions)
                         })],
-                        engine::FormatFilter::NonQr,
+                        non_qr,
                         &mut stages,
                     )?;
                 }
@@ -1590,7 +1687,7 @@ pub(crate) fn run_seeded(
             let stop = run.stage(
                 "direct",
                 vec![Attempt::plain(|| luma.clone())],
-                engine::FormatFilter::All,
+                reads.every,
                 &mut stages,
             )?;
             if stop || run.store.settled() {
@@ -1617,7 +1714,7 @@ pub(crate) fn run_seeded(
                     }));
                 }
             }
-            let stop = run.stage("enhance", attempts, engine::FormatFilter::All, &mut stages)?;
+            let stop = run.stage("enhance", attempts, reads.every, &mut stages)?;
             if stop || run.store.settled() {
                 break 'ladder;
             }
@@ -1625,15 +1722,13 @@ pub(crate) fn run_seeded(
 
         // S4 — deep: the curated boost rungs (v0.2 empirical known-good)
         // first, then the size × contrast × binarization grid.
-        if config.deep && run.admit() {
+        if let Some(qr_family) = reads.qr_family
+            && config.deep
+            && run.admit()
+        {
             // deep is QR-calibrated recovery: the multi-format detectors on
             // 17 rungs would starve the budget for nothing
-            let _ = run.stage(
-                "deep",
-                deep_attempts(luma, longest),
-                engine::FormatFilter::QrFamily,
-                &mut stages,
-            )?;
+            let _ = run.stage("deep", deep_attempts(luma, longest), qr_family, &mut stages)?;
         }
 
         // S5 — rescue: erasure-aware RS over grids the engines detected
@@ -1641,7 +1736,9 @@ pub(crate) fn run_seeded(
         // ladder published nothing — a decoded symbol never needs rescuing.
         run.rescue_stage(luma, &mut stages)?;
     }
-    run.finish(stages, started, &planes.luma)
+    let mut outcome = run.finish(stages, started, &planes.luma)?;
+    outcome.trace.formats = reads.listed();
+    Ok(outcome)
 }
 
 impl Run<'_> {
@@ -1713,6 +1810,7 @@ impl Run<'_> {
                     detections: detections_saturated,
                     occurrences: occurrences_saturated,
                 }),
+                formats: None,
             },
             store: self.store,
         })
@@ -3216,6 +3314,7 @@ mod ladder_mutant_kills {
                 total_ms,
                 budget_exhausted: Some(cut),
                 saturation: Some(Saturation::default()),
+                formats: None,
             },
         };
         let mut first = outcome(1.5, false);

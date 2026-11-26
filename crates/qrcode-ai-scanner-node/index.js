@@ -61,6 +61,7 @@ async function scan(image, options = {}) {
       options.alphaBackground,
       options.alphaPalette,
       options.scorePreset,
+      options.formats,
     );
     return JSON.parse(json);
   } catch (error) {
@@ -88,6 +89,7 @@ function scanSync(image, options = {}) {
       options.alphaBackground,
       options.alphaPalette,
       options.scorePreset,
+      options.formats,
     ),
   );
 }

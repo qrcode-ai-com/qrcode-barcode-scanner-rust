@@ -226,6 +226,10 @@ configuration, cache or state.
   sets it and `--budget-ms 0` removes it. Under a budget, where the scan stops
   depends on the machine, and a report it cut says so with
   `trace.budget_exhausted: true`: an empty result is then not final.
+- `--formats qr_code,ean13` looks for the symbologies you name and runs no
+  reader of another one. The names are those a report uses, listed by
+  `qrscan --capabilities`, and the report repeats them in `trace.formats`.
+  Without the option every symbology is read.
 - Decoded text is data from the image: `qrscan` never opens or follows it. The
   JSON report carries it as a JSON string, with control characters escaped;
   `--pretty` also escapes invisible and direction-changing characters.
@@ -255,8 +259,8 @@ Exit 2 covers:
   `--profile`, a missing image, conflicting options, or `--capabilities` with
   anything else;
 - an unknown name given to `--score-preset`, `--score-skip-axes`,
-  `--score-skip-checks`, `--alpha-background` or `--alpha-palette`, or more
-  palette colours than allowed;
+  `--score-skip-checks`, `--alpha-background`, `--alpha-palette` or
+  `--formats`, or more palette colours than allowed;
 - an image file that cannot be read, such as a missing file or a directory;
 - a scan error, whose message ends with its code in brackets, for example
   `[QRS-001]` when the bytes are not a decodable image;

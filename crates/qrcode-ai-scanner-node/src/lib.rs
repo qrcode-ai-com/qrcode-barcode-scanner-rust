@@ -34,6 +34,10 @@ fn limits_from(max_dimension: Option<f64>, max_pixels: Option<f64>) -> Result<Li
     Ok(limits)
 }
 
+#[expect(
+    clippy::too_many_arguments,
+    reason = "one parameter per option of the scan signature, parsed in one place"
+)]
 fn profile_from(
     name: Option<&str>,
     budget_ms: Option<f64>,
@@ -42,6 +46,7 @@ fn profile_from(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<ScanProfile> {
     let profile = match name {
         None => ScanProfile::Full,
@@ -148,11 +153,18 @@ fn profile_from(
         .map(options::budget_ms_from_number)
         .transpose()
         .map_err(|e| scan_error(&e))?;
+    // formats: the symbologies the host handles, by wire name. Unset or
+    // empty = every symbology; an unknown name is QRS-006, never a scan
+    // silently widened back to all of them.
+    let formats =
+        qrcode_barcode_scanner::ScanConfig::formats_from_names(&formats.unwrap_or_default())
+            .map_err(|e| scan_error(&e))?;
     if budget_ms.is_none()
         && skip.is_empty()
         && checks.is_empty()
         && alpha.is_none()
         && palette.is_empty()
+        && formats.is_empty()
     {
         return Ok(profile);
     }
@@ -166,6 +178,7 @@ fn profile_from(
         config.alpha_background = alpha;
     }
     config.alpha_palette = palette;
+    config.formats = formats;
     Ok(ScanProfile::Custom(config))
 }
 
@@ -232,6 +245,7 @@ pub fn scan(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<AsyncTask<ScanTask>> {
     let task = ScanTask {
         bytes: image.to_vec(),
@@ -243,6 +257,7 @@ pub fn scan(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?,
         limits: limits_from(max_dimension, max_pixels)?,
     };
@@ -268,6 +283,7 @@ pub fn scan_sync(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<String> {
     let scanner = Scanner::builder()
         .profile(profile_from(
@@ -278,6 +294,7 @@ pub fn scan_sync(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?)
         .limits(limits_from(max_dimension, max_pixels)?)
         .build();

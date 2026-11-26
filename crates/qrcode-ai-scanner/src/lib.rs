@@ -176,6 +176,7 @@ impl Scanner {
         // on wasm panics trap regardless — documented limitation). A
         // contained panic is a fault, not a cut: the judgment is absent
         // whatever the budget, and no envelope is planned after it.
+        self.measure_margin(&planes.luma, &mut outcome);
         let primary = outcome
             .merged
             .first()
@@ -274,6 +275,23 @@ impl Scanner {
         #[cfg(not(feature = "parallel"))]
         {
             inputs.iter().map(|input| self.scan(*input)).collect()
+        }
+    }
+
+    /// A scan that judges first measures the primary symbol's correction
+    /// margin where it lies in the image (`score::margin`): bounded pixel
+    /// sampling, no engine, whatever the budget — the detection states the
+    /// same format in a cut report as in the final one. Same panic posture
+    /// as the judgment: a fault leaves the detection as read.
+    fn measure_margin(&self, luma: &input::LumaImage, outcome: &mut ladder::LadderOutcome) {
+        if self.config.computes_score()
+            && let Some(detection) = outcome.merged.first_mut()
+            && let Ok(Some(measured)) =
+                std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    score::margin::remeasure(luma, detection)
+                }))
+        {
+            detection.adopt(measured);
         }
     }
 }

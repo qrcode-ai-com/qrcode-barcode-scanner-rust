@@ -77,6 +77,10 @@ Machine-readable mirrors — load these directly in tools and agents:
   published), `occurrences` (a detection's copies incomplete). A `true`
   flag means what was left out is unknown, not absent. Absent on older
   reports.
+  `formats` lists the symbologies the scan was restricted to (the `formats`
+  option), each once, in `Symbology` order: what was looked for, not what
+  was found. Absent from an unrestricted scan, and from a scanner older
+  than the option.
 </ResponseField>
 
 <ResponseField name="versions" type="Versions" required>
@@ -85,9 +89,10 @@ Machine-readable mirrors — load these directly in tools and agents:
   published; 4 added native-resolution linear completion after QR pyramid success; 3 introduced exact content —
   the original bytes, declarations read once, reads reconciled by content
   identity; since 2, transparent inputs flatten before decode),
-  `score_contract` (5: the correction-margin cap on the verified
-  orientation's stream, interrupted judgments absent, probes matched by
-  content identity).
+  `score_contract` (6: the correction margin of the primary QR Code also
+  measured in the image, the widest verified sampling published; 5: the
+  correction-margin cap on the verified orientation's stream, interrupted
+  judgments absent, probes matched by content identity).
 </ResponseField>
 
 ## Detection
@@ -136,7 +141,11 @@ Machine-readable mirrors — load these directly in tools and agents:
   `version` (1-40) · `ec_level` · `mask` · `modules` (= version×4+17) ·
   `inverted` (light-on-dark, MEASURED). `null` when no geometry was
   measured — never fabricated — except `ec_level`: a symbol only rxing
-  read carries the level its decoder states.
+  read carries the level its decoder states. From score contract 6 a scan
+  that computes a score also samples its primary QR Code in the image:
+  when that sampling verifies, a symbol only rxing read states its
+  `version`, `mask` and `modules` too, beside `null` `corners` and
+  `inverted`.
 </ResponseField>
 
 <ResponseField name="engines" type="EngineKind[]" required>
@@ -192,7 +201,7 @@ Machine-readable mirrors — load these directly in tools and agents:
     { "stage": "rescue", "transforms_tried": 1, "ms": 0.1, "detections_found": 1 }
   ], "engine_panics": 0, "total_ms": 153.8, "budget_exhausted": false,
      "saturation": { "reads": false, "detections": false, "occurrences": false } },
-  "versions": { "scanner": "0.12.0", "pipeline": 5, "score_contract": 5 }
+  "versions": { "scanner": "0.12.0", "pipeline": 5, "score_contract": 6 }
 }
 ```
 

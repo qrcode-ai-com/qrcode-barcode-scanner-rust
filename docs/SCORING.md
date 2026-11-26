@@ -1,6 +1,6 @@
-# Score contract v5
+# Score contract v6
 
-> `Versions.score_contract = 5`. The composite, the axes, the caps, and the
+> `Versions.score_contract = 6`. The composite, the axes, the caps, and the
 > weights below are a published contract: changing any of them bumps the
 > version. Output language: **validation**, never ISO *verification* — no
 > calibrated optics are involved (geometry-class signals transfer to digital
@@ -34,6 +34,9 @@ unstressed baseline needed, when it needed one (`CellProbe` — "fragile" is
 never conflated with "undecodable"; the score still measures *margin*, not
 the deep ladder's recovery power). Ramps stop at the first failure (the
 knee). Full depth = 5 cells/axis · Fast profile = 2 · Frame = no scoring.
+Within a cell the decode passes are tried cheapest expected first, from the
+time the judgment's earlier passes took: the order changes what a judgment
+costs, never a verdict.
 
 | Axis | Weight | Ramp |
 |---|---|---|
@@ -63,8 +66,9 @@ geometry ⇒ `structural: null`, no cap.
 
 ## Synthetic UEC (the margin)
 
-The ISO 15415 *Unused Error Correction* computed from rqrr's own sampled
-bitstream: zigzag replay → unmask → ISO 18004 §8.6 de-interleave →
+The ISO 15415 *Unused Error Correction* computed from a sampled bitstream
+of the symbol (rqrr's own, or the scanner's sampling of the image, below):
+zigzag replay → unmask → ISO 18004 §8.6 de-interleave →
 per-block RS syndromes → Berlekamp-Massey degree = exact corrected-error
 count `t`. `margin = 1 − 2t/d` (worst block, `d` its parity codewords;
 ISO uses `d − p`, see the known limits) · grades A ≥0.62 · B ≥0.50 ·
@@ -78,6 +82,20 @@ margin hint — absent, never a guess. A stream the S5 rescue recovered
 needed erasures, so it keeps its errors-only count: with `rescue` among
 the engines, `worst_block_errors` (and the hint's `errors`) is a distrust
 marker, typically margin 0, not a count of corrected errors.
+
+From contract v6 the scanner also samples a QR Code itself, where it lies
+in the image, at the outer corners a reader measured: every module read
+three ways (its centre, its central half, most of the cell), each binarized
+two ways, on the candidate grids whose finder and timing patterns fit. A
+sampling counts only when its stream error-corrects errors-only to the
+detection's exact payload bytes. The widest margin among those that count
+is published when it is wider than the engine stream's, or when no engine
+stream measures one: a symbol only rxing read can carry a margin, its cap
+and its hints — still without `structural` or `iso15415`, which need
+corners. This runs once per scan that computes a score, for the primary
+detection, never for a rescued one, and reads no clock. A symbol no
+sampling verifies keeps what its reader measured. Normative text:
+[`spec/04-score.md`](../spec/04-score.md) § The correction margin.
 
 The margin caps the value whether or not `uec` is published: skipping the
 `uec` check (`score_skip_checks`) withholds `score.uec`, the ISO

@@ -14,7 +14,7 @@ code; the cross-surface match contract is the regex `QRS-\d{3}`
 | `QRS-003` | PixelLimit | total pixels exceed `max_pixels` | decompression bomb, huge photo |
 | `QRS-004` | BufferMismatch | raw buffer length ≠ expected for (w,h,format) | binding misuse (`rgba8`/`luma8` paths) |
 | `QRS-005` | Cancelled | the `CancelToken` fired | caller-initiated cancellation |
-| `QRS-006` | InvalidOption | an option value outside its domain ([02-profiles.md § Option domains](02-profiles.md#option-domains-validated-before-the-input)), checked before the input is read | a zero size cap, a budget above 4 294 967 295 ms, a JavaScript `NaN` or fractional cap |
+| `QRS-006` | InvalidOption | an option value outside its domain ([02-profiles.md § Option domains](02-profiles.md#option-domains-validated-before-the-input)), checked before the input is read | a zero size cap, a budget above 4 294 967 295 ms, a JavaScript `NaN` or fractional cap, an unknown `formats` name |
 
 ## Per-surface mapping
 
@@ -36,6 +36,9 @@ integer type cannot hold. That is Node's and WASM's thrown error, Python's
 `String` (a `RangeError` for a negative `budgetMs`), and Kotlin/Swift's own
 case (`UnknownProfile`, `PaletteTooLarge`, …).
 Match it by its type or case, never by a code it does not have.
+An unknown `formats` name is not one of them: the core parses that option
+for every surface, so it is a scan fault, `QRS-006`, in each binding's
+shape above (02-profiles.md § Formats).
 
 `QRS-005` comes only from Rust's `scan_cancellable`. Node's `AbortSignal`
 rejects a scan that has not started (the signal was already aborted at the

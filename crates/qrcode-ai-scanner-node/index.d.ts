@@ -2,7 +2,7 @@
 // package — see bindings/report-types.d.ts at the repo root (copied here
 // as ./report-types.d.ts at pack time by scripts/sync-report-types.mjs).
 export * from "./report-types";
-import type { Capabilities, ScanReport, StressAxis } from "./report-types";
+import type { Capabilities, ScanReport, StressAxis, Symbology } from "./report-types";
 
 /** A skippable report section (`score.uec` / `score.iso15415` / `alpha.envelope`) — config-only, never serialized. */
 export type ScoreCheck = "uec" | "iso15415" | "alpha_envelope";
@@ -92,6 +92,14 @@ export interface ScanOptions {
    * Mutually exclusive with scoreSkipAxes (rejects loudly).
    */
   scorePreset?: "design" | "capture";
+  /**
+   * The symbologies to look for, by wire name (`["qr_code"]`,
+   * `["ean13", "upc_a"]`). No reader of another symbology runs — faster
+   * for a host that handles only some — and the report says what was
+   * looked for (`report.trace.formats`). Unset or empty = every
+   * symbology; an unknown name rejects `[QRS-006]`.
+   */
+  formats?: Symbology[];
 }
 
 /** Runs the Rust scan on the libuv worker pool. */

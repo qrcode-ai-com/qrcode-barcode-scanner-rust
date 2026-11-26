@@ -24,7 +24,7 @@ required) · `parallel` (rayon batching, native only — OFF for wasm) ·
 
 ```rust
 use qrcode_barcode_scanner::{
-    AlphaBackground, CancelToken, ImageInput, Limits, ScanConfig, ScanProfile, Scanner,
+    AlphaBackground, CancelToken, ImageInput, Limits, ScanConfig, ScanProfile, Scanner, Symbology,
 };
 
 let scanner = Scanner::builder()
@@ -67,6 +67,10 @@ config.budget_ms = Some(1_500);
 // background under transparent pixels — AlphaBackground::from_name parses
 // "auto" | "white" | "black" | "none" | "#rrggbb" (opaque inputs untouched)
 config.alpha_background = AlphaBackground::Custom([0x1a, 0x1a, 0x2e]);
+// only these symbologies: no other reader runs, and the report lists them
+// in `trace.formats`; empty (the default) = every symbology.
+// `ScanConfig::formats_from_names` parses wire names ("qr_code", "ean13")
+config.formats = vec![Symbology::QrCode, Symbology::Ean13];
 let scanner = Scanner::builder()
     .profile(ScanProfile::Custom(config))
     .build();
@@ -102,7 +106,8 @@ enum is `#[non_exhaustive]`. `QRS-006` is an option outside its domain —
 a zero `Limits` cap, a zero side, a palette above
 `ScanConfig::MAX_ALPHA_PALETTE` or a `budget_ms` above
 `ScanConfig::MAX_BUDGET_MS` (4 294 967 295 ms) — refused before the input
-is read. `ScanConfig::validate` and `Limits::validate` run the same check
+is read; `ScanConfig::formats_from_names` returns it for an unknown
+symbology name. `ScanConfig::validate` and `Limits::validate` run the same check
 ahead of a scan; `qrcode_barcode_scanner::options` maps a JavaScript number
 onto these domains (the WASM and Node bindings use it).
 

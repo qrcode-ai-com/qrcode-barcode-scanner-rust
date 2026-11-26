@@ -97,6 +97,13 @@ struct Cli {
     #[arg(long, value_delimiter = ',', value_name = "COLOR,...")]
     alpha_palette: Vec<String>,
 
+    /// Symbologies to look for (comma-separated wire names, e.g.
+    /// `qr_code` or `ean13,upc_a`). No reader of another symbology runs —
+    /// faster on a host that handles only some — and the report says what
+    /// was looked for (`trace.formats`). Default: every symbology.
+    #[arg(long, value_delimiter = ',', value_name = "SYMBOLOGY,...")]
+    formats: Vec<String>,
+
     /// Human-readable summary instead of JSON.
     #[arg(long, short = 'p')]
     pretty: bool,
@@ -587,6 +594,63 @@ fn print_capabilities() -> ExitCode {
     }
 }
 
+/// The profile the options ask for: the named one as it is, or its
+/// configuration with every option given applied. A value outside an
+/// option's domain is the exit code to leave with, its reason already on
+/// stderr.
+fn scan_profile(cli: &Cli) -> Result<ScanProfile, ExitCode> {
+    // --score-skip-axes: wire names, loud on a typo (a silently ignored
+    // axis would score all six and drift the caller's contract).
+    // preset and explicit list resolve in one seam (clap enforces exclusivity)
+    let skip = parse_axis_posture(&cli.score_skip_axes, cli.score_preset.as_deref())?;
+    // --score-skip-checks: same loud-typo posture for report sections.
+    let checks = parse_skip_checks(&cli.score_skip_checks)?;
+    // --alpha-background: same loud posture — a silently-defaulted typo
+    // would flip which image the whole ladder sees.
+    let alpha = parse_alpha_arg(cli.alpha_background.as_deref())?;
+    // --alpha-palette: per-color envelope verdicts, loud on a bad color.
+    let palette = parse_palette_args(&cli.alpha_palette)?;
+    // --formats: wire names, loud on a typo (an ignored name would widen
+    // the scan back to every symbology).
+    let formats = match ScanConfig::formats_from_names(&cli.formats) {
+        Ok(formats) => formats,
+        Err(error) => {
+            let th = term::Theme::auto_stderr();
+            eprintln!("{} {} [{}]", th.err_strong("✖"), error, error.code());
+            return Err(ExitCode::from(2));
+        }
+    };
+    // --budget-ms overrides the preset's wall-clock budget (0 = unbounded) —
+    // the same semantics as Node `budgetMs` / WASM / Python / UniFFI.
+    Ok(
+        if cli.budget_ms.is_none()
+            && skip.is_empty()
+            && checks.is_empty()
+            && alpha.is_none()
+            && palette.is_empty()
+            && cli.score_preset.is_none()
+            && formats.is_empty()
+        {
+            cli.profile.into()
+        } else {
+            // The core crate's `spec_golden` test mirrors this branch in its
+            // `cli_profile` to rescan the goldens: change both together.
+            let mut config = ScanProfile::from(cli.profile).config();
+            if let Some(ms) = cli.budget_ms {
+                config.budget_ms = (ms > 0).then_some(u64::from(ms));
+            }
+            config.score_skip_axes = skip;
+            config.score_skip_checks = checks;
+            if let Some(alpha) = alpha {
+                config.alpha_background = alpha;
+            }
+            config.alpha_palette = palette;
+            config.formats = formats;
+            ScanProfile::Custom(config)
+        },
+    )
+}
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
 
@@ -610,53 +674,9 @@ fn main() -> ExitCode {
         }
     };
 
-    // --score-skip-axes: wire names, loud on a typo (a silently ignored
-    // axis would score all six and drift the caller's contract).
-    // preset and explicit list resolve in one seam (clap enforces exclusivity)
-    let skip = match parse_axis_posture(&cli.score_skip_axes, cli.score_preset.as_deref()) {
-        Ok(skip) => skip,
+    let profile = match scan_profile(&cli) {
+        Ok(profile) => profile,
         Err(code) => return code,
-    };
-    // --score-skip-checks: same loud-typo posture for report sections.
-    let checks = match parse_skip_checks(&cli.score_skip_checks) {
-        Ok(checks) => checks,
-        Err(code) => return code,
-    };
-    // --alpha-background: same loud posture — a silently-defaulted typo
-    // would flip which image the whole ladder sees.
-    let alpha = match parse_alpha_arg(cli.alpha_background.as_deref()) {
-        Ok(alpha) => alpha,
-        Err(code) => return code,
-    };
-    // --alpha-palette: per-color envelope verdicts, loud on a bad color.
-    let palette = match parse_palette_args(&cli.alpha_palette) {
-        Ok(palette) => palette,
-        Err(code) => return code,
-    };
-    // --budget-ms overrides the preset's wall-clock budget (0 = unbounded) —
-    // the same semantics as Node `budgetMs` / WASM / Python / UniFFI.
-    let profile = if cli.budget_ms.is_none()
-        && skip.is_empty()
-        && checks.is_empty()
-        && alpha.is_none()
-        && palette.is_empty()
-        && cli.score_preset.is_none()
-    {
-        cli.profile.into()
-    } else {
-        // The core crate's `spec_golden` test mirrors this branch in its
-        // `cli_profile` to rescan the goldens: change both together.
-        let mut config = ScanProfile::from(cli.profile).config();
-        if let Some(ms) = cli.budget_ms {
-            config.budget_ms = (ms > 0).then_some(u64::from(ms));
-        }
-        config.score_skip_axes = skip;
-        config.score_skip_checks = checks;
-        if let Some(alpha) = alpha {
-            config.alpha_background = alpha;
-        }
-        config.alpha_palette = palette;
-        ScanProfile::Custom(config)
     };
     // the configuration the scan runs under: what --score-only and --pretty
     // read a missing score against

@@ -102,13 +102,16 @@ untrusted input. The following options have different output purposes:
 qrscan label.png --pretty
 qrscan label.png --profile fast
 qrscan label.png --score-only --budget-ms 0
+qrscan label.png --formats qr_code
 qrscan --capabilities
 ```
 
 PNG, JPEG, WebP and GIF are accepted. The engine processes the image locally;
 decoding a URL does not visit it. `--capabilities` lists the compiled readers,
 engine versions and symbologies, not a guarantee that any particular image will
-decode.
+decode. `--formats` takes a comma-separated list of symbologies, by the names a
+report uses: no reader of another symbology runs, and the report lists them in
+`trace.formats`. On the sample, `--formats qr_code` reports the QR code alone.
 
 | Output | Use |
 |---|---|

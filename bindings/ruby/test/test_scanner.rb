@@ -112,6 +112,21 @@ class ScannerTest < Minitest::Test
     assert_equal 'ScorePresetConflict', conflict.kind
   end
 
+  def test_formats_read_the_listed_symbologies_and_no_other
+    every = MIXED.fetch('contents').map { |row| [row['symbology'], row['text']] }.sort
+    assert_equal every, contents(QrcodeBarcodeScanner.scan(fixture(MIXED), budget_ms: 0, formats: []))
+    %w[qr_code code128].each do |name|
+      report = QrcodeBarcodeScanner.scan(fixture(MIXED), budget_ms: 0, formats: [name.to_sym])
+      assert_equal every.select { |symbology, _| symbology == name }, contents(report)
+      assert_equal [name], report.to_h.dig('trace', 'formats')
+    end
+    assert_nil QrcodeBarcodeScanner.scan(fixture(MIXED), budget_ms: 0).to_h.dig('trace', 'formats')
+    error = assert_raises(QrcodeBarcodeScanner::ScanError) do
+      QrcodeBarcodeScanner.scan(fixture(MIXED), formats: %w[qr_code ean_13])
+    end
+    assert_equal ['ScanFailed', 'QRS-006'], [error.kind, error.code]
+  end
+
   def test_skipped_axes_leave_the_score
     report = QrcodeBarcodeScanner.scan(fixture(CLEAN), budget_ms: 0, score_skip_axes: %i[perspective rotation])
     axes = report.to_h.dig('score', 'axes').map { |row| row['axis'] }

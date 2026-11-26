@@ -436,7 +436,7 @@ fn every_category_report_validates_against_the_wire_schema() {
         );
         assert_eq!(
             report["versions"],
-            serde_json::json!({"scanner": env!("CARGO_PKG_VERSION"), "pipeline": 5, "score_contract": 5}),
+            serde_json::json!({"scanner": env!("CARGO_PKG_VERSION"), "pipeline": 5, "score_contract": 6}),
             "{rel}: versions block is the wire's compatibility anchor"
         );
     }
@@ -677,6 +677,67 @@ fn score_skip_checks_flag_threads_and_rejects_typos() {
         .unwrap();
     assert_eq!(out.status.code(), Some(2), "typo'd check = usage error");
     assert!(String::from_utf8_lossy(&out.stderr).contains("unknown score check"));
+}
+
+/// --formats restricts the scan to the listed symbologies and the report
+/// names the list; without it the list is absent; a typo'd name is a loud
+/// exit-2 carrying its code, never a scan widened back to every symbology.
+#[test]
+fn formats_flag_restricts_the_scan_and_rejects_typos() {
+    let scan = |formats: Option<&str>| {
+        let mut command = qrscan();
+        command.args(["--profile", "fast", "--budget-ms", "0"]);
+        if let Some(formats) = formats {
+            command.args(["--formats", formats]);
+        }
+        let out = command
+            .arg(fixture("symbology/mixed-code128-qr.png"))
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(0), "formats {formats:?}");
+        let report: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+        let mut found: Vec<String> = report["detections"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| d["symbology"].as_str().unwrap().to_owned())
+            .collect();
+        found.sort();
+        (found, report["trace"]["formats"].clone())
+    };
+    assert_eq!(
+        scan(None),
+        (
+            vec!["code128".to_owned(), "qr_code".to_owned()],
+            serde_json::Value::Null
+        ),
+        "an unrestricted scan reads both and names no list"
+    );
+    assert_eq!(
+        scan(Some("qr_code")),
+        (vec!["qr_code".to_owned()], serde_json::json!(["qr_code"]))
+    );
+    // The list is published in the engine's order, whatever the order given.
+    assert_eq!(
+        scan(Some("code128,qr_code")),
+        (
+            vec!["code128".to_owned(), "qr_code".to_owned()],
+            serde_json::json!(["qr_code", "code128"])
+        )
+    );
+
+    let out = qrscan()
+        .args(["--formats", "qr_code,ean_13"])
+        .arg(fixture("symbology/mixed-code128-qr.png"))
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2), "typo'd symbology = usage error");
+    assert!(out.stdout.is_empty(), "a refused option prints no report");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        stderr.contains("unknown symbology `ean_13`") && stderr.contains("[QRS-006]"),
+        "{stderr}"
+    );
 }
 
 /// `--capabilities` prints the build's readers as JSON and exits 0: the

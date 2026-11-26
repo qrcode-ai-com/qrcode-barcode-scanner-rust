@@ -82,13 +82,24 @@ order `rxing`, `rqrr`, `rescue`, and the `symbologies` they can return
 iOS 13+ and macOS 11+. A native app on the App Store is almost always closed-source and needs
 Project-authored source is MIT; pinned published engines retain their packaged license.
 
+## Formats
+
+From the next engine version `scan` and `scanFrame` take `formats`, the
+symbologies to look for, by the names a report uses: Kotlin
+`scan(imageBytes, "full", formats = listOf("qr_code"))`, Swift
+`try scan(image: imageData, profile: "full", formats: ["qr_code"])`. No
+reader of another symbology runs, and the report says what was looked for
+in `trace.formats`. Left out or empty, every symbology is read
+(`spec/02-profiles.md` § Formats).
+
 ## Errors
 
 A scan fault throws `ScanBindingException.ScanFailed` (Kotlin) or
 `ScanBindingError.ScanFailed` (Swift); its message carries the `[QRS-xxx]`
 wire code ([catalog](/api/errors)). An unknown name or a palette above 32
 colors throws its own case (`UnknownProfile`, `PaletteTooLarge`, …) without
-a code. The report shape is the [one contract](/api/report).
+a code; an unknown `formats` name is a scan fault, `ScanFailed` with
+`[QRS-006]`. The report shape is the [one contract](/api/report).
 
 From the next engine version each case carries one message and nothing else:
 `scan failed: … [QRS-001]`, `unknown profile: turbo`. Up to 0.11.0 a case

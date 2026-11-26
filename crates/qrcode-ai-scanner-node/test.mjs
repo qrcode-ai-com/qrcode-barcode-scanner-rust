@@ -201,6 +201,27 @@ assert.throws(() => scanSync(clean, { scorePreset: "builder" }), /unknown score 
 assert.throws(() => scanSync(clean, { scorePreset: "design", scoreSkipAxes: ["blur"] }), /mutually exclusive/,
   "preset + explicit list must reject loudly");
 
+// formats: only the listed symbologies are looked for and the report names the
+// list (the engine's order); unset or empty reads everything and names none
+const twoCodes = fixture("symbology/mixed-code128-qr.png");
+const symbologies = (r) => r.detections.map((d) => d.symbology).sort();
+for (const formats of [undefined, []]) {
+  const every = scanSync(twoCodes, { profile: "fast", budgetMs: 0, formats });
+  assert.deepEqual(symbologies(every), ["code128", "qr_code"]);
+  assert.equal("formats" in every.trace, false, "an unrestricted scan names no list");
+}
+const qrOnly = scanSync(twoCodes, { profile: "fast", budgetMs: 0, formats: ["qr_code"] });
+assert.deepEqual(symbologies(qrOnly), ["qr_code"]);
+assert.deepEqual(qrOnly.trace.formats, ["qr_code"]);
+const barsOnly = await scan(twoCodes, { profile: "fast", budgetMs: 0, formats: ["code128"] });
+assert.deepEqual(symbologies(barsOnly), ["code128"]);
+assert.deepEqual(barsOnly.trace.formats, ["code128"]);
+const listed = scanSync(twoCodes, { profile: "fast", budgetMs: 0, formats: ["code128", "qr_code"] });
+assert.deepEqual(symbologies(listed), ["code128", "qr_code"]);
+assert.deepEqual(listed.trace.formats, ["qr_code", "code128"]);
+assert.throws(() => scanSync(twoCodes, { formats: ["qr_code", "ean_13"] }),
+  /unknown symbology `ean_13`.*\[QRS-006\]/s, "a typo'd symbology must reject loudly, with its code");
+
 // alphaBackground: a transparent input carries the alpha block (auto default);
 // an opaque input NEVER does; "none" restores the drop-the-channel path
 const transparent = readFileSync(here("../../playground/public/samples/transparent.png"));

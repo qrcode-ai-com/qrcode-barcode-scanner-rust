@@ -462,54 +462,74 @@ impl<'a> Grid<'a> {
     /// The two format-information copies, unmasked (`^ 0x5412`), in rqrr's
     /// bit order.
     fn format_words(&self) -> [u16; 2] {
-        const XS: [usize; 15] = [8, 8, 8, 8, 8, 8, 8, 8, 7, 5, 4, 3, 2, 1, 0];
-        const YS: [usize; 15] = [0, 1, 2, 3, 4, 5, 7, 8, 8, 8, 8, 8, 8, 8, 8];
-        let size = self.size;
-        let mut first = 0u16;
-        for i in (0..15).rev() {
-            first = (first << 1) | u16::from(self.dark(YS[i], XS[i]));
-        }
-        let mut second = 0u16;
-        for i in 0..7 {
-            second = (second << 1) | u16::from(self.dark(size - 1 - i, 8));
-        }
-        for i in 0..8 {
-            second = (second << 1) | u16::from(self.dark(8, size - 8 + i));
-        }
-        [first ^ 0x5412, second ^ 0x5412]
+        format_words(self.size, &|row, column| self.dark(row, column))
     }
 
     /// The version the version information states, within three bit
     /// errors — either copy.
     fn version_word(&self) -> Option<u8> {
-        let size = self.size;
-        let mut top_right = 0u32;
-        let mut bottom_left = 0u32;
-        for bit in 0..18 {
-            if self.dark(bit / 3, size - 11 + bit % 3) {
-                top_right |= 1 << bit;
-            }
-            if self.dark(size - 11 + bit % 3, bit / 3) {
-                bottom_left |= 1 << bit;
-            }
-        }
-        decode_version(top_right).or_else(|| decode_version(bottom_left))
+        version_word(self.size, &|row, column| self.dark(row, column))
     }
 
     /// The data modules in placement order, still masked — the stream rqrr
     /// would read from this grid.
     fn masked_stream(&self) -> crate::engine::MaskedStream {
-        let positions = zigzag_positions((self.size - 17) / 4);
-        let mut bits = vec![0u8; positions.len().div_ceil(8)];
-        for (k, &(row, column)) in positions.iter().enumerate() {
-            if self.dark(row, column) {
-                bits[k / 8] |= 1 << (7 - k % 8);
-            }
+        masked_stream(self.size, &|row, column| self.dark(row, column))
+    }
+}
+
+/// The two format-information copies of a `size`-module symbol whose module
+/// `(row, column)` is dark when `dark` says so: unmasked (`^ 0x5412`), in
+/// rqrr's bit order.
+pub(crate) fn format_words(size: usize, dark: &dyn Fn(usize, usize) -> bool) -> [u16; 2] {
+    const XS: [usize; 15] = [8, 8, 8, 8, 8, 8, 8, 8, 7, 5, 4, 3, 2, 1, 0];
+    const YS: [usize; 15] = [0, 1, 2, 3, 4, 5, 7, 8, 8, 8, 8, 8, 8, 8, 8];
+    let mut first = 0u16;
+    for i in (0..15).rev() {
+        first = (first << 1) | u16::from(dark(YS[i], XS[i]));
+    }
+    let mut second = 0u16;
+    for i in 0..7 {
+        second = (second << 1) | u16::from(dark(size - 1 - i, 8));
+    }
+    for i in 0..8 {
+        second = (second << 1) | u16::from(dark(8, size - 8 + i));
+    }
+    [first ^ 0x5412, second ^ 0x5412]
+}
+
+/// The version the version information of a `size`-module symbol states,
+/// within three bit errors — either copy.
+pub(crate) fn version_word(size: usize, dark: &dyn Fn(usize, usize) -> bool) -> Option<u8> {
+    let mut top_right = 0u32;
+    let mut bottom_left = 0u32;
+    for bit in 0..18 {
+        if dark(bit / 3, size - 11 + bit % 3) {
+            top_right |= 1 << bit;
         }
-        crate::engine::MaskedStream {
-            bits,
-            bit_len: positions.len(),
+        if dark(size - 11 + bit % 3, bit / 3) {
+            bottom_left |= 1 << bit;
         }
+    }
+    decode_version(top_right).or_else(|| decode_version(bottom_left))
+}
+
+/// The data modules of a `size`-module symbol in placement order, still
+/// masked — the stream rqrr would read from that grid.
+pub(crate) fn masked_stream(
+    size: usize,
+    dark: &dyn Fn(usize, usize) -> bool,
+) -> crate::engine::MaskedStream {
+    let positions = zigzag_positions((size - 17) / 4);
+    let mut bits = vec![0u8; positions.len().div_ceil(8)];
+    for (k, &(row, column)) in positions.iter().enumerate() {
+        if dark(row, column) {
+            bits[k / 8] |= 1 << (7 - k % 8);
+        }
+    }
+    crate::engine::MaskedStream {
+        bits,
+        bit_len: positions.len(),
     }
 }
 
@@ -538,7 +558,7 @@ fn bch_remainder(mut value: u32, generator: u32) -> u32 {
 
 /// The format word within three bit errors of an unmasked read: its EC
 /// level (format bits M=0 · L=1 · H=2 · Q=3) and mask.
-fn decode_format(word: u16) -> Option<(EcLevel, u8)> {
+pub(crate) fn decode_format(word: u16) -> Option<(EcLevel, u8)> {
     (0u32..32)
         .find(|&data| {
             let code = (data << 10) | bch_remainder(data << 10, 0x537);

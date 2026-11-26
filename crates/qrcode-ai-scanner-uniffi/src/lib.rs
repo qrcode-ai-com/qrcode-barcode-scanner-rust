@@ -8,8 +8,8 @@
 //! sync by design); callers move it off the main thread on their side.
 
 use scanner_core::{
-    AlphaBackground, ImageInput, Limits, ScanConfig, ScanProfile, Scanner, ScoreCheck,
-    ScorePreset, StressAxis,
+    AlphaBackground, ImageInput, Limits, ScanConfig, ScanProfile, Scanner, ScoreCheck, ScorePreset,
+    StressAxis,
 };
 
 uniffi::setup_scaffolding!();
@@ -66,6 +66,10 @@ fn parse_profile(profile: &str) -> Result<ScanProfile, ScanBindingError> {
         .ok_or_else(|| ScanBindingError::UnknownProfile(profile.to_string()))
 }
 
+#[expect(
+    clippy::too_many_arguments,
+    reason = "one parameter per option of the scan signature, parsed in one place"
+)]
 fn profile_from(
     profile: &str,
     budget_ms: Option<u64>,
@@ -74,6 +78,7 @@ fn profile_from(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<ScanProfile, ScanBindingError> {
     let profile = parse_profile(profile)?;
     // score_skip_axes: axes excluded from scoring, by wire name — the
@@ -147,12 +152,19 @@ fn profile_from(
     // budget_ms overrides the preset's wall-clock budget (0 = unbounded, NOT a
     // zero-millisecond budget — spec/02) — mobile embedders bound tail latency
     // on their scan thread without giving up the deep ladder.
+    // formats: the symbologies the app handles, by wire name. Unset or
+    // empty = every symbology; an unknown name is the core's QRS-006 in
+    // `ScanFailed` (no new error case: an exhaustive `switch` keeps
+    // compiling), never a scan silently widened back to all of them.
+    let formats = ScanConfig::formats_from_names(&formats.unwrap_or_default())
+        .map_err(|e| ScanBindingError::ScanFailed(format!("{} [{}]", e, e.code())))?;
     if budget_ms.is_none()
         && skip.is_empty()
         && checks.is_empty()
         && alpha.is_none()
         && palette.is_empty()
         && score_preset.is_none()
+        && formats.is_empty()
     {
         return Ok(profile);
     }
@@ -166,6 +178,7 @@ fn profile_from(
         config.alpha_background = alpha;
     }
     config.alpha_palette = palette;
+    config.formats = formats;
     Ok(ScanProfile::Custom(config))
 }
 
@@ -199,7 +212,12 @@ fn limits_from(max_dimension: Option<u32>, max_pixels: Option<u64>) -> Limits {
 /// so a UI embedder bounds its scan thread with it. A report the budget cut
 /// says so (`trace.budget_exhausted: true`): a `null` score beside detections
 /// then means "not judged", never 0.
-#[uniffi::export(default(profile = "full", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None))]
+///
+/// `formats` (wire names, e.g. `["qr_code"]`) restricts the scan to the
+/// symbologies the app handles: no reader of another symbology runs, and the
+/// report says what was looked for (`trace.formats`). Unset or empty = every
+/// symbology; an unknown name is `ScanFailed` ending `[QRS-006]`.
+#[uniffi::export(default(profile = "full", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None, formats = None))]
 #[expect(
     clippy::too_many_arguments,
     reason = "the FFI signature IS the cross-binding contract (profile + caps + budget + skips + alpha)"
@@ -215,6 +233,7 @@ pub fn scan(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<String, ScanBindingError> {
     let report = Scanner::builder()
         .profile(profile_from(
@@ -225,6 +244,7 @@ pub fn scan(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?)
         .limits(limits_from(max_dimension, max_pixels))
         .build()
@@ -238,8 +258,9 @@ pub fn scan(
 /// `rgba` must be `width * height * 4` bytes. `max_dimension` / `max_pixels`
 /// cap attacker-controlled dimensions before any pixel work; `budget_ms`
 /// overrides the profile's wall-clock budget (0 = unbounded) — the camera
-/// loop's per-frame bound.
-#[uniffi::export(default(profile = "frame", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None))]
+/// loop's per-frame bound. `formats`: see [`scan`] — a camera that only
+/// handles QR Codes names `qr_code`.
+#[uniffi::export(default(profile = "frame", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None, formats = None))]
 #[expect(
     clippy::too_many_arguments,
     reason = "the FFI signature IS the cross-binding contract (dims + profile + caps + budget + skips + alpha)"
@@ -257,6 +278,7 @@ pub fn scan_frame(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<String, ScanBindingError> {
     let report = Scanner::builder()
         .profile(profile_from(
@@ -267,6 +289,7 @@ pub fn scan_frame(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?)
         .limits(limits_from(max_dimension, max_pixels))
         .build()
@@ -324,7 +347,20 @@ mod tests {
     #[test]
     fn scan_clean_fixture_decodes_to_envelope_with_text() {
         let v = assert_envelope(
-            &scan(clean_qr(), "full".into(), None, None, Some(0), None, None, None, None, None).unwrap(),
+            &scan(
+                clean_qr(),
+                "full".into(),
+                None,
+                None,
+                Some(0),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
         );
         let dets = v["detections"].as_array().unwrap();
         assert_eq!(dets.len(), 1, "single-QR fixture → exactly one detection");
@@ -334,7 +370,10 @@ mod tests {
         assert!(!text.is_empty(), "a clean QR must decode to non-empty text");
         // full profile scores the primary detection (frame leaves it null).
         assert!(v["score"].is_object(), "full profile must populate score");
-        assert_eq!(v["trace"]["budget_exhausted"], false, "an unbounded scan is final");
+        assert_eq!(
+            v["trace"]["budget_exhausted"], false,
+            "an unbounded scan is final"
+        );
     }
 
     #[test]
@@ -343,15 +382,40 @@ mod tests {
         // valid names, and all three emit the 5-key envelope (frame → score:null,
         // which the schema's anyOf allows).
         for profile in ["full", "fast", "frame"] {
-            let out = scan(clean_qr(), profile.into(), None, None, None, None, None, None, None, None)
-                .unwrap_or_else(|e| panic!("profile `{profile}` should scan: {e}"));
+            let out = scan(
+                clean_qr(),
+                profile.into(),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap_or_else(|e| panic!("profile `{profile}` should scan: {e}"));
             assert_envelope(&out);
         }
     }
 
     #[test]
     fn unknown_profile_is_a_typed_error_not_a_scan() {
-        let err = scan(clean_qr(), "turbo".into(), None, None, None, None, None, None, None, None).unwrap_err();
+        let err = scan(
+            clean_qr(),
+            "turbo".into(),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
         // The message a binding receives names the value: the error is flat.
         assert_eq!(err.to_string(), "unknown profile: turbo");
         match err {
@@ -369,6 +433,7 @@ mod tests {
         let err = scan(
             vec![0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01],
             "full".into(),
+            None,
             None,
             None,
             None,
@@ -411,6 +476,7 @@ mod tests {
             None,
             None,
             None,
+            None,
         )
         .unwrap_err();
         assert!(
@@ -426,6 +492,7 @@ mod tests {
             0,
             0,
             "frame".into(),
+            None,
             None,
             None,
             None,
@@ -459,6 +526,7 @@ mod tests {
             None,
             None,
             None,
+            None,
         )
         .expect("a valid blank frame is not an error");
         let v = assert_envelope(&out);
@@ -472,7 +540,20 @@ mod tests {
     fn tight_dimension_cap_rejects_with_qrs_002() {
         // The clean fixture is far larger than 16 px — the cap must reject
         // BEFORE any pixel work, with the dimension-limit wire code.
-        let err = scan(clean_qr(), "full".into(), Some(16), None, None, None, None, None, None, None).unwrap_err();
+        let err = scan(
+            clean_qr(),
+            "full".into(),
+            Some(16),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
         let ScanBindingError::ScanFailed(msg) = err else {
             panic!("expected ScanFailed, got {err:?}");
         };
@@ -484,7 +565,20 @@ mod tests {
 
     #[test]
     fn tight_pixel_cap_rejects_with_qrs_003() {
-        let err = scan(clean_qr(), "full".into(), None, Some(64), None, None, None, None, None, None).unwrap_err();
+        let err = scan(
+            clean_qr(),
+            "full".into(),
+            None,
+            Some(64),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .unwrap_err();
         let ScanBindingError::ScanFailed(msg) = err else {
             panic!("expected ScanFailed, got {err:?}");
         };
@@ -499,14 +593,30 @@ mod tests {
         // 0 = unbounded (NOT a zero-millisecond budget) — the cross-binding
         // convention from spec/02. Deterministic: no wall-clock dependence.
         let v = assert_envelope(
-            &scan(clean_qr(), "full".into(), None, None, Some(0), None, None, None, None, None).unwrap(),
+            &scan(
+                clean_qr(),
+                "full".into(),
+                None,
+                None,
+                Some(0),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
         );
         assert_eq!(v["detections"].as_array().unwrap().len(), 1);
         assert!(
             v["score"].is_object(),
             "full profile must still score unbounded"
         );
-        assert_eq!(v["trace"]["budget_exhausted"], false, "an unbounded scan is final");
+        assert_eq!(
+            v["trace"]["budget_exhausted"], false,
+            "an unbounded scan is final"
+        );
     }
 
     #[test]
@@ -519,6 +629,7 @@ mod tests {
             None,
             None,
             Some(600_000),
+            None,
             None,
             None,
             None,
@@ -542,6 +653,7 @@ mod tests {
             64,
             "frame".into(),
             Some(16),
+            None,
             None,
             None,
             None,
@@ -573,6 +685,7 @@ mod tests {
                 None,
                 None,
                 None,
+                None,
             )
             .unwrap(),
         );
@@ -596,12 +709,103 @@ mod tests {
             None,
             None,
             None,
+            None,
         )
         .unwrap_err();
         assert!(
             matches!(err, ScanBindingError::UnknownStressAxis(ref n) if n == "perspektive"),
             "typo must be the typed loud error, got {err:?}"
         );
+    }
+
+    /// formats parity: only the listed symbologies are read and the report
+    /// names the list; unset or empty reads every symbology and names none;
+    /// an unknown name is the core's QRS-006 in `ScanFailed` — no new case,
+    /// never a scan widened back to every symbology.
+    #[test]
+    fn formats_restrict_the_scan_and_reject_typos() {
+        let mixed = || {
+            std::fs::read(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/../../fixtures/symbology/mixed-code128-qr.png"
+            ))
+            .expect("mixed fixture present")
+        };
+        let found = |formats: Option<Vec<String>>| {
+            let v = assert_envelope(
+                &scan(
+                    mixed(),
+                    "fast".into(),
+                    None,
+                    None,
+                    Some(0),
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    formats,
+                )
+                .unwrap(),
+            );
+            let mut symbologies: Vec<String> = v["detections"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|d| d["symbology"].as_str().unwrap().to_owned())
+                .collect();
+            symbologies.sort();
+            (symbologies, v["trace"]["formats"].clone())
+        };
+        let both = vec!["code128".to_owned(), "qr_code".to_owned()];
+        assert_eq!(found(None), (both.clone(), Value::Null));
+        assert_eq!(found(Some(Vec::new())), (both, Value::Null));
+        assert_eq!(
+            found(Some(vec!["qr_code".into()])),
+            (vec!["qr_code".to_owned()], serde_json::json!(["qr_code"]))
+        );
+        assert_eq!(
+            found(Some(vec!["code128".into()])),
+            (vec!["code128".to_owned()], serde_json::json!(["code128"]))
+        );
+
+        let frame = scan_frame(
+            vec![255; 16 * 16 * 4],
+            16,
+            16,
+            "frame".into(),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(vec!["qr_code".into(), "ean_13".into()]),
+        )
+        .unwrap_err();
+        let image = scan(
+            mixed(),
+            "full".into(),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(vec!["ean_13".into()]),
+        )
+        .unwrap_err();
+        for err in [frame, image] {
+            assert!(
+                matches!(err, ScanBindingError::ScanFailed(ref m)
+                    if m.contains("unknown symbology `ean_13`") && m.ends_with("[QRS-006]")),
+                "a typo must be the core's refusal with its code, got {err:?}"
+            );
+        }
     }
 
     #[test]
@@ -617,6 +821,7 @@ mod tests {
                 Some(0),
                 None,
                 Some(vec!["uec".into(), "iso15415".into()]),
+                None,
                 None,
                 None,
                 None,
@@ -639,6 +844,7 @@ mod tests {
             None,
             None,
             Some(vec!["margin".into()]),
+            None,
             None,
             None,
             None,
@@ -667,6 +873,7 @@ mod tests {
                 Some("white".into()),
                 None,
                 None,
+                None,
             )
             .unwrap(),
         );
@@ -683,6 +890,7 @@ mod tests {
             None,
             None,
             Some("transparent".into()),
+            None,
             None,
             None,
         )
@@ -710,10 +918,28 @@ mod tests {
         assert_eq!(caps["engines"], defs["EngineKind"]["enum"]);
         assert_eq!(caps["symbologies"], defs["Symbology"]["enum"]);
         let report = assert_envelope(
-            &scan(clean_qr(), "fast".into(), None, None, Some(0), None, None, None, None, None).unwrap(),
+            &scan(
+                clean_qr(),
+                "fast".into(),
+                None,
+                None,
+                Some(0),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
         );
         assert_eq!(caps["versions"], report["versions"]);
-        let mut keys: Vec<&str> = caps.as_object().unwrap().keys().map(String::as_str).collect();
+        let mut keys: Vec<&str> = caps
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect();
         keys.sort_unstable();
         assert_eq!(keys, ["engines", "symbologies", "versions"]);
     }

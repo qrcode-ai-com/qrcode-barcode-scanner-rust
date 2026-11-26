@@ -21,6 +21,10 @@ and fuzzed.
 | detection cap | 16 per report |
 | engine panics | caught + isolated (`trace.engine_panics`) |
 
+A cap of `0` does not lift a limit or select its default: `max_dimension: 0`
+or `max_pixels: 0` is refused with `QRS-006` before the image is read.
+Leave a cap unset to keep its default.
+
 ### Content layer
 
 - Decoded text reaching the GS1/payload parsers is boundary-safe

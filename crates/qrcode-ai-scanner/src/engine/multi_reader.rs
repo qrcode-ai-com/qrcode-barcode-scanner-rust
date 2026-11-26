@@ -34,6 +34,12 @@
 //!    by point count: a linear read with four points (an EAN add-on, a
 //!    `DataBar`) was taken for a quad, and equal linear copies collapsed to
 //!    one wherever they lay.
+//! 6. **A caller can end the walk at a read.** [`decode_multiple`] asks its
+//!    `stop` about each read, in the image's frame, as soon as it is made:
+//!    at the first one it accepts the walk ends and that read alone is
+//!    returned. A probe that only asks whether one content still reads
+//!    (score cells, envelope probes) then pays for no region around it. A
+//!    `stop` that accepts nothing is the walk as before.
 
 /*
  * Copyright 2009 ZXing authors
@@ -248,15 +254,21 @@ impl NodeReader for FormatReader {
 
 /// Decode every symbol `reader` finds in `image` (the attempt's binarized
 /// `luma`): the read, then the regions left of, above, right of and below
-/// it, recursively; duplicates filtered (module doc).
+/// it, recursively; duplicates filtered (module doc). The walk ends at the
+/// first read `stop` accepts, which is then the only one returned (module
+/// doc, change 6).
 pub(super) fn decode_multiple<R: NodeReader, B: Binarizer>(
     reader: &mut R,
     image: &mut BinaryBitmap<B>,
     hints: &DecodeHints,
     luma: &LumaImage,
+    stop: &dyn Fn(&RXingResult) -> bool,
 ) -> Result<Vec<RXingResult>> {
     let mut results = Vec::new();
-    recurse(reader, image, hints, &mut results, (0, 0), 0);
+    if recurse(reader, image, hints, &mut results, (0, 0), 0, stop) {
+        // the accepted read is the last one made
+        return Ok(results.pop().into_iter().collect());
+    }
     let mut bridges = MAX_FILTER_BRIDGES;
     let mut unique = Vec::new();
     for (i, own) in results.iter().enumerate() {
@@ -381,7 +393,9 @@ fn scan_line(points: &[rxing::Point]) -> Option<[Point; 2]> {
 }
 
 /// Upstream's recursion (`GenericMultipleBarcodeReader::doDecodeMultiple`),
-/// with changes 2 to 4 of the module doc.
+/// with changes 2 to 4 and 6 of the module doc. Returns whether `stop`
+/// accepted a read: the walk is over, and that read is the last of
+/// `results`.
 #[expect(
     clippy::cast_possible_truncation,
     clippy::cast_sign_loss,
@@ -395,9 +409,10 @@ fn recurse<R: NodeReader, B: Binarizer>(
     results: &mut Vec<RXingResult>,
     (x_offset, y_offset): (u32, u32),
     depth: u32,
-) {
+    stop: &dyn Fn(&RXingResult) -> bool,
+) -> bool {
     if depth > MAX_DEPTH {
-        return;
+        return false;
     }
     let width = image.get_width();
     let height = image.get_height();
@@ -409,7 +424,15 @@ fn recurse<R: NodeReader, B: Binarizer>(
         };
         let format = *result.getBarcodeFormat();
         let (result, extent) = normalized(result, width, height);
-        results.push(translated(result, x_offset, y_offset));
+        let result = translated(result, x_offset, y_offset);
+        let accepted = stop(&result);
+        results.push(result);
+        if accepted {
+            for format in passed {
+                reader.readmit(format);
+            }
+            return true;
+        }
         if !extent.is_empty() {
             break Some(extent);
         }
@@ -423,7 +446,7 @@ fn recurse<R: NodeReader, B: Binarizer>(
         reader.readmit(format);
     }
     let Some(extent) = extent else {
-        return;
+        return false;
     };
     let (mut min_x, mut min_y) = (width as f32, height as f32);
     let (mut max_x, mut max_y) = (0.0_f32, 0.0_f32);
@@ -435,46 +458,55 @@ fn recurse<R: NodeReader, B: Binarizer>(
     }
     // the normalized points can lie on the image's far edges
     let (max_x, max_y) = (max_x.min(width as f32), max_y.min(height as f32));
-    if min_x > MIN_DIMENSION_TO_RECUR {
-        recurse(
+    if min_x > MIN_DIMENSION_TO_RECUR
+        && recurse(
             reader,
             &mut image.crop(0, 0, min_x as usize, height),
             hints,
             results,
             (x_offset, y_offset),
             depth + 1,
-        );
+            stop,
+        )
+    {
+        return true;
     }
-    if min_y > MIN_DIMENSION_TO_RECUR {
-        recurse(
+    if min_y > MIN_DIMENSION_TO_RECUR
+        && recurse(
             reader,
             &mut image.crop(0, 0, width, min_y as usize),
             hints,
             results,
             (x_offset, y_offset),
             depth + 1,
-        );
+            stop,
+        )
+    {
+        return true;
     }
-    if max_x < (width as f32) - MIN_DIMENSION_TO_RECUR {
-        recurse(
+    if max_x < (width as f32) - MIN_DIMENSION_TO_RECUR
+        && recurse(
             reader,
             &mut image.crop(max_x as usize, 0, width - max_x as usize, height),
             hints,
             results,
             (x_offset + max_x as u32, y_offset),
             depth + 1,
-        );
+            stop,
+        )
+    {
+        return true;
     }
-    if max_y < (height as f32) - MIN_DIMENSION_TO_RECUR {
-        recurse(
+    max_y < (height as f32) - MIN_DIMENSION_TO_RECUR
+        && recurse(
             reader,
             &mut image.crop(0, max_y as usize, width, height - max_y as usize),
             hints,
             results,
             (x_offset, y_offset + max_y as u32),
             depth + 1,
-        );
-    }
+            stop,
+        )
 }
 
 /// A read's points in its `width` × `height` crop, in the edge convention
@@ -760,14 +792,16 @@ mod tests {
     fn walk<R: NodeReader>(reader: &mut R, width: usize, height: usize) -> Vec<RXingResult> {
         let mut results = Vec::new();
         let hints = DecodeHints::default();
-        recurse(
+        let stopped = recurse(
             reader,
             &mut blank(width, height),
             &hints,
             &mut results,
             (0, 0),
             0,
+            &|_| false,
         );
+        assert!(!stopped, "a stop that accepts nothing never ends the walk");
         results
     }
 
@@ -922,7 +956,9 @@ mod tests {
     ) -> Result<Vec<RXingResult>> {
         let luma = LumaImage::new(vec![255; (width * height) as usize], width, height);
         let mut image = blank(width as usize, height as usize);
-        decode_multiple(reader, &mut image, &DecodeHints::default(), &luma)
+        decode_multiple(reader, &mut image, &DecodeHints::default(), &luma, &|_| {
+            false
+        })
     }
 
     #[test]

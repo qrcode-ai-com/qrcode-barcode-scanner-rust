@@ -90,7 +90,7 @@ OPTIONAL_FIELDS: dict[str, set[str]] = {
     "AxisScore": {"refined_failed_at"},
     "DecodedContent": {"eci", "fnc1"},
     "Detection": {"occurrences"},
-    "PipelineTrace": {"budget_exhausted", "saturation"},
+    "PipelineTrace": {"budget_exhausted", "saturation", "formats"},
 }
 
 # Flat enums with a same-named schema $def (rust ↔ ts ↔ schema).

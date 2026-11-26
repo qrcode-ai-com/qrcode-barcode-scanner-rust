@@ -141,6 +141,24 @@ public class ScannerTests
     }
 
     [Fact]
+    public void FormatsReadTheListedSymbologiesAndNoOther()
+    {
+        var qr = Scanner.Scan(Mixed(), Unbounded with { Formats = new[] { "qr_code" } });
+        Assert.Equal(new[] { ("qr_code", Qr, Qr) }, Contents(qr));
+
+        var linear = Scanner.Scan(Mixed(), Unbounded with { Formats = new[] { "code128" } });
+        Assert.Equal(new[] { ("code128", Code128, Code128) }, Contents(linear));
+
+        var every = Scanner.Scan(Mixed(), Unbounded with { Formats = Array.Empty<string>() });
+        Assert.Equal(new[] { ("code128", Code128, Code128), ("qr_code", Qr, Qr) }, Contents(every));
+
+        var refusal = Assert.Throws<ScanException>(() => Scanner.Scan(
+            Mixed(), new ScanOptions { Formats = new[] { "qr_code", "ean_13" } }));
+        Assert.Equal("ScanFailed", refusal.Case);
+        Assert.Equal("QRS-006", refusal.Code);
+    }
+
+    [Fact]
     public void APresetAndSkippedAxesTogetherAreRefused()
     {
         var refusal = Assert.Throws<ScanException>(() => Scanner.Scan(

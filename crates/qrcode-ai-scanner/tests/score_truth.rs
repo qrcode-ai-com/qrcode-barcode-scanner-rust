@@ -6,7 +6,8 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use qrcode_barcode_scanner::{
-    Hint, ImageInput, ScanConfig, ScanProfile, ScanReport, Scanner, Score, ScoreCheck, StressAxis,
+    EngineKind, Hint, ImageInput, ScanConfig, ScanProfile, ScanReport, Scanner, Score, ScoreCheck,
+    StressAxis,
 };
 
 fn fixture(rel: &str) -> Vec<u8> {
@@ -78,27 +79,43 @@ fn assert_honest(score: &Score) {
     }
 }
 
-/// The quiet-ring phase pair are REAL thin margins on the rqrr path — 5 and
-/// 6 corrected errors of 16 in the worst block (margins 0.375 · 0.25),
-/// capped at 85 and 70. Skipping `uec`, `iso15415` or both withholds those
-/// sections and the hints the margin drives; value, grade, weights, axes
-/// and the ISO `overall` (the minimum over every MEASURED parameter, a
-/// withheld one included) never move. (While the cap read only the
-/// PUBLISHED margin, `[uec]` lifted the pair to 100 and 88.)
+/// These two templates carry a REAL thin margin: a centre logo covers
+/// modules, 8 corrected errors of 22 in the worst block (margin 0.2727),
+/// capped at 73. Only the rxing port reads them, and its read carries no
+/// stream: the margin is the one measured in the image. Skipping `uec`,
+/// `iso15415` or both withholds those sections and the hints the margin
+/// drives; value, grade, weights, axes and the ISO `overall` (the minimum
+/// over every MEASURED parameter, a withheld one included) never move.
+/// (While the cap read only the PUBLISHED margin, `[uec]` lifted a capped
+/// value.)
 #[test]
 fn skip_checks_never_move_the_verdict() {
     for (rel, margin, value) in [
-        ("degraded/quiet-ring-phase-1015.png", 0.375, 85),
-        ("degraded/quiet-ring-phase-1023.png", 0.25, 70),
+        ("artistic/github-orb-code39-regression.png", 6.0 / 22.0, 73),
+        (
+            "artistic/builder-template-hearts-web-1024.png",
+            6.0 / 22.0,
+            73,
+        ),
     ] {
         let bytes = fixture(rel);
         let shown = scan(&bytes, unbudgeted_full());
+        assert_eq!(
+            shown.detections[0].engines,
+            [EngineKind::Rxing],
+            "{rel}: precondition: a read by the rxing port alone"
+        );
         let score = shown.score.as_ref().expect("the default checks judge");
         assert_honest(score);
         let uec = score
             .uec
-            .expect("precondition: the rqrr stream measures the margin");
+            .expect("precondition: the image measures the margin");
         assert!((uec.margin - margin).abs() < 1e-6, "{rel}: {uec:?}");
+        assert_eq!(
+            (uec.worst_block_errors, uec.worst_block_capacity),
+            (8, 22),
+            "{rel}"
+        );
         assert_eq!(
             score.value, value,
             "{rel}: the measured margin caps the value"
@@ -136,7 +153,7 @@ fn skip_checks_never_move_the_verdict() {
                     "{rel} {checks:?}: a skip never moves the ISO overall"
                 );
             }
-            // the pair's axes alone compose ≥ 70, so the raise-EC hint here
+            // each one's axes alone compose ≥ 70, so the raise-EC hint here
             // is the margin's own — it speaks only through the section
             let expected: Vec<Hint> = shown
                 .hints
@@ -377,4 +394,55 @@ fn pdf417_verdict_repeatability() {
             .or_insert(0usize) += 1;
     }
     println!("{SCANS} unbudgeted Full scans of symbology/pdf417.png: {verdicts:#?}");
+}
+
+/// The correction margin is the symbol's, not the frame's: the same symbol
+/// pixels in a bare 1015 px frame and inside a 4 px white ring read one
+/// margin, a full one, and what the rxing port read alone carries the
+/// format the image states. (Up to score contract 5 the margin was the one
+/// of the reader's own sampling: 5 and 6 errors of 16 on this pair, no
+/// margin at all on a read by the port alone.)
+#[test]
+fn a_margin_is_the_symbols_whatever_the_frame_or_the_reader() {
+    for rel in [
+        "degraded/quiet-ring-phase-1015.png",
+        "degraded/quiet-ring-phase-1023.png",
+    ] {
+        let report = scan(&fixture(rel), unbudgeted_full());
+        let uec = report
+            .score
+            .as_ref()
+            .and_then(|score| score.uec)
+            .unwrap_or_else(|| panic!("{rel}: a margin is measured"));
+        assert_eq!(
+            (uec.worst_block_errors, uec.worst_block_capacity, uec.margin),
+            (0, 16, 1.0),
+            "{rel}"
+        );
+    }
+    for (rel, version, mask, errors, capacity) in [
+        ("artistic/OK_1069ms_85_8b6a54b3.png", 2u8, 3u8, 0u8, 16u8),
+        ("degraded/gen_v5_q_tiny.png", 5, 7, 3, 18),
+        ("symbology/qr-twins-code128.png", 3, 6, 0, 26),
+    ] {
+        let report = scan(&fixture(rel), unbudgeted_full());
+        let read = &report.detections[0];
+        assert_eq!(read.engines, [EngineKind::Rxing], "{rel}: the port alone");
+        assert_eq!(
+            (read.meta.version, read.meta.mask),
+            (Some(version), Some(mask)),
+            "{rel}"
+        );
+        assert!(read.corners.is_none(), "{rel}: no geometry is invented");
+        let uec = report
+            .score
+            .as_ref()
+            .and_then(|score| score.uec)
+            .unwrap_or_else(|| panic!("{rel}: a margin is measured"));
+        assert_eq!(
+            (uec.worst_block_errors, uec.worst_block_capacity),
+            (errors, capacity),
+            "{rel}"
+        );
+    }
 }

@@ -166,6 +166,9 @@ The `full`, `fast` and `frame` profiles select the scan workload and default
 budget. A report is final when `report.trace.budget_exhausted == Some(false)`.
 Set the configuration's `budget_ms` to `None` for an unbounded scan; a time-bounded
 scan can stop before planned work finishes, which the trace records.
+`ScanConfig.formats` restricts a scan to the symbologies it lists: no reader of
+another symbology runs, and the report repeats them in `trace.formats`. Empty,
+the default, reads every symbology.
 
 The multi-engine ladder uses rxing and rqrr. QR quality diagnostics include
 survival-ramp stress tests and the synthetic unused-error-correction margin

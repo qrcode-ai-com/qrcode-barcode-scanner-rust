@@ -8,8 +8,8 @@
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use scanner_core::{
-    AlphaBackground, ImageInput, Limits, ScanConfig, ScanProfile, Scanner, ScoreCheck,
-    ScorePreset, StressAxis,
+    AlphaBackground, ImageInput, Limits, ScanConfig, ScanProfile, Scanner, ScoreCheck, ScorePreset,
+    StressAxis,
 };
 
 fn parse_profile(profile: &str) -> PyResult<ScanProfile> {
@@ -41,6 +41,10 @@ fn build_limits(max_dimension: Option<u32>, max_pixels: Option<u64>) -> Option<L
 /// without giving up the deep ladder. `score_skip_axes` (wire names) excludes
 /// axes from scoring engine-side — the generated-preview integration config
 /// (spec/04 § skipping axes); unknown names raise, never silently score six.
+#[expect(
+    clippy::too_many_arguments,
+    reason = "one parameter per option of the scan signature, parsed in one place"
+)]
 fn with_config(
     profile: ScanProfile,
     budget_ms: Option<u64>,
@@ -49,6 +53,7 @@ fn with_config(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> PyResult<ScanProfile> {
     let skip: Vec<StressAxis> = match &score_skip_axes {
         None => Vec::new(),
@@ -132,12 +137,18 @@ fn with_config(
         Some(preset) => preset.skips(),
         None => skip,
     };
+    // formats: the symbologies the caller handles, by wire name. Unset or
+    // empty = every symbology; an unknown name raises `[QRS-006]`, never a
+    // scan silently widened back to all of them.
+    let formats = scanner_core::ScanConfig::formats_from_names(&formats.unwrap_or_default())
+        .map_err(|e| PyValueError::new_err(format!("{} [{}]", e, e.code())))?;
     if budget_ms.is_none()
         && skip.is_empty()
         && checks.is_empty()
         && alpha.is_none()
         && palette.is_empty()
         && score_preset.is_none()
+        && formats.is_empty()
     {
         return Ok(profile);
     }
@@ -151,6 +162,7 @@ fn with_config(
         config.alpha_background = alpha;
     }
     config.alpha_palette = palette;
+    config.formats = formats;
     Ok(ScanProfile::Custom(config))
 }
 
@@ -170,7 +182,7 @@ fn report_to_py<'py>(
 /// `detections`); a `ValueError` is raised only for invalid input or cancellation.
 /// `budget_ms` overrides the profile's wall-clock budget (0 = unbounded).
 #[pyfunction]
-#[pyo3(signature = (image, profile = "full", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None))]
+#[pyo3(signature = (image, profile = "full", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None, formats = None))]
 #[expect(
     clippy::too_many_arguments,
     reason = "the Python signature IS the cross-binding contract (profile + caps + budget + skips + alpha)"
@@ -187,6 +199,7 @@ fn scan<'py>(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> PyResult<Bound<'py, PyAny>> {
     let profile = with_config(
         parse_profile(profile)?,
@@ -196,6 +209,7 @@ fn scan<'py>(
         alpha_background,
         alpha_palette,
         score_preset,
+        formats,
     )?;
     let limits = build_limits(max_dimension, max_pixels);
     let image = image.to_vec(); // own it before releasing the GIL
@@ -217,7 +231,7 @@ fn scan<'py>(
 /// `rgba` must be `width * height * 4` bytes. `budget_ms` overrides the profile's
 /// wall-clock budget (0 = unbounded) — the camera loop's per-frame bound.
 #[pyfunction]
-#[pyo3(signature = (rgba, width, height, profile = "frame", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None))]
+#[pyo3(signature = (rgba, width, height, profile = "frame", max_dimension = None, max_pixels = None, budget_ms = None, score_skip_axes = None, score_skip_checks = None, alpha_background = None, alpha_palette = None, score_preset = None, formats = None))]
 #[expect(
     clippy::too_many_arguments,
     reason = "the Python signature IS the cross-binding contract (dims + profile + caps + budget + skips + alpha)"
@@ -236,6 +250,7 @@ fn scan_frame<'py>(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> PyResult<Bound<'py, PyAny>> {
     let profile = with_config(
         parse_profile(profile)?,
@@ -245,6 +260,7 @@ fn scan_frame<'py>(
         alpha_background,
         alpha_palette,
         score_preset,
+        formats,
     )?;
     let limits = build_limits(max_dimension, max_pixels);
     let rgba = rgba.to_vec(); // own it before releasing the GIL

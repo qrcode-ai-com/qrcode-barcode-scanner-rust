@@ -1007,7 +1007,7 @@ const exampleWitness = async (browser, name, site, runtimeSupport) => {
 // A published package is a default build: both engines and every symbology, each list in the
 // order of the schema's EngineKind and Symbology (spec/01-report.md § Capabilities).
 const reportSchema = JSON.parse(readFileSync(join(root, 'spec/scan-report.schema.json')));
-const defaultBuild = { versions: { scanner: manifest.version, pipeline: 5, score_contract: 5 },
+const defaultBuild = { versions: { scanner: manifest.version, pipeline: 5, score_contract: 6 },
   engines: reportSchema.$defs.EngineKind.enum, symbologies: reportSchema.$defs.Symbology.enum };
 // The worker knows nothing of the page, so a camera page can share it: from the page's origin,
 // its load reply names what the browser supports (RUNTIME_SUPPORT) and the module's readers,
@@ -1903,7 +1903,7 @@ try {
         assert.equal(response.ok, true, `${fixture.name}: ${JSON.stringify(response)}`);
         assert.deepEqual(response.result.detections.map(d => d.content), fixture.expected, fixture.name);
         assert.equal(response.result.trace.budget_exhausted, false);
-        assert.deepEqual(response.result.versions, { scanner: manifest.version, pipeline: 5, score_contract: 5 });
+        assert.deepEqual(response.result.versions, { scanner: manifest.version, pipeline: 5, score_contract: 6 });
         reports.push(response.result); latency.push({ fixture: fixture.name, wallMs: performance.now() - started });
       }
       // The pre-0.11 'compatible' name loads the same portable module; a SIMD
@@ -2030,7 +2030,7 @@ try {
     try {
       const { record, failures } = await overlayWitnesses({ browser, base, runtime: runtime.name, profiles: runtime.profiles,
         exactProfiles: runtime.exactProfiles ?? runtime.profiles, truth: overlayTruth, judge,
-        versions: { scanner: manifest.version, pipeline: 5, score_contract: 5 }, bytesOf: testCase => [...caseBytes(testCase)],
+        versions: { scanner: manifest.version, pipeline: 5, score_contract: 6 }, bytesOf: testCase => [...caseBytes(testCase)],
         recordsFile: join(root, 'fixtures/symbology/CONTENT-FIXTURES.md'), normalize, phase });
       const { defaultBudget, ...judged } = record;
       receipt.overlay.runtimes[runtime.name] = { browser: browser.version(), ...judged };

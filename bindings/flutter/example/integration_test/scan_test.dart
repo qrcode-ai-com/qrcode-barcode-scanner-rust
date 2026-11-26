@@ -78,7 +78,7 @@ void main() {
         final report = await timedScan('mixed-default', bytes, profile: profile);
         expect(report.trace.enginePanics, 0);
         expect(report.versions.pipeline, 5);
-        expect(report.versions.scoreContract, 5);
+        expect(report.versions.scoreContract, 6);
         // A cut report is partial: it may miss a code or leave the score
         // unjudged. So the budget is checked before the reads, and its
         // failure says what the cut report read.
@@ -113,7 +113,7 @@ void main() {
     expect(report.detections, isNotEmpty);
     expect(report.detections.first.content.text, isNotEmpty);
     expect(report.detections.first.symbology, Symbology.qrCode);
-    expect(report.versions.scoreContract, 5);
+    expect(report.versions.scoreContract, 6);
   });
 
   testWidgets('a blank RGBA frame is "no QR", not an error', (tester) async {

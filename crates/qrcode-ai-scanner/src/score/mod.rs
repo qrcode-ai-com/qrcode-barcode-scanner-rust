@@ -24,6 +24,7 @@
 //! cut planned work (`trace.budget_exhausted`).
 
 pub(crate) mod iso15415;
+pub(crate) mod margin;
 pub(crate) mod structural;
 pub(crate) mod uec;
 pub(crate) mod warp;
@@ -105,15 +106,141 @@ fn uec_margin_cap(margin: f32) -> u8 {
 /// compatible ECI account ([`ContentKey::admits`], 07-pipeline property 7).
 /// Neither text nor corners are compared; [`cell_decode`] filters the
 /// symbology.
+#[cfg(test)]
 fn detections_match(found: &[engine::RawDetection], expected: &ContentKey) -> bool {
     found.iter().any(|d| expected.admits(d))
 }
 
-/// Stress cells decode ONLY the scored symbology — survival of the same
-/// content in another symbology would be a false signal, and the filtered
-/// pass keeps cell cost at one decoder instead of all of them.
+/// The whole single-symbology pass a probe step answers for: every reader
+/// of the scored symbology, every read. The reference [`Bound::reads`] is
+/// held to — a step asks only whether one of those reads carries the scored
+/// content, and stops at the first that does.
+#[cfg(test)]
 fn cell_decode(img: &LumaImage, symbology: crate::report::Symbology) -> engine::EngineOutcome {
     engine::decode_filtered(img, engine::FormatFilter::Only(symbology))
+}
+
+/// One image a probe step may read: the cell as built, its Otsu
+/// binarization, or the baseline's deep rung over it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Variant {
+    Plain,
+    Otsu,
+    Rung,
+}
+
+/// One probe of a step: an image of the cell under one reader.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Pair {
+    variant: Variant,
+    reader: crate::report::EngineKind,
+}
+
+impl Pair {
+    /// Its place in [`Schedule::trials`].
+    fn slot(self) -> usize {
+        let variant = match self.variant {
+            Variant::Otsu => 0,
+            Variant::Plain => 1,
+            Variant::Rung => 2,
+        };
+        variant * 2 + usize::from(self.reader == crate::report::EngineKind::Rqrr)
+    }
+}
+
+/// What a judgment remembers of a pair's last pass.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Trial {
+    /// It read the expected content.
+    read: bool,
+    /// Its wall time as a power-of-two class ([`Schedule::class_of`]).
+    cost: u8,
+}
+
+/// The order a probe step tries its pairs in: the cheapest expected first.
+///
+/// A step passes when ANY image of the cell reads under ANY reader of the
+/// symbology, so the order decides only what a step costs, never whether it
+/// passes. And the cost is far from even: on a degraded image of a design
+/// whose modules look like finders (outlines, rings, dashes) one reader can
+/// spend a hundred times a clean read on its finder candidates, to fail or
+/// to read, while the same cell binarized reads at once — or the reverse,
+/// depending on the design. No fixed order is cheap on every design, so the
+/// judgment measures: each pass leaves its outcome and its wall time, and
+/// the next step tries first the pair whose last pass was the cheapest, a
+/// pass that failed counted [`Schedule::FAILED`] classes dearer and a pair
+/// not yet tried one class above the cheapest read so far.
+///
+/// The clock orders work and nothing else: the verdict of a step, the score
+/// and the report do not depend on it (`trace.engine_panics` counts the
+/// panics of the passes that ran, as it always did). Costs are compared by
+/// power-of-two class, so timer noise rarely reorders two pairs.
+#[derive(Debug, Clone, Copy)]
+struct Schedule {
+    /// The reader tried first among pairs that are otherwise level: the one
+    /// that read the detection.
+    first: crate::report::EngineKind,
+    /// The last pass of each pair ([`Pair::slot`]).
+    trials: [Option<Trial>; 6],
+    /// The cheapest read so far.
+    floor: Option<u8>,
+}
+
+impl Schedule {
+    /// Cost classes a failed pass counts above its own: a pair that failed
+    /// is tried after one that read up to four times slower.
+    const FAILED: u8 = 2;
+
+    fn new() -> Self {
+        Self {
+            first: crate::report::EngineKind::Rxing,
+            trials: [None; 6],
+            floor: None,
+        }
+    }
+
+    /// The class of a wall time: the bit length of its microseconds — one
+    /// class per doubling, 0 for a time the clock cannot tell from none.
+    fn class_of(elapsed: std::time::Duration) -> u8 {
+        let bits = u128::BITS - elapsed.as_micros().leading_zeros();
+        u8::try_from(bits).unwrap_or(u8::MAX)
+    }
+
+    /// The pairs of a step for `probe`, in the order to try them: by
+    /// expected cost, then a pair that read before one never tried before
+    /// one that failed, then the binarized image before the cell as built
+    /// before the rung, and the first reader before the other.
+    fn order(&self, probe: CellProbe) -> Vec<Pair> {
+        let readers = engine::probe_readers(probe.symbology);
+        let mut pairs = Vec::with_capacity(6);
+        for variant in [Variant::Otsu, Variant::Plain, Variant::Rung] {
+            if variant == Variant::Rung && probe.rung.is_none() {
+                continue;
+            }
+            let ordered = std::iter::once(self.first)
+                .filter(|reader| readers.contains(reader))
+                .chain(readers.iter().copied().filter(|r| *r != self.first));
+            for reader in ordered {
+                pairs.push(Pair { variant, reader });
+            }
+        }
+        // stable: level pairs keep the order built above
+        pairs.sort_by_key(|pair| match self.trials[pair.slot()] {
+            Some(Trial { read: true, cost }) => (cost, 0u8),
+            None => (self.floor.map_or(0, |floor| floor.saturating_add(1)), 1),
+            Some(Trial { read: false, cost }) => (cost.saturating_add(Self::FAILED), 2),
+        });
+        pairs
+    }
+
+    /// Remember a pass of `pair`.
+    fn record(&mut self, pair: Pair, read: bool, elapsed: std::time::Duration) {
+        let cost = Self::class_of(elapsed);
+        self.trials[pair.slot()] = Some(Trial { read, cost });
+        if read {
+            self.floor = Some(self.floor.map_or(cost, |floor| floor.min(cost)));
+        }
+    }
 }
 
 /// The limits one judgment runs under — the shared scan deadline, the
@@ -133,6 +260,8 @@ pub(crate) struct Bound<'a> {
     /// Decoder panics the engine boundary caught in this bound's decodes —
     /// the report counts them in `trace.engine_panics`.
     panics: u8,
+    /// The order its probe steps try their pairs in ([`Schedule`]).
+    schedule: Schedule,
 }
 
 impl<'a> Bound<'a> {
@@ -145,6 +274,16 @@ impl<'a> Bound<'a> {
             spent: 0,
             cut: false,
             panics: 0,
+            schedule: Schedule::new(),
+        }
+    }
+
+    /// Start the probes with the reader that read the detection: rqrr when
+    /// it did, rxing otherwise. The order never changes a step's outcome
+    /// ([`Schedule`]).
+    fn lead_with(&mut self, engines: &[crate::report::EngineKind]) {
+        if engines.contains(&crate::report::EngineKind::Rqrr) {
+            self.schedule.first = crate::report::EngineKind::Rqrr;
         }
     }
 
@@ -192,17 +331,24 @@ impl<'a> Bound<'a> {
         self.panics
     }
 
-    /// One decode of a probe step ([`cell_decode`]): its reads, the decoder
-    /// panics it caught added to the tally. How the step is judged does not
-    /// change — a panicking decoder read nothing.
-    fn decode(
+    /// One pass of a probe step: whether `pair`'s reader reads `expected` in
+    /// `img`, the image of `pair`'s variant ([`engine::probe`], restricted
+    /// to `symbology`). The pass is remembered ([`Schedule::record`]) and
+    /// the decoder panics it caught are added to the tally. How the step is
+    /// judged does not change — a panicking decoder read nothing.
+    fn reads(
         &mut self,
         img: &LumaImage,
         symbology: crate::report::Symbology,
-    ) -> Vec<engine::RawDetection> {
-        let outcome = cell_decode(img, symbology);
-        self.panics = self.panics.saturating_add(outcome.panics);
-        outcome.detections
+        pair: Pair,
+        expected: &ContentKey,
+    ) -> bool {
+        let started = Instant::now();
+        let probe = engine::probe(img, symbology, pair.reader, &|read| expected.admits(read));
+        self.schedule
+            .record(pair, probe.accepted, started.elapsed());
+        self.panics = self.panics.saturating_add(probe.panics);
+        probe.accepted
     }
 }
 
@@ -306,11 +452,20 @@ impl CellProbe {
                 return Ok(Calibrated::Interrupted);
             }
             let boosted = rung.apply(base);
-            if detections_match(&bound.decode(&boosted, symbology), expected) {
-                return Ok(Calibrated::Class(Self {
-                    rung: Some(rung),
-                    symbology,
-                }));
+            let class = Self {
+                rung: Some(rung),
+                symbology,
+            };
+            // neither the base nor its binarization read: only the rung's
+            // own pairs can
+            let pairs = bound.schedule.order(class);
+            for pair in pairs
+                .into_iter()
+                .filter(|pair| pair.variant == Variant::Rung)
+            {
+                if bound.reads(&boosted, symbology, pair, expected) {
+                    return Ok(Calibrated::Class(class));
+                }
             }
         }
         Ok(Calibrated::Undecodable)
@@ -328,28 +483,31 @@ impl CellProbe {
 /// Probe = direct + otsu + the baseline's deep rung when it needed one —
 /// the margin is measured RELATIVE to the symbol's own decode class, never
 /// with the full ladder's recovery power (that asymmetry is the point).
-/// The decodes run through `bound`, which tallies the decoder panics they
-/// caught.
+/// The cell passes when any of those images reads under any reader of the
+/// symbology: the pairs are tried cheapest expected first ([`Schedule`])
+/// and the first read ends the step. The decodes run through `bound`, which
+/// tallies the decoder panics they caught.
 pub(crate) fn cell_passes(
     img: &LumaImage,
     expected: &ContentKey,
     probe: CellProbe,
     bound: &mut Bound<'_>,
 ) -> bool {
-    if detections_match(&bound.decode(img, probe.symbology), expected) {
-        return true;
-    }
-    let binarized = transform::otsu_threshold(img);
-    if detections_match(&bound.decode(&binarized, probe.symbology), expected) {
-        return true;
-    }
-    match probe.rung {
-        Some(rung) => {
-            let boosted = rung.apply(img);
-            detections_match(&bound.decode(&boosted, probe.symbology), expected)
+    // each image is built once, and only when a pair reaches it
+    let mut otsu: Option<LumaImage> = None;
+    let mut boosted: Option<LumaImage> = None;
+    for pair in bound.schedule.order(probe) {
+        let image = match (pair.variant, probe.rung) {
+            (Variant::Plain, _) => img,
+            (Variant::Otsu, _) => otsu.get_or_insert_with(|| transform::otsu_threshold(img)),
+            (Variant::Rung, Some(rung)) => boosted.get_or_insert_with(|| rung.apply(img)),
+            (Variant::Rung, None) => continue,
+        };
+        if bound.reads(image, probe.symbology, pair, expected) {
+            return true;
         }
-        None => false,
     }
+    false
 }
 
 /// Ramp cell indices at a given depth (Reduced takes the 2nd and 4th
@@ -816,6 +974,7 @@ pub(crate) fn judge(
         "injected judgment fault"
     );
     let base = transform::downscale_to(luma, STRESS_BASE_SIDE);
+    bound.lead_with(&detection.engines);
     // calibrate the cell probe on the unstressed base (its decode class)
     let probe = match CellProbe::calibrate_admitted(&base, key, detection.symbology, bound)? {
         Calibrated::Class(probe) => probe,
@@ -2950,6 +3109,231 @@ mod tests {
         println!(
             "256px pixels as an input, {RUNS} ladder walks: {:#?}",
             walk(&cell_planes)
+        );
+    }
+
+    // ---- probe schedule ----
+
+    use crate::report::EngineKind as Reader;
+
+    fn qr_class(rung: bool) -> CellProbe {
+        CellProbe {
+            rung: rung.then_some(crate::ladder::DEEP_RUNGS[0]),
+            symbology: crate::report::Symbology::QrCode,
+        }
+    }
+
+    fn pair(variant: Variant, reader: Reader) -> Pair {
+        Pair { variant, reader }
+    }
+
+    fn micros(micros: u64) -> std::time::Duration {
+        std::time::Duration::from_micros(micros)
+    }
+
+    #[test]
+    fn a_fresh_schedule_tries_the_binarized_cell_first_under_the_detections_reader() {
+        let cancel = CancelToken::new();
+        let mut bound = Bound::new(&cancel, None);
+        bound.lead_with(&[Reader::Rxing]);
+        assert_eq!(
+            bound.schedule.order(qr_class(false)),
+            vec![
+                pair(Variant::Otsu, Reader::Rxing),
+                pair(Variant::Otsu, Reader::Rqrr),
+                pair(Variant::Plain, Reader::Rxing),
+                pair(Variant::Plain, Reader::Rqrr),
+            ]
+        );
+        bound.lead_with(&[Reader::Rxing, Reader::Rqrr]);
+        assert_eq!(
+            bound.schedule.order(qr_class(true)),
+            vec![
+                pair(Variant::Otsu, Reader::Rqrr),
+                pair(Variant::Otsu, Reader::Rxing),
+                pair(Variant::Plain, Reader::Rqrr),
+                pair(Variant::Plain, Reader::Rxing),
+                pair(Variant::Rung, Reader::Rqrr),
+                pair(Variant::Rung, Reader::Rxing),
+            ]
+        );
+        // a symbology only rxing reads has one pair per image, whatever
+        // read the detection
+        let linear = CellProbe {
+            rung: None,
+            symbology: crate::report::Symbology::Code128,
+        };
+        assert_eq!(
+            bound.schedule.order(linear),
+            vec![
+                pair(Variant::Otsu, Reader::Rxing),
+                pair(Variant::Plain, Reader::Rxing),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_schedule_tries_the_cheapest_expected_pair_first() {
+        let class = qr_class(false);
+        let otsu_x = pair(Variant::Otsu, Reader::Rxing);
+        let otsu_q = pair(Variant::Otsu, Reader::Rqrr);
+        let plain_x = pair(Variant::Plain, Reader::Rxing);
+        let plain_q = pair(Variant::Plain, Reader::Rqrr);
+        let mut schedule = Schedule::new();
+        // a read leads; the pairs not yet tried sit one class above the
+        // cheapest read, in their first order
+        schedule.record(plain_q, true, micros(900));
+        assert_eq!(
+            schedule.order(class),
+            vec![plain_q, otsu_x, otsu_q, plain_x]
+        );
+        // … so before a read two classes dearer
+        schedule.record(otsu_q, true, micros(3_000));
+        assert_eq!(
+            schedule.order(class),
+            vec![plain_q, otsu_x, plain_x, otsu_q]
+        );
+        // a pass that failed counts two classes dearer: after a read four
+        // times slower (the read first when level), before one eight times
+        schedule.record(otsu_x, false, micros(900));
+        schedule.record(plain_x, true, micros(5_000));
+        assert_eq!(
+            schedule.order(class),
+            vec![plain_q, otsu_q, otsu_x, plain_x]
+        );
+        // a failure that cost little is tried again before a dear read
+        schedule.record(otsu_x, false, micros(100));
+        assert_eq!(
+            schedule.order(class),
+            vec![otsu_x, plain_q, otsu_q, plain_x]
+        );
+        // and a failure never moves the floor the untried are held to
+        assert_eq!(schedule.floor, Some(Schedule::class_of(micros(900))));
+    }
+
+    #[test]
+    fn a_wall_time_classes_by_its_doublings() {
+        for (elapsed, class) in [
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 2),
+            (4, 3),
+            (1_000, 10),
+            (1_023, 10),
+            (1_024, 11),
+            (1_000_000, 20),
+        ] {
+            assert_eq!(Schedule::class_of(micros(elapsed)), class, "{elapsed} µs");
+        }
+        assert_eq!(Schedule::class_of(std::time::Duration::MAX), 84);
+    }
+
+    #[test]
+    fn every_history_orders_every_pair_of_the_step_exactly_once() {
+        let class = qr_class(true);
+        let fresh = Schedule::new().order(class);
+        let mut slots: Vec<usize> = fresh.iter().map(|pair| pair.slot()).collect();
+        slots.sort_unstable();
+        assert_eq!(slots, [0, 1, 2, 3, 4, 5], "one slot per pair");
+        let outcomes = [
+            None,
+            Some((true, 5)),
+            Some((true, 9_000)),
+            Some((false, 5)),
+            Some((false, 9_000)),
+        ];
+        for history in 0..outcomes.len().pow(6) {
+            let mut schedule = Schedule::new();
+            let mut rest = history;
+            for pair in &fresh {
+                if let Some((read, elapsed)) = outcomes[rest % outcomes.len()] {
+                    schedule.record(*pair, read, micros(elapsed));
+                }
+                rest /= outcomes.len();
+            }
+            let mut order = schedule.order(class);
+            order.sort_by_key(|pair| pair.slot());
+            let mut every = fresh.clone();
+            every.sort_by_key(|pair| pair.slot());
+            assert_eq!(order, every, "history {history}");
+        }
+    }
+
+    /// What a probe step answers for, read in full: every image of the
+    /// class under every reader of the symbology, every read.
+    fn whole_pass_reads(img: &LumaImage, key: &ContentKey, probe: CellProbe) -> bool {
+        let reads =
+            |img: &LumaImage| detections_match(&cell_decode(img, probe.symbology).detections, key);
+        reads(img)
+            || reads(&transform::otsu_threshold(img))
+            || probe.rung.is_some_and(|rung| reads(&rung.apply(img)))
+    }
+
+    #[test]
+    fn a_step_passes_exactly_when_the_whole_pass_reads_whatever_the_history() {
+        let cancel = CancelToken::new();
+        let (base, key, probe) = clean_base_and_probe();
+        let mut examples = vec![("clean".to_owned(), base, key, probe)];
+        for rel in [
+            "artistic/blob-style-monkey-logo.webp",
+            "symbology/code128.png",
+            "symbology/datamatrix.png",
+            "symbology/microqr.png",
+        ] {
+            let (luma, detection, key) = fixture_example(rel);
+            let base = transform::downscale_to(&luma, STRESS_BASE_SIDE);
+            let probe = CellProbe::calibrate(&base, &key, detection.symbology)
+                .unwrap_or_else(|| panic!("{rel}: the base decodes"));
+            examples.push((rel.to_owned(), base, key, probe));
+        }
+        let (mut passed, mut failed) = (0, 0);
+        for (name, base, key, probe) in &examples {
+            let mut cells = vec![base.clone()];
+            cells.extend([256u32, 128, 72].map(|side| transform::downscale_to(base, side)));
+            cells.extend([2.0f32, 6.0].map(|sigma| transform::gaussian_blur(base, sigma)));
+            cells.extend([0.3f32, 0.02].map(|gain| transform::contrast_boost(base, gain, 1.0)));
+            // one judgment's schedule carried across its cells, under each
+            // first reader
+            let mut carried = [Reader::Rxing, Reader::Rqrr].map(|first| {
+                let mut bound = Bound::new(&cancel, None);
+                bound.schedule.first = first;
+                bound
+            });
+            for (index, cell) in cells.iter().enumerate() {
+                let expected = whole_pass_reads(cell, key, *probe);
+                if expected {
+                    passed += 1;
+                } else {
+                    failed += 1;
+                }
+                for bound in &mut carried {
+                    assert_eq!(
+                        cell_passes(cell, key, *probe, bound),
+                        expected,
+                        "{name} cell {index} carried from {:?}",
+                        bound.schedule.first
+                    );
+                }
+                // an adverse history: the pairs in reverse order, every
+                // one of them last failed, or last read
+                for read in [false, true] {
+                    let mut adverse = Bound::new(&cancel, None);
+                    let reversed = adverse.schedule.order(*probe).into_iter().rev();
+                    for (rank, pair) in reversed.enumerate() {
+                        adverse.schedule.record(pair, read, micros(1 << (2 * rank)));
+                    }
+                    assert_eq!(
+                        cell_passes(cell, key, *probe, &mut adverse),
+                        expected,
+                        "{name} cell {index} after every pair {read}"
+                    );
+                }
+            }
+        }
+        assert!(
+            passed >= 12 && failed >= 8,
+            "the witness needs both outcomes: {passed} passed, {failed} failed"
         );
     }
 }

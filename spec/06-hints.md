@@ -43,3 +43,7 @@ tagged (`"hint"` discriminator). Parse leniently — new hints may appear.
   margin-driven hints — `low_correction_margin` and the UEC path of
   `raise_error_correction` — while the measured margin still caps the
   score value.
+- From score_contract 6 the published margin is the widest one a verified
+  sampling of the symbol reads (04-score.md § The correction margin). The
+  two margin-driven hints follow it, and a QR Code only the rxing port read
+  can raise them.

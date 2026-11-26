@@ -65,4 +65,11 @@ public sealed record ScanOptions
 
     /// <summary>A named set of score axes: <c>design</c> or <c>capture</c>. Not with <see cref="ScoreSkipAxes"/>.</summary>
     public string? ScorePreset { get; init; }
+
+    /// <summary>
+    /// The symbologies the scan looks for, by the engine's names, such as <c>qr_code</c> and
+    /// <c>ean13</c>. No reader of another symbology runs. <c>null</c> or empty reads every
+    /// symbology.
+    /// </summary>
+    public IReadOnlyList<string>? Formats { get; init; }
 }

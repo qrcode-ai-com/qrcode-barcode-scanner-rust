@@ -17,6 +17,10 @@ fn scan_error(e: &ScanError) -> JsError {
     JsError::new(&format!("{} [{}]", e, e.code()))
 }
 
+#[expect(
+    clippy::too_many_arguments,
+    reason = "one parameter per option of the scan signature, parsed in one place"
+)]
 fn config_from(
     name: Option<String>,
     budget_ms: Option<f64>,
@@ -25,6 +29,7 @@ fn config_from(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<ScanProfile, JsError> {
     let profile = match name.as_deref() {
         None => ScanProfile::Full,
@@ -133,11 +138,17 @@ fn config_from(
         .map(options::budget_ms_from_number)
         .transpose()
         .map_err(|e| scan_error(&e))?;
+    // formats: the symbologies the host handles, by wire name (`qr_code`,
+    // `ean13`, …). Unset or empty = every symbology; an unknown name is
+    // QRS-006, never a scan silently widened back to all of them.
+    let formats =
+        ScanConfig::formats_from_names(&formats.unwrap_or_default()).map_err(|e| scan_error(&e))?;
     if budget_ms.is_none()
         && skip.is_empty()
         && checks.is_empty()
         && alpha.is_none()
         && palette.is_empty()
+        && formats.is_empty()
     {
         return Ok(profile);
     }
@@ -151,6 +162,7 @@ fn config_from(
         config.alpha_background = alpha;
     }
     config.alpha_palette = palette;
+    config.formats = formats;
     Ok(ScanProfile::Custom(config))
 }
 
@@ -207,6 +219,10 @@ fn run_scan(
 /// `#rrggbb`) picks the background flattened under transparent pixels —
 /// `auto` (default) reads the design's own content and retries the
 /// opposite on a zero-detection scan; opaque inputs are untouched.
+/// `formats` (wire names, e.g. `["qr_code"]`) restricts the scan to the
+/// symbologies the host handles: no reader of another symbology runs, and
+/// the report says what was looked for (`trace.formats`). Unset or empty =
+/// every symbology; an unknown name rejects `[QRS-006]`.
 // allow, not expect: wasm_bindgen re-emits the fn — the lint fires on the
 // generated item, breaking #[expect] fulfillment tracking (napi precedent).
 #[allow(
@@ -225,6 +241,7 @@ pub fn scan_image(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<JsValue, JsError> {
     run_scan(
         ImageInput::encoded(bytes),
@@ -236,6 +253,7 @@ pub fn scan_image(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?,
         max_dimension,
         max_pixels,
@@ -250,7 +268,8 @@ pub fn scan_image(
 /// positional call written for the earlier five arguments keeps its
 /// meaning: `max_dimension`, `max_pixels`, `score_skip_axes`,
 /// `score_skip_checks`, `alpha_background` (transparent pixels of the
-/// frame flatten over it before luma), `alpha_palette`, `score_preset`.
+/// frame flatten over it before luma), `alpha_palette`, `score_preset`,
+/// `formats`.
 // allow, not expect: the same wasm_bindgen re-emission as `scan_image`.
 #[allow(
     clippy::too_many_arguments,
@@ -270,6 +289,7 @@ pub fn scan_frame(
     alpha_background: Option<String>,
     alpha_palette: Option<Vec<String>>,
     score_preset: Option<String>,
+    formats: Option<Vec<String>>,
 ) -> Result<JsValue, JsError> {
     run_scan(
         ImageInput::rgba8(data, width, height),
@@ -281,6 +301,7 @@ pub fn scan_frame(
             alpha_background,
             alpha_palette,
             score_preset,
+            formats,
         )?,
         max_dimension,
         max_pixels,

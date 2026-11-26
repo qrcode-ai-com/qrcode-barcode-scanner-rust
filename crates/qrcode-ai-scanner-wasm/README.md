@@ -129,8 +129,9 @@ The positional functions stay on the same object and behave as before.
 An option left out keeps the engine's default. A key that is not in this table
 throws a `TypeError` that names it and lists the accepted keys, so a misspelling
 such as `budget_ms` is never ignored. The engine checks each value and throws
-as it does for a positional call: `[QRS-006]` for a number outside its domain,
-and an error for an unknown profile, format, axis or check name.
+as it does for a positional call: `[QRS-006]` for a number outside its domain
+or an unknown `formats` name, and an error without a code for an unknown
+profile, axis or check name.
 
 `scan` takes a `Uint8Array` (a Node `Buffer` is one) or an `ArrayBuffer`.
 `scanFrame` takes an `ImageData`, or any `{ data, width, height }` whose `data`

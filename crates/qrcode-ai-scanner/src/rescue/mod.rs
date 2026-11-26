@@ -422,6 +422,32 @@ pub(crate) fn rederive(
     }
 }
 
+/// The codewords a sampled stream stands for: every block corrected
+/// errors-only, back in the stream's own (interleaved) order, unmasked — the
+/// modules the symbol encodes, to count a sampling's misread modules
+/// against. `None`: the version is out of range, the stream is short or a
+/// block does not correct.
+pub(crate) fn corrected_codewords(
+    stream: &MaskedStream,
+    version: u8,
+    ec: EcLevel,
+    mask: u8,
+) -> Option<Vec<u8>> {
+    if !(1..=40).contains(&version) {
+        return None;
+    }
+    let mut codewords =
+        unmask_to_codewords(&stream.bits, stream.bit_len, usize::from(version), mask)?;
+    for block in deinterleave(&codewords, usize::from(version), format_bits_index(ec)) {
+        let mut bytes = block.bytes;
+        ee::correct(&mut bytes, block.npar, &[])?;
+        for (byte, origin) in bytes.iter().zip(&block.origins) {
+            *codewords.get_mut(*origin)? = *byte;
+        }
+    }
+    Some(codewords)
+}
+
 /// The QR version whose RS-corrected data stream under `ec` is exactly
 /// `len` codewords. rxing's general reader returns that stream without
 /// its version; at a fixed EC level the data capacity strictly grows with
