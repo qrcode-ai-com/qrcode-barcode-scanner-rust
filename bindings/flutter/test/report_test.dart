@@ -30,7 +30,7 @@ void main() {
       expect(files, isNotEmpty);
       for (final f in files) {
         final r = ScanReport.parse(f.readAsStringSync());
-        expect(r.versions.scoreContract, 5, reason: f.path);
+        expect(r.versions.scoreContract, 6, reason: f.path);
         expect(r.detections, isA<List<Detection>>(), reason: f.path);
         // pipeline 5 writes both: every detection is located at least once
         // (an unavailable occurrence when no reader measured it)
@@ -171,6 +171,17 @@ void main() {
       final r = report('', bare);
       expect(r.detections.single.occurrences, isNull);
       expect(r.trace.saturation, isNull);
+      expect(r.trace.formats, isNull);
+    });
+
+    test('a restricted scan names its symbologies; a newer one is unknown',
+        () {
+      final r = report(
+          '',
+          '{"stages":[],"engine_panics":0,"total_ms":0,'
+              '"formats":["qr_code","code128","future_code"]}');
+      expect(r.trace.formats,
+          [Symbology.qrCode, Symbology.code128, Symbology.unknown]);
     });
 
     test('two printed copies are one detection with two occurrences', () {

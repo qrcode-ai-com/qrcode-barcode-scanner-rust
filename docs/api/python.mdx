@@ -32,6 +32,7 @@ report = q.scan(
     "full",              # "full" | "fast" | "frame"   (default "full")
     max_dimension=4096,  # anti-DoS — LOWER THESE for untrusted uploads
     max_pixels=16_000_000,
+    formats=["qr_code", "ean13"],  # only these symbologies; unset = all
     alpha_background="auto",  # background under transparent pixels:
                               # "auto" | "white" | "black" | "none" | "#rrggbb"
                               # (opaque inputs untouched; result in report["alpha"])
@@ -92,10 +93,18 @@ clock starts once the image is decoded and normalized; `max_dimension` and
 detections are not final, and a `None` score beside a detection means "not
 judged".
 
+`formats` restricts the scan to the symbologies you name, by the names a
+report uses (`capabilities()["symbologies"]` lists them): no reader of
+another symbology runs, and `report["trace"]["formats"]` says what was
+looked for. Unset or empty reads every symbology; `scan_frame` takes it
+too. The two differences from an unrestricted scan are in
+`spec/02-profiles.md` § Formats.
+
 A scan fault raises `ValueError` with a `[QRS-xxx]`-tagged message
 ([catalog](/api/errors)). An unknown name (profile, stress axis, score
 check, alpha background, palette color, preset) or a palette above 32
-colors raises `ValueError` without a code; a negative or non-integer limit
+colors raises `ValueError` without a code; an unknown `formats` name is a
+scan fault, `ValueError` ending `[QRS-006]`. A negative or non-integer limit
 or budget is refused by the conversion (`OverflowError` / `TypeError`). The
 report shape is the [one contract](/api/report).
 

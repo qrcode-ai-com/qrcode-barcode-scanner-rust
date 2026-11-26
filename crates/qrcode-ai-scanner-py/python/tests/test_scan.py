@@ -342,6 +342,24 @@ def test_all_exported():
     assert sorted(qr.__all__) == ["__version__", "capabilities", "scan", "scan_frame"]
 
 
+def test_formats_restrict_the_scan_and_reject_typos():
+    image = (REPO / "fixtures" / "symbology" / "mixed-code128-qr.png").read_bytes()
+
+    def found(**options):
+        report = qr.scan(image, "fast", budget_ms=0, **options)
+        return sorted(d["symbology"] for d in report["detections"]), report["trace"].get("formats")
+
+    # unset or empty: every symbology, and the report names no list
+    assert found() == (["code128", "qr_code"], None)
+    assert found(formats=[]) == (["code128", "qr_code"], None)
+    assert found(formats=["qr_code"]) == (["qr_code"], ["qr_code"])
+    assert found(formats=["code128"]) == (["code128"], ["code128"])
+    # the list is published in the engine's order, whatever the order given
+    assert found(formats=["code128", "qr_code"]) == (["code128", "qr_code"], ["qr_code", "code128"])
+    with pytest.raises(ValueError, match=r"^invalid option `formats`: unknown symbology `ean_13`.* \[QRS-006\]$"):
+        qr.scan(image, "fast", formats=["qr_code", "ean_13"])
+
+
 def test_score_skip_axes_thread_through_and_reject_typos():
     # Skipped axes are absent from the wire (the engine never ran them and
     # renormalized the composite); a typo'd name raises loudly — never a

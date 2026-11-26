@@ -95,7 +95,7 @@ const viteModule = await import(process.env.QRSCAN_VITE_MODULE ?? 'vite');
 const vite = typeof viteModule.build === 'function' ? viteModule : viteModule.default;
 const { startFixture, startFixturePair } = await import(
   new URL('./destination-fixtures.mjs', import.meta.url).href);
-const SCANNER_FILES = ['auto.js', 'qrcode-barcode-scanner.js', 'qrcode-barcode-scanner_bg.wasm'];
+const SCANNER_FILES = ['auto.js', 'scan.js', 'qrcode-barcode-scanner.js', 'qrcode-barcode-scanner_bg.wasm'];
 const hasScanner = SCANNER_FILES.every(file => existsSync(join(PACKAGE_DIR, file)));
 
 const report = {

@@ -21,7 +21,10 @@ ImageInput (Encoded | Rgba8 | Luma8)
                  detection (01-report § Content)
   → occurrences  each detection's footprints grouped by physical copy
                  (01-report § Occurrences)
-  → score        contract v5 (04-score.md) — Full/Fast only
+  → margin       the primary QR Code sampled where it lies in the image
+                 (04-score.md § The correction margin) — only when a score
+                 is computed
+  → score        contract v6 (04-score.md) — Full/Fast only
   → alpha placement envelope (Full only) — 01-report § Alpha
   → ScanReport
 ```
@@ -64,6 +67,15 @@ Normative properties:
    S1–S4 published nothing: hits the scanner refused or withheld do not
    count, so `trace.stages[].detections_found` may be non-zero on a walk
    that went on (read `detections`, not the counter).
+
+   **Under a `formats` restriction** (02-profiles.md § Formats) every stage
+   reads the listed symbologies only, and a stage that exists for the
+   others is not planned: the complementary non-QR pass above runs only
+   when a listed symbology is outside the QR family, and S4 only when one
+   is inside it. The stages keep their order and their attempts, and the
+   exit rule above reads what the listed readers found: a restricted walk
+   can go further than an unrestricted one that stopped on a symbology the
+   restriction leaves out.
 3. **Budget + cancel checked between attempts** — an engine call is not
    interruptible; inputs are size-capped instead.
 4. **Engines are panic-isolated** — a third-party decoder panic increments
@@ -260,7 +272,11 @@ Normative properties:
    symbology, `raw` and agreeing FNC1 position, and compatible evidence —
    unobserved with anything; no-ECI with no-ECI; signalled with signalled
    or located; located with an identical list or with signalled. Corners
-   are not compared.
+   are not compared. A step passes when any of its images reads under any
+   reader of the symbology, and the first read ends it; the passes are
+   tried cheapest expected first, from the wall time of the judgment's
+   earlier passes. That order decides what a step costs, never whether it
+   passes.
 
 ## Acceptance
 
@@ -356,8 +372,8 @@ that decode normally.
 |---|---|---|---|
 | Robustness decode | ✓ (TryHarder + AlsoInverted) | ✓ (retries the mirrored grid) | S5 beyond-t recovery (Hanzi and structured-append streams are not rescued) |
 | Geometry (corners) | — (points used internally) | ✓ (also grids it detected but could not decode, re-derived by the scanner) | from the candidate |
-| version/ec/mask | ec only | ✓ (the orientation that decoded) | ✓ |
-| Raw bitstream | — | ✓ (verified orientation; feeds UEC + rescue) | consumes |
+| version/ec/mask | ec only (version and mask stated by the scanner's sampling of the image when a score is computed — 04-score.md § The correction margin) | ✓ (the orientation that decoded) | ✓ |
+| Raw bitstream | — (the scanner's own sampling can supply the UEC stream, same section) | ✓ (verified orientation; feeds UEC + rescue) | consumes |
 | Payload bytes (`raw`) | original: port payload · fallback-reader codewords re-parsed | original: the scanner's parse of rqrr's grid; rqrr's bytes only when it decides nothing | original |
 | ECI designators | located by the re-read or a re-derived rqrr grid; fallback reader parsed; else presence only (`]Q2`/`]Q4`/`]Q6`) | parsed from its grid | parsed |
 | Kanji / Hanzi segments | observed by the re-read or fallback reader; else the port's reading may confirm a double-byte reading (rule 1e) | Kanji parsed · Hanzi ✗ (grid re-derived instead) | parsed |

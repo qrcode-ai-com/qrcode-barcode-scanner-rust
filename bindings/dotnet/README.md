@@ -104,6 +104,7 @@ var report = Scanner.Scan(image, new ScanOptions { Profile = ScanProfile.Fast, B
 | `MaxDimension`, `MaxPixels` | The largest image accepted. A larger one is refused before it is decoded. |
 | `ScoreSkipAxes`, `ScoreSkipChecks`, `ScorePreset` | Which parts of the score are left out. A preset and skipped axes cannot be given together. |
 | `AlphaBackground`, `AlphaPalette` | What a transparent image is laid over, and the backgrounds a transparent code must scan over. |
+| `Formats` | The symbologies the scan looks for, by the engine's names, such as `qr_code` and `ean13`. No reader of another symbology runs. Left out, every symbology is read. |
 
 The values each option takes are those of the engine: see the
 [option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/02-profiles.md).

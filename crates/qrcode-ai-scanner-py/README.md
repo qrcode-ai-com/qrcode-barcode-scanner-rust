@@ -157,6 +157,12 @@ Both scan functions accept `max_dimension`, `max_pixels` and `budget_ms`.
 The default caps are 10000 px per side and 64 million pixels; lower them when
 processing untrusted uploads. Caps are checked before pixel work.
 
+Both also accept `formats`, a list of the symbologies to look for by the names
+a report uses, such as `["qr_code", "ean13"]`. No reader of another symbology
+runs, and `report["trace"]["formats"]` says what was looked for. Unset or
+empty reads every symbology; an unknown name raises `ValueError` ending
+`[QRS-006]`.
+
 An unset budget uses the profile default: `full` 4000 ms, `fast` 800 ms,
 `frame` 80 ms. `budget_ms=0` removes the scan budget for reproducible scans.
 The clock starts after image decoding; the input caps bound the decoding step.

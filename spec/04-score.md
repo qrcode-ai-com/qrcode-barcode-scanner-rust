@@ -1,4 +1,4 @@
-# 04 · Score contract v5
+# 04 · Score contract v6
 
 The score answers ONE question: **how much margin does this code have
 before it stops scanning in the real world?** It is VALIDATION, never ISO
@@ -28,9 +28,35 @@ failed cell (`"blur 2.5"`, `"glare"`, `"128px"`…), `null` when every cell
 passed. A lost point always names its cell: surfaces render the reason, not
 just the count.
 
+### The stress base
+
+Every cell is built from one base image of the frame. For a matrix or a
+stacked symbology the base is the frame downscaled to a longest side of
+512 px; a smaller frame is kept as it is. A linear symbology (EAN-13, EAN-8,
+UPC-A, UPC-E, Code 128, Code 39, Code 93, Codabar, ITF, DataBar, DataBar
+Expanded, Telepen) carries its data along one direction, in a frame that is
+usually wide and short. From score_contract 6 its base keeps the pixel
+count of that 512 px square instead of its side: the longest side is
+`512 × √(long side ÷ short side)`, at most 2048 px and never more than the
+frame's own. A square frame gets 512 px either way.
+
+The resolution cells are shares of the base: 358 · 256 · 179 · 128 · 90 px
+of a 512 px base, and the same shares of a wider one (a 1037 px base runs
+725 · 518 · 362 · 259 · 182 px). `failed_at` names the side the cell ran
+at. A frame whose longest side is at most 512 px runs the five sides of the
+table, whatever its symbology.
+
+Up to score_contract 5 every base had a longest side of 512 px. A wide
+barcode then kept under two pixels per bar before any stress: no contrast
+cell read, and the judgment asked for contrast.
+
 Survival is measured **relative to the symbol's own decode class**
 (`CellProbe`): an artistic symbol that only decodes through a deep rung is
 probed with that rung — "fragile" is never conflated with "undecodable".
+A cell passes when any image of its class reads under any reader of the
+symbology, and the first read ends it. The passes are tried cheapest
+expected first, from the wall time of the judgment's earlier passes: that
+order decides what a judgment costs, never a verdict.
 
 ### Skipping axes (integration config)
 
@@ -111,6 +137,9 @@ progress.
 
 The margin cap reads the measured margin (§ Synthetic UEC), published or
 skipped: a consumed Reed-Solomon budget is invisible to the stress axes.
+From contract v6 that margin is the widest one a verified sampling reads
+(§ The correction margin), and a QR Code only the rxing port read can
+carry one, with its cap.
 Where a symbol reserves no misdecode-protection codewords, a decode at the
 RS limit caps at 40 and is never a pass; on version 1, v2-L and v3-L an
 errors-only decode at the acceptance limit caps at 47 to 91 instead
@@ -123,8 +152,10 @@ errors-only decode at the acceptance limit caps at 47 to 91 instead
 
 ## Synthetic UEC (`score.uec`)
 
-ISO 15415 *Unused Error Correction* computed from the geometry engine's own
-sampled bitstream: zigzag replay → unmask → ISO 18004 §8.6 de-interleave →
+ISO 15415 *Unused Error Correction* computed from a sampled bitstream of
+the symbol — the geometry engine's own or, from contract v6, the scanner's
+sampling of the image when it reads a wider margin (§ The correction
+margin): zigzag replay → unmask → ISO 18004 §8.6 de-interleave →
 per-block RS syndromes → Berlekamp-Massey degree = EXACT corrected-error
 count `t`. `margin = 1 − 2t/d` over the worst block, `d` its parity
 codewords.
@@ -170,7 +201,8 @@ errors-only decode at the acceptance limit. A stream that error-corrects
 errors-only reaches margin 0 there only on v1-M and v2-L, at 5 errors: a
 word past the reserve, published only when another read of its content
 keeps a margin of zero or more (the detection measures the stream of its
-earliest read that carries one, 07-pipeline.md property 6). On v1-L, v1-Q,
+earliest read that carries one, 07-pipeline.md property 6, unless the
+image measures a wider margin, § The correction margin). On v1-L, v1-Q,
 v1-H and v3-L `d` is odd, and `2t ≤ d` leaves a parity codeword unspent.
 Otherwise the hint comes there only from a rescued read — never on v1-L,
 whose detections carry no stream that counts more than 3 errors (margin
@@ -182,6 +214,81 @@ errors-only it means the worst block's errors spent every parity codeword
 (`2t = d`). This is a distrust signal, not proof of a miscorrection; where
 `p` is 0, it is the acceptance limit itself. On a rescued read it is the
 distrust marker above.
+
+### The correction margin
+
+An engine's stream is one sampling of the symbol, taken in the attempt
+image that read it: a downscale, a binarization, that reader's grid. Its
+error count mixes the modules the design damages with the ones that
+sampling misread, and it moves with the attempt; the rxing port supplies
+no stream at all. So, from contract v6, the scanner also samples the symbol
+itself, where it lies in the image it was given.
+
+**When.** Once per scan that computes a score (not the `frame` profile,
+not with every stress axis skipped), for the primary detection, when it is
+a `qr_code` whose `engines` do not include `rescue` and one of its
+occurrences was measured as a quad (01-report.md § Occurrences): the first
+such quad gives the symbol's outer corners. Micro QR and rMQR have no
+margin path, and a rescued detection keeps its distrust marker (above).
+The measurement is bounded pixel sampling with no decode engine: it runs
+whatever the budget and never makes a report partial.
+
+**What is sampled.** Candidate grids over those corners — the version the
+detection's engine stream came with, else versions 1 to 40, each
+dark-on-light and light-on-dark — are ranked by the share of their finder
+and timing modules that read as drawn. The three best that reach one half
+are tried, each as read and transposed; at most six grids are sampled in
+full, and a grid whose modules are under one pixel is not tried. The format
+information is read on the same grid — and from version 7 the version
+information, which must state the grid's version — and must agree with
+what the detection already states: its EC level when it states one, its
+version and mask when its engine stream came with them. Every module is
+read three ways (its centre pixel, the mean of its central half, the mean
+of four fifths of the cell) and each reading is binarized two ways over the
+symbol's own modules (the midpoint of their 2nd and 98th percentiles,
+Otsu's threshold).
+
+**What counts.** A sampling counts only when its stream error-corrects
+errors-only (`2t ≤ d` in every block) and parses to exactly the detection's
+payload bytes. Among the samplings of a grid that count, the widest margin
+stands, and the first grid with one ends the search. When that margin is
+under 1, the grid is registered on the symbol: each corner moves by 1/4,
+1/8 then 1/16 of a module, along the axes and the diagonals, while fewer
+sampled modules disagree with the corrected codewords (at most 3 000 000
+pixels read), and the registered grid is sampled again. The wider of the
+two verified margins stands.
+
+**What is published.** The image's margin replaces the engine stream's
+only when it is wider, or when no engine stream measures one. The detection
+then holds the sampled stream and the format it verified under:
+`score.uec`, the margin cap, the margin hints and
+`iso15415.unused_error_correction` read it, and a detection that stated no
+version or mask states them (01-report.md § Detection). Nothing else of
+the detection changes: its `corners`, `meta.inverted`, `occurrences`,
+`engines` and content are as read. A symbol no sampling verifies keeps what
+its reader measured, and no `uec` when it measured none.
+
+What follows:
+
+- The published margin is the widest one a verified sampling reads, the
+  engine's or the scanner's: what the design leaves a reader that samples
+  it well. It is never a margin no sampling verified, and never narrower
+  than the engine stream's.
+- A QR Code read by the rxing port alone can carry a `uec` section, the
+  margin cap and the margin hints. Its `corners` stay `null`: it still has
+  no structural check and no ISO card. Witnesses:
+  `fixtures/artistic/github-orb-code39-regression.png` and
+  `fixtures/artistic/builder-template-hearts-web-1024.png`, both version
+  3-H, publish 8 errors of 22 (margin 0.27, grade `d`) and a value the cap
+  holds at 73 (88 and 82 under contract v5, which measured no margin for
+  them).
+- The stress axes read neither the margin nor the format: `axes` do not
+  move between contract v5 and v6. What reads them can: `uec`, the margin
+  cap, the ISO `unused_error_correction` parameter, the hints that read
+  the margin and, for a detection that stated no version, its `meta` and
+  the sections that need a version beside `corners` (structural, ISO).
+- The measurement reads no clock and no RNG; a fault in it leaves the
+  detection as read.
 
 ## ISO 15415-informed grade card (`score.iso15415`)
 
@@ -227,7 +334,10 @@ as the decode engines are deterministic. The documented bounds:
    publish a different stage trace. QR-family symbols and every other
    symbology are unaffected.
 
-Cancellation is not a bound: a cancelled scan is `QRS-005`.
+Cancellation is not a bound: a cancelled scan is `QRS-005`. Nor is the
+order in which a stress cell tries its passes (§ Composite value): it
+follows measured wall time and changes what a judgment costs, never a
+verdict (`trace.engine_panics` counts the panics of the passes that ran).
 
 ## Frame sensitivity (characterized, not hidden)
 
@@ -235,16 +345,16 @@ The composite is a property of the FRAME, not of the symbol alone. Two
 documented consequences:
 
 - **Dilution** — a small symbol in a large frame scores lower (the stress
-  base downscales the whole frame to ≤512px, shrinking the symbol's
-  effective module size). Monotone and intended: a QR occupying 20% of a
+  base downscales the whole frame, § The stress base, shrinking the
+  symbol's effective module size). Monotone and intended: a QR occupying 20% of a
   poster IS harder to scan from afar.
 - **Quiet-ring phase** — near the resolution knee, the perspective cells
   (which warp the whole frame) can flip with small quiet-ring changes:
   on identical styled symbol pixels, perspective reads 5/5 bare vs 2/5
   with a +4px white ring (the 26° cell · axis weight 20 × 3/5 = 12
-  composite points; the published pair reads 85 vs 70, each frame's RS
-  margin capping too), while pure-black comfortable-margin symbols do not
-  move. Sentinel: `quiet_ring_shifts_perspective_cells_near_the_knee`
+  composite points; the published pair reads 100 vs 88), while pure-black
+  comfortable-margin symbols do not move.
+  Sentinel: `quiet_ring_shifts_perspective_cells_near_the_knee`
   (`scan_integration.rs`) over the committed
   `fixtures/degraded/quiet-ring-phase-*.png` pair.
 

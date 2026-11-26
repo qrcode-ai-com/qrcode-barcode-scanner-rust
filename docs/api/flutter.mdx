@@ -194,6 +194,9 @@ deadline has passed. It does not stop one that is running. So a `frame` scan
 can take longer than 80 ms and still be final: its last stage started in time,
 and `budgetExhausted` is `false`.
 
+The Flutter package does not take the `formats` option yet: it looks for
+every symbology.
+
 Simulators and emulators run Flutter in debug mode. When cargokit compiles the
 core there, it uses the package's dev profile, which the package optimizes
 (opt-level 3, no debug assertions, no LTO); up to 0.11.0 that profile is not

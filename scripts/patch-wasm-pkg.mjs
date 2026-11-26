@@ -8,8 +8,9 @@ const pkg = JSON.parse(readFileSync(path, "utf8"));
 
 // The hand-written modules and their types, copied verbatim from the crate into pkg/ and listed
 // in the publish allowlist (scripts/package-inspect.py holds the tarball to these exact bytes).
-const COPIED_FILES = ["auto.js", "auto.d.ts", "camera.js", "camera.d.ts", "camera-overlay.js", "camera-overlay.d.ts",
-  "destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts"];
+const COPIED_FILES = ["auto.js", "auto.d.ts", "scan.js", "scan.d.ts", "node.js", "node.d.ts", "camera.js", "camera.d.ts",
+  "camera-overlay.js", "camera-overlay.d.ts", "destination.js", "destination.d.ts", "destination-node.js",
+  "destination-node.d.ts"];
 // The examples ship inside the package, so the installed folder runs them: the image and camera
 // pages under any static server, their shared worker, and the server-rendering script under Node.
 // Each file is listed one by one (never the folder), and copied verbatim like the modules.
@@ -35,6 +36,14 @@ pkg.files = ["qrcode-barcode-scanner.js", "qrcode-barcode-scanner.d.ts", "qrcode
 pkg.exports = {
   ".": { types: "./qrcode-barcode-scanner.d.ts", import: "./qrcode-barcode-scanner.js", default: "./qrcode-barcode-scanner.js" },
   "./auto": { types: "./auto.d.ts", import: "./auto.js", default: "./auto.js" },
+  // Named options over scan_image and scan_frame, and isFinal: plain JavaScript that imports
+  // nothing and runs in any runtime. ./auto and ./node import it.
+  "./scan": { types: "./scan.d.ts", import: "./scan.js", default: "./scan.js" },
+  // The Node loader reads the WASM from disk with node:fs/promises. Like ./destination-node below,
+  // it has a `node` target alone, so a browser build fails at resolution, and a null key that
+  // keeps "./*" from serving the file without that condition.
+  "./node": { types: "./node.d.ts", node: "./node.js" },
+  "./node.js": null,
   "./camera": { types: "./camera.d.ts", import: "./camera.js", default: "./camera.js" },
   "./camera-overlay": { types: "./camera-overlay.d.ts", import: "./camera-overlay.js", default: "./camera-overlay.js" },
   // The destination core imports nothing and runs in any runtime.

@@ -46,7 +46,7 @@ keys:
   "corners":  [Point,Point,Point,Point] | null, // clockwise from top-left,
                                  // ORIGINAL-image pixel coords, sub-pixel
   "meta": {
-    "version":  1..40 | null,    // measured (geometry path), never guessed
+    "version":  1..40 | null,    // measured, never guessed
     "ec_level": "l"|"m"|"q"|"h" | null,
     "mask":     0..7 | null,
     "modules":  number | null,   // version*4+17, derived
@@ -101,12 +101,21 @@ Semantics that bite:
   `rxing` measures no geometry: a symbol only `rxing` read carries `null`
   corners, version and mask, and the EC level its decoder states —
   `ec_level` is the one `meta` field such a read fills. (Micro QR/rMQR
-  decode via `rxing` only, so they carry no geometry today.) For a symbol
-  decoded mirrored, `ec_level` and `mask` are those of
+  decode via `rxing` only, so they carry no geometry today.) One exception,
+  score_contract ≥ 6: a scan that computes a score samples its primary QR
+  Code detection where it lies in the image (04-score.md § The correction
+  margin). When a sampling verifies, a symbol only `rxing` read states the
+  `version`, `ec_level` and `mask` that sampling verified under, and
+  `modules` — beside `null` `corners` and `inverted`. It gains a `uec`
+  margin and still no structural or ISO section, which need `corners`. A
+  configuration that computes no score (the `frame` profile, every stress
+  axis skipped) samples nothing: the same symbol keeps `null` there. For a
+  symbol decoded mirrored, `ec_level` and `mask` are those of
   the orientation that decoded, and the score measures that orientation
   (04-score.md § UEC). An `rqrr` decode whose grid the scanner could not
   verify (07-pipeline.md property 6) carries no stream, version, EC level
-  or mask — and then no structural or ISO section. The scanner also
+  or mask — and then no structural or ISO section — unless that sampling
+  of the image verifies it and states them. The scanner also
   samples symbols internally (the re-read, 07-pipeline.md property 6) and
   uses every engine's corner points to keep the reads of different symbols
   apart; it publishes no re-read. What every reader measured of each copy
@@ -546,9 +555,19 @@ reconciled once has one primary score whatever its number of copies.
                                  // or the refusal records failed closed (07-pipeline.md property 6)
     "detections":  boolean,      // contents past the 16 published detections were left out
     "occurrences": boolean       // some detection's occurrences are incomplete (§ Occurrences)
-  }
+  },
+  "formats": [Symbology, ...]    // OPTIONAL KEY: the symbologies the scan was restricted to
+                                 // (the `formats` option, 02-profiles.md § Formats), each once,
+                                 // in Symbology order. ABSENT: no restriction, every symbology
+                                 // the build reads was looked for — and every older report
 }
 ```
+
+`formats` says what the scan looked for, never what it found: a restricted
+scan that reads nothing still lists them. A consumer that receives a report
+without the key cannot tell an unrestricted scan from a scanner older than
+the option; one that sent the option and reads the key back knows it was
+applied.
 
 A flag is the OR over both walks when the opposite-background walk ran
 (§ Alpha). A set flag means what was left out is unknown, not absent: a
@@ -575,7 +594,7 @@ establish; a confirmation decode's reads are counted nowhere
 // `scanner` is illustrative — it carries whatever workspace release produced
 // the report. `pipeline` and `score_contract` are the normative compatibility
 // anchors (bumped only on breaking / semantic change).
-{ "scanner": "0.12.0", "pipeline": 5, "score_contract": 5 }
+{ "scanner": "0.12.0", "pipeline": 5, "score_contract": 6 }
 ```
 
 ## Capabilities
@@ -630,7 +649,10 @@ detection whose `engines` include `rescue`, where it is the errors-only
 count of its stream: a distrust marker, typically margin 0, not errors
 corrected. The margin does not subtract the ISO/IEC 18004 Annex B reserve,
 so on version 1, v2-L and v3-L a block with errors reads above ISO's UEC
-(04-score.md § Synthetic UEC).
+(04-score.md § Synthetic UEC). From score_contract 6 the stream counted is
+the widest-margin one among the engine's and the scanner's own verified
+samplings of the image (04-score.md § The correction margin): the count is
+of that sampling, not necessarily of the read that decoded the symbol.
 
 `score` evaluates the PRIMARY detection, `detections[0]`: QR family
 first, then the detection whose earliest read came first (07-pipeline.md

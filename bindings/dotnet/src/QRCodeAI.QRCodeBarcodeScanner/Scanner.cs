@@ -23,7 +23,8 @@ public static class Scanner
         return new ScanReport(Call(() => NativeScanner.Scan(
             image, Name(options.Profile ?? ScanProfile.Full), options.MaxDimension, options.MaxPixels,
             options.BudgetMs, Names(options.ScoreSkipAxes), Names(options.ScoreSkipChecks),
-            options.AlphaBackground, Names(options.AlphaPalette), options.ScorePreset)));
+            options.AlphaBackground, Names(options.AlphaPalette), options.ScorePreset,
+            Names(options.Formats))));
     }
 
     /// <summary>Reads the codes of one raw frame: four bytes per pixel, red, green, blue, alpha, row by row.</summary>
@@ -40,7 +41,8 @@ public static class Scanner
         return new ScanReport(Call(() => NativeScanner.ScanFrame(
             rgba, width, height, Name(options.Profile ?? ScanProfile.Frame), options.MaxDimension,
             options.MaxPixels, options.BudgetMs, Names(options.ScoreSkipAxes), Names(options.ScoreSkipChecks),
-            options.AlphaBackground, Names(options.AlphaPalette), options.ScorePreset)));
+            options.AlphaBackground, Names(options.AlphaPalette), options.ScorePreset,
+            Names(options.Formats))));
     }
 
     /// <summary>

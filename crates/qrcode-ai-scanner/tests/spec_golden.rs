@@ -647,6 +647,8 @@ mod fresh_scan {
         // no `--score-skip-axes`, `--score-preset` or `--score-skip-checks`
         config.score_skip_axes = Vec::new();
         config.score_skip_checks = Vec::new();
+        // no `--formats`: every symbology
+        config.formats = Vec::new();
         // No `--alpha-background`: the preset's mode stays. For
         // `--alpha-palette`, clap splits the argument at commas, and the
         // CLI's private parser refuses more than `MAX_ALPHA_PALETTE` colors

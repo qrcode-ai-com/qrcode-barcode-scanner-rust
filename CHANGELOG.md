@@ -4,6 +4,146 @@ All notable changes to this workspace. Every surface versions together — the R
 crate + CLI, the npm node + wasm packages, the Python wheel, and the
 Kotlin/Android · Swift/iOS · Flutter bindings.
 
+## Unreleased
+
+### Added
+
+- **`formats`: a scan can look for the symbologies you name and no other.**
+  A product that only handles QR codes no longer pays for the readers of
+  eighteen other symbologies: no reader of an unlisted symbology runs, and the
+  stages that exist only for unlisted symbologies are not planned. The names
+  are the ones a report uses (`qr_code`, `ean13`, `code128`, …). Left out or
+  empty, every symbology is read, as before.
+  - Surfaces: Rust `ScanConfig::formats` (with `ScanConfig::formats_from_names`,
+    `Symbology::ALL`, `Symbology::name` and `Symbology::from_name`), CLI
+    `--formats qr_code,ean13`, Node `formats`, the browser package (`formats`
+    in the named options below, or the last positional argument of
+    `scan_image` and `scan_frame`), Python `formats=`, Kotlin and Swift
+    `formats`, Ruby `formats:` and .NET `ScanOptions.Formats`. The Flutter
+    package does not take it yet.
+  - The report says what was looked for: `trace.formats` lists the
+    symbologies in the engine's order. The key is absent from an unrestricted
+    scan, so existing reports do not change.
+  - An unknown name is refused with `QRS-006` before the image is read (the
+    CLI exits 2 and prints the code on stderr). A typo never widens the scan
+    back to every symbology.
+  - Two results differ from an unrestricted scan, and both are stated in
+    `spec/02-profiles.md` § Formats. A code that shares its rows with a symbol
+    of an unlisted symbology can need that neighbor listed too
+    (`fixtures/symbology/ean13-addon5-code128.png` read for `code128` alone
+    returns nothing; with `ean13` listed both are read). A UPC-A symbol read
+    with `ean13` listed and `upc_a` not is reported as the EAN-13 it also is,
+    with its leading zero.
+- **Browser package: `scan` and `scanFrame` with named options.** The scanner
+  that `/auto` and the new `/node` entry load carries
+  `scan(bytes, { profile, budgetMs, formats, scoreSkipAxes, … })` and
+  `scanFrame(frame, options)` beside the positional `scan_image` and
+  `scan_frame`, which are unchanged. An unknown option throws a `TypeError`
+  that names it. `retryBudgetMs` reruns once a scan the time budget cut, and
+  `isFinal(report)` is `false` only for a cut report. `./scan` exports
+  `bindScanner(module)` for a module you initialized yourself.
+- **Browser package: a Node entry.** `import { loadScanner } from
+  "@qrcode-ai-com/qrcode-barcode-scanner-wasm/node"` reads the package's own
+  WASM from disk and resolves to the same scanner as `/auto`:
+  server-side rendering, tests and scripts need no bundler and no `fetch`.
+
+### Changed
+
+- **`versions.score_contract` 5 → 6: the correction margin of a QR code is
+  measured in the image, whatever read the symbol.** A consumer that pins the
+  contract number must accept 6, and some scores move. This release changes
+  the contract in a patch version because the change corrects a measurement
+  that depended on the export size of the same design.
+  - Up to contract 5 the margin (`score.uec`, its cap on `score.value` and the
+    `low_correction_margin` hint) was counted on the one sampling a decoder
+    happened to return. One design exported at twelve sizes could report
+    several margins, and a symbol that only the rxing port read reported none.
+  - The symbol is now sampled again at the corners that located it, with
+    three samplers and two thresholds. Only a sampling that error-corrects to
+    exactly the decoded payload counts, and the widest such margin stands.
+    When the first verified sampling still shows errors, the sampling grid is
+    registered on the corrected codewords and measured once more. The margin
+    never gets narrower than the one contract 5 reported.
+  - A symbol that only the rxing port read gains `score.uec`, and with it
+    `meta.version`, `meta.ec_level`, `meta.mask` and `meta.modules`. Its
+    `corners` stay `null`: no geometry is invented. A margin can lower its
+    score where real damage was not counted before:
+    `fixtures/artistic/github-orb-code39-regression.png` goes from 88 to 73
+    and `fixtures/artistic/builder-template-hearts-web-1024.png` from 82 to
+    73, both at 8 errors of 22.
+  - A clean symbol whose former sampling was a fraction of a module off no
+    longer pays a margin cap it did not earn: the pair
+    `fixtures/degraded/quiet-ring-phase-1015.png` and `-1023.png` goes from
+    85 and 70 to 100 and 88, both frames at 0 errors of 16. The difference
+    that remains is their perspective cells.
+  - Decoded contents, the stress axes of a QR code and the structural
+    checks are unchanged. The ISO 15415 card reads the same margin: its
+    `unused_error_correction` parameter follows the wider margin, and so does
+    `iso15415.overall` where that parameter decided it. A symbol only the
+    rescue path read, and every symbology other than QR, is measured as
+    before. A symbol no sampling verifies keeps `score.uec: null`, which
+    means not measured.
+- **Contract 6 also judges a linear barcode at its own width.** The stress
+  cells of a judgment run on one base image of the frame, and that base had
+  a longest side of 512 px for every symbology. A wide barcode then kept
+  under two pixels per bar before any stress: no contrast cell read, the
+  score fell to a few points and the judgment asked for contrast.
+  - The base of a linear symbology (EAN-13, EAN-8, UPC-A, UPC-E, Code 128,
+    Code 39, Code 93, Codabar, ITF, DataBar, DataBar Expanded, Telepen) now
+    keeps the pixel count of that 512 px square instead of its side: its
+    longest side is `512 × √(long side ÷ short side)`, at most 2048 px and
+    never more than the frame's own. The cost of a judgment stays bounded
+    by the same number of pixels.
+  - The resolution cells are the same shares of that base, and `failed_at`
+    names the side the cell ran at (`"518px"` on a 1037 px base, where a
+    512 px base says `"256px"`).
+  - `fixtures/symbology/ean13-addon5-code128.png` (1037 × 205) goes from 4
+    to 66 and no longer carries `increase_contrast`,
+    `fixtures/symbology/telepen.png` from 63 to 76,
+    `fixtures/symbology/code93-bwipp-checked.png` from 61 to 74 and
+    `fixtures/symbology/databar-expanded-bwipp-regression.png` from 51
+    to 61.
+  - A linear symbol in a frame whose longest side is at most 512 px, and
+    every matrix or stacked symbology (PDF417 included), is judged as
+    before. A linear symbol in a larger frame that is close to square has a
+    base a few percent wider than before and can move by one resolution
+    cell in either direction.
+- **The stress probes of a judgment run in the order of their expected
+  cost.** A stress cell passes when any binarization of its image reads under
+  any reader, so the order changes how long a cell takes and never whether it
+  passes. Each judgment remembers which pair read its last cells and how long
+  each took, and tries the cheapest expected pair first. On the 82 images of
+  `fixtures/` a full unbudgeted scan, with the margin measurement above, took
+  25 % less wall time in total and its median went from 162 ms to 110 ms on
+  the development machine; the order moved no axis result.
+- **Browser package: `/auto` no longer keeps a failure the next call could
+  fix.** A failed import of the loader, a failed request for the WASM, an
+  HTTP error status and a failed read of the response body are not cached:
+  the callers already waiting share the one rejection, and the next
+  `loadScanner()` starts a fresh attempt. `ScannerInitError.retryable` is
+  `true` for those four cases. Every other failure stays cached, no timer
+  runs and nothing is retried on its own. `/auto` now also requests
+  `scan.js`, one more file beside the loader.
+- **Browser package: a full scan of a styled QR code takes about a third of
+  the time.** rxing 0.9.3, which 0.11.0 adopted, compares its Reed-Solomon
+  field (two tables, 16 KiB) on every polynomial operation, and
+  `wasm32-unknown-unknown` links a comparison that walks one byte per step:
+  since 0.11.0 the `direct` and `enhance` stages took about three times
+  longer in the browser module than in 0.10.0. The module now links its own
+  `memcmp` and `bcmp` (`crates/qrcode-ai-scanner-wasm/src/mem.rs`): a range
+  compared with itself is equal without being read, and two ranges are
+  compared eight bytes per step. No report changes.
+  - Measured on 98 styled QR designs of a private set, one thread, CPU time
+    of a `full` scan with its score (three axes and three checks skipped):
+    a median of 2 399 ms with 0.12.0, 870 ms with this module and 503 ms
+    with `formats: ["qr_code"]`; the slowest scan went from 11.2 s to 2.2 s.
+    0.9.0, the last release measured before rxing 0.9.3, took a median of
+    1 177 ms.
+  - `memcmp` and `bcmp` appear among the module's raw WebAssembly exports,
+    because a linked symbol is one. They are not part of the package's API.
+  - Native builds (the CLI, the Node addon, Python, the mobile bindings) link
+    their platform's comparison, where the same field comparison was about a
+    quarter of one profiled scan. They are unchanged.
 ## 0.12.0 — 2026-11-22
 
 ### Added

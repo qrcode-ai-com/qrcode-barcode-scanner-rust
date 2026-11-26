@@ -146,6 +146,6 @@ void main() {
   test('the report the bridge returns is parsed', () async {
     final report = await QrcodeAiScanner.scan(image, budgetMs: 0);
     expect(report.detections, isEmpty);
-    expect(report.versions.scoreContract, 5);
+    expect(report.versions.scoreContract, 6);
   }, skip: skipReason);
 }

@@ -939,8 +939,13 @@ class PipelineTrace {
   /// The capacities the scan reached, whatever the budget; null: a report
   /// older than pipeline 5 (unknown, never false).
   final Saturation? saturation;
+
+  /// The symbologies the scan was restricted to, in the engine's order;
+  /// null: every symbology was read (an unrestricted scan, or a report
+  /// older than the option).
+  final List<Symbology>? formats;
   const PipelineTrace(this.stages, this.enginePanics, this.totalMs,
-      [this.budgetExhausted, this.saturation]);
+      [this.budgetExhausted, this.saturation, this.formats]);
   factory PipelineTrace.fromJson(Map<String, dynamic> j) => PipelineTrace(
         _objList(j['stages']).map(StageTrace.fromJson).toList(),
         _int(j['engine_panics']) ?? 0,
@@ -948,6 +953,9 @@ class PipelineTrace {
         j['budget_exhausted'] as bool?,
         j['saturation'] is Map
             ? Saturation.fromJson(_obj(j['saturation']))
+            : null,
+        j['formats'] is List
+            ? (j['formats'] as List).map(Symbology.from).toList()
             : null,
       );
 }

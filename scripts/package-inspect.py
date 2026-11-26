@@ -15,7 +15,10 @@ platform packages carry no scripts at all. The wasm package's destination
 modules are also read statically: the core imports nothing and uses none of
 the refused syntax or APIs past its browser floor; the Node resolver loads
 only node:http, node:https, node:dns and the core, reads no environment
-variables, and keeps certificate checks on. Nothing is ever uploaded: packing
+variables, and keeps certificate checks on. Its named-options module
+(scan.js) imports nothing, and its Node loader (node.js) loads only
+node:fs/promises, the automatic loader, that module and the package's own
+module. Nothing is ever uploaded: packing
 goes through `cargo package`, `npm pack --pack-destination`,
 scripts/build-wasm.sh (wasm-pack), maturin and `pub publish --dry-run`.
 pypi-live alone reads the network: one GET of PyPI's public JSON for the
@@ -184,9 +187,14 @@ WASM_FILES = frozenset({
     "report-types.d.ts",
     "camera.js", "camera.d.ts", "camera-overlay.js", "camera-overlay.d.ts",
     "destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts",
-    "auto.js", "auto.d.ts", "build-info.json",
+    "auto.js", "auto.d.ts", "scan.js", "scan.d.ts", "node.js", "node.d.ts", "build-info.json",
     *WASM_EXAMPLE_FILES,
 })
+# The hand-written modules and their types: scripts/patch-wasm-pkg.mjs copies each from the crate
+# (its COPIED_FILES), and the archive must hold those exact bytes.
+WASM_COPIED_FILES = ("auto.js", "auto.d.ts", "scan.js", "scan.d.ts", "node.js", "node.d.ts", "camera.js", "camera.d.ts",
+                     "camera-overlay.js", "camera-overlay.d.ts", "destination.js", "destination.d.ts",
+                     "destination-node.js", "destination-node.d.ts")
 # The keys wasm-pack 0.13.1 writes and scripts/patch-wasm-pkg.mjs renames or
 # adds; a wasm package.json may carry no other key. A `dependencies` or a
 # `publishConfig` is planted — nothing here writes one, and some would run or
@@ -790,10 +798,10 @@ def inspect_npm(host: Host, path: pathlib.Path, notes=()) -> Artifact:
         check_wasm_build(art, files, pkg.get("version"), name)
         for notice in ("LICENSE-APACHE-2.0", "THIRD-PARTY.md"):
             check_equal_file(art, notice, files.get(notice), ROOT / "crates/qrcode-ai-scanner" / notice)
-        for source in ("auto.js", "auto.d.ts", "camera.js", "camera.d.ts", "camera-overlay.js", "camera-overlay.d.ts",
-                       "destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts"):
+        for source in WASM_COPIED_FILES:
             check_equal_file(art, source, files.get(source), WASM_DIR / source)
         check_destination_modules(art, files)
+        check_scan_modules(art, files)
         for source in WASM_EXAMPLE_FILES:
             check_equal_file(art, source, files.get(source), WASM_DIR / source)
         check_example(art, files)
@@ -921,8 +929,10 @@ def check_wasm_manifest(art: Artifact, pkg: dict) -> None:
               all(exports.get(f"./{name}") == {"types": f"./{name}.d.ts", "import": f"./{name}.js", "default": f"./{name}.js"}
                   for name in ("camera", "camera-overlay"))
               and exports.get("./report-types") == {"types": "./report-types.d.ts"})
-    problems = destination_export_problems(exports)
+    problems = export_problems(exports, DESTINATION_EXPORTS, "./destination-node")
     art.check("browser-safe destination core and Node-only resolver exports", not problems, "; ".join(problems))
+    problems = export_problems(exports, SCAN_EXPORTS, "./node")
+    art.check("named-options module and Node-only loader exports", not problems, "; ".join(problems))
 
 
 # The destination core runs anywhere. The Node resolver is exported under `node` alone (types
@@ -933,22 +943,29 @@ DESTINATION_EXPORTS = {
     "./destination": {"types": "./destination.d.ts", "import": "./destination.js", "default": "./destination.js"},
     "./destination-node": {"types": "./destination-node.d.ts", "node": "./destination-node.js"},
 }
+# The named-options module runs anywhere. The Node loader reads the WASM with node:fs/promises
+# and is exported the way the Node resolver is: `node` alone, types first, behind a null key.
+SCAN_EXPORTS = {
+    "./scan": {"types": "./scan.d.ts", "import": "./scan.js", "default": "./scan.js"},
+    "./node": {"types": "./node.d.ts", "node": "./node.js"},
+}
 
 
-def destination_export_problems(exports: dict) -> list:
-    """How EXPORTS departs from a browser-safe destination core and a Node-only resolver."""
+def export_problems(exports: dict, wanted: dict, node_only: str) -> list:
+    """How EXPORTS departs from WANTED, whose NODE_ONLY key names a module no other runtime may
+    resolve: its file (NODE_ONLY + '.js') is a null key and the target of no other key."""
     problems = []
-    for key, want in DESTINATION_EXPORTS.items():
+    for key, want in wanted.items():
         got = exports.get(key)
         # Conditions match in object order: the same targets in another order are another export.
         if not isinstance(got, dict) or list(got.items()) != list(want.items()):
             problems.append(f"{key} is {json.dumps(got)}, not {json.dumps(want)}")
-    if "./destination-node.js" not in exports:
-        problems.append("no ./destination-node.js key (want null: the file stays unexported)")
-    elif exports["./destination-node.js"] is not None:
-        problems.append(f"./destination-node.js is {json.dumps(exports['./destination-node.js'])}, not null")
-    others = sorted(key for key, value in exports.items()
-                    if key != "./destination-node" and "./destination-node.js" in json.dumps(value))
+    file = f"{node_only}.js"
+    if file not in exports:
+        problems.append(f"no {file} key (want null: the file stays unexported)")
+    elif exports[file] is not None:
+        problems.append(f"{file} is {json.dumps(exports[file])}, not null")
+    others = sorted(key for key, value in exports.items() if key != node_only and file in json.dumps(value))
     patterns = sorted(key for key in exports if "*" in key and key != "./*")
     if others:
         problems.append(f"also exported as {', '.join(others)}")
@@ -1598,6 +1615,52 @@ def _opens_function(tokens: list, k: int, paren) -> bool:
     if head is not None and head[0] == "name" and head[1] in ("if", "for", "while", "switch", "catch", "with"):
         return False
     return not (head is not None and head[1] == "await" and before is not None and before[1] == "for")
+
+
+# The Node loader reads the WASM from disk and loads the three package modules it builds on;
+# anything else (node:http, a network client, a child process) has no place in it.
+NODE_LOADER_IMPORTS = frozenset({"node:fs/promises", "./auto.js", "./scan.js"})
+NODE_LOADER_MODULE = f"./{WASM_STEM}.js"
+
+
+def judge_node_loader(tokens: list) -> list:
+    """The Node loader's modules: its import declarations name exactly NODE_LOADER_IMPORTS, and its
+    one import() names the package's module as a literal."""
+    loaded = js_imports(tokens)
+    problems = [f"line {line}: {form}" + ("" if form.endswith("()") else " (module unreadable)")
+                for form, module, line in loaded if module is None and form != "import()"]
+    modules = {module for _form, module, _line in loaded if module is not None}
+    problems += [f"imports {module}" for module in sorted(modules - NODE_LOADER_IMPORTS)]
+    problems += [f"does not import {module}" for module in sorted(NODE_LOADER_IMPORTS - modules)]
+    literals = []
+    for k, (kind, value, line) in enumerate(tokens):
+        if kind != "name" or value != "import" or not _is(_at(tokens, k + 1), "(") or _is(_at(tokens, k - 1), ".", "?."):
+            continue
+        arguments = _call_arguments(tokens, k + 1)
+        literal = _quoted(arguments[0][0]) if len(arguments) == 1 and len(arguments[0]) == 1 else None
+        if literal is None:
+            problems.append(f"line {line}: an import() that names no literal module")
+        else:
+            literals.append(literal)
+    if literals != [NODE_LOADER_MODULE]:
+        problems.append(f"import() of {', '.join(literals) or 'nothing'}; expected {NODE_LOADER_MODULE}")
+    return problems
+
+
+def check_scan_modules(art: Artifact, files: dict) -> None:
+    """The named-options module and the Node loader, read statically as they ship. A source the
+    reader cannot read fails: an unread module is not a judged one."""
+    for name, check, judge in (
+        ("scan.js", "scan.js imports nothing (no import declaration, import(), require() or export … from)",
+         judge_isolated_core),
+        ("node.js", f"node.js loads only node:fs/promises, ./auto.js and ./scan.js, and {NODE_LOADER_MODULE} "
+                    "through one import() of a literal", judge_node_loader),
+    ):
+        data = files.get(name)
+        problems = ([f"no {name} in the archive"] if data is None
+                    else list(read_module(judge, data.decode("utf-8", errors="replace"))))
+        shown = problems[:12] + ([f"… {len(problems) - 12} more"] if len(problems) > 12 else [])
+        art.check(check, not problems, "; ".join(shown))
 
 
 def check_destination_modules(art: Artifact, files: dict) -> None:
@@ -3586,7 +3649,9 @@ def _npm_wasm(version: str) -> dict:
            "exports": {".": {"types": f"./{WASM_STEM}.d.ts", "import": f"./{WASM_STEM}.js",
                              "default": f"./{WASM_STEM}.js"},
                        **{f"./{name}": {"types": f"./{name}.d.ts", "import": f"./{name}.js", "default": f"./{name}.js"}
-                          for name in ("auto", "camera", "camera-overlay", "destination")},
+                          for name in ("auto", "scan", "camera", "camera-overlay", "destination")},
+                       "./node": {"types": "./node.d.ts", "node": "./node.js"},
+                       "./node.js": None,
                        "./destination-node": {"types": "./destination-node.d.ts", "node": "./destination-node.js"},
                        "./destination-node.js": None,
                        "./report-types": {"types": "./report-types.d.ts"},
@@ -3606,9 +3671,7 @@ def _npm_wasm(version: str) -> dict:
             f"{WASM_STEM}.d.ts": dts.encode(), WASM_MODULE: wasm,
             "build-info.json": json.dumps(info).encode(),
             "report-types.d.ts": CANON_TYPES.read_bytes(),
-            **{f"{name}.{ext}": (WASM_DIR / f"{name}.{ext}").read_bytes()
-               for name in ("auto", "camera", "camera-overlay", "destination", "destination-node")
-               for ext in ("js", "d.ts")},
+            **{name: (WASM_DIR / name).read_bytes() for name in WASM_COPIED_FILES},
             **{name: (WASM_DIR / name).read_bytes() for name in WASM_EXAMPLE_FILES}}
 
 
@@ -3731,9 +3794,7 @@ def self_test() -> int:
         judge("clean platform package", [npm("platform", _npm_platform(version, "linux-x64-gnu"))], PASS)
         judge("clean main package", [npm("main", _npm_main(version))], PASS)
         judge("clean wasm package", [npm("wasm", _npm_wasm(version))], PASS)
-        for missing in ("auto.js", "auto.d.ts", "camera.js", "camera.d.ts", "camera-overlay.js", "camera-overlay.d.ts",
-                        "destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts",
-                        "LICENSE-APACHE-2.0", "THIRD-PARTY.md", "build-info.json"):
+        for missing in (*WASM_COPIED_FILES, "LICENSE-APACHE-2.0", "THIRD-PARTY.md", "build-info.json"):
             incomplete = {key: value for key, value in _npm_wasm(version).items() if key != missing}
             judge(f"wasm package missing {missing}", [npm("wasm-incomplete", incomplete)], FAIL, missing)
         # One physical module, and the recorded current build: a second binary
@@ -3791,12 +3852,13 @@ def self_test() -> int:
               FAIL, "outside the floor")
         # Tests, fixtures and replay tools sit beside the shipped modules and never ship.
         for planted in ("destination.test.mjs", "destination-node.test.mjs", "destination.browser.test.mjs",
-                        "destination-fixtures.mjs", "camera-replay.test.mjs", "replay/metrics.mjs"):
+                        "destination-fixtures.mjs", "camera-replay.test.mjs", "replay/metrics.mjs", "scan.test.mjs"):
             judge(f"wasm package + {planted}",
                   [npm(f"wasm-plant-{re.sub(r'[^a-z0-9]+', '-', planted)}", _npm_wasm(version) | {planted: b"//\n"})],
                   FAIL, f"unexpected: {planted}")
         # A trailing comment passes every static reading: only the copy check refuses it.
-        for name in ("destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts"):
+        for name in ("destination.js", "destination.d.ts", "destination-node.js", "destination-node.d.ts",
+                     "scan.js", "scan.d.ts", "node.js", "node.d.ts"):
             altered = _npm_wasm(version)
             altered[name] += b"\n// altered\n"
             judge(f"wasm package with an altered {name}", [npm(f"wasm-altered-{name}", altered)], FAIL,
@@ -3992,6 +4054,46 @@ def self_test() -> int:
                 ("destination-node.js destructures env from process", "destination-node.js",
                  b"const { env } = process;\nexport const proxy = () => env.HTTPS_PROXY;",
                  ("destination-node.js loads only", "process other than process.versions"))):
+            files = _npm_wasm(version)
+            files[name] += b"\n" + addition + b"\n"
+            judge(f"wasm package whose {label}", [npm(f"wasm-read-{re.sub(r'[^a-z0-9]+', '-', label)}", files)], FAIL,
+                  *needles)
+        # The Node loader is exported under `node` alone, types first, and through no other key;
+        # the named-options module keeps its three targets.
+        node_loader = {"types": "./node.d.ts", "node": "./node.js"}
+        for label, key, value in (
+                ("a default target on the Node-only loader", "./node", node_loader | {"default": "./node.js"}),
+                ("an import target on the Node-only loader", "./node", node_loader | {"import": "./node.js"}),
+                ("a browser target on the Node-only loader", "./node", node_loader | {"browser": "./auto.js"}),
+                ("the Node-only loader's types after its node target", "./node",
+                 {"node": "./node.js", "types": "./node.d.ts"}),
+                ("./node.js exported instead of null", "./node.js", "./node.js"),
+                ("a second key exporting the Node loader", "./server", {"default": "./node.js"}),
+                ("a named-options module without its default target", "./scan",
+                 {"types": "./scan.d.ts", "import": "./scan.js"}),
+                ("the ./scan key removed", "./scan", None),  # None: removed
+                ("the null ./node.js key removed", "./node.js", None)):
+            manifest = json.loads(_npm_wasm(version)["package.json"])
+            if value is None:
+                del manifest["exports"][key]
+            else:
+                manifest["exports"][key] = value
+            judge(f"wasm package with {label}",
+                  [npm(f"wasm-exports-{re.sub(r'[^a-z0-9]+', '-', label)}",
+                       _npm_wasm(version) | {"package.json": json.dumps(manifest, indent=2).encode()})],
+                  FAIL, "named-options module and Node-only loader exports")
+        for label, name, addition, needles in (
+                ("scan.js imports the loader", "scan.js", b"import './auto.js';",
+                 ("scan.js imports nothing", "import './auto.js'")),
+                ("scan.js loads the module by itself", "scan.js",
+                 b"export const load = () => import('./qrcode-barcode-scanner.js');",
+                 ("scan.js imports nothing", "import()")),
+                ("node.js imports node:http", "node.js", b"import http from 'node:http';",
+                 ("node.js loads only", "imports node:http")),
+                ("node.js starts a child process", "node.js", b"const { spawn } = require('node:child_process');",
+                 ("node.js loads only", "require()")),
+                ("node.js imports a computed module", "node.js", b"export const later = (name) => import(name);",
+                 ("node.js loads only", "names no literal module"))):
             files = _npm_wasm(version)
             files[name] += b"\n" + addition + b"\n"
             judge(f"wasm package whose {label}", [npm(f"wasm-read-{re.sub(r'[^a-z0-9]+', '-', label)}", files)], FAIL,

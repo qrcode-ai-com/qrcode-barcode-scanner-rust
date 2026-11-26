@@ -20,8 +20,10 @@
 // every view on it. Requests run one at a time, in the order they arrive.
 import { createScannerLoader, scannerCapabilities } from '../auto.js';
 
-// One loader for the life of this worker: every request shares its single attempt, a failure
-// included. Terminating the worker and starting a new one is the explicit retry.
+// One attempt for the life of this worker: every request shares it, a failure included.
+// Terminating the worker and starting a new one is the explicit retry. `load` is that attempt's
+// Promise, which the worker keeps itself: a loader alone starts over after a failed request or
+// read (ScannerInitError.retryable).
 let load = null;
 
 const QRS_CODE = /\[(QRS-\d{3})\]/;
@@ -91,8 +93,8 @@ self.onmessage = async (event) => {
       throw malformed(`unknown request type ${JSON.stringify(type)}`);
     }
     phase = 'load';
-    if (load === null) load = createScannerLoader();
-    const scanner = await load();
+    if (load === null) load = createScannerLoader()();
+    const scanner = await load;
     if (type === 'load') {
       self.postMessage({ id, type, ok: true, version: scanner.version(), variant: scanner.variant,
         runtime: scannerCapabilities(), capabilities: scanner.capabilities() });

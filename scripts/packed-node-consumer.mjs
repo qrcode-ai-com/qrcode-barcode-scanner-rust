@@ -213,7 +213,7 @@ const optionPaths = mode === "native"
 const optionDomains = { paths: optionPaths.map(({ name: pathName }) => pathName), cases: 0 };
 for (const path of optionPaths) optionDomains.cases += await assertOptionDomains(path);
 assert.equal(qr.version(), expectedVersion);
-assert.deepEqual(full.versions, { scanner: expectedVersion, pipeline: 5, score_contract: 5 });
+assert.deepEqual(full.versions, { scanner: expectedVersion, pipeline: 5, score_contract: 6 });
 // the installed build lists the readers it carries: both engines and every
 // symbology, in the contract's order (a published package is a default build)
 const contract = JSON.parse(readFileSync(new URL("../spec/scan-report.schema.json", import.meta.url), "utf8")).$defs;

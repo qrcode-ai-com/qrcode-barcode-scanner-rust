@@ -52,7 +52,7 @@ versioned by the markers every report carries:
 |---|---|---|
 | `versions.scanner` | crate semver | every release |
 | `versions.pipeline` | `5` | the decode ladder's observable behavior changes (v2: transparent inputs flatten before decode — 01-report § Alpha; v3: exact content — original QR bytes, the scanner's own parses and re-read, declarations and Kanji/Hanzi segments interpreted once, refused malformed streams, reconciliation by content identity, the walk continuing past signalled-only QR reads — 01-report § Content, 07-pipeline properties 2 and 6; v4: budgeted native-resolution linear completion after QR pyramid success and consolidated linear-format acceptance; v5: every physical copy of a content measured as an occurrence — 01-report § Occurrences — equal linear copies kept apart instead of collapsed, and the capacities a scan reached published as `trace.saturation`) |
-| `versions.score_contract` | `5` | any score semantic changes (weights, axes, caps, bands; v4: alpha inputs score their flattened image; v5: the UEC margin cap, measured when `uec` is skipped, on the verified orientation's stream; interrupted judgments absent; probes match content identity) |
+| `versions.score_contract` | `6` | any score semantic changes (weights, axes, caps, bands; v4: alpha inputs score their flattened image; v5: the UEC margin cap, measured when `uec` is skipped, on the verified orientation's stream; interrupted judgments absent; probes match content identity; v6: the correction margin of the primary QR Code also measured in the image at its outer corners, the widest verified sampling published — a symbol only the rxing port read gains a margin and its cap, 04-score.md § The correction margin) |
 
 ## Layout
 
@@ -61,7 +61,7 @@ versioned by the markers every report carries:
 | [`01-report.md`](01-report.md) | The `ScanReport` wire format — every field, type, nullability |
 | [`02-profiles.md`](02-profiles.md) | Profiles, budgets, anti-DoS limits |
 | [`03-errors.md`](03-errors.md) | `QRS-xxx` error catalog + per-surface mapping + exit codes |
-| [`04-score.md`](04-score.md) | Score contract v5 — axes, weights, caps, UEC, ISO 15415 card |
+| [`04-score.md`](04-score.md) | Score contract v6 — axes, weights, caps, UEC, ISO 15415 card |
 | [`05-payloads.md`](05-payloads.md) | The payload kinds incl. the GS1 conformance verdict |
 | [`06-hints.md`](06-hints.md) | Hint catalog with exact firing conditions |
 | [`07-pipeline.md`](07-pipeline.md) | Ladder S1→S5 normative behavior + determinism contract |

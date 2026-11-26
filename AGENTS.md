@@ -213,6 +213,13 @@ manifest only and reports the gate as NOT VERIFIED, never as a pass.
   (incl. the `files` allowlist — wasm-pack wipes manual edits).
 - wasm-pack's bundled wasm-opt is too old for Rust ≥1.87 output — use
   binaryen ≥130 (`brew install binaryen`; CI pins version_130).
+- The browser module links its own `memcmp` and `bcmp`
+  (`crates/qrcode-ai-scanner-wasm/src/mem.rs`): rxing 0.9.3 compares 16 KiB
+  of Reed-Solomon tables on every polynomial operation, and the byte loop
+  `wasm32-unknown-unknown` links for it made the `direct` and `enhance`
+  stages about three times slower. `test.mjs` reads both linked symbols;
+  drop the file only with an rxing that no longer compares the tables, and
+  measure the stages when the rxing pin moves.
 - `corpus.toml` is TOML: control bytes (e.g. GS 0x1D) must be written
   as `\u001D` escapes, never as literal bytes.
 - The score probes decode ONLY the scored symbology

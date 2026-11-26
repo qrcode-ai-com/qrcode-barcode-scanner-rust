@@ -43,6 +43,11 @@ documented failure class:
 | S5 rescue | **logo-occluded symbols** past the engines' RS error wall |
 | alpha flatten + retry | **transparent exports** — the class where the verdict used to depend on which tool wrote the PNG (canvas stores black under the alpha, editors often white); the flatten pins it, the opposite-background retry kills the false "no detection", and `report.alpha.envelope` answers *over which backgrounds the design keeps decoding* with tested probes |
 
+A host that handles only some symbologies names them with the `formats`
+option: every stage then reads those alone, a stage that exists for the
+others is not planned, and the report lists the restriction in
+`trace.formats`.
+
 ## From reads to detections
 
 Engines report **reads**, never text. The scanner error-corrects and
@@ -142,8 +147,9 @@ same attempt sequence, bit for bit on a given platform. A wall-clock budget
 makes the *cut point* machine-dependent, and the report says when it cut:
 a planned stage, attempt or rescue candidate the deadline prevents sets
 `trace.budget_exhausted: true` (partial); `false` is the unbounded report.
-The grid re-derivations, the re-read, the end-of-walk pass and the
-confirmation decodes have no budget and never set it. Cross-platform, libm transcendentals may differ in
+The grid re-derivations, the re-read, the end-of-walk pass, the
+confirmation decodes and the measurement of the primary QR Code's
+correction margin in the image have no budget and never set it. Cross-platform, libm transcendentals may differ in
 the last ulp; rxing's PDF417 decoder breaks ties in randomized order (the
 one engine exception).
 </Note>

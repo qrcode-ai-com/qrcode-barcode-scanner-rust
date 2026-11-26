@@ -913,9 +913,10 @@ const pickFile = async (page, sample, serial) => {
   return settledView(page, serial);
 };
 const wasmPath = '/qrcode-barcode-scanner_bg.wasm';
-// Each file the page needs, served once with a static server's type, and nothing else.
+// Each file the page needs, served once with a static server's type, and nothing else. The
+// loader imports scan.js (the named options on the scanner it resolves to).
 const EXAMPLE_LOADS = ['/examples/headless.html', '/examples/headless.js', '/examples/scanner.worker.js', '/package.json',
-  '/build-info.json', '/auto.js', '/qrcode-barcode-scanner.js', wasmPath]
+  '/build-info.json', '/auto.js', '/scan.js', '/qrcode-barcode-scanner.js', wasmPath]
   .map(path => `${path} 200 ${STATIC_TYPES[extname(path)]}`).sort();
 receipt.example = { files: EXAMPLE_FILES.map(file => `examples/${file}`), loads: EXAMPLE_LOADS,
   cases: Object.fromEntries(Object.entries(exampleCases).map(([id, { file, rows }]) => [id, { file, rows }])),
@@ -1006,7 +1007,7 @@ const exampleWitness = async (browser, name, site, runtimeSupport) => {
 // A published package is a default build: both engines and every symbology, each list in the
 // order of the schema's EngineKind and Symbology (spec/01-report.md § Capabilities).
 const reportSchema = JSON.parse(readFileSync(join(root, 'spec/scan-report.schema.json')));
-const defaultBuild = { versions: { scanner: manifest.version, pipeline: 5, score_contract: 5 },
+const defaultBuild = { versions: { scanner: manifest.version, pipeline: 5, score_contract: 6 },
   engines: reportSchema.$defs.EngineKind.enum, symbologies: reportSchema.$defs.Symbology.enum };
 // The worker knows nothing of the page, so a camera page can share it: from the page's origin,
 // its load reply names what the browser supports (RUNTIME_SUPPORT) and the module's readers,
@@ -1494,7 +1495,8 @@ const cspSearch = async (browser, name, site) => {
 };
 // Each file the camera page needs, served once with a static server's type, and nothing else.
 const CAMERA_LOADS = ['/examples/camera.html', '/examples/camera.js', '/camera.js', '/camera-overlay.js', '/destination.js',
-  '/examples/scanner.worker.js', '/auto.js', '/qrcode-barcode-scanner.js', wasmPath, '/package.json', '/build-info.json']
+  '/examples/scanner.worker.js', '/auto.js', '/scan.js', '/qrcode-barcode-scanner.js', wasmPath, '/package.json',
+  '/build-info.json']
   .map(path => `${path} 200 ${STATIC_TYPES[extname(path)]}`).sort();
 receipt.example.cameraLoads = CAMERA_LOADS;
 // The control code's quad as the overlay should draw it: drawn at (140, 0) in the 640x360 frame,
@@ -1901,7 +1903,7 @@ try {
         assert.equal(response.ok, true, `${fixture.name}: ${JSON.stringify(response)}`);
         assert.deepEqual(response.result.detections.map(d => d.content), fixture.expected, fixture.name);
         assert.equal(response.result.trace.budget_exhausted, false);
-        assert.deepEqual(response.result.versions, { scanner: manifest.version, pipeline: 5, score_contract: 5 });
+        assert.deepEqual(response.result.versions, { scanner: manifest.version, pipeline: 5, score_contract: 6 });
         reports.push(response.result); latency.push({ fixture: fixture.name, wallMs: performance.now() - started });
       }
       // The pre-0.11 'compatible' name loads the same portable module; a SIMD
@@ -2028,7 +2030,7 @@ try {
     try {
       const { record, failures } = await overlayWitnesses({ browser, base, runtime: runtime.name, profiles: runtime.profiles,
         exactProfiles: runtime.exactProfiles ?? runtime.profiles, truth: overlayTruth, judge,
-        versions: { scanner: manifest.version, pipeline: 5, score_contract: 5 }, bytesOf: testCase => [...caseBytes(testCase)],
+        versions: { scanner: manifest.version, pipeline: 5, score_contract: 6 }, bytesOf: testCase => [...caseBytes(testCase)],
         recordsFile: join(root, 'fixtures/symbology/CONTENT-FIXTURES.md'), normalize, phase });
       const { defaultBudget, ...judged } = record;
       receipt.overlay.runtimes[runtime.name] = { browser: browser.version(), ...judged };

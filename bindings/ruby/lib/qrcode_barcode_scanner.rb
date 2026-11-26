@@ -26,17 +26,20 @@ module QrcodeBarcodeScanner
     #   report = QrcodeBarcodeScanner.scan(File.binread('label.png'))
     #   report.detections.each { |found| puts "#{found['symbology']} #{found.dig('content', 'text')}" }
     #
-    # profile: is :full (the default), :fast or :frame. budget_ms: 0 sets no time budget. Every
-    # option left out keeps the engine's own default. Raises ScanError when the engine refuses
-    # the image or an option; an image with no code is a report with no detection.
+    # profile: is :full (the default), :fast or :frame. budget_ms: 0 sets no time budget.
+    # formats: lists the symbologies to look for, such as %i[qr_code ean13]; left out, every
+    # symbology is read. Every option left out keeps the engine's own default. Raises ScanError
+    # when the engine refuses the image or an option; an image with no code is a report with no
+    # detection.
     def scan(image, profile: :full, budget_ms: nil, max_dimension: nil, max_pixels: nil,
              score_skip_axes: nil, score_skip_checks: nil, score_preset: nil,
-             alpha_background: nil, alpha_palette: nil)
+             alpha_background: nil, alpha_palette: nil, formats: nil)
       bytes = binary(image, 'image')
       Report.new(call do
         QrcodeAiScannerUniffi.scan(bytes, profile_name(profile), max_dimension, max_pixels, budget_ms,
                                    names(score_skip_axes), names(score_skip_checks),
-                                   text(alpha_background), names(alpha_palette), text(score_preset))
+                                   text(alpha_background), names(alpha_palette), text(score_preset),
+                                   names(formats))
       end)
     end
 
@@ -44,13 +47,13 @@ module QrcodeBarcodeScanner
     # width * height * 4 bytes in all. profile: defaults to :frame, the camera loop's profile.
     def scan_frame(rgba, width, height, profile: :frame, budget_ms: nil, max_dimension: nil,
                    max_pixels: nil, score_skip_axes: nil, score_skip_checks: nil, score_preset: nil,
-                   alpha_background: nil, alpha_palette: nil)
+                   alpha_background: nil, alpha_palette: nil, formats: nil)
       bytes = binary(rgba, 'rgba')
       Report.new(call do
         QrcodeAiScannerUniffi.scan_frame(bytes, Integer(width), Integer(height), profile_name(profile),
                                          max_dimension, max_pixels, budget_ms, names(score_skip_axes),
                                          names(score_skip_checks), text(alpha_background),
-                                         names(alpha_palette), text(score_preset))
+                                         names(alpha_palette), text(score_preset), names(formats))
       end)
     end
 

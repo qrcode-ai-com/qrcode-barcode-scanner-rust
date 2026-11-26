@@ -217,18 +217,18 @@
       {
         "stage": "pyramid",
         "transforms_tried": 1,
-        "ms": 13.944869,
+        "ms": 11.218166,
         "detections_found": 2
       },
       {
         "stage": "direct",
         "transforms_tried": 1,
-        "ms": 52.97117,
+        "ms": 69.68525000000001,
         "detections_found": 0
       }
     ],
     "engine_panics": 0,
-    "total_ms": 67.338712,
+    "total_ms": 81.10375,
     "budget_exhausted": false,
     "saturation": {
       "reads": false,
@@ -239,6 +239,6 @@
   "versions": {
     "scanner": "0.12.0",
     "pipeline": 5,
-    "score_contract": 5
+    "score_contract": 6
   }
 }

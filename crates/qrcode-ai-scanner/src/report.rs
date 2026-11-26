@@ -149,6 +149,67 @@ pub enum Symbology {
 }
 
 impl Symbology {
+    /// Every symbology, in declaration order — the order of
+    /// `trace.formats`.
+    pub const ALL: [Self; 19] = [
+        Self::QrCode,
+        Self::MicroQrCode,
+        Self::RectangularMicroQrCode,
+        Self::DataMatrix,
+        Self::Aztec,
+        Self::Pdf417,
+        Self::MaxiCode,
+        Self::Ean13,
+        Self::Ean8,
+        Self::UpcA,
+        Self::UpcE,
+        Self::Code128,
+        Self::Code39,
+        Self::Code93,
+        Self::Codabar,
+        Self::Itf,
+        Self::DataBar,
+        Self::DataBarExpanded,
+        Self::Telepen,
+    ];
+
+    /// The wire name of the symbology (`qr_code`, `ean13`, … — the
+    /// spelling of `detections[].symbology`).
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::QrCode => "qr_code",
+            Self::MicroQrCode => "micro_qr_code",
+            Self::RectangularMicroQrCode => "rectangular_micro_qr_code",
+            Self::DataMatrix => "data_matrix",
+            Self::Aztec => "aztec",
+            Self::Pdf417 => "pdf417",
+            Self::MaxiCode => "maxi_code",
+            Self::Ean13 => "ean13",
+            Self::Ean8 => "ean8",
+            Self::UpcA => "upc_a",
+            Self::UpcE => "upc_e",
+            Self::Code128 => "code128",
+            Self::Code39 => "code39",
+            Self::Code93 => "code93",
+            Self::Codabar => "codabar",
+            Self::Itf => "itf",
+            Self::DataBar => "data_bar",
+            Self::DataBarExpanded => "data_bar_expanded",
+            Self::Telepen => "telepen",
+        }
+    }
+
+    /// Parse the wire name of a symbology ([`Symbology::name`]). `None` on
+    /// anything else, so bindings fail LOUD on a typo — the same shape as
+    /// [`StressAxis::from_name`].
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|symbology| symbology.name() == name)
+    }
+
     /// QR family — the symbologies whose geometry/meta/UEC paths exist.
     #[must_use]
     pub fn is_qr_family(self) -> bool {
@@ -162,6 +223,26 @@ impl Symbology {
     #[must_use]
     pub fn is_retail_gtin(self) -> bool {
         matches!(self, Self::Ean13 | Self::Ean8 | Self::UpcA | Self::UpcE)
+    }
+
+    /// Linear symbologies — one row of bars, read along one direction. The
+    /// stacked and matrix symbologies (PDF417 included) are not.
+    pub(crate) fn is_linear(self) -> bool {
+        matches!(
+            self,
+            Self::Ean13
+                | Self::Ean8
+                | Self::UpcA
+                | Self::UpcE
+                | Self::Code128
+                | Self::Code39
+                | Self::Code93
+                | Self::Codabar
+                | Self::Itf
+                | Self::DataBar
+                | Self::DataBarExpanded
+                | Self::Telepen
+        )
     }
 }
 
@@ -954,6 +1035,15 @@ pub struct PipelineTrace {
         serde(default, skip_serializing_if = "Option::is_none")
     )]
     pub saturation: Option<Saturation>,
+    /// The symbologies the scan was restricted to (`ScanConfig::formats`),
+    /// each once, in the declaration order of [`Symbology`]. `None`: every
+    /// symbology the build reads was looked for — an unrestricted scan, and
+    /// every report older than this field.
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub formats: Option<Vec<Symbology>>,
 }
 
 impl Default for PipelineTrace {
@@ -965,6 +1055,7 @@ impl Default for PipelineTrace {
             total_ms: 0.0,
             budget_exhausted: Some(false),
             saturation: Some(Saturation::default()),
+            formats: None,
         }
     }
 }
@@ -1003,10 +1094,15 @@ impl Versions {
             // Pipeline 4: native-resolution linear completion after a QR
             // pyramid read, plus independently confirmed DataBar reads.
             pipeline: 5,
-            // score contract 5: the correction-margin cap on the verified
-            // orientation's stream, interrupted judgments absent, probes
-            // matched by content identity
-            score_contract: 5,
+            // score contract 6: the correction margin measured in the image
+            // (the widest verified sampling of the symbol, whatever read
+            // it), so one design keeps one margin at every export size;
+            // and a linear symbology judged on a base that keeps the pixel
+            // count of the 512 px square, not its side.
+            // Contract 5: the margin cap on the verified orientation's
+            // stream, interrupted judgments absent, probes matched by
+            // content identity.
+            score_contract: 6,
         }
     }
 }
@@ -1232,6 +1328,7 @@ mod tests {
                     detections: false,
                     occurrences: true,
                 }),
+                formats: None,
             },
             versions: Versions::current(),
         }
@@ -1355,9 +1452,9 @@ mod tests {
              reached; a bump must be deliberate"
         );
         assert_eq!(
-            v.score_contract, 5,
-            "score contract v5 = the margin cap on the verified stream, interrupted \
-             judgments absent, probes matched by content identity"
+            v.score_contract, 6,
+            "score contract v6 = the correction margin measured in the image, \
+             whatever read the symbol; a bump must be deliberate"
         );
     }
 

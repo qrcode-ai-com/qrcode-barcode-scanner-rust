@@ -42,6 +42,7 @@ const report: ScanReport = await scan(imageBuffer, {
   budgetMs: 1500,         // wall-clock bound; 0 = unbounded
   maxDimension: 4096,     // anti-DoS — LOWER THESE for untrusted uploads
   maxPixels: 16_000_000,
+  formats: ["qr_code", "ean13"], // only these symbologies; unset = all
   alphaBackground: "auto", // background under transparent pixels:
                           // "auto" | "white" | "black" | "none" | "#rrggbb"
                           // (opaque inputs untouched; result in report.alpha)
@@ -84,6 +85,15 @@ stage); above 4294967295 rejects. `maxDimension` / `maxPixels`: a whole
 number from 1 (to 4294967295 / `Number.MAX_SAFE_INTEGER`); `0`, a negative,
 a fraction, `NaN` or an infinity rejects — never a wrapped or disabled cap.
 A refused option rejects with `[QRS-006]` before the image is read.
+
+`formats` restricts the scan to the symbologies you name, by the names a
+report uses (`capabilities().symbologies` lists them): no reader of another
+symbology runs, and `report.trace.formats` says what was looked for. Unset
+or empty reads every symbology; an unknown name rejects with `[QRS-006]`.
+A package older than the option ignores the key and its report carries no
+`trace.formats`: read the key back to confirm the restriction applied. The
+two differences from an unrestricted scan are in `spec/02-profiles.md`
+§ Formats.
 
 ## Server recipe (Nitro/Express upload endpoint)
 

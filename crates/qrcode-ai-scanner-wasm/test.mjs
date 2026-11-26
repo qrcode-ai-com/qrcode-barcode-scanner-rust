@@ -10,7 +10,32 @@ import { inflateSync } from "node:zlib";
 import { assertOptionDomains, pngSize } from "../../scripts/option-domains.mjs";
 const { initSync, capabilities, scan_image, scan_frame, version } = await import("./pkg/qrcode-barcode-scanner.js");
 
-initSync({ module: readFileSync(new URL("./pkg/qrcode-barcode-scanner_bg.wasm", import.meta.url)) });
+const wasm = initSync({ module: readFileSync(new URL("./pkg/qrcode-barcode-scanner_bg.wasm", import.meta.url)) });
+
+// The module links its own memcmp and bcmp (src/mem.rs): the speed of every
+// QR Code decode depends on them. A linked symbol is an export, so both are
+// read here; neither is part of the package's API. The page is grown for this
+// check, so no byte of the module's own heap is written.
+{
+  const size = 40;
+  const a = wasm.memory.grow(1) * 65536;
+  const b = a + 4096 + 3;
+  const bytes = new Uint8Array(wasm.memory.buffer);
+  for (let i = 0; i < size; i += 1) bytes[a + i] = bytes[b + i] = (i * 37 + 1) & 255;
+  for (const compare of [wasm.memcmp, wasm.bcmp]) {
+    assert.equal(compare(a, b, size), 0);
+    assert.equal(compare(a, a, size), 0);
+    assert.equal(compare(a, b, 0), 0);
+  }
+  bytes[a + 33] = 10;
+  bytes[b + 33] = 15;
+  bytes[a + 34] = 250;
+  bytes[b + 34] = 1;
+  assert.equal(wasm.memcmp(a, b, size), -5);
+  assert.equal(wasm.memcmp(b, a, size), 5);
+  assert.equal(wasm.memcmp(a, b, 33), 0);
+  assert.notEqual(wasm.bcmp(a, b, size), 0);
+}
 
 const here = (rel) => new URL(rel, import.meta.url);
 const pkg = JSON.parse(readFileSync(here("./pkg/package.json"), "utf8"));

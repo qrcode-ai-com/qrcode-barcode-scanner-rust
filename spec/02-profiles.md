@@ -17,7 +17,8 @@
 Format coverage per stage: S1-S3 decode ALL symbologies; S4 (the
 QR-calibrated deep rungs) and S5 restrict to the QR family — paying the
 1D/PDF417/DataMatrix detectors on 17 recovery rungs would starve the
-budget for nothing.
+budget for nothing. The `formats` option narrows every stage to the
+symbologies a host names (§ Formats).
 
 ¹ S5 runs on EVERY profile whenever a rescue candidate was collected, the
 ladder came up empty and budget remains — `fast` collects candidates from
@@ -86,10 +87,65 @@ reading "NO" on valid product output is the documented trap.
   cancellation is checked before it and before every confirmation decode.
   A judgment whose every planned cell ran also completes its structural,
   UEC and ISO measurements (no decode) without waiting on the deadline.
+  The measurement of the primary QR Code's correction margin in the image
+  runs whenever a score is computed, before the judgment and whatever the
+  deadline: at most six grids sampled and one registration of at most
+  3 000 000 pixels, no decode engine (04-score.md § The correction margin).
   When a transparent input's first `auto` walk publishes nothing, the
   opposite background's plane is built — composited at full resolution,
   then downscaled to `max_engine_side` — before the second walk's first
   gate checks the deadline, so that work also runs past an expired one.
+
+## Formats (the symbologies a scan looks for)
+
+A scan looks for every symbology its build reads (01-report.md
+§ Capabilities) unless `formats` names the ones the host handles. Then no
+reader of another symbology runs in any stage, and a stage that exists for
+the others is not planned (07-pipeline.md property 2): the
+native-resolution completion for non-QR symbologies when every listed one
+is in the QR family, S4 when none is. Every profile takes the option, and
+its default is no restriction.
+
+- **Values**: the wire names of `Symbology`, the ones a report uses —
+  `qr_code` · `micro_qr_code` · `rectangular_micro_qr_code` ·
+  `data_matrix` · `aztec` · `pdf417` · `maxi_code` · `ean13` · `ean8` ·
+  `upc_a` · `upc_e` · `code128` · `code39` · `code93` · `codabar` · `itf` ·
+  `data_bar` · `data_bar_expanded` · `telepen`. Order and repetition do
+  not matter. Unset or empty = every symbology.
+- **Surfaces**: Rust `ScanConfig.formats` (`ScanConfig::formats_from_names`
+  parses wire names) · CLI `--formats` (comma-separated) · Node `formats` ·
+  WASM `formats` (the last positional argument: #11 of `scan_image`, #13 of
+  `scan_frame`) · Python `formats` kwarg · Kotlin/Swift (UniFFI) `formats` ·
+  Ruby `formats:` · .NET `ScanOptions.Formats`. The Flutter package does
+  not take it yet: it looks for every symbology. The Go and PHP packages
+  drive the `qrscan` command and expose no `formats` argument of their own.
+- **An unknown name** is `QRS-006` on each of these surfaces, before the
+  input is read (§ Option domains): one parser serves them all, and a
+  misspelt name never widens the scan back to every symbology. The message
+  lists the accepted names; the CLI prints it on stderr and exits 2.
+- **A name the build has no reader for** (`ean13` in an rqrr-only build)
+  is accepted and reads nothing: `capabilities().symbologies` says what a
+  build reads.
+- **The report says what was looked for**: `trace.formats` lists the
+  restriction, each symbology once, in `Symbology` order. The key is absent
+  from an unrestricted scan (01-report.md § PipelineTrace).
+
+A listed symbology is read by the same readers, judged and reported as in
+an unrestricted scan. Two differences follow from the restriction:
+
+- An unrestricted scan sets each symbol it reads aside and reads again
+  around it. A symbol that shares its rows with one of an unlisted
+  symbology — two linear codes side by side — can therefore need its
+  neighbour listed to be read.
+- A UPC-A symbol read with `ean13` listed and `upc_a` not is reported as
+  the EAN-13 it also is, with its leading zero.
+
+The restriction also moves where the walk stops: the exit rule reads what
+the listed readers found, so a scan restricted to `qr_code` goes on to the
+later stages of its profile on an image where an unrestricted scan stopped
+on a barcode. And it moves what `score` judges: the primary detection is
+the first of those the restricted scan publishes, so on an image holding a
+QR Code and a barcode a scan restricted to the barcode judges the barcode.
 
 ## Anti-DoS limits (validated BEFORE decode)
 
@@ -107,7 +163,10 @@ followed by `scan_image`'s scoring and alpha options. Flutter takes no
 limits: it scans under the defaults.
 Server guidance: lower `maxDimension`/`maxPixels` for untrusted uploads
 (e.g. 4096 / 16M). Violations are `QRS-002`/`QRS-003` errors — see
-[03-errors.md](03-errors.md).
+[03-errors.md](03-errors.md). A cap of `0` does not lift a limit or select
+its default: `max_dimension: 0` and `max_pixels: 0` are refused with
+`QRS-006` before the input is read (§ Option domains). Leave a cap unset to
+keep its default.
 
 ## Option domains (validated BEFORE the input)
 
@@ -123,6 +182,7 @@ input is read: an invalid option beside unreadable bytes is `QRS-006`, never
 | `max_dimension` | 1 to 4 294 967 295 px | `0` |
 | `max_pixels` | 1 to 2⁶⁴ − 1 px (JavaScript: to 2⁵³ − 1) | `0` |
 | `alpha_palette` (Rust `ScanConfig`) | at most 32 colors | more |
+| `formats` | unset or empty (every symbology) · wire names of `Symbology` (§ Formats) | an unknown name |
 | `pyramid_side` · `max_engine_side` (Rust `ScanConfig`) | 1 or more px | `0` |
 
 The budget's maximum, about 49.7 days, is the one range every binding
@@ -157,7 +217,9 @@ same way on both — never through an integer conversion that wraps modulo
 Unknown names (a profile, stress axis, score check, alpha background,
 palette color or preset) keep each binding's own loud error, without a
 `QRS` code. So does a binding's palette list above 32 colors: the bindings
-refuse it before the core sees it (Kotlin/Swift: `PaletteTooLarge`).
+refuse it before the core sees it (Kotlin/Swift: `PaletteTooLarge`). An
+unknown `formats` name is the one name refused with a code: the core
+parses it for every surface (`QRS-006`, § Formats).
 
 ## Cancellation
 

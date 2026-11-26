@@ -88,6 +88,11 @@ export interface DecodedContent {
   fnc1?: Fnc1Position;
 }
 
+/**
+ * version · mask · modules are measured, never guessed: by the geometry engine or, from score_contract 6, by the
+ * scanner's own sampling of the primary QR Code detection where it lies in the image, when that sampling verifies
+ * (spec/04-score.md § The correction margin). That detection can state them beside null corners.
+ */
 export interface QrMeta {
   version: number | null;
   ec_level: EcLevel | null;
@@ -160,6 +165,9 @@ export interface StructuralReport { finder_integrity: [number, number, number]; 
  * block), measured on the stream of the orientation the decode verified,
  * only when every block error-corrects errors-only under the detection's
  * version, EC level and mask (an S5 rescue stream keeps its own count).
+ * From score_contract 6 a QR Code is also sampled by the scanner where it
+ * lies in the image, and the widest margin a verified sampling reads is the
+ * one published (spec/04-score.md § The correction margin).
  * ISO measures against d − p: the Annex B reserve p of v1, v2-L and v3-L is
  * not subtracted, so there a block with errors reads above ISO's margin
  * (spec/04-score.md § Synthetic UEC).
@@ -326,6 +334,11 @@ export interface PipelineTrace {
   budget_exhausted?: boolean;
   /** The capacities the scan reached, whatever the budget. Absent before pipeline 5 (unknown, never false). */
   saturation?: Saturation;
+  /**
+   * The symbologies the scan was restricted to (the `formats` option), each once, in Symbology order. ABSENT: no
+   * restriction — every symbology the build reads was looked for (also any report older than this field).
+   */
+  formats?: Symbology[];
 }
 
 /** A true flag: what that capacity left out is unknown, not absent (spec/01 § PipelineTrace). */

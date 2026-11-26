@@ -273,6 +273,51 @@ pub(crate) enum FormatFilter {
     /// every decoder is 1× vs ~5× scan cost, and a cross-symbology text
     /// match would be a false survival signal anyway).
     Only(Symbology),
+    /// The symbologies the caller asked for (`ScanConfig::formats`), or the
+    /// part of them a stage reads: never empty.
+    Set(Formats),
+}
+
+/// A set of symbologies: what a scan restricted with `ScanConfig::formats`
+/// looks for.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Formats(u32);
+
+impl Formats {
+    /// Every symbology the QR-family stages read.
+    const QR_FAMILY: [Symbology; 3] = [
+        Symbology::QrCode,
+        Symbology::MicroQrCode,
+        Symbology::RectangularMicroQrCode,
+    ];
+
+    fn bit(symbology: Symbology) -> u32 {
+        1 << (symbology as u32)
+    }
+
+    /// The set of `list`; a symbology listed twice is in it once.
+    pub(crate) fn of(list: &[Symbology]) -> Self {
+        Self(list.iter().fold(0, |set, s| set | Self::bit(*s)))
+    }
+
+    pub(crate) fn contains(self, symbology: Symbology) -> bool {
+        self.0 & Self::bit(symbology) != 0
+    }
+
+    pub(crate) fn is_empty(self) -> bool {
+        self.0 == 0
+    }
+
+    /// Its QR-family members.
+    pub(crate) fn qr_family(self) -> Self {
+        Self(self.0 & Self::of(&Self::QR_FAMILY).0)
+    }
+
+    /// Its members outside the QR family.
+    #[cfg(feature = "engine-rxing")]
+    pub(crate) fn non_qr(self) -> Self {
+        Self(self.0 & !Self::of(&Self::QR_FAMILY).0)
+    }
 }
 
 /// One decode pass: every enabled engine, all symbologies.
@@ -297,18 +342,78 @@ pub(crate) fn decode_filtered(luma: &LumaImage, filter: FormatFilter) -> EngineO
     // a single-symbology pass (score cells, envelope probes) discards the
     // rescue candidates: their orientation is never worth an RS there
     #[cfg(feature = "engine-rqrr")]
-    if matches!(
+    if (matches!(
         filter,
         FormatFilter::All | FormatFilter::QrFamily | FormatFilter::Only(Symbology::QrCode)
-    ) && let Some(pass) = run_engine(&mut outcome.panics, || {
-        rqrr_engine::decode(luma, !matches!(filter, FormatFilter::Only(_)))
-    }) {
+    ) || matches!(filter, FormatFilter::Set(set) if set.contains(Symbology::QrCode)))
+        && let Some(pass) = run_engine(&mut outcome.panics, || {
+            rqrr_engine::decode(luma, !matches!(filter, FormatFilter::Only(_)))
+        })
+    {
         outcome.detections.extend(pass.found);
         outcome.rescue.extend(pass.rescue);
         outcome.refused.extend(pass.refused);
     }
 
     outcome
+}
+
+/// What one reader answered a probe ([`probe`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Probe {
+    /// The reader made a read the caller accepts.
+    pub(crate) accepted: bool,
+    /// Decoder panics caught in the pass.
+    pub(crate) panics: u8,
+}
+
+/// The readers of a pass restricted to `symbology` — those of
+/// `decode_filtered(luma, FormatFilter::Only(symbology))`: rxing for every
+/// symbology, rqrr beside it for QR Code.
+pub(crate) fn probe_readers(symbology: Symbology) -> &'static [EngineKind] {
+    if symbology == Symbology::QrCode {
+        &[EngineKind::Rxing, EngineKind::Rqrr]
+    } else {
+        &[EngineKind::Rxing]
+    }
+}
+
+/// Whether `reader`'s pass restricted to `symbology` makes a read `admits`
+/// accepts — one reader's share of the question a score cell or an envelope
+/// probe asks, which keeps nothing else of the pass. Over
+/// [`probe_readers`] the answer is that of
+/// `decode_filtered(luma, FormatFilter::Only(symbology))`: a read one of
+/// them makes is accepted or none is. Only the work differs: the caller
+/// picks the order and stops at the first accepted read, and rxing's pass
+/// ends at that read. A reader the build lacks, or one that does not read
+/// `symbology`, accepts nothing; a decoder panic is caught, counted, and a
+/// read not made.
+pub(crate) fn probe(
+    luma: &LumaImage,
+    symbology: Symbology,
+    reader: EngineKind,
+    admits: &dyn Fn(&RawDetection) -> bool,
+) -> Probe {
+    let mut panics = 0u8;
+    let accepted = match reader {
+        #[cfg(feature = "engine-rxing")]
+        EngineKind::Rxing => run_engine(&mut panics, || {
+            #[cfg(test)]
+            inject_probe_panic(FormatFilter::Only(symbology));
+            rxing_engine::probe(luma, symbology, admits)
+        }),
+        // rqrr reads QR Code alone; a probe keeps no rescue candidate, so
+        // none is oriented (`rqrr_engine::decode`)
+        #[cfg(feature = "engine-rqrr")]
+        EngineKind::Rqrr if symbology == Symbology::QrCode => run_engine(&mut panics, || {
+            rqrr_engine::decode(luma, false).found.iter().any(admits)
+        }),
+        _ => None,
+    };
+    Probe {
+        accepted: accepted == Some(true),
+        panics,
+    }
 }
 
 #[cfg(test)]

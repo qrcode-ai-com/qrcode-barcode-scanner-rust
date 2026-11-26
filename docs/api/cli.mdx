@@ -32,6 +32,7 @@ qrscan <image> [--profile full|fast|frame] [--budget-ms <ms>]
                [--score-skip-checks <check,...>]
                [--alpha-background auto|white|black|none|"#rrggbb"]
                [--alpha-palette <color,...>]
+               [--formats <symbology,...>]
                [--pretty|-p] [--score-only|-s]
 qrscan --capabilities
 ```
@@ -65,6 +66,17 @@ renders the flatten verdict plus the placement-envelope strip
 `--alpha-palette` probes your own colors in the same scan (comma-separated
 `white`, `black` or `#rrggbb`, at most 32): per-color verdicts land in
 `alpha.envelope.palette`.
+
+`--formats` restricts the scan to the symbologies you name (comma-separated,
+by the names a report uses: `qr_code`, `ean13`, `code128`, `data_matrix`…
+— `qrscan --capabilities` lists them). No reader of another symbology
+runs, which is faster when you handle only some, and the report says what
+was looked for in `trace.formats`. Without the option every symbology is
+read. An unknown name exits 2 and lists the accepted names on stderr. Two
+things differ from an unrestricted scan: a barcode that shares its rows
+with one of an unlisted symbology can need that neighbour listed to be
+read, and a UPC-A read with `ean13` listed and `upc_a` not is reported as
+the EAN-13 it also is (`spec/02-profiles.md` § Formats).
 
 | Mode | Output |
 |---|---|
@@ -130,6 +142,9 @@ score=$(qrscan render.png -s --budget-ms 0) && [ "$score" -ge 70 ] || exit 1
 
 # extract just the decoded text
 qrscan in.png | jq -r '.detections[0].content.text'
+
+# only QR codes: no other reader runs
+qrscan in.png --formats qr_code | jq -r '.detections[0].content.text'
 
 # is it retail-ready GS1?
 qrscan in.png | jq '.detections[0].payload | select(.kind=="gs1_digital_link") | .conformant'

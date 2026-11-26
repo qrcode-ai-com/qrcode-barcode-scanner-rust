@@ -98,6 +98,7 @@ report = QrcodeBarcodeScanner.scan(image, profile: :fast, budget_ms: 0)
 | `max_dimension:`, `max_pixels:` | The largest image accepted. A larger one is refused before it is decoded. |
 | `score_skip_axes:`, `score_skip_checks:`, `score_preset:` | Which parts of the score are left out. A preset and skipped axes cannot be given together. |
 | `alpha_background:`, `alpha_palette:` | What a transparent image is laid over, and the backgrounds a transparent code must scan over. |
+| `formats:` | The symbologies the scan looks for, by the engine's names, such as `%i[qr_code ean13]`. No reader of another symbology runs. Left out, every symbology is read. |
 
 The values each option takes are those of the engine: see the
 [option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/spec/02-profiles.md).

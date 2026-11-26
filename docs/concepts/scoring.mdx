@@ -1,6 +1,6 @@
 ---
 title: "Scoring"
-description: "Score contract v5 · the synthetic UEC margin · the ISO 15415-informed grade card."
+description: "Score contract v6 · the synthetic UEC margin · the ISO 15415-informed grade card."
 ---
 
 The score answers one question: **how much margin does this code have
@@ -32,6 +32,11 @@ stops at the first failed cell (the knee). Weighted sum → structural caps
 | rotation | 10 | non-cardinal angles |
 | lighting | 15 | shadows, glare, exposure defects |
 
+Every cell is built from one base image of the frame, at most 512 px on its
+longest side. A linear barcode keeps the pixel count of that square instead,
+so a wide Code 128 is judged at its own width (at most 2048 px) and its
+resolution cells are the same shares of that width.
+
 Two structural caps override everything: a dead finder pattern caps the
 score at **40**, a violated quiet zone at **60** — the two documented
 AI-art killers. A thin error-correction margin `m` below 0.5 caps it
@@ -60,8 +65,8 @@ unjudged → NOT_JUDGED (never LOW) — the pattern of the
 > unused. A full tank (margin 1.0) is healthy; an empty one (0) means the decode
 > sat at the edge and might be wrong.
 
-The ISO 15415 *Unused Error Correction* margin, computed from the
-engine's own sampled bitstream: unmask → de-interleave → Reed-Solomon
+The ISO 15415 *Unused Error Correction* margin, computed from a sampled
+bitstream of the symbol: unmask → de-interleave → Reed-Solomon
 syndromes → Berlekamp-Massey degree = the EXACT number of codewords the
 decode had to correct. The stream is the one of the orientation the decode
 verified (a mirrored code is measured mirrored-back, and reads the same
@@ -72,6 +77,16 @@ errors-only count: with `rescue` among the engines, `worst_block_errors`
 is a distrust marker (typically margin 0), not the errors it corrected.
 Skipping the `uec` check withholds the section and its two hints, never
 the cap: the value does not move.
+
+From score contract 6 the scanner also samples a QR Code itself, where it
+lies in the image, and publishes the widest margin a sampling verifies —
+one whose stream error-corrects to the exact payload bytes — when it is
+wider than the engine's, or when the engine measured none. A code only
+`rxing` read can therefore carry a `uec`, its cap and its hints. This runs
+for the primary detection of a scan that computes a score, never for a
+rescued read
+([`spec/04-score.md`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/spec/04-score.md)
+§ The correction margin).
 
 ```json
 "uec": { "margin": 0.82, "grade": "a",

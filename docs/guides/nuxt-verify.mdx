@@ -31,9 +31,10 @@ const onVerify = async () => {
   if (!canvas) return;
 
   // The loader checks WASM support in this execution realm. Handle
-  // ScannerInitError separately from scan errors in the calling UI. Its failed
-  // attempt stays cached; retry only after an explicit user action with a fresh
-  // createScannerLoader(), rather than retrying every verify/render.
+  // ScannerInitError separately from scan errors in the calling UI. A failure
+  // whose `retryable` is false stays cached; from 0.12.1 a retryable one (a
+  // failed request or read) is not kept, and the next loadScanner() call tries
+  // again. Retry after an explicit user action, not on every verify/render.
   const { scan_image } = await loadScanner();
 
   // NATIVE resolution — no resize prep: downscaling destroys the blob

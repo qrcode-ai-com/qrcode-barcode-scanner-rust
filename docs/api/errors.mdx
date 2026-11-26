@@ -18,7 +18,7 @@ invalid option.
 | `QRS-003` | total pixels over `maxPixels` (incl. decompression bombs) | 413 |
 | `QRS-004` | raw buffer length mismatch (`rgba8`/`luma8` misuse) | 500 — caller bug |
 | `QRS-005` | cancelled via `CancelToken` | — |
-| `QRS-006` | an option outside its domain (a zero cap, a budget above 4 294 967 295 ms, a JavaScript `NaN` or fractional cap), checked before the input | 500 — caller bug: fix the call, never retry it unchanged |
+| `QRS-006` | an option outside its domain (a zero cap, a budget above 4 294 967 295 ms, a JavaScript `NaN` or fractional cap, an unknown `formats` name), checked before the input | 500 — caller bug: fix the call, never retry it unchanged |
 
 Match the **code**, never the prose: the cross-surface contract is the
 regex `QRS-\d{3}`, delimited `[QRS-xxx]` in every message.

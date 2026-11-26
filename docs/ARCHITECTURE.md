@@ -94,7 +94,9 @@ ImageInput (Encoded | Rgba8 | Luma8)
                      weighed over the whole walk (spec/07 § Acceptance)
   → reconcile        the walk's read set → the distinct contents the scanner
                      can tell apart; each content read once → engines consensus
-  → score            contract v5 (see SCORING.md) — Full/Fast profiles only
+  → margin           the primary QR Code sampled where it lies in the image,
+                     when a score is computed (spec/04 § The correction margin)
+  → score            contract v6 (see SCORING.md) — Full/Fast profiles only
   → ScanReport       versioned serde contract (snake_case · raw as base64)
 ```
 

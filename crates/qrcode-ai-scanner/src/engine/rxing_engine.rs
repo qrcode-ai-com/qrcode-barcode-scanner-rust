@@ -79,6 +79,38 @@ fn parse_ec(s: &str) -> Option<EcLevel> {
     }
 }
 
+/// Every symbology an rxing pass can be restricted to.
+const SYMBOLOGIES: [Symbology; 19] = [
+    Symbology::QrCode,
+    Symbology::MicroQrCode,
+    Symbology::RectangularMicroQrCode,
+    Symbology::DataMatrix,
+    Symbology::Aztec,
+    Symbology::Pdf417,
+    Symbology::MaxiCode,
+    Symbology::Ean13,
+    Symbology::Ean8,
+    Symbology::UpcA,
+    Symbology::UpcE,
+    Symbology::Code128,
+    Symbology::Code39,
+    Symbology::Code93,
+    Symbology::Codabar,
+    Symbology::Itf,
+    Symbology::DataBar,
+    Symbology::DataBarExpanded,
+    Symbology::Telepen,
+];
+
+/// The rxing format set of a caller's symbology set.
+fn formats_of(set: super::Formats) -> std::collections::HashSet<rxing::BarcodeFormat> {
+    SYMBOLOGIES
+        .into_iter()
+        .filter(|symbology| set.contains(*symbology))
+        .flat_map(formats_for)
+        .collect()
+}
+
 /// Our symbology → the rxing format set to restrict a pass to.
 fn formats_for(only: Symbology) -> std::collections::HashSet<rxing::BarcodeFormat> {
     use rxing::BarcodeFormat as F;
@@ -107,7 +139,33 @@ fn formats_for(only: Symbology) -> std::collections::HashSet<rxing::BarcodeForma
 }
 
 pub(super) fn decode(luma: &LumaImage, filter: super::FormatFilter) -> Vec<RawDetection> {
+    decode_until(luma, filter, &|_| false)
+}
+
+/// Whether a pass restricted to `symbology` makes a read `admits` accepts.
+/// The pass ends at the first such read ([`decode_until`]): the regions
+/// around it are not searched, and the answer is the one the whole pass
+/// would give (a read it filters out as a duplicate carries the content of
+/// the read that replaces it).
+pub(super) fn probe(
+    luma: &LumaImage,
+    symbology: Symbology,
+    admits: &dyn Fn(&RawDetection) -> bool,
+) -> bool {
+    decode_until(luma, super::FormatFilter::Only(symbology), admits)
+        .iter()
+        .any(admits)
+}
+
+/// One rxing pass under `filter`, ended at the first read whose observation
+/// `stop` accepts: that read is then the only one returned.
+fn decode_until(
+    luma: &LumaImage,
+    filter: super::FormatFilter,
+    stop: &dyn Fn(&RawDetection) -> bool,
+) -> Vec<RawDetection> {
     use rxing::BarcodeFormat as F;
+    let stop = |result: &rxing::RXingResult| observe(result).is_some_and(|read| stop(&read));
     let possible = match filter {
         super::FormatFilter::All => None,
         super::FormatFilter::NonQr => Some(std::collections::HashSet::from([
@@ -136,6 +194,30 @@ pub(super) fn decode(luma: &LumaImage, filter: super::FormatFilter) -> Vec<RawDe
         super::FormatFilter::Only(symbology) => {
             Some(formats_for(symbology)).filter(|set| !set.is_empty())
         }
+        super::FormatFilter::Set(set) => Some(formats_of(set)),
+    };
+    // the dispatcher of the general pass runs the zxing-cpp port for QR Code
+    // or Micro QR only: a set with rMQR and neither of them reads rMQR in
+    // the pass of its own (`decode_rmqr`), after the general one
+    let (general, rmqr_alone) = match filter {
+        super::FormatFilter::Only(Symbology::RectangularMicroQrCode) => (false, true),
+        super::FormatFilter::Set(set) => {
+            let alone = set.contains(Symbology::RectangularMicroQrCode)
+                && !set.contains(Symbology::QrCode)
+                && !set.contains(Symbology::MicroQrCode);
+            (
+                !alone || set != super::Formats::of(&[Symbology::RectangularMicroQrCode]),
+                alone,
+            )
+        }
+        _ => (true, false),
+    };
+    let expanded = match filter {
+        super::FormatFilter::All
+        | super::FormatFilter::NonQr
+        | super::FormatFilter::Only(Symbology::DataBarExpanded) => true,
+        super::FormatFilter::Set(set) => set.contains(Symbology::DataBarExpanded),
+        _ => false,
     };
     // TryHarder defaults on in the helper; inverted symbols are real in the
     // artistic corpus — always on (a config knob nobody turns is debt).
@@ -145,25 +227,28 @@ pub(super) fn decode(luma: &LumaImage, filter: super::FormatFilter) -> Vec<RawDe
         ..Default::default()
     };
 
-    let found = if filter == super::FormatFilter::Only(Symbology::RectangularMicroQrCode) {
-        decode_rmqr(luma, &mut hints)
+    let mut results = if general {
+        decode_all(luma, &mut hints, &stop).unwrap_or_default()
     } else {
-        decode_all(luma, &mut hints)
+        Vec::new()
     };
-    let mut results = found.unwrap_or_default();
-    if matches!(
-        filter,
-        super::FormatFilter::All
-            | super::FormatFilter::NonQr
-            | super::FormatFilter::Only(Symbology::DataBarExpanded)
-    ) && !results
-        .iter()
-        .any(|result| *result.getBarcodeFormat() == F::RSS_EXPANDED)
+    if rmqr_alone {
+        let mut hints = rxing::DecodeHints {
+            AlsoInverted: Some(true),
+            PossibleFormats: Some(formats_for(Symbology::RectangularMicroQrCode)),
+            ..Default::default()
+        };
+        results.extend(decode_rmqr(luma, &mut hints, &stop).unwrap_or_default());
+    }
+    if expanded
+        && !results
+            .iter()
+            .any(|result| *result.getBarcodeFormat() == F::RSS_EXPANDED)
     {
         // The upstream reader can stop at an internal false finder. The
         // patched reader retains checksums, stacked rows and independent
         // confirmation; it only rejects incorrectly spaced finders.
-        if let Ok(expanded) = decode_expanded(luma) {
+        if let Ok(expanded) = decode_expanded(luma, &stop) {
             results.extend(expanded);
         }
     }
@@ -192,14 +277,18 @@ fn bitmap(
 fn decode_all(
     luma: &LumaImage,
     hints: &mut rxing::DecodeHints,
+    stop: &dyn Fn(&rxing::RXingResult) -> bool,
 ) -> rxing::common::Result<Vec<rxing::RXingResult>> {
     hints.TryHarder = hints.TryHarder.or(Some(true));
     let mut image = bitmap(luma)?;
     let mut reader = super::multi_reader::FormatReader::default();
-    super::multi_reader::decode_multiple(&mut reader, &mut image, hints, luma)
+    super::multi_reader::decode_multiple(&mut reader, &mut image, hints, luma, stop)
 }
 
-fn decode_expanded(luma: &LumaImage) -> rxing::common::Result<Vec<rxing::RXingResult>> {
+fn decode_expanded(
+    luma: &LumaImage,
+    stop: &dyn Fn(&rxing::RXingResult) -> bool,
+) -> rxing::common::Result<Vec<rxing::RXingResult>> {
     let mut image = bitmap(luma)?;
     // The patched reader reads only TryHarder; the ladder retries inverted images.
     let hints = rxing::DecodeHints {
@@ -207,7 +296,7 @@ fn decode_expanded(luma: &LumaImage) -> rxing::common::Result<Vec<rxing::RXingRe
         ..Default::default()
     };
     let mut reader = super::databar_expanded::RSSExpandedReader::default();
-    super::multi_reader::decode_multiple(&mut reader, &mut image, &hints, luma)
+    super::multi_reader::decode_multiple(&mut reader, &mut image, &hints, luma, stop)
 }
 
 /// The pass of an rMQR-only filter (score cells, envelope probes): the
@@ -222,11 +311,12 @@ fn decode_expanded(luma: &LumaImage) -> rxing::common::Result<Vec<rxing::RXingRe
 fn decode_rmqr(
     luma: &LumaImage,
     hints: &mut rxing::DecodeHints,
+    stop: &dyn Fn(&rxing::RXingResult) -> bool,
 ) -> rxing::common::Result<Vec<rxing::RXingResult>> {
     hints.TryHarder = hints.TryHarder.or(Some(true));
     let mut image = bitmap(luma)?;
     let mut reader = rxing::MultiFormatReader::default();
-    super::multi_reader::decode_multiple(&mut reader, &mut image, hints, luma)
+    super::multi_reader::decode_multiple(&mut reader, &mut image, hints, luma, stop)
 }
 
 /// Which rxing QR reader produced a result — it decides what
@@ -1456,8 +1546,8 @@ mod tests {
         let mut read = 0;
         for name in &names {
             let luma = fixture(&format!("symbology/{name}"));
-            let ours =
-                super::decode_all(&luma, &mut rxing::DecodeHints::default()).unwrap_or_default();
+            let ours = super::decode_all(&luma, &mut rxing::DecodeHints::default(), &|_| false)
+                .unwrap_or_default();
             let upstream = rxing::helpers::detect_multiple_in_luma_with_hints(
                 luma.data().to_vec(),
                 luma.width(),
@@ -1769,7 +1859,7 @@ mod tests {
             PossibleFormats: only.map(|format| std::collections::HashSet::from([format])),
             ..Default::default()
         };
-        super::decode_all(luma, &mut hints).unwrap_or_default()
+        super::decode_all(luma, &mut hints, &|_| false).unwrap_or_default()
     }
 
     /// `left` and `right` side by side on a white plane, top-aligned.
@@ -1802,7 +1892,7 @@ mod tests {
             [(RSS_EXPANDED, EXPANDED_TEXT)]
         );
         assert_eq!(
-            reads(&super::decode_expanded(&quarter).unwrap()),
+            reads(&super::decode_expanded(&quarter, &|_| false).unwrap()),
             [(RSS_EXPANDED, EXPANDED_TEXT)],
             "the patched pass reads the quarter-size symbol as well"
         );

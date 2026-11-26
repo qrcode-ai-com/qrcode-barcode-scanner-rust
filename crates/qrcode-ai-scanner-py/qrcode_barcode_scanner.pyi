@@ -87,6 +87,7 @@ def scan(
     alpha_background: str | None = None,
     alpha_palette: list[str] | None = None,
     score_preset: str | None = None,
+    formats: list[str] | None = None,
 ) -> ScanReport:
     """Decode + score an encoded image (PNG, JPEG, WebP, GIF).
 
@@ -122,6 +123,11 @@ def scan(
     drop-the-channel behavior). Opaque inputs are untouched; transparent inputs
     report the resolved background + placement envelope in ``report["alpha"]``.
     An unknown value raises (spec/01 § alpha).
+    formats: the symbologies to look for, by wire name (``["qr_code"]``,
+    ``["ean13", "upc_a"]``). No reader of another symbology runs — faster for a
+    caller that handles only some — and the report says what was looked for
+    (``report["trace"]["formats"]``). Unset or empty = every symbology; an unknown
+    name raises ``ValueError`` ending ``[QRS-006]``.
     "No QR found" returns a report with empty ``detections``; raises ``ValueError``
     on invalid input, an oversized image, or an unknown profile.
     """
@@ -140,13 +146,14 @@ def scan_frame(
     alpha_background: str | None = None,
     alpha_palette: list[str] | None = None,
     score_preset: str | None = None,
+    formats: list[str] | None = None,
 ) -> ScanReport:
     """Decode + score a raw RGBA frame (e.g. a camera frame) — no image-format roundtrip.
 
     ``rgba`` must be ``width * height * 4`` bytes. max_dimension / max_pixels: optional
     input-size caps (see ``scan``). budget_ms: per-frame wall-clock bound
     (``0`` = unbounded, see ``scan``). score_skip_axes / score_skip_checks /
-    alpha_background: see ``scan``.
+    alpha_background / formats: see ``scan``.
     Raises ``ValueError`` on invalid input.
     """
     ...

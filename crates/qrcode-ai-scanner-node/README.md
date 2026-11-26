@@ -164,6 +164,10 @@ Scan faults other than an abort carry `QRS-xxx` codes, including invalid input a
   work. Defaults are 10000 px per side and 64 million pixels. Lower these for
   untrusted uploads; invalid values reject with `[QRS-006]` before reading
   the image.
+- `formats`: the symbologies to look for, by the names a report uses, such as
+  `["qr_code", "ean13"]`. No reader of another symbology runs, and
+  `report.trace.formats` says what was looked for. Unset or empty reads every
+  symbology; an unknown name rejects with `[QRS-006]`.
 - `signal`: an `AbortSignal` already aborted at the call, or aborted while the
   task is queued, rejects with an `AbortError` DOMException. A running scan is
   not interrupted; it settles with its report or its own `[QRS-xxx]` fault.
