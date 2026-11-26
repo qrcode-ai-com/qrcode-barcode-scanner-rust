@@ -172,12 +172,13 @@ such as a phone, serve the folder over `https`. Without a secure context the cam
 so when you press **Start the camera**.
 
 Each page requests only files of the package folder. The image page: `examples/headless.html`,
-`examples/headless.js`, `examples/scanner.worker.js`, `auto.js`, `qrcode-barcode-scanner.js`,
-`qrcode-barcode-scanner_bg.wasm`, `package.json` and `build-info.json`. The camera page:
-`examples/camera.html`, `examples/camera.js`, `camera.js`, `camera-overlay.js`,
-`destination.js`, `examples/scanner.worker.js`, `auto.js`, `qrcode-barcode-scanner.js`,
-`qrcode-barcode-scanner_bg.wasm`, `package.json` and `build-info.json`; and, only for a destination
-check you start, the link's URL and every redirect the browser follows from it.
+`examples/headless.js`, `examples/scanner.worker.js`, `auto.js`, `scan.js`,
+`qrcode-barcode-scanner.js`, `qrcode-barcode-scanner_bg.wasm`, `package.json` and
+`build-info.json`. The camera page: `examples/camera.html`, `examples/camera.js`, `camera.js`,
+`camera-overlay.js`, `destination.js`, `examples/scanner.worker.js`, `auto.js`, `scan.js`,
+`qrcode-barcode-scanner.js`, `qrcode-barcode-scanner_bg.wasm`, `package.json` and
+`build-info.json`; and, only for a destination check you start, the link's URL and every redirect
+the browser follows from it.
 
 Each page also carries a Content-Security-Policy of its own, in a `meta` element. The image
 page's:

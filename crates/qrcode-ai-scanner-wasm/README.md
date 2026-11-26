@@ -87,6 +87,109 @@ and import an image. The decoder runs in the packaged module worker. The
 explains camera access, HTTPS and CSP requirements. Opening the HTML as a
 `file://` URL does not support the module-worker flow.
 
+## Scan with named options (0.12.1)
+
+```js
+import { loadScanner, isFinal } from "@qrcode-ai-com/qrcode-barcode-scanner-wasm/auto";
+
+const scanner = await loadScanner();
+
+// encoded bytes (PNG, JPEG, WebP, GIF): a Uint8Array or an ArrayBuffer
+const report = scanner.scan(await file.arrayBuffer(), {
+  profile: "full",
+  formats: ["qr_code", "ean13"], // read these symbologies only
+  budgetMs: 1500,
+});
+const texts = report.detections.map((detection) => detection.content.text);
+if (!isFinal(report)) {
+  // the time budget cut the scan: codes can be missing, and a null score
+  // beside a detection means "not judged"
+}
+
+// raw RGBA pixels: an ImageData, or any { data, width, height }
+const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+const live = scanner.scanFrame(pixels, { budgetMs: 80 });
+```
+
+The scanner that `loadScanner()` resolves to carries `scan(bytes, options)` and
+`scanFrame(frame, options)`. They call `scan_image` and `scan_frame` with the
+options given by name, in any order, and return the engine's report unchanged.
+The positional functions stay on the same object and behave as before.
+
+| Option | What it sets |
+|---|---|
+| `profile` | `"full"`, `"fast"` or `"frame"`. Left out, `scan` uses `full` and `scanFrame` uses `frame`. |
+| `formats` | The symbologies to read, by the names a report uses, such as `"qr_code"`, `"ean13"`, `"code128"` or `"data_matrix"`; `capabilities().symbologies` lists them. Left out or empty, every symbology is read. |
+| `budgetMs` | The time budget in milliseconds, in place of the profile's. `0` removes the limit. |
+| `retryBudgetMs` | The budget of one second scan, which runs only when the first report is not final. `0` removes the limit for that scan. |
+| `maxDimension`, `maxPixels` | The largest accepted width or height, and the largest pixel count: whole numbers from 1. |
+| `scoreSkipAxes`, `scoreSkipChecks`, `scorePreset` | The score options of `scan_image`. |
+| `alphaBackground`, `alphaPalette` | The transparency options of `scan_image`. |
+
+An option left out keeps the engine's default. A key that is not in this table
+throws a `TypeError` that names it and lists the accepted keys, so a misspelling
+such as `budget_ms` is never ignored. The engine checks each value and throws
+as it does for a positional call: `[QRS-006]` for a number outside its domain,
+and an error for an unknown profile, format, axis or check name.
+
+`scan` takes a `Uint8Array` (a Node `Buffer` is one) or an `ArrayBuffer`.
+`scanFrame` takes an `ImageData`, or any `{ data, width, height }` whose `data`
+is a `Uint8Array` or a `Uint8ClampedArray` of RGBA bytes. Anything else throws
+a `TypeError` before the engine is called.
+
+### Final reports and one retry
+
+`isFinal(report)` is `true` unless the time budget cut the scan
+(`report.trace.budget_exhausted === true`). A cut report is a valid account of
+what was read in time: it can miss codes, and its `score` can be `null` beside
+a detection, which then means "not judged", never "unscannable".
+`retryBudgetMs` gives the usual answer in the same call:
+
+```js
+// a short first scan and, only if the budget cut it, one scan with no limit
+const report = scanner.scan(bytes, { budgetMs: 200, retryBudgetMs: 0 });
+```
+
+The second report is returned as it is, final or not, and a third scan never
+runs. A scan occupies its thread until it returns, so give a long or unlimited
+budget to a worker, not to the page's main thread.
+
+### The same scanner in Node
+
+The `/node` entry loads the same module in Node 18 or later. It reads the
+package's own `.wasm` file from disk where `/auto` fetches it:
+
+```js
+import { readFile } from "node:fs/promises";
+import { loadScanner, isFinal } from "@qrcode-ai-com/qrcode-barcode-scanner-wasm/node";
+
+const scanner = await loadScanner();
+const report = scanner.scan(await readFile("label.png"), { profile: "fast" });
+```
+
+Its scanner has the shape `/auto` resolves to: the module's exports, `scan`,
+`scanFrame` and `variant`. A failure is a `ScannerInitError` with the codes of
+`/auto`, and a file that cannot be read rejects with `asset_read_failed`.
+`createScannerLoader({ wasmPath })` reads the file from another path or
+`file:` URL. The entry is exported for Node alone, so a browser build that
+imports it fails when it resolves the name. `/node` runs the bytes the browser
+runs; for the native Node addon, see
+[The same engine in other runtimes](#the-same-engine-in-other-runtimes).
+
+### Without a loader
+
+`bindScanner` from `/scan` gives the same two functions to a module you
+initialized yourself. `/scan` is plain JavaScript that imports nothing:
+
+```js
+import init, * as scanner from "@qrcode-ai-com/qrcode-barcode-scanner-wasm";
+import { bindScanner, isFinal } from "@qrcode-ai-com/qrcode-barcode-scanner-wasm/scan";
+
+await init();
+const { scan, scanFrame } = bindScanner(scanner);
+const report = scan(pngBytes, { profile: "fast", formats: ["qr_code"] });
+```
+
 ## Automatic loading, including module workers
 
 ```js
@@ -112,16 +215,40 @@ The root import below loads the same module through wasm-pack's default
 initialization and `initSync`; `/auto` adds the feature checks and typed
 errors. Use `/auto` in both the worker and any main-thread fallback.
 
-Concurrent or repeated `loadScanner()` calls share one promise and instance.
-An initialization rejection also stays cached. There are no automatic retries,
-reloads, or blind fallbacks after a network/compiler error. For an explicit
-user-initiated retry, create one fresh loader:
+Concurrent `loadScanner()` calls share one promise, and a loaded scanner is
+kept: later calls return the same instance and request nothing. There are no
+automatic retries, reloads, or blind fallbacks after a network/compiler error.
+What a failed attempt leaves behind depends on its cause, which
+`error.retryable` states:
+
+- `loader_import_failed`, `asset_network_failed`, `asset_http_failed` and
+  `asset_read_failed` have `retryable: true`. The loader does not keep them:
+  every caller already waiting receives the one rejection, and the next call
+  starts a fresh attempt.
+- Every other code has `retryable: false` and stays cached. The options, the
+  runtime or the bytes themselves are at fault, so another attempt would end
+  the same way, and later calls return the same rejection.
+
+Call the loader again from an explicit user action, such as a retry button:
 
 ```js
-import { createScannerLoader } from "@qrcode-ai-com/qrcode-barcode-scanner-wasm/auto";
-const retry = createScannerLoader();
-const scanner = await retry();
+import { loadScanner } from "@qrcode-ai-com/qrcode-barcode-scanner-wasm/auto";
+
+retryButton.addEventListener("click", async () => {
+  try {
+    start(await loadScanner()); // a new attempt after a retryable failure
+  } catch (error) {
+    retryButton.hidden = !error.retryable;
+    show(`The scanner did not load (${error.code}).`);
+  }
+});
 ```
+
+Before 0.12.1 every rejection stayed cached, and a retry needed a new loader
+from `createScannerLoader()`. That form still works: each loader has its own
+state. After a failed import of the package's module, a browser can keep that
+failure for the life of the page and answer the next import with it, without a
+new request; reloading the page is then the retry.
 
 The factory also accepts an optional `wasmUrl` for an asset pipeline that
 cannot process package URLs. Keep that override on the same exact package
@@ -131,8 +258,8 @@ no-SIMD feature set; any other value, `"simd"` included, rejects with
 `invalid_options`. The 0.10 `compatible/` export paths were removed: import the
 package root instead, and `variant: "compatible"` still selects this module.
 
-`ScannerInitError` carries a stable `code`, selected `variant`, optional HTTP
-`status`, and original `cause`. Codes distinguish `wasm_unavailable`,
+`ScannerInitError` carries a stable `code`, selected `variant`, `retryable`,
+optional HTTP `status`, and original `cause`. Codes distinguish `wasm_unavailable`,
 `wasm_features_unsupported`, `loader_import_failed`, `asset_network_failed`,
 `asset_http_failed`, `asset_read_failed`, `binary_invalid`,
 `wasm_validation_failed`, `wasm_compile_failed`, `wasm_instantiate_failed` and
@@ -200,7 +327,9 @@ const frame = ctx.getImageData(0, 0, w, h);
 const live = scan_frame(new Uint8Array(frame.data.buffer), w, h);
 // after profile and budget_ms, scan_frame takes scan_image's other options:
 // max_dimension, max_pixels, score_skip_axes, score_skip_checks,
-// alpha_background, alpha_palette, score_preset (same domains and errors)
+// alpha_background, alpha_palette, score_preset (same domains and errors).
+// From 0.12.1 both functions end with formats, the symbologies to read
+// (absent or empty: all of them), and bindScanner takes every option by name
 
 // the readers compiled into the module: versions, engines, symbologies
 // (which readers are included, not that an image decodes)
@@ -671,9 +800,10 @@ own:
   to compile it. A module worker loaded from its own URL takes its policy from
   the headers of that script's response: a page's `meta` policy, such as the
   one each example page carries, does not reach it.
-- `/auto` imports the package's own module and fetches only its `.wasm` file,
-  next to it unless you pass `wasmUrl`, so `connect-src`, or `default-src`
-  when `connect-src` is absent, must allow that origin.
+- `/auto` imports the package's own modules (`scan.js` with it, then the
+  generated module when the loader is called) and fetches only its `.wasm`
+  file, next to it unless you pass `wasmUrl`, so `connect-src`, or
+  `default-src` when `connect-src` is absent, must allow that origin.
 - The overlay injects one `<style>` element, which needs `styleNonce` or
   `styles: 'none'` with `CAMERA_OVERLAY_CSS` in your own stylesheet, and sets
   every other value through the CSSOM.
@@ -691,10 +821,10 @@ own:
   in a Chromium started with WebAssembly SIMD disabled. Those runs say nothing
   about Safari, iOS or Android.
 - **Bundlers.** The examples need no bundler. In a bundled application, import
-  the entries by name (`/auto`, `/camera`, `/camera-overlay`, `/destination`):
-  the loader finds its `.wasm` through `import.meta.url`, and the package's CI
-  builds a fresh Vite application with a module worker from the installed
-  package. The browser API guide lists the bundler settings, and
+  the entries by name (`/auto`, `/scan`, `/camera`, `/camera-overlay`,
+  `/destination`): the loader finds its `.wasm` through `import.meta.url`, and
+  the package's CI builds a fresh Vite application with a module worker from
+  the installed package. The browser API guide lists the bundler settings, and
   [Use a bundler](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-wasm/examples/README.md#use-a-bundler)
   shows the example pages' imports by package name.
 - **Server rendering.** Importing `/auto`, `/camera`, `/camera-overlay` and
@@ -702,9 +832,10 @@ own:
   nothing and touches no DOM; the package's CI imports them in Node with
   `WebAssembly` undefined and checks that `fetch` is never called, and
   `examples/ssr.mjs` shows the camera, overlay and destination helpers a server
-  can call. Load the scanner in the browser or a worker, and start the camera
-  in the browser: where WebAssembly is missing, `loadScanner()` rejects with
-  `wasm_unavailable`.
+  can call. `/scan` imports nothing and is as safe to import. Load the scanner
+  in the browser or a worker, and start the camera in the browser: where
+  WebAssembly is missing, `loadScanner()` rejects with `wasm_unavailable`. On
+  a server that should scan, `/node` loads the module from disk.
 
 Releases up to 0.10.1 were published as `@supernovae-st/qrcode-ai-scanner-wasm`.
 
