@@ -1,0 +1,41 @@
+{
+  "schema": "qrscan-oci-inputs/1",
+  "version": "0.12.1",
+  "engineSource": "5b2c580c78b0693e58909f889b66f24fc1c548b1",
+  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+  "license": "MIT",
+  "rustc": "1.99.1",
+  "baseImage": "debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc",
+  "releaseManifest": {
+    "name": "qrcode-barcode-scanner-cli-0.12.1-SHA256SUMS",
+    "sha256": "9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055"
+  },
+  "platforms": {
+    "amd64": {
+      "target": "x86_64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.1-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "5e99d584447b03eef3818e14034c12ad09c88f31f8535b5929b0b846203a0665",
+      "binarySha256": "dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de"
+    },
+    "arm64": {
+      "target": "aarch64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.1-aarch64-unknown-linux-gnu.tar.gz",
+      "sha256": "ba2af3b5304b0756ba172d38ce9f839fc3b668c38d4a7ab49b719e5f0cfd5789",
+      "binarySha256": "b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b"
+    }
+  },
+  "sources": {
+    "qrcode-barcode-scanner-cli-0.12.1-source.tar.gz": {
+      "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-source.tar.gz",
+      "sha256": "2fa08f66f7f5840f4abbbcda947a108ed8b2639c42322a338bbd04805ee4d7ff"
+    },
+    "qrcode-barcode-scanner-0.12.1.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner/qrcode-barcode-scanner-0.12.1.crate",
+      "sha256": "9a2e012d2ceb3c05f4ea6332aed311667af060481925621e6e813c8a158e514e"
+    },
+    "qrcode-barcode-scanner-cli-0.12.1.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner-cli/qrcode-barcode-scanner-cli-0.12.1.crate",
+      "sha256": "7414ba4b5b43f562ca2ef9d9ac4b69f333bc32a841ccd76e8d2553490938d88c"
+    }
+  }
+}
