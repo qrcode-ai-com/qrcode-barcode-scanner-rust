@@ -317,8 +317,8 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 | Destination | Version | Platforms |
 | --- | --- | --- |
 | [GitHub Releases](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1) | 0.12.1 | macOS ARM64/x64, GNU/Linux ARM64/x64, [Windows x64](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-x86_64-pc-windows-msvc.zip), and source |
-| [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.0 | macOS and GNU/Linux on ARM64/x64 |
-| [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.0 | Windows x64 |
+| [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.1 | macOS and GNU/Linux on ARM64/x64 |
+| [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.1 | Windows x64 |
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0) | 0.12.0-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0) | 0.12.0-1.fc44 | Fedora 44, x86_64 and aarch64 |
@@ -338,9 +338,12 @@ scoop bucket add qrcode-ai https://github.com/qrcode-ai-com/scoop-bucket
 scoop install qrcode-ai/qrcode-barcode-scanner
 ```
 
-The [Scoop Windows run](https://github.com/qrcode-ai-com/scoop-bucket/actions/runs/42226107417)
-installed the public package, read the QR and Code 128 `STOCK-4827` together
-in `fast`, `frame` and `full`, and uninstalled the CLI.
+The [Homebrew consumer run](https://github.com/qrcode-ai-com/homebrew-tap/actions/runs/45896392319)
+installed `qrscan` 0.12.1 from the public tap on macOS and GNU/Linux, ARM64 and x64, ran
+`brew test`, read the QR code and the Code 128 `STOCK-4827` together in `fast`, `frame`
+and `full`, and uninstalled it. The
+[Scoop Windows run](https://github.com/qrcode-ai-com/scoop-bucket/actions/runs/45896250486)
+did the same from the public bucket on Windows x64.
 For direct downloads, follow the [CLI archive and checksum guide](cli/README.md#download-and-verify).
 
 For Debian or Ubuntu, download the `.deb` for your architecture from the
@@ -409,11 +412,13 @@ SHA-256 of its checksum list, and its checks run in this repository. The Termux 
 0.12.1 source archive instead, and its update function follows each later CLI release. The Glama
 container and the MCP Bundle hold the published MCP server instead, with the engine it was released on,
 each package pinned by its npm integrity. None of these destinations serves the scanner yet, except
-Glama, which lists the MCP server since 20 November 2026, and the MCP Bundle, whose 0.3.3 file is on
+Glama, which lists the MCP server since 20 November 2026, the MCP Bundle, whose 0.3.3 file is on
 the release [`mcpb-v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) since 25 November 2026 and whose 0.3.2 file is
-on the release [`mcpb-v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) since 24 November 2026. Four destinations received pull requests
-that day (conda-forge two, one per recipe). Three wait for review by their maintainers; MSYS2 closed
-its pull request unmerged. The other nine are prepared. Each recipe README says what its registry
+on the release [`mcpb-v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) since 24 November 2026, and the Termux User Repository, which
+serves the CLI package since its maintainer merged the pull request on 26 November 2026. Four
+destinations received pull requests (conda-forge two, one per recipe). The two conda-forge pull
+requests wait for review by their maintainers, TUR merged its pull request, and the MacPorts and
+MSYS2 pull requests were closed unmerged. The other nine are prepared. Each recipe README says what its registry
 still needs, usually an account or a review in that registry.
 
 | Destination | Recipe | State | Checked here |
@@ -428,8 +433,8 @@ still needs, usually an account or a review in that registry.
 | openSUSE Build Service | [obs](obs/README.md) | prepared | `rpmspec`, `rpmlint` and the service file |
 | Launchpad PPA | [ppa](ppa/README.md) | prepared | source package built with `debuild -S`, then `lintian` |
 | Alpine Linux | [alpine](alpine/README.md) | prepared | `apkbuild-lint`, `abuild sanitycheck` and `abuild fetch verify` |
-| Termux User Repository | [termux](termux/README.md) | [submitted](https://github.com/termux-user-repository/tur/pull/3114) | the termux-packages linter |
-| MacPorts | [macports](macports/README.md) | [submitted](https://github.com/macports/macports-ports/pull/36975) | Portfile tests, with the crate list equal to `Cargo.lock` |
+| Termux User Repository | [termux](termux/README.md) | [merged: in TUR](https://github.com/termux-user-repository/tur/pull/3114) | the termux-packages linter |
+| MacPorts | [macports](macports/README.md) | [closed unmerged](https://github.com/macports/macports-ports/pull/36975) | Portfile tests, with the crate list equal to `Cargo.lock` |
 | FreeBSD ports | [freebsd](freebsd/README.md) | prepared | crates and distinfo equal to `Cargo.lock`, port variables read by `bmake` |
 | MSYS2 | [msys2](msys2/README.md) | [closed unmerged](https://github.com/msys2/MINGW-packages/pull/33763) | `makepkg-mingw --printsrcinfo` for three environments and `--verifysource` |
 

@@ -271,8 +271,13 @@ held = "the AUR package"
 match = 'aur\.archlinux\.org'
 
 [[line]]
+held = "the Termux User Repository package: TUR builds it from its own copy of the script, and serves a new version once its update job has built it"
+paths = ["distribution/termux/README.md"]
+match = '^TUR serves version '
+
+[[line]]
 held = "the Homebrew tap"
-match = '\[Homebrew tap\]|prebuilt `qrscan` \S+ binary on macOS'
+match = '\[Homebrew tap\]|prebuilt `qrscan` \S+ binary on macOS|Homebrew distributes the CLI|installed `qrscan` \S+ from the public tap'
 
 [[line]]
 held = "the Scoop bucket"
@@ -446,6 +451,16 @@ match = "scanner: '0\\.11\\.0'|\"scanner\":\"0\\.11\\.0\"|scanner@0\\.11\\.0\"\\
 keep = "What the Termux pull request received on its day."
 paths = ["distribution/termux/README.md"]
 match = 'The pull request received the 0\.12\.0 script'
+
+[[line]]
+keep = "What a clean install from the Termux User Repository verified on its day, on the version TUR served."
+paths = ["distribution/termux/README.md"]
+match = '^On 26 November 2026, a clean Termux container'
+
+[[line]]
+keep = "What the Termux User Repository ran on the day it merged the package."
+paths = ["distribution/termux/README.md"]
+match = '^After the merge, the \[Packages-TUR run\]'
 
 [[line]]
 keep = "An entry of the package changelog: a new version adds one above it."
