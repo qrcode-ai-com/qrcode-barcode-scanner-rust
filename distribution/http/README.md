@@ -53,10 +53,10 @@ The picture is the page the service shows at its root address in a browser, with
 ## Files
 
 - `server.mjs`: the whole service, on Node.js's own HTTP server and the engine package. No framework and no other dependency.
-- `package.json` and `package-lock.json`: the one dependency, the engine 0.12.0, and its six native packages, each with its npm registry address and sha512.
+- `package.json` and `package-lock.json`: the one dependency, the engine 0.12.1, and its six native packages, each with its npm registry address and sha512.
 - `Dockerfile` and `.dockerignore`: the image, from `node:22.22.2-bookworm-slim` pinned by digest. It runs `npm ci --omit=dev --ignore-scripts`, compiles nothing and runs the service as user `1000:1000`.
 - `test/consumer.mjs`: a client that judges any running copy of the service from outside, in eighteen checks. `test/server.test.mjs`: the service's tests in one process.
-- `LICENSE` (MIT, for these files), `LICENSE-NOTES.md` (what the image holds and under which license) and `licenses/engine-0.12.0/` (the engine's third-party notices at tag `v0.12.0`).
+- `LICENSE` (MIT, for these files), `LICENSE-NOTES.md` (what the image holds and under which license) and `licenses/engine-0.12.1/` (the engine's third-party notices at tag `v0.12.1`).
 - `render.yaml` and `.do/deploy.template.yaml`: the Render Blueprint and the DigitalOcean App Platform app spec, described in [Deploy it on a host](#deploy-it-on-a-host).
 - `mirror/test.yml`: the workflow of the service's own repository. It checks that every file comes from the engine, builds the image from the root as a host does and judges it with the consumer.
 - `media/`: the two pictures of this page, taken from the real service.
@@ -123,7 +123,7 @@ The answer is the engine's report, as `application/json`, and its `X-Scan-Mode` 
 
 | Request | Answer |
 | --- | --- |
-| `GET /healthz` | `200 {"status":"ok","service":"0.1.2","engine":"0.12.0"}` once the engine is loaded |
+| `GET /healthz` | `200 {"status":"ok","service":"0.1.3","engine":"0.12.1"}` once the engine is loaded |
 | `GET /` | the service, its modes and `defaultMode`, its limits, its privacy rule and its source, as JSON; the upload page for a browser |
 | `POST /scan` | `200` and the report. An empty report (no code found) is a `200` too |
 
@@ -154,6 +154,10 @@ The limits are the ones of the [MCP server](https://github.com/qrcode-ai-com/qrc
 
 ## Upgrading
 
+### From 0.1.2
+
+Service 0.1.3 runs the engine 0.12.1 instead of 0.12.0. The routes, the modes and the `fast` default, the refusals and the limits do not change, and the answer is still the engine's report, field for field. In that report, `versions.score_contract` is 6 instead of 5: the engine now measures the correction margin of a QR code in the image and judges a linear barcode at its own width, so some scores move, and a client that pins the contract number must accept 6. The service passes no `formats` to the engine, so every symbology is read, as before, and its reports carry no `trace.formats`. `GET /healthz` answers `"engine":"0.12.1"`. Until the image 0.1.3 is published, the image 0.1.2 in [Run it](#run-it) runs the engine 0.12.0.
+
 ### From 0.1.1
 
 Service 0.1.2 changes the mode of a scan that names none from `frame` to `fast`; `GET /` reports `"defaultMode": "fast"` and the upload page starts on `fast`. A request that names its mode is unchanged. A request that names none can now reach the enhance stage that `frame` skips, returns a reduced QR score where the engine measured one instead of `score: null`, and is bounded by the fast profile's 800 ms budget instead of 80 ms, times `QRSCAN_HTTP_BUDGET_SCALE`. The `frame` budget is sized for one camera frame among many: on a busy server, its deadline can stop the scan of an image before its full-resolution stage, and a barcode only that stage reads is then missing from a report marked `trace.budget_exhausted: true`. Every scan answer now names its mode in the `X-Scan-Mode` header. The engine 0.12.0, the routes, the report, the refusals and the limits do not change. To keep the former behavior, send `mode=frame`. The image 0.1.1 keeps `frame` as its default: send `mode=fast` to it for this behavior, or pull the image 0.1.2 in [Run it](#run-it).
@@ -169,7 +173,7 @@ Service 0.1.2 changes the mode of a scan that names none from `frame` to `fast`;
 
 ## Source offer
 
-The service tells every user where its source is: the `X-Source-Code` header of each answer names the source of the service at its exact commit, and `GET /` names it together with the engine's source at tag [`v0.12.0`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0). The engine 0.12.0 is MIT, so no license requires this offer, but a user of a running service can read the exact code that served them. The commit comes from `SOURCE.json`, which the staged tree carries. If you change the service and let others use it, point these links at your own source.
+The service tells every user where its source is: the `X-Source-Code` header of each answer names the source of the service at its exact commit, and `GET /` names it together with the engine's source at tag [`v0.12.1`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.1). The engine 0.12.1 is MIT, so no license requires this offer, but a user of a running service can read the exact code that served them. The commit comes from `SOURCE.json`, which the staged tree carries. If you change the service and let others use it, point these links at your own source.
 
 ## How it is tested
 
@@ -177,7 +181,7 @@ The workflow `.github/workflows/http-service.yml` of the [engine repository](htt
 
 - `unit` runs `test/server.test.mjs` on the published engine: the consumer below, a report compared field for field with a direct call of the engine, the limits, the source record, the busy and failure answers, and the log.
 - `image` stages the tree of the service's repository, checks it against the commit, builds the image on Linux x64 and on Linux arm64 runners, and saves it with its sha256 and its config digest.
-- `consume` loads each saved image on its own architecture and checks its user, labels and health check. It runs it with a read-only root filesystem, no Linux capability, and on a Docker network that has no route out. `test/consumer.mjs` then judges it from a second container: health, the JSON and the browser page of `GET /`, the source links, the mixed QR code and Code 128 sample in `fast`, `frame` and `full` as a raw body and as a form, and with no mode, which must run `fast`, each answer naming its mode in `X-Scan-Mode`, with exactly `https://qrc-ai.com/76xMa` and `STOCK-4827` and engine 0.12.0, then each refusal. The job checks that the service cannot reach the network and that its log holds no query or decoded text, then removes the container, the network and the image and checks that they are gone.
+- `consume` loads each saved image on its own architecture and checks its user, labels and health check. It runs it with a read-only root filesystem, no Linux capability, and on a Docker network that has no route out. `test/consumer.mjs` then judges it from a second container: health, the JSON and the browser page of `GET /`, the source links, the mixed QR code and Code 128 sample in `fast`, `frame` and `full` as a raw body and as a form, and with no mode, which must run `fast`, each answer naming its mode in `X-Scan-Mode`, with exactly `https://qrc-ai.com/76xMa` and `STOCK-4827` and engine 0.12.1, then each refusal. The job checks that the service cannot reach the network and that its log holds no query or decoded text, then removes the container, the network and the image and checks that they are gone.
 - `hosts` checks `render.yaml` in the staged tree against the schema Render publishes on the day of the run, `.do/deploy.template.yaml` with `doctl apps spec validate`, and that no file configures Railway, then runs the judged Linux x64 image as each host would. For Render: `PORT=10000`, the variables of the file, half a CPU and 512 MB. For Railway: an injected `PORT` that is not the default one, the template's variables, 1 vCPU and 512 MB. For App Platform: port 8080, the variables of the app spec, 1 vCPU and 512 MB. It refuses a host file whose budget scale is below twice one over its plan's share of a CPU. The consumer judges each run as above, and the job removes it.
 - `droplet` validates the Packer template of the 1-Click Droplet, runs its `install.sh` on a fresh Ubuntu 24.04 runner, checks the firewall and the unprivileged service user, judges the service on port 80 with the consumer, then removes it and checks that nothing answers.
 - `rehearse` pushes both judged images and their multi-architecture index to a local registry, exactly as the release does, reads the index back and pulls it.
@@ -186,7 +190,7 @@ The same consumer judges a deployed copy: `node test/consumer.mjs https://exampl
 
 ## Release it
 
-[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.2`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.2-amd64`, `0.1.2-arm64` and the index `0.1.2`. Version 0.1.2 is published: the tag `http-v0.1.2` is on commit `9160d3afe409bab1c00b867567f53bcedf1baa50`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). Version 0.1.1 is published too: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, and its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) pushed the first images. The owner then made the package public and linked it to this repository.
+[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.3`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.3-amd64`, `0.1.3-arm64` and the index `0.1.3`. Version 0.1.3 is prepared in this folder and not published yet. Version 0.1.2 is published: the tag `http-v0.1.2` is on commit `9160d3afe409bab1c00b867567f53bcedf1baa50`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). Version 0.1.1 is published too: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, and its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) pushed the first images. The owner then made the package public and linked it to this repository.
 
 ## What it returns
 
@@ -236,7 +240,7 @@ To scan inside your own program instead of over HTTP, use a package that holds t
 
 ## License
 
-The image holds the scanner engine 0.12.0 and its native package, published under the MIT License, so its `org.opencontainers.image.licenses` label is `MIT`. Two reader parts of the engine derive from rxing and keep their Apache-2.0 notice, which the image carries in `licenses/engine-0.12.0/`; Node.js and the Debian base keep their own licenses. [LICENSE-NOTES.md](LICENSE-NOTES.md) lists every part and where its license text is in the image. The files of this folder are project source, available under the MIT License described below. Version 0.1.0 of the service ran the engine 0.11.0, which keeps the license it was published with, AGPL-3.0-or-later.
+The image of service 0.1.3 holds the scanner engine 0.12.1 and its native package, published under the MIT License, so its `org.opencontainers.image.licenses` label is `MIT`; the images 0.1.1 and 0.1.2 hold the engine 0.12.0, MIT as well. Two reader parts of the engine derive from rxing and keep their Apache-2.0 notice, which the image carries in `licenses/engine-0.12.1/`; Node.js and the Debian base keep their own licenses. [LICENSE-NOTES.md](LICENSE-NOTES.md) lists every part and where its license text is in the image. The files of this folder are project source, available under the MIT License described below. Version 0.1.0 of the service ran the engine 0.11.0, which keeps the license it was published with, AGPL-3.0-or-later.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**.
 

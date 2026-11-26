@@ -6,8 +6,8 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-export const SERVICE_VERSION = "0.1.2";
-export const ENGINE_VERSION = "0.12.0";
+export const SERVICE_VERSION = "0.1.3";
+export const ENGINE_VERSION = "0.12.1";
 export const REPOSITORY = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust";
 export const ENGINE_SOURCE = `${REPOSITORY}/tree/v${ENGINE_VERSION}`;
 export const PROFILES = Object.freeze(["fast", "frame", "full"]);

@@ -7,33 +7,34 @@ The image built from them is not only that source. It also holds:
 
 | Part | Version | License | Where its text is in the image |
 | --- | --- | --- | --- |
-| `@qrcode-ai-com/qrcode-barcode-scanner`, the scanner engine for Node.js | 0.12.0 | MIT | `/opt/qrscan-http/node_modules/@qrcode-ai-com/qrcode-barcode-scanner/LICENSE` |
-| its native package for the image's platform (`linux-x64-gnu` or `linux-arm64-gnu`) | 0.12.0 | MIT | `LICENSE` in that package's folder under `node_modules/@qrcode-ai-com/` |
-| the reader parts the engine derives from rxing 0.9.3 | as in engine 0.12.0 | Apache-2.0 | `/opt/qrscan-http/licenses/engine-0.12.0/` |
+| `@qrcode-ai-com/qrcode-barcode-scanner`, the scanner engine for Node.js | 0.12.1 | MIT | `/opt/qrscan-http/node_modules/@qrcode-ai-com/qrcode-barcode-scanner/LICENSE` |
+| its native package for the image's platform (`linux-x64-gnu` or `linux-arm64-gnu`) | 0.12.1 | MIT | `LICENSE` in that package's folder under `node_modules/@qrcode-ai-com/` |
+| the reader parts the engine derives from rxing 0.9.3 | as in engine 0.12.1 | Apache-2.0 | `/opt/qrscan-http/licenses/engine-0.12.1/` |
 | Node.js and the Debian base of the `node:22.22.2-bookworm-slim` image | as pinned in `Dockerfile` | their own licenses | as that base image ships them (Debian's under `/usr/share/doc`) |
 
-The engine 0.12.0 is published under the MIT License, like this folder's files, so the image's
+The engine 0.12.1 is published under the MIT License, like this folder's files, so the image's
 `org.opencontainers.image.licenses` label is `MIT`. Two isolated reader parts of the engine derive
 from rxing and keep their Apache-2.0 notice; the npm packages ship only the MIT `LICENSE`, so the
-image carries those notices itself, in `licenses/engine-0.12.0/`. Node.js and the Debian base keep
+image carries those notices itself, in `licenses/engine-0.12.1/`. Node.js and the Debian base keep
 their own licenses.
 
-Version 0.1.0 of the service ran the engine 0.11.0, which was published under AGPL-3.0-or-later
+Versions 0.1.1 and 0.1.2 of the service ran the engine 0.12.0, also MIT. Version 0.1.0 of the
+service ran the engine 0.11.0, which was published under AGPL-3.0-or-later
 and keeps that license; an image built from version 0.1.0 is therefore AGPL-3.0-or-later as a
 whole.
 
 ## Source
 
-- The engine 0.12.0: tag `v0.12.0` of
-  [qrcode-ai-com/qrcode-barcode-scanner-rust](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.0),
-  commit `897dd50cdf27cbde54d408bf65e1ca4622035d42`. The npm packages were built from it.
+- The engine 0.12.1: tag `v0.12.1` of
+  [qrcode-ai-com/qrcode-barcode-scanner-rust](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.1),
+  commit `5b2c580c78b0693e58909f889b66f24fc1c548b1`. The npm packages were built from it.
 - The service: the folder `distribution/http` of the same repository, at the commit that
   `SOURCE.json` names next to `server.mjs` in the image.
 
 The service names its source on every answer: the `X-Source-Code` header and the `source` field of
-`GET /` name the service's source at its commit and the engine's source at `v0.12.0`. If you
+`GET /` name the service's source at its commit and the engine's source at `v0.12.1`. If you
 change the service and run it for others, point those links at your own source.
 
-`licenses/engine-0.12.0/THIRD-PARTY.md` and `LICENSE-APACHE-2.0` are copies of
+`licenses/engine-0.12.1/THIRD-PARTY.md` and `LICENSE-APACHE-2.0` are copies of
 `crates/qrcode-ai-scanner/THIRD-PARTY.md` and `crates/qrcode-ai-scanner/LICENSE-APACHE-2.0` at tag
-`v0.12.0`, byte for byte.
+`v0.12.1`, byte for byte.

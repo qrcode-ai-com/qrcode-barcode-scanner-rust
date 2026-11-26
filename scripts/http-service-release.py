@@ -13,7 +13,7 @@ The image of distribution/http is built by .github/workflows/http-service.yml fr
 scripts/stage-http-satellite.py writes, once per architecture, and saved as a tar archive:
 
   gate      REF is refs/tags/http-vX.Y.Z, X.Y.Z is the version of distribution/http/package.json
-            and of server.mjs, and the service pins the engine 0.12.0.
+            and of server.mjs, and the service pins the engine 0.12.1.
   save      `docker save` of TAG into DIR/qrscan-http-ARCH.tar, with DIR/ARCH.json: the tar's
             sha256, the image config digest read from the tar, the architecture and the commit.
   consume   loads the tar after checking its sha256, checks the image (non-root, labels,
@@ -47,7 +47,7 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SERVICE = ROOT / "distribution/http"
 IMAGE = "ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http"
-ENGINE = "0.12.0"
+ENGINE = "0.12.1"
 ARCHITECTURES = ("amd64", "arm64")
 TAG = re.compile(r"refs/tags/http-v(\d+\.\d+\.\d+)")
 HEX = re.compile(r"[0-9a-f]{64}")
@@ -378,7 +378,7 @@ def self_test():
             failures.append("the tag of this version did not gate to it")
     except Refused as error:
         failures.append(f"the tag of this version was refused: {error}")
-    refused("an engine tag", lambda: gate("refs/tags/v0.12.0"), "is not a refs/tags/http-vX.Y.Z tag")
+    refused("an engine tag", lambda: gate("refs/tags/v0.12.1"), "is not a refs/tags/http-vX.Y.Z tag")
     refused("a branch", lambda: gate("refs/heads/main"), "is not a refs/tags/http-vX.Y.Z tag")
     refused("another version", lambda: gate("refs/tags/http-v9.9.9"), "must be one version")
     with tempfile.TemporaryDirectory() as temporary:

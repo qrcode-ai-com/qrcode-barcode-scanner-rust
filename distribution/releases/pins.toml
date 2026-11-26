@@ -351,7 +351,7 @@ match = '`v0\.12\.\d+` Linux CLI archives, MIT|\[0\.12 BOM\]|^Engine source is t
 [[line]]
 held = "the HTTP service image, under its own tag http-v: it runs the published engine it pins"
 paths = ["RELEASING.md"]
-match = 'qrcode-barcode-scanner@\S+: `POST /scan`|The engine tag `v\S+`$|^engine \S+, and the image.s license label|and the engine pin \S+\), downloads|^engine \S+\. The package is public and linked|user `1000:1000`, engine \S+\.'
+match = 'qrcode-barcode-scanner@\S+: `POST /scan`|The engine tag `v\S+`$|^engine \S+, and the image.s license label|and the engine pin \S+\), downloads|^engine \S+\. The package is public and linked|user `1000:1000`, engine \S+\.|Service \S+ runs the MIT engine \S+\.$'
 
 [[line]]
 held = "the Go module, with its own versions"
