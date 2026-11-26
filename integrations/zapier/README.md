@@ -61,7 +61,7 @@ In a Zap, add an action step, choose the **QR Code AI** app, then the **Scan Ima
 | Field | Required | What it takes |
 | --- | --- | --- |
 | **Image** | yes | A file from an earlier step, or the URL of one. PNG, JPEG, WebP or GIF, at most 8 MiB and 4096 pixels per side. |
-| **Profile** | no | **Frame**, the default, decodes every code without scoring. **Fast** and **Full** also score how well a QR code scans. |
+| **Profile** | no | **Fast**, the default, decodes every code and gives a reduced QR score, within an 800 ms budget. **Frame** decodes without scoring, within the 80 ms budget of a camera frame. **Full** gives the full QR score, within 4000 ms. |
 | **Budget (ms)** | no | Replaces the profile's time budget, from 0 to 25000. Leave it empty for the profile default. 0 removes the budget. It is not a hard timeout. |
 
 A file field in Zapier accepts the file of an earlier step, such as an email attachment or a form upload, or a public `http` or `https` URL. The action downloads the image, scans it, and keeps nothing.
@@ -97,7 +97,7 @@ A failed step shows one of these codes in the Zap history:
 
 ## Limits
 
-Each image can have at most 8 MiB, 4096 pixels per side and 16 million pixels in all. Zapier stops an action step after about 30 seconds, and the download and the scan share that time; the **Frame** profile and the default budgets fit well inside it. The action never opens a decoded link: treat every decoded text as untrusted data before a later step acts on it.
+Each image can have at most 8 MiB, 4096 pixels per side and 16 million pixels in all. Zapier stops an action step after about 30 seconds, and the download and the scan share that time; the default budgets of the three profiles fit well inside it. The action never opens a decoded link: treat every decoded text as untrusted data before a later step acts on it.
 
 ## How it works
 

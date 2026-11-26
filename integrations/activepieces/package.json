@@ -1,6 +1,6 @@
 {
   "name": "@qrcode-ai-com/piece-qrcode-barcode-scanner",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Activepieces piece that reads QR codes and barcodes in image files with the open-source QR Code AI engine, on the worker.",
   "license": "MIT",
   "homepage": "https://qrcode-ai.com/en-US/qr-code-scanner/integrations/activepieces",

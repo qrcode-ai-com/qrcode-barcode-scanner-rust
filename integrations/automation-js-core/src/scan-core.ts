@@ -16,9 +16,14 @@ import { Worker } from 'node:worker_threads';
 export const ENGINE_PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
 export const ENGINE_VERSION = '0.12.0';
 
-/** The engine profiles. `frame` decodes without scoring and is the default. */
+/** The engine profiles. `fast` is the default, `frame` decodes without scoring. */
 export const PROFILES = ['frame', 'fast', 'full'] as const;
 export type Profile = (typeof PROFILES)[number];
+
+// An image scanned with no profile runs fast, whose 800 ms budget suits one uploaded image. frame's
+// 80 ms suits a camera frame: when the pyramid stage alone outlasts it, the direct stage never runs,
+// and a barcode only that stage reads is missing from a report flagged budget_exhausted.
+export const DEFAULT_PROFILE: Profile = 'fast';
 
 /** The same input boundary as the MCP adapter: bytes, pixels per side, pixels in all. */
 export const LIMITS = Object.freeze({
@@ -29,7 +34,7 @@ export const LIMITS = Object.freeze({
 });
 
 export interface ScanOptions {
-	/** `frame` (default), `fast` or `full`. */
+	/** `fast` (default), `frame` or `full`. */
 	profile?: string;
 	/** Profile budget override in milliseconds; 0 is unbounded. It is not a hard timeout. */
 	budgetMs?: number | null;
@@ -167,7 +172,7 @@ export function checkInput(bytes: unknown, options: ScanOptions = {}): { profile
 	if (bytes.byteLength > LIMITS.inputBytes) {
 		throw new ScanError('QRSCAN_INPUT_LIMIT', `The image exceeds ${LIMITS.inputBytes} bytes`);
 	}
-	const profile = (options.profile ?? 'frame') as Profile;
+	const profile = (options.profile ?? DEFAULT_PROFILE) as Profile;
 	if (!PROFILES.includes(profile)) {
 		throw new ScanError('QRSCAN_PROFILE', `The profile must be one of ${PROFILES.join(', ')}`);
 	}

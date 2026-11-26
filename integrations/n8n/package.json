@@ -1,6 +1,6 @@
 {
 	"name": "@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "n8n community node that reads QR codes and barcodes in binary images, locally, with the QR Code & Barcode Scanner engine",
 	"license": "MIT",
 	"homepage": "https://qrcode-ai.com/en-US/qr-code-scanner/integrations/n8n",

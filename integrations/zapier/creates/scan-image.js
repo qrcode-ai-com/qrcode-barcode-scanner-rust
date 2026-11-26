@@ -2,16 +2,16 @@
 // Scan Image: download the image Zapier hands over (a file from an earlier step arrives as a URL),
 // then read every QR code and barcode in it with the engine, inside this step.
 'use strict';
-const { ENGINE_VERSION, LIMITS, PROFILES, ScanError, scanImage, summarize } = require('../lib/scan-core');
+const { DEFAULT_PROFILE, ENGINE_VERSION, LIMITS, PROFILES, ScanError, scanImage, summarize } = require('../lib/scan-core');
 
 // Zapier stops an action after about 30 seconds: the download and the scan share that time.
 const DOWNLOAD_TIMEOUT_MS = 15_000;
 const MAX_BUDGET_MS = 25_000;
 
 const PROFILE_CHOICES = [
-  { value: 'frame', label: 'Frame: decode without scoring', sample: 'frame' },
-  { value: 'fast', label: 'Fast: decode and score with a short budget', sample: 'fast' },
-  { value: 'full', label: 'Full: decode and score QR scannability', sample: 'full' },
+  { value: 'fast', label: 'Fast: decode and give a reduced QR score (default)', sample: 'fast' },
+  { value: 'frame', label: 'Frame: decode without scoring, for camera frames', sample: 'frame' },
+  { value: 'full', label: 'Full: decode and give the full QR score', sample: 'full' },
 ];
 
 /** One line of text, without control characters, short enough for the Zap history. */
@@ -105,7 +105,8 @@ function scanFailure(z, error) {
 async function perform(z, bundle) {
   // cleanInputData is off, so an untouched optional field can arrive as an empty string.
   const { image, budget_ms: budgetField } = bundle.inputData;
-  const profile = bundle.inputData.profile || 'frame';
+  // An empty or missing profile runs the core's default, fast.
+  const profile = bundle.inputData.profile || DEFAULT_PROFILE;
   if (!PROFILES.includes(profile)) {
     throw new z.errors.Error(`The profile must be one of ${PROFILES.join(', ')}.`, 'InvalidOption', 400);
   }
@@ -152,9 +153,9 @@ module.exports = {
         label: 'Profile',
         type: 'string',
         required: false,
-        default: 'frame',
+        default: DEFAULT_PROFILE,
         choices: PROFILE_CHOICES,
-        helpText: 'Frame decodes without scoring. Fast and Full also score how well a QR code scans.',
+        helpText: 'Fast, the default, decodes and gives a reduced QR score within 800 ms. Frame decodes without scoring within the 80 ms of a camera frame. Full gives the full QR score within 4000 ms.',
       },
       {
         key: 'budget_ms',
@@ -174,7 +175,7 @@ module.exports = {
         { symbology: 'code128', text: 'STOCK-0001', raw: 'U1RPQ0stMDAwMQ==', charset: 'utf8', payload: { kind: 'text' } },
       ],
       budget_exhausted: false,
-      profile: 'frame',
+      profile: 'fast',
       scanner_version: ENGINE_VERSION,
       report_json: '{"detections":[],"score":null,"hints":[],"trace":{},"versions":{}}',
     },

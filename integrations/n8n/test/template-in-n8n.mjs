@@ -11,8 +11,9 @@
 // The label folder holds the mixed fixture (a QR code and a Code 128), a blank image and a file that
 // is not an image. The template file itself is imported unchanged and must send each to its own
 // branch. Three copies set the scan profile to fast, frame and full in turn (with the full report
-// kept and no time budget, so --reports can write the three acceptance reports), and one copy
-// expects a value the labels do not carry. Each branch's items are compared with exact values.
+// kept and no time budget, so --reports can write the three acceptance reports), one copy removes
+// the profile, so n8n runs the node's default, which must be the fast report, and one copy expects
+// a value the labels do not carry. Each branch's items are compared with exact values.
 // --screenshot starts the editor, signs in a throwaway owner and saves the canvas of the template.
 // The workflows are deleted through n8n's REST API and must be gone; the node is uninstalled and
 // must be gone too. Needs Docker and, for --screenshot, the playwright package in the current folder.
@@ -105,11 +106,13 @@ inN8n([
 	editJson('~/.n8n/nodes/package.json', `json.dependencies["${PACKAGE}"] = require(process.env.HOME + "/.n8n/nodes/node_modules/${PACKAGE}/package.json").version;`),
 ].join('\n'));
 const installed = JSON.parse(inN8n(`cat ${PACKAGE_DIR}/package.json`));
-assert.equal(installed.version, '0.1.1');
+// The version the tarball holds, read without unpacking it on this machine.
+const packed = JSON.parse(execFileSync('tar', ['-xzOf', args.tarball, 'package/package.json'], { encoding: 'utf8' }));
+assert.equal(installed.version, packed.version);
 assert.equal(installed.peerDependencies, undefined);
 const engine = JSON.parse(inN8n(`cat ${PACKAGE_DIR}/node_modules/${ENGINE}/package.json`));
 assert.equal(engine.version, '0.12.0');
-assert.deepEqual(JSON.parse(inN8n('cat ~/.n8n/nodes/package.json')).dependencies, { [PACKAGE]: '0.1.1' });
+assert.deepEqual(JSON.parse(inN8n('cat ~/.n8n/nodes/package.json')).dependencies, { [PACKAGE]: packed.version });
 // The file n8n loads, resolved from ~/.n8n/nodes: found now, and gone after step 6.
 const NODE_FILE = `${PACKAGE}/dist/nodes/QrcodeBarcodeScanner/QrcodeBarcodeScanner.node.js`;
 const resolveNode = `node -e "console.log(require.resolve('${NODE_FILE}', { paths: ['/home/node/.n8n/nodes'] }))"`;
@@ -134,6 +137,11 @@ for (const profile of ['fast', 'frame', 'full']) {
 		node(SCAN).parameters.options = { includeReport: true, budgetMs: 0 };
 	});
 }
+// No profile in the workflow: n8n gives the node the default its description declares.
+variant('default', (_, node) => {
+	delete node(SCAN).parameters.profile;
+	node(SCAN).parameters.options = { includeReport: true, budgetMs: 0 };
+});
 variant('wrong', (_, node) => {
 	node('Settings').parameters.assignments.assignments.find((row) => row.name === 'expectedText').value = 'STOCK-0001';
 });
@@ -184,7 +192,10 @@ const unreadable = (json) => {
 };
 
 // The template as shipped: one item per file, each in the branch its result calls for.
-for (const key of ['shipped', 'fast', 'frame', 'full']) {
+const DEFAULT_PROFILE = 'fast';
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
+const mixedReports = {};
+for (const key of ['shipped', 'fast', 'frame', 'full', 'default']) {
 	const runData = runs[key];
 	const read = outputs(runData, 'Read label images')[0].map((json) => json.fileName).sort();
 	assert.deepEqual(read, ['blank.png', 'corrupt.png', 'mixed.png'], `${key}: files read`);
@@ -195,7 +206,7 @@ for (const key of ['shipped', 'fast', 'frame', 'full']) {
 	assert.equal(failed.length, 1, `${key}: one item on the error output`);
 	assert.deepEqual(Object.keys(failed[0]), ['error'], `${key}: the error item`);
 	assert.match(failed[0].error, /\[QRS-001\]$/);
-	const profile = key === 'shipped' ? 'frame' : key;
+	const profile = { shipped: 'frame', default: DEFAULT_PROFILE }[key] ?? key;
 	for (const json of scanned) {
 		assert.equal(json.profile, profile);
 		assert.equal(json.engine, '0.12.0');
@@ -207,15 +218,21 @@ for (const key of ['shipped', 'fast', 'frame', 'full']) {
 	assert.deepEqual(got['Wrong value'], [], `${key}: no wrong value`);
 	assert.equal(got['Unreadable image'].length, 1, `${key}: one unreadable image`);
 	assert.ok(unreadable(got['Unreadable image'][0]));
-	if (key !== 'shipped' && args.reports) {
-		mkdirSync(args.reports, { recursive: true });
+	if (key !== 'shipped') {
 		const mixed = scanned.find((json) => json.image.fileName === 'mixed.png');
 		assert.equal(mixed.report.versions.scanner, '0.12.0');
 		assert.equal(mixed.report.trace.budget_exhausted, false);
-		writeFileSync(join(args.reports, `${key}.json`), JSON.stringify(mixed.report));
+		mixedReports[key] = mixed.report;
+		if (args.reports) {
+			mkdirSync(args.reports, { recursive: true });
+			writeFileSync(join(args.reports, `${key}.json`), JSON.stringify(mixed.report));
+		}
 	}
 	console.log(`${key}: mixed.png expected value found, blank.png no code, corrupt.png unreadable (QRS-001)`);
 }
+assert.notEqual(mixedReports.default.score, null, 'the default profile scores, which frame never does');
+assert.deepEqual(untimed(mixedReports.default), untimed(mixedReports[DEFAULT_PROFILE]), 'a workflow with no profile runs the fast profile');
+console.log(`default: the node with no profile ran ${DEFAULT_PROFILE}, its report equal to the ${DEFAULT_PROFILE} copy`);
 // A label that does not carry the expected value.
 {
 	const got = branches(runs.wrong);
@@ -307,4 +324,4 @@ inN8n([
 assert.equal(inN8n(`test -e ${PACKAGE_DIR} && echo present || echo gone`).trim(), 'gone');
 assert.equal(inN8n(`${resolveNode} 2>/dev/null || echo gone`).trim(), 'gone');
 assert.deepEqual(JSON.parse(inN8n('cat ~/.n8n/nodes/package.json')).dependencies, {});
-console.log(`n8n ${version}: template imported, run on the three profiles and the four branches, deleted; node uninstalled`);
+console.log(`n8n ${version}: template imported, run on the three profiles, the default one and the four branches, deleted; node uninstalled`);

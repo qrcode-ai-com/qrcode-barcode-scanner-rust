@@ -89,9 +89,9 @@ and a review request are not done by automation.
 
 1. In a scenario, add a module that gives a file, then **QR Code AI › Scan an Image**. Create the
    connection with your scan service's base URL. Make calls `GET /healthz` to check it.
-2. Map **File name** and **Data**, keep **Profile** on `frame`, and run once with the repository's
-   `fixtures/symbology/mixed-code128-qr.png`. The bundle must hold two codes, a QR code with
-   `https://qrc-ai.com/76xMa` and a Code 128 with `STOCK-4827`.
+2. Map **File name** and **Data**, keep **Profile** on `fast`, its default, and run once with the
+   repository's `fixtures/symbology/mixed-code128-qr.png`. The bundle must hold two codes, a QR
+   code with `https://qrc-ai.com/76xMa` and a Code 128 with `STOCK-4827`.
 3. Add **Make an API call** with URL `healthz` and method GET; it must return the service status.
 
 The app now works for the scenarios of your organization. Stop here unless you want to share it.

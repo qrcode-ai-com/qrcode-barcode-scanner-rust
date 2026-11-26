@@ -128,11 +128,26 @@ test('a connection to an address with no scan service fails', async () => {
   assert.deepEqual(answer.error, { type: 'RuntimeError', message: '[404] The scan service did not answer GET /healthz with its status.' });
 });
 
+// Make fills a new module's fields with their defaults: a scan the test does not give a mode takes it.
+const modeField = read(scanModule.codeFiles.mappableParams).find((field) => field.name === 'mode');
 const scan = (parameters) => send({
   base,
   communication: read(scanModule.codeFiles.communication),
   connection: { baseUrl: service },
-  parameters: { fileName: 'mixed-code128-qr.png', data: fixture, mode: 'frame', ...parameters },
+  parameters: { fileName: 'mixed-code128-qr.png', data: fixture, mode: modeField.default, ...parameters },
+});
+
+// A new module starts on fast: frame's 80 ms camera budget could cut a single image's scan before
+// the stage that reads its barcode.
+test('the profile field starts on fast', { timeout: 60_000 }, async () => {
+  assert.equal(modeField.default, 'fast');
+  assert.equal(modeField.required, true);
+  assert.deepEqual(modeField.options.map((option) => option.value), ['fast', 'frame', 'full']);
+  assert.match(modeField.options[0].label, /\(default\)$/);
+  const answer = await scan({});
+  assert.equal(answer.statusCode, 200, JSON.stringify(answer.error));
+  assert.equal(answer.output.count, 2);
+  assert.notEqual(answer.output.score, null, 'the default profile scores, which frame never does');
 });
 
 for (const mode of ['fast', 'frame', 'full']) {
