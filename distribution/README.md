@@ -53,10 +53,10 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a known image to validate the installation route you chose, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-Choose an installation route for scanner engine 0.12.0. These packages scan QR
+Choose an installation route for scanner engine 0.12.1. These packages scan QR
 codes and barcodes locally and return the engine's report.
 
-To try the engine locally in a browser, use the [WASM image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml).
+To try the engine locally in a browser, use the [WASM image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml).
 
 [Runtime packages](#published-runtime-packages) · [Packages that drive the CLI](#packages-that-drive-the-installed-cli)
 · [CLI and containers](#cli-and-containers)
@@ -66,19 +66,19 @@ To try the engine locally in a browser, use the [WASM image example](https://git
 
 | Runtime | Package | Version |
 | --- | --- | --- |
-| Rust | [`qrcode-barcode-scanner`](https://crates.io/crates/qrcode-barcode-scanner/0.12.0) | 0.12.0 |
-| CLI | [`qrcode-barcode-scanner-cli`](https://crates.io/crates/qrcode-barcode-scanner-cli/0.12.0) | 0.12.0 |
-| Node.js | [`@qrcode-ai-com/qrcode-barcode-scanner`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner/v/0.12.0) | 0.12.0 |
-| Browser WASM | [`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.12.0) | 0.12.0 |
-| Python | [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) | 0.12.0 |
+| Rust | [`qrcode-barcode-scanner`](https://crates.io/crates/qrcode-barcode-scanner/0.12.1) | 0.12.1 |
+| CLI | [`qrcode-barcode-scanner-cli`](https://crates.io/crates/qrcode-barcode-scanner-cli/0.12.1) | 0.12.1 |
+| Node.js | [`@qrcode-ai-com/qrcode-barcode-scanner`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner/v/0.12.1) | 0.12.1 |
+| Browser WASM | [`@qrcode-ai-com/qrcode-barcode-scanner-wasm`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-wasm/v/0.12.1) | 0.12.1 |
+| Python | [`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.1/) | 0.12.1 |
 
 See the [runtime quick starts](../README.md#get-started) for install commands
 and examples. The Node.js package selects the matching native dependency
-automatically from these six packages, all at **0.12.0**.
+automatically from these six packages, all at **0.12.1**.
 
-- macOS · [`darwin-arm64`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-darwin-arm64/v/0.12.0) · [`darwin-x64`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-darwin-x64/v/0.12.0)
-- Linux · [`linux-arm64-gnu`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-arm64-gnu/v/0.12.0) · [`linux-x64-gnu`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-gnu/v/0.12.0) · [`linux-x64-musl`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-musl/v/0.12.0)
-- Windows · [`win32-x64-msvc`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-win32-x64-msvc/v/0.12.0)
+- macOS · [`darwin-arm64`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-darwin-arm64/v/0.12.1) · [`darwin-x64`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-darwin-x64/v/0.12.1)
+- Linux · [`linux-arm64-gnu`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-arm64-gnu/v/0.12.1) · [`linux-x64-gnu`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-gnu/v/0.12.1) · [`linux-x64-musl`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-linux-x64-musl/v/0.12.1)
+- Windows · [`win32-x64-msvc`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-win32-x64-msvc/v/0.12.1)
 
 ## Packages that drive the installed CLI
 
@@ -115,8 +115,8 @@ archive for Linux ARM64, it read the mixed fixture in the three profiles.
 
 ## Browser CDNs and package indexes
 
-- Browser WASM **0.12.0** from npm · [jsDelivr](https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/auto.js) · [UNPKG](https://unpkg.com/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/auto.js) · [esm.sh](https://esm.sh/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0/auto).
-- API documentation and package metadata for **0.12.0** · [docs.rs](https://docs.rs/qrcode-barcode-scanner/0.12.0/qrcode_barcode_scanner/) · [deps.dev](https://deps.dev/npm/%40qrcode-ai-com%2Fqrcode-barcode-scanner/0.12.0) · [Libraries.io](https://libraries.io/npm/@qrcode-ai-com%2Fqrcode-barcode-scanner) · [Lib.rs](https://lib.rs/crates/qrcode-barcode-scanner).
+- Browser WASM **0.12.1** from npm · [jsDelivr](https://cdn.jsdelivr.net/npm/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.1/auto.js) · [UNPKG](https://unpkg.com/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.1/auto.js) · [esm.sh](https://esm.sh/@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.1/auto).
+- API documentation and package metadata for **0.12.1** · [docs.rs](https://docs.rs/qrcode-barcode-scanner/0.12.1/qrcode_barcode_scanner/) · [deps.dev](https://deps.dev/npm/%40qrcode-ai-com%2Fqrcode-barcode-scanner/0.12.1) · [Libraries.io](https://libraries.io/npm/@qrcode-ai-com%2Fqrcode-barcode-scanner) · [Lib.rs](https://lib.rs/crates/qrcode-barcode-scanner).
 
 The CDNs serve the npm browser package. The indexes describe the packages
 published to npm or crates.io.
@@ -316,7 +316,7 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 
 | Destination | Version | Platforms |
 | --- | --- | --- |
-| [GitHub Releases](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.0) | 0.12.0 | macOS ARM64/x64, GNU/Linux ARM64/x64, [Windows x64](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.0/qrcode-barcode-scanner-cli-0.12.0-x86_64-pc-windows-msvc.zip), and source |
+| [GitHub Releases](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1) | 0.12.1 | macOS ARM64/x64, GNU/Linux ARM64/x64, [Windows x64](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-x86_64-pc-windows-msvc.zip), and source |
 | [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.0 | macOS and GNU/Linux on ARM64/x64 |
 | [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.0 | Windows x64 |
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0) | 0.12.0-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
@@ -406,7 +406,7 @@ the DigitalOcean routes are prepared, not submitted.
 
 These recipes package the 0.11.0 CLI for other systems. Each one pins the v0.11.0 release by the
 SHA-256 of its checksum list, and its checks run in this repository. The Termux recipe builds the
-0.12.0 source archive instead, and its update function follows each later CLI release. The Glama
+0.12.1 source archive instead, and its update function follows each later CLI release. The Glama
 container and the MCP Bundle hold the published MCP server instead, with the engine it was released on,
 each package pinned by its npm integrity. None of these destinations serves the scanner yet, except
 Glama, which lists the MCP server since 20 November 2026, and the MCP Bundle, whose 0.3.3 file is on

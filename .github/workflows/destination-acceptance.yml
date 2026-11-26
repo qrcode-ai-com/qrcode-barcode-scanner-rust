@@ -31,9 +31,9 @@ concurrency:
 env:
   # The public release the consumer installs, and the sha256 of its checksum list.
   RELEASE_REPOSITORY: qrcode-ai-com/qrcode-barcode-scanner
-  RELEASE_TAG: v0.12.0
-  RELEASE_VERSION: 0.12.0
-  SUMS_SHA256: f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691
+  RELEASE_TAG: v0.12.1
+  RELEASE_VERSION: 0.12.1
+  SUMS_SHA256: 9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055
 
 jobs:
   self-test:

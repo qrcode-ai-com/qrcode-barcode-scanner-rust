@@ -13,7 +13,7 @@ QR/barcode modes and SEO pages do not authorize
 separate scanner engines, product extractions or alias/wrapper packages.
 
 The source repository is `qrcode-ai-com/qrcode-barcode-scanner-rust`. Its repository
-identity, history and tags are retained from its previous names. The 0.12.0
+identity, history and tags are retained from its previous names. The 0.12.1
 release is public: `qrcode-barcode-scanner` and `qrcode-barcode-scanner-cli`
 on crates.io (`qrscan` remains the command), `@qrcode-ai-com/qrcode-barcode-scanner`
 with six automatic native platform dependencies and
@@ -90,11 +90,11 @@ transport the caller supplies.
 
 | Path | Artifact | Registry |
 |---|---|---|
-| `crates/qrcode-ai-scanner` | `qrcode-barcode-scanner`, the core library, 0.12.0 published | crates.io |
-| `crates/qrcode-ai-scanner-cli` | `qrcode-barcode-scanner-cli`, the `qrscan` binary, 0.12.0 published | crates.io |
-| `crates/qrcode-ai-scanner-node` | `@qrcode-ai-com/qrcode-barcode-scanner` (napi) and six automatic platform dependencies, 0.12.0 published | npm |
-| `crates/qrcode-ai-scanner-wasm` | `@qrcode-ai-com/qrcode-barcode-scanner-wasm`, 0.12.0 published | npm |
-| `crates/qrcode-ai-scanner-py` | `qrcode-barcode-scanner` (PyO3, workspace-excluded), 0.12.0 published | PyPI |
+| `crates/qrcode-ai-scanner` | `qrcode-barcode-scanner`, the core library, 0.12.1 published | crates.io |
+| `crates/qrcode-ai-scanner-cli` | `qrcode-barcode-scanner-cli`, the `qrscan` binary, 0.12.1 published | crates.io |
+| `crates/qrcode-ai-scanner-node` | `@qrcode-ai-com/qrcode-barcode-scanner` (napi) and six automatic platform dependencies, 0.12.1 published | npm |
+| `crates/qrcode-ai-scanner-wasm` | `@qrcode-ai-com/qrcode-barcode-scanner-wasm`, 0.12.1 published | npm |
+| `crates/qrcode-ai-scanner-py` | `qrcode-barcode-scanner` (PyO3, workspace-excluded), 0.12.1 published | PyPI |
 | `bindings/flutter` | `qr_barcode_scanner`, Flutter plugin (FRB + cargokit), 0.12.0 public with signed precompiled libraries; separate native qualification limits | pub.dev |
 | `bindings/kotlin` | com.github.qrcode-ai-com:qrcode-barcode-scanner, not yet qualified | JitPack |
 | `bindings/swift` | `QRCodeBarcodeScanner` 0.12.0 published from `qrcode-ai-com/qrcode-barcode-scanner-swift`, staged from `bindings/swift/package`, its xcframework on the release `swift-v0.12.0`; the local source package `QrcodeAiScanner` stays for development | SwiftPM by repository URL; listed on the Swift Package Index |

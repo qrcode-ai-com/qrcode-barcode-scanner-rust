@@ -11,8 +11,8 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 $id = 'qrcode-barcode-scanner'
-$version = '0.12.0'
-$exeSha = '03f673307c3a399c30fecbcaa1047b00ed755d4d29b62dda73c559b5d688207d'
+$version = '0.12.1'
+$exeSha = '65f53ad3b24363d3740a4e134f3cf7feb92a8f991ea70ed8729daa06c3e83f04'
 $fixtureSha = 'c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8'
 $feed = 'https://community.chocolatey.org/api/v2/'
 $work = (New-Item -ItemType Directory -Path $WorkDirectory -Force).FullName
@@ -27,7 +27,7 @@ if ((Get-Command qrscan.exe -CommandType Application -ErrorAction SilentlyContin
 }
 
 $fixture = Join-Path $work 'mixed codes.png'
-Invoke-WebRequest 'https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/897dd50cdf27cbde54d408bf65e1ca4622035d42/fixtures/symbology/mixed-code128-qr.png' -OutFile $fixture
+Invoke-WebRequest 'https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/5b2c580c78b0693e58909f889b66f24fc1c548b1/fixtures/symbology/mixed-code128-qr.png' -OutFile $fixture
 if ((Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash -ine $fixtureSha) {
     throw 'Mixed-symbol fixture SHA-256 mismatch.'
 }

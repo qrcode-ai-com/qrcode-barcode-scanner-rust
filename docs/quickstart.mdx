@@ -4,7 +4,7 @@ description: "Decode and grade your first QR on every surface."
 ---
 
 <Note>
-The five runtime entry points below are public in **0.12.0**: Rust core, CLI,
+The five runtime entry points below are public in **0.12.1**: Rust core, CLI,
 Node native, browser WASM and Python. Install and import the new package names
 together. Native Node platform dependencies are selected automatically; the
 browser package uses one portable WASM. See the
@@ -14,7 +14,7 @@ browser package uses one portable WASM. See the
 <Tabs>
   <Tab title="Rust">
     ```bash
-    cargo add qrcode-barcode-scanner@=0.12.0
+    cargo add qrcode-barcode-scanner@=0.12.1
     ```
 
     ```rust
@@ -42,7 +42,7 @@ browser package uses one portable WASM. See the
 
   <Tab title="Node">
     ```bash
-    npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0
+    npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.1
     ```
 
     ```js
@@ -68,7 +68,7 @@ browser package uses one portable WASM. See the
 
   <Tab title="Browser (WASM)">
     ```bash
-    npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0
+    npm install --save-exact @qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.1
     ```
 
     ```ts
@@ -98,7 +98,7 @@ browser package uses one portable WASM. See the
 
   <Tab title="CLI">
     ```bash
-    cargo install qrcode-barcode-scanner-cli --version 0.12.0 --locked
+    cargo install qrcode-barcode-scanner-cli --version 0.12.1 --locked
 
     qrscan image.png            # full ScanReport JSON on stdout
     qrscan image.png --pretty   # human summary (incl. the ISO grade card)
@@ -116,7 +116,7 @@ browser package uses one portable WASM. See the
     Install the public PyPI package; a matching wheel needs no Rust toolchain:
 
     ```bash
-    python -m pip install qrcode-barcode-scanner==0.12.0
+    python -m pip install qrcode-barcode-scanner==0.12.1
     ```
 
     ```python

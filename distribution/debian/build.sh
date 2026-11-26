@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Wrap the verified 0.12.0 CLI in a Debian binary package.
+# Wrap the verified 0.12.1 CLI in a Debian binary package.
 set -euo pipefail
 
 if [[ $# -ne 3 ]]; then
@@ -11,11 +11,11 @@ architecture=$1
 case "$architecture" in
   amd64)
     target=x86_64-unknown-linux-gnu
-    binary_sha256=cbc1ac6456a0a791ae636da55388f981dcbd740081af79abb680c3a876be5357
+    binary_sha256=dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de
     ;;
   arm64)
     target=aarch64-unknown-linux-gnu
-    binary_sha256=e400b7464357f35d43bae7172d5408a5e412fbd90a371577baca9473746fbe55
+    binary_sha256=b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b
     ;;
   *)
     echo "Unsupported Debian architecture: $architecture" >&2
@@ -24,11 +24,11 @@ case "$architecture" in
 esac
 
 package=qrcode-barcode-scanner
-version=0.12.0
+version=0.12.1
 archive_stem="$package-cli-$version-$target"
 source_archive="$package-cli-$version-source.tar.gz"
 checksums="$package-cli-$version-SHA256SUMS"
-checksums_sha256=f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691
+checksums_sha256=9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055
 input_dir=$(cd -- "$2" && pwd)
 output_dir=$(cd -- "$3" && pwd)
 filename="${package}_${version}-1_${architecture}.deb"
@@ -64,15 +64,15 @@ COPYRIGHT-rust-std.html retain upstream third-party notices and licenses.
 
 Corresponding source for the executable and its build inputs is identified
 in SOURCE.md and build-info.json. The release source archive is available at:
-https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.12.0/qrcode-barcode-scanner-cli-0.12.0-source.tar.gz
+https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-source.tar.gz
 COPYRIGHT
 
 gzip -n -9 >"$docdir/changelog.Debian.gz" <<'CHANGELOG'
-qrcode-barcode-scanner (0.12.0-1) stable; urgency=medium
+qrcode-barcode-scanner (0.12.1-1) stable; urgency=medium
 
-  * Package the official QR Code & Barcode Scanner 0.12.0 Linux CLI.
+  * Package the official QR Code & Barcode Scanner 0.12.1 Linux CLI.
 
- -- QR Code AI <contact@qrcode-ai.com>  Sun, 22 Nov 2026 19:16:13 +0000
+ -- QR Code AI <contact@qrcode-ai.com>  Thu, 26 Nov 2026 20:03:09 +0000
 CHANGELOG
 
 installed_size=$(find "$root/usr" -type f -printf '%s\n' \
