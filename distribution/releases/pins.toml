@@ -32,6 +32,10 @@ why = "The recipe and record of the 0.12 container image: its inputs, labels and
 paths = ["distribution/docker/v0.12/**"]
 
 [[frozen]]
+why = "The recipe and record of the 0.12.1 container image: its inputs, labels and receipts pin the 0.12.1 release by hash, and its release BOM pins the recipe files."
+paths = ["distribution/docker/v0.12.1/**"]
+
+[[frozen]]
 why = "Written by its package manager. Regenerate it with that tool."
 paths = ["Cargo.lock", "**/Cargo.lock", "**/package-lock.json", "**/pubspec.lock"]
 
@@ -196,6 +200,10 @@ paths = [
   "scripts/stage-http-satellite.py",
   ".github/workflows/http-service.yml",
 ]
+
+[[file]]
+held = "the container image, under its own tag"
+paths = [".github/workflows/distribution-checks.yml"]
 
 [[file]]
 held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
