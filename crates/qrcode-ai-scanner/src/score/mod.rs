@@ -35,7 +35,7 @@ use crate::engine::{self, content::ContentKey};
 use crate::error::Result;
 use crate::input::LumaImage;
 use crate::ladder::{CancelToken, MergedDetection, ScoreDepth};
-use crate::report::{AxisScore, EcLevel, Grade, Hint, Score, StressAxis};
+use crate::report::{AxisScore, EcLevel, Grade, Hint, Score, StressAxis, Symbology};
 use crate::transform;
 
 /// A stress-cell builder: base image + ramp index → transformed cell.
@@ -46,6 +46,35 @@ type RampRefiner<'a> = &'a dyn Fn(&LumaImage, usize) -> (LumaImage, String);
 
 /// Stress cells run on a ≤512px base — bounded cost, consistent geometry.
 const STRESS_BASE_SIDE: u32 = 512;
+/// The longest side the stress base of a linear symbology may keep.
+const LINEAR_BASE_SIDE_CAP: u32 = 2048;
+
+/// The longest side of the stress base of a `width` × `height` frame.
+///
+/// A matrix or stacked symbology is judged on the square budget: longest
+/// side ≤ 512 px. A linear symbology carries its data along one direction,
+/// in a frame that is wide and short: its base keeps the PIXEL COUNT of
+/// that square instead of its side, so the bars keep their width (at most
+/// 2048 px on the longest side). A square frame gets 512 px either way.
+fn stress_base_side(width: u32, height: u32, symbology: Symbology) -> u32 {
+    if !symbology.is_linear() {
+        return STRESS_BASE_SIDE;
+    }
+    let longest = u64::from(width.max(height));
+    let shortest = u64::from(width.min(height).max(1));
+    let budget = u64::from(STRESS_BASE_SIDE) * u64::from(STRESS_BASE_SIDE);
+    // the longest side whose frame, at this aspect ratio, holds `budget` pixels
+    let side = (budget * longest / shortest).isqrt();
+    u32::try_from(side)
+        .unwrap_or(LINEAR_BASE_SIDE_CAP)
+        .clamp(STRESS_BASE_SIDE, LINEAR_BASE_SIDE_CAP)
+}
+
+/// A resolution cell of the square base, scaled to a base whose longest
+/// side is `unit` (`unit` 512 returns `side`).
+fn ramp_side(side: u32, unit: u32) -> u32 {
+    u32::try_from(u64::from(side) * u64::from(unit) / u64::from(STRESS_BASE_SIDE)).unwrap_or(side)
+}
 
 #[cfg(test)]
 thread_local! {
@@ -558,7 +587,9 @@ fn run_ramp(
 
 /// Wire label of one stress cell — what `AxisScore.failed_at` carries. Human-
 /// readable, stable (the panel prints it verbatim): the intensity that killed
-/// the ramp, or the lighting defect that failed. Indexes the FULL ramp.
+/// the ramp, or the lighting defect that failed. Indexes the FULL ramp. The
+/// resolution labels are the square base's: a wider base (`stress_base_side`)
+/// labels the sides its cells ran at (`run_axes`).
 fn cell_label(axis: StressAxis, i: usize) -> &'static str {
     match axis {
         StressAxis::Resolution => ["358px", "256px", "179px", "128px", "90px"][i.min(4)],
@@ -582,6 +613,15 @@ fn cell_label(axis: StressAxis, i: usize) -> &'static str {
     }
 }
 
+/// Wire label of a ramp's knee: the side the cell ran at on the resolution
+/// axis, the fixed label of the cell on the others.
+fn knee_label(axis: StressAxis, i: usize, resolution_sides: &[u32; 5]) -> String {
+    match axis {
+        StressAxis::Resolution => format!("{}px", resolution_sides[i.min(4)]),
+        _ => cell_label(axis, i).to_owned(),
+    }
+}
+
 /// One bisection probe tightens a knee (Full depth only): the report gains
 /// the tightest TESTED failing intensity, the composite reads nothing from
 /// it. Deadline or quota cut / no knee / Reduced depth → honestly absent.
@@ -589,17 +629,17 @@ fn refine_knee(
     base: &LumaImage,
     expected: &ContentKey,
     probe: CellProbe,
-    axis: StressAxis,
-    knee: usize,
+    knee: (usize, &str),
     bound: &mut Bound<'_>,
     refine: RampRefiner<'_>,
 ) -> Result<Option<String>> {
     if !bound.admit()? {
         return Ok(None);
     }
+    let (knee, knee_label) = knee;
     let (cell, label) = refine(base, knee);
     Ok(Some(if cell_passes(&cell, expected, probe, bound) {
-        cell_label(axis, knee).to_owned()
+        knee_label.to_owned()
     } else {
         label
     }))
@@ -677,7 +717,11 @@ fn run_axes(
     probe: CellProbe,
 ) -> Result<Option<Vec<AxisScore>>> {
     // ---- ordered ramps (intensity grows with the index) ----
-    let resolution_sides: [u32; 5] = [358, 256, 179, 128, 90];
+    // A base wider than the square side (a linear symbology's,
+    // `stress_base_side`) scales the resolution ramp with it: each cell is
+    // the same share of the base, and its label names the side it ran at.
+    let unit = base.width().max(base.height()).max(STRESS_BASE_SIDE);
+    let resolution_sides: [u32; 5] = [358, 256, 179, 128, 90].map(|side| ramp_side(side, unit));
     let blur_sigmas: [f32; 5] = [0.5, 1.0, 1.5, 2.0, 2.5];
     let contrast_factors: [f32; 5] = [0.7, 0.55, 0.4, 0.3, 0.2];
     let tilt_degrees: [f32; 5] = [10.0, 18.0, 26.0, 34.0, 42.0];
@@ -686,7 +730,7 @@ fn run_axes(
     let indices = depth_indices(depth);
     let mut axes = Vec::with_capacity(6);
     // midpoint of the knee cell and its lower neighbour (index 0 bisects
-    // against the UNSTRESSED value: base side 512 · sigma 0 · factor 1 · 0°)
+    // against the UNSTRESSED value: the base side · sigma 0 · factor 1 · 0°)
     let mid = |arr: &[f32; 5], i: usize, unstressed: f32| -> f32 {
         f32::midpoint(if i == 0 { unstressed } else { arr[i - 1] }, arr[i])
     };
@@ -697,7 +741,7 @@ fn run_axes(
             &|b, i| {
                 let side = u32::midpoint(
                     if i == 0 {
-                        STRESS_BASE_SIDE
+                        unit
                     } else {
                         resolution_sides[i - 1]
                     },
@@ -757,7 +801,7 @@ fn run_axes(
             axis,
             passed,
             total: u8::try_from(indices.len()).unwrap_or(u8::MAX),
-            failed_at: knee.map(|i| cell_label(axis, i).to_owned()),
+            failed_at: knee.map(|i| knee_label(axis, i, &resolution_sides)),
             refined_failed_at: None,
         });
     }
@@ -774,8 +818,9 @@ fn run_axes(
     if matches!(depth, ScoreDepth::Full) {
         for (slot, knee, refine) in knees {
             if let Some(entry) = axes.get_mut(slot) {
+                let label = entry.failed_at.clone().unwrap_or_default();
                 entry.refined_failed_at =
-                    refine_knee(base, expected, probe, entry.axis, knee, bound, refine)?;
+                    refine_knee(base, expected, probe, (knee, &label), bound, refine)?;
             }
         }
     }
@@ -973,7 +1018,10 @@ pub(crate) fn judge(
         !JUDGMENT_FAULT.with(std::cell::Cell::get),
         "injected judgment fault"
     );
-    let base = transform::downscale_to(luma, STRESS_BASE_SIDE);
+    let base = transform::downscale_to(
+        luma,
+        stress_base_side(luma.width(), luma.height(), detection.symbology),
+    );
     bound.lead_with(&detection.engines);
     // calibrate the cell probe on the unstressed base (its decode class)
     let probe = match CellProbe::calibrate_admitted(&base, key, detection.symbology, bound)? {
@@ -1054,12 +1102,66 @@ pub(crate) fn judge(
 
 #[cfg(test)]
 mod tests {
+
     #![allow(clippy::unwrap_used, clippy::expect_used)]
 
     use super::*;
     use crate::input::{ImageInput, Limits};
     use crate::ladder::{self, ScanConfig};
     use crate::transform::normalize;
+
+    /// A linear symbology's base holds the pixel count of the 512 px square
+    /// at the frame's aspect ratio; every other symbology keeps the side.
+    #[test]
+    fn a_linear_base_keeps_the_pixel_count_of_the_square_base() {
+        // a square frame, and every symbology that is not linear: the side
+        assert_eq!(stress_base_side(2000, 2000, Symbology::Code128), 512);
+        for other in Symbology::ALL.into_iter().filter(|s| !s.is_linear()) {
+            assert_eq!(stress_base_side(1600, 400, other), 512, "{other:?}");
+        }
+        // four to one: twice the side, half the height, the same pixel count
+        assert_eq!(stress_base_side(4000, 1000, Symbology::Ean13), 1024);
+        assert_eq!(stress_base_side(1000, 4000, Symbology::Ean13), 1024);
+        // a frame already under the budget is kept: its bars are not resampled
+        assert!(stress_base_side(1032, 240, Symbology::Code128) >= 1032);
+        assert!(stress_base_side(516, 121, Symbology::Code128) >= 516);
+        // bounded on the side, and never above the budget in pixels
+        assert_eq!(stress_base_side(60_000, 30, Symbology::Code128), 2048);
+        assert_eq!(stress_base_side(u32::MAX, 1, Symbology::Itf), 2048);
+        assert_eq!(stress_base_side(0, 0, Symbology::Itf), 512);
+        for (width, height) in [(1037, 205), (892, 233), (604, 385), (3000, 700), (640, 480)] {
+            for linear in Symbology::ALL.into_iter().filter(|s| s.is_linear()) {
+                let side = u64::from(stress_base_side(width, height, linear));
+                let short = side * u64::from(height) / u64::from(width);
+                assert!(
+                    side * short <= 512 * 512,
+                    "{width}x{height} {linear:?}: {side}"
+                );
+                assert!(side >= 512, "{width}x{height} {linear:?}: {side}");
+            }
+        }
+        assert_eq!(
+            Symbology::ALL.into_iter().filter(|s| s.is_linear()).count(),
+            12,
+            "seven of the nineteen symbologies are matrix or stacked"
+        );
+    }
+
+    /// The resolution cells are shares of the base: the square base's own
+    /// sides at 512, the same shares of a wider one.
+    #[test]
+    fn the_resolution_ramp_keeps_its_shares_on_a_wider_base() {
+        let cells = [358, 256, 179, 128, 90];
+        assert_eq!(cells.map(|side| ramp_side(side, 512)), cells);
+        assert_eq!(
+            cells.map(|side| ramp_side(side, 1024)),
+            [716, 512, 358, 256, 180]
+        );
+        assert_eq!(
+            cells.map(|side| ramp_side(side, 1037)),
+            [725, 518, 362, 259, 182]
+        );
+    }
 
     fn detection_with(ec: Option<EcLevel>) -> MergedDetection {
         MergedDetection {

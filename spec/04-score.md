@@ -28,6 +28,28 @@ failed cell (`"blur 2.5"`, `"glare"`, `"128px"`…), `null` when every cell
 passed. A lost point always names its cell: surfaces render the reason, not
 just the count.
 
+### The stress base
+
+Every cell is built from one base image of the frame. For a matrix or a
+stacked symbology the base is the frame downscaled to a longest side of
+512 px; a smaller frame is kept as it is. A linear symbology (EAN-13, EAN-8,
+UPC-A, UPC-E, Code 128, Code 39, Code 93, Codabar, ITF, DataBar, DataBar
+Expanded, Telepen) carries its data along one direction, in a frame that is
+usually wide and short. From score_contract 6 its base keeps the pixel
+count of that 512 px square instead of its side: the longest side is
+`512 × √(long side ÷ short side)`, at most 2048 px and never more than the
+frame's own. A square frame gets 512 px either way.
+
+The resolution cells are shares of the base: 358 · 256 · 179 · 128 · 90 px
+of a 512 px base, and the same shares of a wider one (a 1037 px base runs
+725 · 518 · 362 · 259 · 182 px). `failed_at` names the side the cell ran
+at. A frame whose longest side is at most 512 px runs the five sides of the
+table, whatever its symbology.
+
+Up to score_contract 5 every base had a longest side of 512 px. A wide
+barcode then kept under two pixels per bar before any stress: no contrast
+cell read, and the judgment asked for contrast.
+
 Survival is measured **relative to the symbol's own decode class**
 (`CellProbe`): an artistic symbol that only decodes through a deep rung is
 probed with that rung — "fragile" is never conflated with "undecodable".
@@ -323,8 +345,8 @@ The composite is a property of the FRAME, not of the symbol alone. Two
 documented consequences:
 
 - **Dilution** — a small symbol in a large frame scores lower (the stress
-  base downscales the whole frame to ≤512px, shrinking the symbol's
-  effective module size). Monotone and intended: a QR occupying 20% of a
+  base downscales the whole frame, § The stress base, shrinking the
+  symbol's effective module size). Monotone and intended: a QR occupying 20% of a
   poster IS harder to scan from afar.
 - **Quiet-ring phase** — near the resolution knee, the perspective cells
   (which warp the whole frame) can flip with small quiet-ring changes:

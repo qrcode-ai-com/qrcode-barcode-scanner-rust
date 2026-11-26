@@ -32,6 +32,11 @@ stops at the first failed cell (the knee). Weighted sum → structural caps
 | rotation | 10 | non-cardinal angles |
 | lighting | 15 | shadows, glare, exposure defects |
 
+Every cell is built from one base image of the frame, at most 512 px on its
+longest side. A linear barcode keeps the pixel count of that square instead,
+so a wide Code 128 is judged at its own width (at most 2048 px) and its
+resolution cells are the same shares of that width.
+
 Two structural caps override everything: a dead finder pattern caps the
 score at **40**, a violated quiet zone at **60** — the two documented
 AI-art killers. A thin error-correction margin `m` below 0.5 caps it

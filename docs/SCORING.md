@@ -47,6 +47,11 @@ costs, never a verdict.
 | rotation | 10 | 10° → 50° |
 | lighting | 15 | shadow ×2 · glare blob · exposure ±60 (unordered set) |
 
+The cells run on one base image of the frame: its longest side is at most
+512 px. A linear symbology keeps the pixel count of that square instead
+(`512 × √(long side ÷ short side)`, at most 2048 px), so a wide barcode keeps
+its width, and its resolution cells are the same shares of that base.
+
 Perspective/rotation/lighting exist because they are the documented blind
 spot of naive scorers (BoofCV categories · DiffQRCoder WACV 2025): artistic
 codes erode the *grid-estimation* margin first.

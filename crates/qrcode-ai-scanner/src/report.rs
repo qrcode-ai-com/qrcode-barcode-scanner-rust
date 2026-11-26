@@ -224,6 +224,26 @@ impl Symbology {
     pub fn is_retail_gtin(self) -> bool {
         matches!(self, Self::Ean13 | Self::Ean8 | Self::UpcA | Self::UpcE)
     }
+
+    /// Linear symbologies — one row of bars, read along one direction. The
+    /// stacked and matrix symbologies (PDF417 included) are not.
+    pub(crate) fn is_linear(self) -> bool {
+        matches!(
+            self,
+            Self::Ean13
+                | Self::Ean8
+                | Self::UpcA
+                | Self::UpcE
+                | Self::Code128
+                | Self::Code39
+                | Self::Code93
+                | Self::Codabar
+                | Self::Itf
+                | Self::DataBar
+                | Self::DataBarExpanded
+                | Self::Telepen
+        )
+    }
 }
 
 /// Which decode engine produced a detection.
@@ -1076,7 +1096,9 @@ impl Versions {
             pipeline: 5,
             // score contract 6: the correction margin measured in the image
             // (the widest verified sampling of the symbol, whatever read
-            // it), so one design keeps one margin at every export size.
+            // it), so one design keeps one margin at every export size;
+            // and a linear symbology judged on a base that keeps the pixel
+            // count of the 512 px square, not its side.
             // Contract 5: the margin cap on the verified orientation's
             // stream, interrupted judgments absent, probes matched by
             // content identity.

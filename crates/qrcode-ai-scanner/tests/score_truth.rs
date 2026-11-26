@@ -446,3 +446,49 @@ fn a_margin_is_the_symbols_whatever_the_frame_or_the_reader() {
         );
     }
 }
+
+/// A linear symbology is judged on a base that keeps the pixel count of the
+/// 512 px square instead of its side. This frame is 1037 × 205: on a 512 px
+/// side its EAN-13 kept under two pixels per bar, no contrast cell read and
+/// the judgment asked for contrast (4 of 100). At its own width the bars
+/// are three pixels wide, every contrast cell reads, and the resolution
+/// cells are the same shares of that width.
+#[test]
+fn a_wide_barcode_is_judged_at_its_own_width() {
+    let report = scan(
+        &fixture("symbology/ean13-addon5-code128.png"),
+        unbudgeted_full(),
+    );
+    let primary = report.detections.first().expect("the EAN-13 decodes");
+    assert_eq!(primary.symbology, qrcode_barcode_scanner::Symbology::Ean13);
+    let score = report.score.as_ref().expect("an unbounded scan judges");
+    assert_eq!(score.weights_run, 100);
+    let axis = |wanted: StressAxis| {
+        score
+            .axes
+            .iter()
+            .find(|a| a.axis == wanted)
+            .unwrap_or_else(|| panic!("{wanted:?} ran: {score:#?}"))
+    };
+    let contrast = axis(StressAxis::Contrast);
+    assert_eq!((contrast.passed, contrast.total), (5, 5), "{contrast:?}");
+    assert!(
+        !report.hints.contains(&Hint::IncreaseContrast),
+        "{:?}",
+        report.hints
+    );
+    // 358 · 256 · 179 · 128 · 90 px of a 512 px base, on a 1037 px one
+    let resolution = axis(StressAxis::Resolution);
+    assert!(resolution.passed >= 1, "{resolution:?}");
+    if let Some(label) = resolution.failed_at.as_deref() {
+        assert!(
+            ["725px", "518px", "362px", "259px", "182px"].contains(&label),
+            "{resolution:?}"
+        );
+    }
+    assert!(score.value >= 50, "{score:#?}");
+
+    // a frame whose longest side is at most 512 px keeps the square base's cells
+    let narrow = scan(&fixture("symbology/ean13.png"), unbudgeted_full());
+    assert_honest(narrow.score.as_ref().expect("an unbounded scan judges"));
+}

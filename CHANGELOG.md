@@ -76,13 +76,38 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
     `fixtures/degraded/quiet-ring-phase-1015.png` and `-1023.png` goes from
     85 and 70 to 100 and 88, both frames at 0 errors of 16. The difference
     that remains is their perspective cells.
-  - Decoded contents, the stress axes and the structural checks are
-    unchanged. The ISO 15415 card reads the same margin: its
+  - Decoded contents, the stress axes of a QR code and the structural
+    checks are unchanged. The ISO 15415 card reads the same margin: its
     `unused_error_correction` parameter follows the wider margin, and so does
     `iso15415.overall` where that parameter decided it. A symbol only the
     rescue path read, and every symbology other than QR, is measured as
     before. A symbol no sampling verifies keeps `score.uec: null`, which
     means not measured.
+- **Contract 6 also judges a linear barcode at its own width.** The stress
+  cells of a judgment run on one base image of the frame, and that base had
+  a longest side of 512 px for every symbology. A wide barcode then kept
+  under two pixels per bar before any stress: no contrast cell read, the
+  score fell to a few points and the judgment asked for contrast.
+  - The base of a linear symbology (EAN-13, EAN-8, UPC-A, UPC-E, Code 128,
+    Code 39, Code 93, Codabar, ITF, DataBar, DataBar Expanded, Telepen) now
+    keeps the pixel count of that 512 px square instead of its side: its
+    longest side is `512 × √(long side ÷ short side)`, at most 2048 px and
+    never more than the frame's own. The cost of a judgment stays bounded
+    by the same number of pixels.
+  - The resolution cells are the same shares of that base, and `failed_at`
+    names the side the cell ran at (`"518px"` on a 1037 px base, where a
+    512 px base says `"256px"`).
+  - `fixtures/symbology/ean13-addon5-code128.png` (1037 × 205) goes from 4
+    to 66 and no longer carries `increase_contrast`,
+    `fixtures/symbology/telepen.png` from 63 to 76,
+    `fixtures/symbology/code93-bwipp-checked.png` from 61 to 74 and
+    `fixtures/symbology/databar-expanded-bwipp-regression.png` from 51
+    to 61.
+  - A linear symbol in a frame whose longest side is at most 512 px, and
+    every matrix or stacked symbology (PDF417 included), is judged as
+    before. A linear symbol in a larger frame that is close to square has a
+    base a few percent wider than before and can move by one resolution
+    cell in either direction.
 - **The stress probes of a judgment run in the order of their expected
   cost.** A stress cell passes when any binarization of its image reads under
   any reader, so the order changes how long a cell takes and never whether it
@@ -90,7 +115,7 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   each took, and tries the cheapest expected pair first. On the 82 images of
   `fixtures/` a full unbudgeted scan, with the margin measurement above, took
   25 % less wall time in total and its median went from 162 ms to 110 ms on
-  the development machine; every axis kept its exact result.
+  the development machine; the order moved no axis result.
 - **Browser package: `/auto` no longer keeps a failure the next call could
   fix.** A failed import of the loader, a failed request for the WASM, an
   HTTP error status and a failed read of the response body are not cached:
