@@ -12,6 +12,8 @@ use qrcode_barcode_scanner::{
 use serde::Serialize as _;
 use wasm_bindgen::prelude::*;
 
+mod mem;
+
 /// `QRS-xxx` lands in the message — consumers match `[QRS-...]`.
 fn scan_error(e: &ScanError) -> JsError {
     JsError::new(&format!("{} [{}]", e, e.code()))

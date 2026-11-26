@@ -124,6 +124,26 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   `true` for those four cases. Every other failure stays cached, no timer
   runs and nothing is retried on its own. `/auto` now also requests
   `scan.js`, one more file beside the loader.
+- **Browser package: a full scan of a styled QR code takes about a third of
+  the time.** rxing 0.9.3, which 0.11.0 adopted, compares its Reed-Solomon
+  field (two tables, 16 KiB) on every polynomial operation, and
+  `wasm32-unknown-unknown` links a comparison that walks one byte per step:
+  since 0.11.0 the `direct` and `enhance` stages took about three times
+  longer in the browser module than in 0.10.0. The module now links its own
+  `memcmp` and `bcmp` (`crates/qrcode-ai-scanner-wasm/src/mem.rs`): a range
+  compared with itself is equal without being read, and two ranges are
+  compared eight bytes per step. No report changes.
+  - Measured on 98 styled QR designs of a private set, one thread, CPU time
+    of a `full` scan with its score (three axes and three checks skipped):
+    a median of 2 399 ms with 0.12.0, 870 ms with this module and 503 ms
+    with `formats: ["qr_code"]`; the slowest scan went from 11.2 s to 2.2 s.
+    0.9.0, the last release measured before rxing 0.9.3, took a median of
+    1 177 ms.
+  - `memcmp` and `bcmp` appear among the module's raw WebAssembly exports,
+    because a linked symbol is one. They are not part of the package's API.
+  - Native builds (the CLI, the Node addon, Python, the mobile bindings) link
+    their platform's comparison, where the same field comparison was about a
+    quarter of one profiled scan. They are unchanged.
 ## 0.12.0 — 2026-11-22
 
 ### Added
