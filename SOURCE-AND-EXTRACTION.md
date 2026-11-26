@@ -15,11 +15,11 @@ under them. From 0.11.0 the packages carry the `qrcode-barcode-scanner` family
 names: `qrcode-barcode-scanner` and `qrcode-barcode-scanner-cli` on crates.io,
 `qrcode-barcode-scanner` on PyPI, and `@qrcode-ai-com/qrcode-barcode-scanner`,
 its six platform packages and `@qrcode-ai-com/qrcode-barcode-scanner-wasm` on
-npm. These five runtime entry points are public in 0.12.0, as are the prebuilt
-CLI archives in the [v0.12.0 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.0).
+npm. These five runtime entry points are public in 0.12.1, as are the prebuilt
+CLI archives in the [v0.12.1 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1).
 The six native npm platform packages are automatic optional dependencies of the
 Node parent, not six additional SDKs. The browser package ships one portable
-WASM module. No 0.12.0 package uses a former name or an alias/wrapper package;
+WASM module. No 0.12.1 package uses a former name or an alias/wrapper package;
 `qrscan` remains the CLI command.
 
 Public Flutter package [`qr_barcode_scanner` 0.12.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.0)

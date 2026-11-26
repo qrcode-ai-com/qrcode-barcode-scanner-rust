@@ -11,9 +11,9 @@ $id = 'qrcode-barcode-scanner'
 $version = $spec.package.metadata.version
 $asset = "$id-cli-$version-x86_64-pc-windows-msvc"
 $release = "https://github.com/qrcode-ai-com/$id/releases/download/v$version"
-$zipSha = 'f3013cd6722bdcd3c2df6a58acd4e3801af2b34e877e132a1242dc3816021886'
-$exeSha = '03f673307c3a399c30fecbcaa1047b00ed755d4d29b62dda73c559b5d688207d'
-$sourceSha = '642f1cd4abcf16c2100eb8fdc2a84691a2af3d78549af4efce7398c2c6a78e17'
+$zipSha = '0b75043f656ed534a0db50e7bc97dfe714d193f285b970b77866dec15c12b2fc'
+$exeSha = '65f53ad3b24363d3740a4e134f3cf7feb92a8f991ea70ed8729daa06c3e83f04'
+$sourceSha = '2fa08f66f7f5840f4abbbcda947a108ed8b2639c42322a338bbd04805ee4d7ff'
 
 $output = (New-Item -ItemType Directory -Path $OutputDirectory -Force).FullName
 $package = Join-Path $output "$id.$version.nupkg"
@@ -59,7 +59,7 @@ qrscan.exe files with the executable hash above.
 
 Corresponding source: $release/$id-cli-$version-source.tar.gz
 Source archive SHA-256: $sourceSha
-Build commit: 897dd50cdf27cbde54d408bf65e1ca4622035d42
+Build commit: 5b2c580c78b0693e58909f889b66f24fc1c548b1
 See SOURCE.md and build-info.json for the build recipe and dependency sources.
 "@ | Set-Content -LiteralPath (Join-Path $tools 'VERIFICATION.txt') -Encoding utf8
 

@@ -15,7 +15,7 @@ schema = "qrscan-release-pins/1"
 
 # The public engine release that the engine mentions and the pinned values follow.
 [engine]
-manifest = "v0.12.0.json"
+manifest = "v0.12.1.json"
 
 # ------------------------------------------------------------------ whole files that never move
 
@@ -326,6 +326,38 @@ held = "the agent integrations: they name the engine they were released on"
 paths = ["README.md", "distribution/README.md", "SOURCE-AND-EXTRACTION.md", "docs/guides/agents.mdx"]
 match = 'agent integrations are published|native engine\. Choose|with engine \d|^engine \S+ and returned|into a project-local runtime|among them engine|a fresh engine|on engine \S+ The MCP adapter|^\S+ See the \[distribution guide\]|reuse the published scanner'
 
+# What a destination with its own tag was built on: these lines name the engine release inside a
+# published adapter, bundle or image, so they wait for that destination's next publication.
+[[line]]
+held = "the agent integrations: they name the engine they were released on"
+paths = ["distribution/README.md", "SOURCE-AND-EXTRACTION.md", "LICENSING.md", "RELEASING.md", "docs/guides/agents.mdx"]
+match = 'the MCP adapter \S+ runs `|Its helper used engine|^`@qrcode-ai-com/qrcode-barcode-scanner@\S+`\.$|^\S+ Its skill archives hold|report naming engine|run the MIT engine|on the MIT engine|hold the MIT server of their version|reuses the published MIT scanner|use the published scanner|the MIT engine \S+ and its six native'
+
+[[line]]
+held = "the JupyterLab extension, under its own tag jupyterlab-v: it bundles the browser module its package.json pins"
+paths = ["RELEASING.md"]
+match = 'so it installs no engine wheel; with engine'
+
+[[line]]
+held = "the container image, under its own tag"
+paths = ["RELEASING.md", ".github/workflows/oci-publish.yml"]
+match = '`v0\.12\.\d+` Linux CLI archives, MIT|\[0\.12 BOM\]|^Engine source is the commit of the `v0\.12|`0\.12\.\d+` is therefore its own listing tag|needs the exact `oci-v0\.12|`0\.12\.\d+-amd64`|add the tag `0\.12\.\d+` to the repository in the Artifact Hub|the `oci-v0\.12\.\d+` \[tag run\]|under the tag `0\.12\.\d+`, after|preserves the immutable v0\.12'
+
+[[line]]
+held = "the HTTP service image, under its own tag http-v: it runs the published engine it pins"
+paths = ["RELEASING.md"]
+match = 'qrcode-barcode-scanner@\S+: `POST /scan`|The engine tag `v\S+`$|^engine \S+, and the image.s license label|and the engine pin \S+\), downloads|^engine \S+\. The package is public and linked'
+
+[[line]]
+held = "the Go module, with its own versions"
+paths = ["bindings/go/README.md"]
+match = '^go get github\.com/qrcode-ai-com/qrcode-barcode-scanner-go@v'
+
+[[line]]
+held = "the PHP package on Packagist, with its own versions"
+paths = ["bindings/php/README.md"]
+match = 'published on Packagist as'
+
 # The package README is not held: pub.dev shows the README of each archive, so the version it
 # installs is the version of its own archive, as in the other package READMEs.
 [[line]]
@@ -409,6 +441,11 @@ paths = [
   "scripts/package-inspect.py",
 ]
 match = "scanner: '0\\.11\\.0'|\"scanner\":\"0\\.11\\.0\"|scanner@0\\.11\\.0\"\\)|String::from\\(\"0\\.11\\.0\"\\)|keeps `0\\.11\\.0`|qrscan-0\\.11\\.0"
+
+[[line]]
+keep = "What the Termux pull request received on its day."
+paths = ["distribution/termux/README.md"]
+match = 'The pull request received the 0\.12\.0 script'
 
 [[line]]
 keep = "An entry of the package changelog: a new version adds one above it."

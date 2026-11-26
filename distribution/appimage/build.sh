@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Wrap the verified 0.12.0 CLI in an AppImage: one file that runs on a GNU/Linux desktop or
+# Wrap the verified 0.12.1 CLI in an AppImage: one file that runs on a GNU/Linux desktop or
 # server with no installation. The executable inside stays byte-identical to the published
 # qrscan; nothing is compiled here.
 #
 #   build.sh x86_64|aarch64 INPUT_DIRECTORY OUTPUT_DIRECTORY
 #
 # INPUT_DIRECTORY holds four files, each checked against a SHA-256 pinned below:
-#   qrcode-barcode-scanner-cli-0.12.0-SHA256SUMS         from the engine release v0.12.0
-#   qrcode-barcode-scanner-cli-0.12.0-<target>.tar.gz    from the same release
+#   qrcode-barcode-scanner-cli-0.12.1-SHA256SUMS         from the engine release v0.12.1
+#   qrcode-barcode-scanner-cli-0.12.1-<target>.tar.gz    from the same release
 #   appimagetool-<machine>.AppImage                      appimagetool 1.9.1, for this machine
 #   runtime-<architecture>                               type2-runtime 20251108, for the AppImage
 #
-# It writes OUTPUT_DIRECTORY/qrcode-barcode-scanner-0.12.0-<architecture>.AppImage.
+# It writes OUTPUT_DIRECTORY/qrcode-barcode-scanner-0.12.1-<architecture>.AppImage.
 set -euo pipefail
 
 if [[ $# -ne 3 ]]; then
@@ -23,12 +23,12 @@ architecture=$1
 case "$architecture" in
   x86_64)
     target=x86_64-unknown-linux-gnu
-    binary_sha256=cbc1ac6456a0a791ae636da55388f981dcbd740081af79abb680c3a876be5357
+    binary_sha256=dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de
     runtime_sha256=2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d
     ;;
   aarch64)
     target=aarch64-unknown-linux-gnu
-    binary_sha256=e400b7464357f35d43bae7172d5408a5e412fbd90a371577baca9473746fbe55
+    binary_sha256=b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b
     runtime_sha256=00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444
     ;;
   *)
@@ -49,12 +49,12 @@ case "$machine" in
 esac
 
 package=qrcode-barcode-scanner
-version=0.12.0
-# The commit time of the tag v0.12.0, as build-info.json of the archives records it.
-source_date_epoch=1795355359
+version=0.12.1
+# The commit time of the tag v0.12.1, as build-info.json of the archives records it.
+source_date_epoch=1795719686
 archive_stem="$package-cli-$version-$target"
 checksums="$package-cli-$version-SHA256SUMS"
-checksums_sha256=f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691
+checksums_sha256=9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055
 recipe_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 input_dir=$(cd -- "$2" && pwd)
 output_dir=$(cd -- "$3" && pwd)
