@@ -583,7 +583,7 @@ dependencies = [
 
 [[package]]
 name = "qrcode-barcode-scanner"
-version = "0.12.0"
+version = "0.12.1"
 dependencies = [
  "base64",
  "encoding_rs",

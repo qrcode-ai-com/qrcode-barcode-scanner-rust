@@ -66,7 +66,7 @@ jitpack.io by a clean Android project
 ([`tests/consumers/jitpack-android`](../../tests/consumers/jitpack-android/)) and
 scanned on an emulator, in a debug build and in an R8-minified build.
 
-JitPack coordinate: com.github.qrcode-ai-com:qrcode-barcode-scanner:0.12.0
+JitPack coordinate: com.github.qrcode-ai-com:qrcode-barcode-scanner:0.12.1
 
 With 0.11.0, add JNA's Android AAR yourself. The module metadata published with
 that version names JNA without its AAR, so Gradle would resolve the plain jar,
@@ -106,7 +106,7 @@ For a minified build with 0.11.0, also add this line to your ProGuard rules:
 -dontwarn java.awt.*
 ```
 
-Use the version string `0.12.0`, without a `v`. JitPack treats `v0.12.0` as
+Use the version string `0.12.1`, without a `v`. JitPack treats `v0.12.1` as
 another build of the same tag.
 
 ## Maven Central
