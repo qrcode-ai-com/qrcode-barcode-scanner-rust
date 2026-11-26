@@ -22,7 +22,7 @@ const runtime = join(root, "runtime");
 mkdirSync(runtime, { recursive: true });
 const manifest = join(runtime, "package.json");
 if (existsSync(manifest)) assert.equal(JSON.parse(readFileSync(manifest)).name, "qrscan-bundle-runtime", "Refusing an unrelated existing runtime directory");
-else writeFileSync(manifest, JSON.stringify({ name: "qrscan-bundle-runtime", private: true, version: "0.2.2" }) + "\n");
+else writeFileSync(manifest, JSON.stringify({ name: "qrscan-bundle-runtime", private: true, version: "0.2.3" }) + "\n");
 const nodeRoot = dirname(realpathSync(process.execPath));
 const npmCli = [join(nodeRoot, "node_modules/npm/bin/npm-cli.js"), join(nodeRoot, "../lib/node_modules/npm/bin/npm-cli.js")].find(existsSync);
 assert.ok(npmCli, "Use Node with its matching npm installation");
