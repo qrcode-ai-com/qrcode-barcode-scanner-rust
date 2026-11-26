@@ -32,6 +32,10 @@ why = "The recipe and record of the 0.12 container image: its inputs, labels and
 paths = ["distribution/docker/v0.12/**"]
 
 [[frozen]]
+why = "The recipe and record of the 0.12.1 container image: its inputs, labels and receipts pin the 0.12.1 release by hash, and its release BOM pins the recipe files."
+paths = ["distribution/docker/v0.12.1/**"]
+
+[[frozen]]
 why = "Written by its package manager. Regenerate it with that tool."
 paths = ["Cargo.lock", "**/Cargo.lock", "**/package-lock.json", "**/pubspec.lock"]
 
@@ -198,6 +202,10 @@ paths = [
 ]
 
 [[file]]
+held = "the container image, under its own tag"
+paths = [".github/workflows/distribution-checks.yml"]
+
+[[file]]
 held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
 paths = ["distribution/wasmer/**", ".github/workflows/wasmer.yml"]
 
@@ -286,6 +294,12 @@ match = '\[Scoop bucket\]|On Windows x64, install `qrscan`'
 [[line]]
 held = "the container image, under its own tag"
 match = 'public GHCR image|\[GitHub Container Registry\]'
+
+# A recipe folder of the image is named after the release it packages, so a path to it names
+# that release wherever it is written: a workflow step, a link, the publish guard.
+[[line]]
+held = "the container image, under its own tag"
+match = 'docker/v\d+\.\d+\.\d+[/)]'
 
 [[line]]
 held = "the hosted examples, under their own tag"
