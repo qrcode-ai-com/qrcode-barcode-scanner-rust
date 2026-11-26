@@ -90,7 +90,7 @@ name, description, homepage and category against the table above.
    in a cloud storage folder. Test it with an image that holds a QR code and a barcode, such as
    `fixtures/symbology/mixed-code128-qr.png` of this repository.
 3. Action: search **QR Code AI**, choose **Scan Image**, map **Image** to the trigger's file, leave
-   **Profile** on **Frame**, and select **Test step**. Expect **Number of codes** 2 and the texts
+   **Profile** on **Fast**, its default, and select **Test step**. Expect **Number of codes** 2 and the texts
    `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 4. Publish the Zap (turn it on) and let one real run succeed. Keep the Zap and its run: rule 5.3,
    and the reviewer may ask for them.

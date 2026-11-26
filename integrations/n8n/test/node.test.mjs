@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // The built node (dist/) driven through the IExecuteFunctions surface n8n gives a programmatic node:
-// the acceptance fixture in the three profiles, both output modes, empty and corrupt images,
-// continue-on-fail, and the workflow template's use of the node's parameters.
+// the acceptance fixture in the three profiles and with the default one, both output modes, empty
+// and corrupt images, continue-on-fail, and the workflow template's use of the node's parameters.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -15,15 +15,20 @@ const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.
 const fixture = readFileSync(new URL('../../../fixtures/symbology/mixed-code128-qr.png', import.meta.url));
 const white = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAXklEQVR4nO3PMQ0AMAzAsPInvYLYYVWKESTzjhsd8KsBrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BbQHKU9LC7/CP1AAAAABJRU5ErkJggg==', 'base64');
 const EXPECTED = ['https://qrc-ai.com/76xMa', 'STOCK-4827'];
+/** A report without its timings, which differ from one scan to the next. */
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
 
 after(() => scanCore.stopScanner());
 
 const binary = (bytes, fileName = 'label.png') => ({ data: { data: bytes.toString('base64'), mimeType: 'image/png', fileName } });
 
-/** The subset of IExecuteFunctions the node calls, with n8n's own error for a missing binary field. */
+/**
+ * The subset of IExecuteFunctions the node calls, with n8n's own error for a missing binary field. A
+ * parameter the workflow does not set gets the default the node declares, as n8n gives it.
+ */
 function context(items, parameters, { continueOnFail = false } = {}) {
 	const node = { id: 'scan', name: 'QR Code & Barcode Scanner', type: `${manifest.name}.qrcodeBarcodeScanner`, typeVersion: 1, position: [0, 0], parameters };
-	const defaults = { binaryPropertyName: 'data', profile: 'frame', output: 'image', options: {} };
+	const defaults = Object.fromEntries(new QrcodeBarcodeScanner().description.properties.map(({ name, default: value }) => [name, value]));
 	return {
 		getInputData: () => items,
 		getNode: () => node,
@@ -81,6 +86,27 @@ for (const profile of ['fast', 'frame', 'full']) {
 		assert.deepEqual(item.pairedItem, { item: 0 });
 	});
 }
+
+// Since 0.1.2 a node left on the default profile runs fast: frame's 80 ms camera budget could cut a
+// single image's scan before the stage that reads its barcode.
+test('the default profile is fast', async () => {
+	const { description } = new QrcodeBarcodeScanner();
+	const profile = description.properties.find((property) => property.name === 'profile');
+	assert.equal(profile.default, 'fast');
+	assert.equal(profile.default, scanCore.DEFAULT_PROFILE);
+	assert.deepEqual(profile.options.map((option) => option.value), ['fast', 'frame', 'full']);
+	assert.match(profile.options[0].description, /^The default\. /);
+	const [[byDefault]] = await run([{ json: {}, binary: binary(fixture) }], { options: { budgetMs: 0 } });
+	const [[fast]] = await run([{ json: {}, binary: binary(fixture) }], { profile: 'fast', options: { budgetMs: 0 } });
+	assert.equal(byDefault.json.profile, 'fast');
+	assert.deepEqual(byDefault.json.texts, EXPECTED);
+	assert.equal(typeof byDefault.json.report.score.value, 'number', 'the default profile scores, which frame never does');
+	assert.deepEqual(untimed(byDefault.json.report), untimed(fast.json.report), 'a node with no profile runs the fast profile');
+	// With the profile's own budget, as a node left on its defaults runs.
+	const [[budgeted]] = await run([{ json: {}, binary: binary(fixture) }], {});
+	assert.equal(budgeted.json.profile, 'fast');
+	assert.deepEqual(budgeted.json.texts, EXPECTED);
+});
 
 test('one item per code, with its exact bytes', async () => {
 	const [output] = await run([{ json: {}, binary: binary(fixture) }], { output: 'code', profile: 'full' });

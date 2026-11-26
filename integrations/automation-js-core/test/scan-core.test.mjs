@@ -13,6 +13,8 @@ const core = require(corePath);
 const fixture = readFileSync(new URL('../../../fixtures/symbology/mixed-code128-qr.png', import.meta.url));
 const white = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAXklEQVR4nO3PMQ0AMAzAsPInvYLYYVWKESTzjhsd8KsBrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BbQHKU9LC7/CP1AAAAABJRU5ErkJggg==', 'base64');
 const EXPECTED = [['qr_code', 'https://qrc-ai.com/76xMa'], ['code128', 'STOCK-4827']];
+/** A report without its timings, which differ from one scan to the next. */
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
 
 after(() => core.stopScanner());
 
@@ -31,10 +33,18 @@ for (const profile of ['fast', 'frame', 'full']) {
 	});
 }
 
-test('the default profile is frame', async () => {
-	const report = await core.scanImage(fixture);
-	assert.equal(report.score, null);
-	assert.deepEqual(core.summarize(report).texts, EXPECTED.map(([, text]) => text));
+// Since the hosts' 0.1.2 a scan that names no profile runs fast: frame's 80 ms camera budget could
+// cut a single image's scan before the stage that reads its barcode.
+test('the default profile is fast', async () => {
+	assert.equal(core.DEFAULT_PROFILE, 'fast');
+	const byDefault = await core.scanImage(fixture, { budgetMs: 0 });
+	assert.equal(typeof byDefault.score.value, 'number', 'the default profile scores, which frame never does');
+	assert.deepEqual(untimed(byDefault), untimed(await core.scanImage(fixture, { profile: 'fast', budgetMs: 0 })));
+	assert.notDeepEqual(untimed(byDefault), untimed(await core.scanImage(fixture, { profile: 'full', budgetMs: 0 })));
+	assert.deepEqual(core.summarize(byDefault).texts, EXPECTED.map(([, text]) => text));
+	const withBudget = await core.scanImage(fixture);
+	assert.deepEqual(core.summarize(withBudget).texts, EXPECTED.map(([, text]) => text), 'the fast budget reads both codes');
+	assert.equal(core.checkInput(fixture).profile, 'fast');
 });
 
 test('an image without a code is an empty report, not an error', async () => {
@@ -62,7 +72,7 @@ test('inputs outside the boundary never reach the engine', async () => {
 	await refused(Buffer.alloc(core.LIMITS.inputBytes + 1), {}, 'QRSCAN_INPUT_LIMIT');
 	await refused(fixture, { profile: 'slow' }, 'QRSCAN_PROFILE');
 	for (const budgetMs of [-1, 1.5, 60_001, Number.NaN]) await refused(fixture, { budgetMs }, 'QRSCAN_BUDGET');
-	assert.deepEqual(core.checkInput(fixture, { budgetMs: null }), { profile: 'frame', budgetMs: undefined });
+	assert.deepEqual(core.checkInput(fixture, { budgetMs: null }), { profile: 'fast', budgetMs: undefined });
 });
 
 test('a scan runs off the event loop and leaves the caller buffer intact', async () => {

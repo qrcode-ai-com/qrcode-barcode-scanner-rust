@@ -3,7 +3,7 @@
 // Do not edit integrations/node-red/nodes/scan-core.js: change the source, then run the sync.
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScanError = exports.LIMITS = exports.PROFILES = exports.ENGINE_VERSION = exports.ENGINE_PACKAGE = void 0;
+exports.ScanError = exports.LIMITS = exports.DEFAULT_PROFILE = exports.PROFILES = exports.ENGINE_VERSION = exports.ENGINE_PACKAGE = void 0;
 exports.checkInput = checkInput;
 exports.scanImage = scanImage;
 exports.summarize = summarize;
@@ -23,8 +23,12 @@ const node_worker_threads_1 = require("node:worker_threads");
 /** The engine package every host depends on, pinned to an exact version. */
 exports.ENGINE_PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
 exports.ENGINE_VERSION = '0.12.0';
-/** The engine profiles. `frame` decodes without scoring and is the default. */
+/** The engine profiles. `fast` is the default, `frame` decodes without scoring. */
 exports.PROFILES = ['frame', 'fast', 'full'];
+// An image scanned with no profile runs fast, whose 800 ms budget suits one uploaded image. frame's
+// 80 ms suits a camera frame: when the pyramid stage alone outlasts it, the direct stage never runs,
+// and a barcode only that stage reads is missing from a report flagged budget_exhausted.
+exports.DEFAULT_PROFILE = 'fast';
 /** The same input boundary as the MCP adapter: bytes, pixels per side, pixels in all. */
 exports.LIMITS = Object.freeze({
     inputBytes: 8 * 1024 * 1024,
@@ -127,7 +131,7 @@ function checkInput(bytes, options = {}) {
     if (bytes.byteLength > exports.LIMITS.inputBytes) {
         throw new ScanError('QRSCAN_INPUT_LIMIT', `The image exceeds ${exports.LIMITS.inputBytes} bytes`);
     }
-    const profile = (options.profile ?? 'frame');
+    const profile = (options.profile ?? exports.DEFAULT_PROFILE);
     if (!exports.PROFILES.includes(profile)) {
         throw new ScanError('QRSCAN_PROFILE', `The profile must be one of ${exports.PROFILES.join(', ')}`);
     }

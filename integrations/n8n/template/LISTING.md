@@ -11,8 +11,8 @@ the submit button. Nothing here has been submitted. The rules are n8n's
 
 | File | What it is | sha256 |
 |---|---|---|
-| [qr-barcode-label-check.json](qr-barcode-label-check.json) | The workflow to submit, exactly as committed | `614acd340f7d09f03375528d5616d447c759887a7b9b263d8d4bd611da7823a7` |
-| `n8n-canvas.png` in the CI artifact | The image of the workflow, 1878 × 978 pixels, from the n8n 2.48.7 editor | `450bf6ba6a513d1ba8a1f9a9866cbbd96b356f4706535593d7af6500febb7581` |
+| [qr-barcode-label-check.json](qr-barcode-label-check.json) | The workflow to submit, exactly as committed | `b72f83ceba96f8668b57bb1f4900758ce9d12aae69da39254302dba4a60a8c02` |
+| `n8n-canvas.png` in the CI artifact | The image of the workflow, 1878 × 978 pixels, from the n8n 2.48.7 editor | `369de907711f0a4da286695ac0006a9543edd11c5ae2add79e45c31623eade1c` |
 
 The workflow's name is `Check QR codes and barcodes in label images against an expected value`.
 The Creator portal writes the library title and description itself, so no other text is needed.
@@ -28,10 +28,11 @@ same screenshot, byte for byte, with the sha256 above.
 
 ## What the template depends on
 
-- The community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.1, published on npm on
-  23 November 2026 on the MIT engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0; npm's
-  `latest` tag was 0.1.1 when read on 24 November 2026. The overview note names the package and
-  its version, links n8n's
+- The community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.2, on the MIT engine
+  `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, like 0.1.1, which npm has served since
+  23 November 2026. Version 0.1.2 changes only the node's default profile, from frame to fast;
+  the template names its profile, frame, so its results are those of 0.1.1. The overview note
+  names the package and its version, links n8n's
   [community node installation](https://docs.n8n.io/integrations/community-nodes/installation-and-management)
   page, and says the template was tested on n8n 2.48.7.
 - Self-hosted n8n. The node is not verified by n8n, and the guidelines say that unverified
@@ -42,7 +43,7 @@ same screenshot, byte for byte, with the sha256 above.
 ## Owner steps
 
 1. Check that npm still serves the version the overview note names:
-   `npm view @qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner version` must print `0.1.1`. If a
+   `npm view @qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner version` must print `0.1.2`. If a
    later version is out, update the note, this file and the template README first.
 2. In a clean self-hosted n8n 2.48.7, open **Settings**, **Community nodes**, select **Install**,
    enter `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner`, accept the risk notice and install.
@@ -69,5 +70,5 @@ result, so read the workflow and its notes before submitting. If the portal asks
 reviewer, this text states the dependency:
 
 ```text
-The scan step is the community node @qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner 0.1.1 (unverified, self-hosted n8n only). It decodes QR codes and barcodes on the n8n instance with an open-source engine; no image is uploaded and no credential is needed. Tested on self-hosted n8n 2.48.7 with an image holding a QR code and a Code 128, an image without a code and a corrupt file.
+The scan step is the community node @qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner 0.1.2 (unverified, self-hosted n8n only). It decodes QR codes and barcodes on the n8n instance with an open-source engine; no image is uploaded and no credential is needed. Tested on self-hosted n8n 2.48.7 with an image holding a QR code and a Code 128, an image without a code and a corrupt file.
 ```

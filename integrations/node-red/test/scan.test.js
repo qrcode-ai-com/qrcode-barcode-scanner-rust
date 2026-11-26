@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // The node in a Node-RED runtime (node-red-node-test-helper): Buffer and file inputs, the acceptance
-// fixture in the three profiles, empty and corrupt images caught by a Catch node, and the packaged
-// example flow wired as the editor would import it.
+// fixture in the three profiles and with the default one, empty and corrupt images caught by a Catch
+// node, and the packaged example flow wired as the editor would import it.
 'use strict';
 const assert = require('node:assert/strict');
 const { mkdtempSync, readFileSync, copyFileSync } = require('node:fs');
@@ -23,6 +23,8 @@ const fixturePath = join(__dirname, '../../../fixtures/symbology/mixed-code128-q
 const fixture = readFileSync(fixturePath);
 const white = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAXklEQVR4nO3PMQ0AMAzAsPInvYLYYVWKESTzjhsd8KsBrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BbQHKU9LC7/CP1AAAAABJRU5ErkJggg==', 'base64');
 const EXPECTED = ['https://qrc-ai.com/76xMa', 'STOCK-4827'];
+/** A report without its timings, which differ from one scan to the next. */
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
 const workingDirectory = mkdtempSync(join(tmpdir(), 'qrscan-node-red-'));
 copyFileSync(fixturePath, join(workingDirectory, 'label.png'));
 
@@ -75,6 +77,24 @@ for (const profile of ['fast', 'frame', 'full']) {
     assert.deepEqual(lastStatus(scan), { fill: 'green', shape: 'dot', text: '2 codes' });
   });
 }
+
+// Since 0.1.2 a new node starts on fast, and a node whose flow names no profile runs it: frame's
+// 80 ms camera budget could cut a single image's scan before the stage that reads its barcode.
+test('the default profile is fast', TIMEOUT, async () => {
+  assert.equal(scanCore.DEFAULT_PROFILE, 'fast');
+  const editor = readFileSync(join(__dirname, '../nodes/scan.html'), 'utf8');
+  assert.match(editor, /profile: \{ value: 'fast', required: true \}/, 'the editor gives a new node the fast profile');
+  assert.deepEqual([...editor.matchAll(/<option value="(\w+)">/g)].map((match) => match[1]), ['fast', 'frame', 'full']);
+  const fast = await exchange({ payload: fixture, profile: 'fast', budgetMs: 0 });
+  for (const profile of [undefined, '']) {
+    const { msg } = await exchange({ payload: fixture, budgetMs: 0 }, { profile });
+    assert.deepEqual(msg.texts, EXPECTED);
+    assert.equal(typeof msg.payload.score.value, 'number', 'the default profile scores, which frame never does');
+    assert.deepEqual(untimed(msg.payload), untimed(fast.msg.payload), `a node whose profile is ${JSON.stringify(profile)} runs fast`);
+  }
+  const example = JSON.parse(readFileSync(join(__dirname, '../examples/scan-image.json'), 'utf8'));
+  assert.equal(example.find((node) => node.type === 'qrcode-barcode-scanner').profile, 'fast');
+});
 
 test('a file path, relative to the working directory, is read and scanned', TIMEOUT, async () => {
   const relative = await exchange({ payload: 'label.png' });

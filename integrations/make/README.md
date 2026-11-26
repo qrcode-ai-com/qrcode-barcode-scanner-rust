@@ -68,7 +68,7 @@ In a scenario, add the **QR Code AI** app, then the **Scan an Image** module:
 | --- | --- |
 | **File name** | The name of the file, mapped from the module that gives the file. |
 | **Data** | The file's data, mapped from the same module. |
-| **Profile** | `frame` (the default) for one clear photo or scan, `fast` for a quick pass, `full` for a difficult image. |
+| **Profile** | `fast` (the default) decodes and gives a reduced QR score within 800 ms, `frame` decodes without scoring within the 80 ms of a camera frame, `full` gives the full QR score within 4000 ms, for a difficult image. |
 
 **Make an API call** sends any other request to the same service, with a path relative to the base URL.
 
