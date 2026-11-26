@@ -392,13 +392,15 @@ image stays available; see the [0.11 container guide](docker/v0.11/README.md#run
 0.10 GHCR and Docker Hub images and 0.1 agent archives remain available below.
 
 To scan over HTTP, the [HTTP service](http/README.md) runs the engine's npm package 0.12.0 behind
-`POST /scan` and answers with its report, unchanged. Its image 0.1.1 is public on GHCR for Linux
-AMD64 and ARM64, MIT: `docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, index
-`sha256:548a51fd038b0bbe1f77d0728c8a2d541ab6f8761f2f11cac77ad9450362932a`. Its
-[tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528)
+`POST /scan` and answers with its report, unchanged. Its image 0.1.2 is public on GHCR for Linux
+AMD64 and ARM64, MIT: `docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2`, index
+`sha256:66b6d22ce7c25b59ba6a9e5223d0e95498a506ca22e6a9621d7e01b3ef277cdb`; a request that names
+no mode scans with `fast`. Its
+[tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510)
 built the image on both architectures, judged each one fresh, read-only and with no route out, on
-the mixed sample in the three profiles, then pushed the judged images. The Railway template, the
-Render Blueprint and the DigitalOcean routes are prepared, not submitted.
+the mixed sample in the three profiles and with no mode, then pushed the judged images. The image
+0.1.1, whose default is `frame`, stays published. The Railway template, the Render Blueprint and
+the DigitalOcean routes are prepared, not submitted.
 
 ## Recipes prepared for other package managers
 

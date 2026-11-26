@@ -9,7 +9,7 @@ kit holds what the owner needs to deploy it once for acceptance and then add the
 
 | Item | Value |
 | --- | --- |
-| Repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 24 November 2026 it holds service 0.1.1 with the engine 0.12.0, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1` is public. Its `package.json` must name service 0.1.2, which scans a request with no mode in `fast`, before step 2: on 26 November 2026 it still held 0.1.1, staged from engine commit `9b4e0176`. Render builds its own copy from the `Dockerfile` |
+| Repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. Render builds its own copy from the `Dockerfile` |
 | Blueprint | `render.yaml` at its root: one `web` service named `qrcode-barcode-scanner-http`, `runtime: docker`, `plan: 0.5c-512mb`, `healthCheckPath: /healthz`, `autoDeployTrigger: 'off'`, `QRSCAN_HTTP_MAX_CONCURRENT=1`, `QRSCAN_HTTP_BUDGET_SCALE=4` |
 | Image | built by Render from the `Dockerfile` at the root: Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0` from the lockfile's sha512, user `1000:1000` |
 | Port | the service reads `PORT`, which Render sets to `10000` for every web service |

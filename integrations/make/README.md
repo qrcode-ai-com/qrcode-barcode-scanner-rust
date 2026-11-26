@@ -56,7 +56,7 @@ An image can hold several codes of different kinds; each one comes back once, in
 
 ## The scan service
 
-The module does not read the image itself. It calls the scanner's HTTP service, which runs the same engine on a server: `POST /scan` reads the image in the request body and answers with the scanner's JSON report, and `GET /healthz` answers once the engine is loaded. The service has no authentication of its own, so put it on a network or behind a gateway you control before a Make scenario reaches it. Its image 0.1.1 is public: `docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, and [its README](../../distribution/http/README.md) shows how to run it. No hosted scan service exists for this app, so it calls the one you run.
+The module does not read the image itself. It calls the scanner's HTTP service, which runs the same engine on a server: `POST /scan` reads the image in the request body and answers with the scanner's JSON report, and `GET /healthz` answers once the engine is loaded. The service has no authentication of its own, so put it on a network or behind a gateway you control before a Make scenario reaches it. Its image 0.1.2 is public: `docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2`, and [its README](../../distribution/http/README.md) shows how to run it. No hosted scan service exists for this app, so it calls the one you run.
 
 ## Use
 

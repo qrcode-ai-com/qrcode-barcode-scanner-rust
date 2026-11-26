@@ -65,15 +65,17 @@ Deploy hosts read their files at the root of a repository. `scripts/stage-http-s
 
 ## Run it
 
-The [image 0.1.1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner-http) is public on the GitHub Container Registry, under the MIT License, for Linux AMD64 and ARM64. Docker picks the architecture of your machine:
+The [image 0.1.2](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner-http) is public on the GitHub Container Registry, under the MIT License, for Linux AMD64 and ARM64. Docker picks the architecture of your machine:
 
 ```sh
-docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1
+docker pull ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2
 docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges \
-  --publish 127.0.0.1:8080:8080 ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1
+  --publish 127.0.0.1:8080:8080 ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2
 ```
 
-The index `0.1.1` is `sha256:548a51fd038b0bbe1f77d0728c8a2d541ab6f8761f2f11cac77ad9450362932a`. It names the AMD64 manifest `sha256:a580cfc0e364e941c31f345c2a03397fdc66e6084d42475bd056f7fee726be2e` and the ARM64 manifest `sha256:b2d083897b8684a4c4339f0d608e455bbfa895b9f80edc82fdc71dafd39ab7df`. To run exactly these bytes, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http@sha256:548a51fd038b0bbe1f77d0728c8a2d541ab6f8761f2f11cac77ad9450362932a`. The [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) judged both images, then pushed them as `0.1.1-amd64` and `0.1.1-arm64` and the index as `0.1.1`. No `latest` tag is published: name the version. On 24 November 2026, an anonymous pull of the index returned that digest and both manifests.
+The index `0.1.2` is `sha256:66b6d22ce7c25b59ba6a9e5223d0e95498a506ca22e6a9621d7e01b3ef277cdb`. It names the AMD64 manifest `sha256:54e25d410be265862173fdbb2226c772cff96b49411baae9fa4844f716401699` and the ARM64 manifest `sha256:ce9360f97545a715c4a9277333d6b8def5edf278b19917f9c38ec7e5239276f7`. To run exactly these bytes, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http@sha256:66b6d22ce7c25b59ba6a9e5223d0e95498a506ca22e6a9621d7e01b3ef277cdb`. The [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510) judged both images, then pushed them as `0.1.2-amd64` and `0.1.2-arm64` and the index as `0.1.2`. No `latest` tag is published: name the version. On 26 November 2026, an anonymous pull of the index returned that digest and both manifests.
+
+The image 0.1.1 stays published, index `sha256:548a51fd038b0bbe1f77d0728c8a2d541ab6f8761f2f11cac77ad9450362932a` from its [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528). It scans a request that names no mode with `frame` ([From 0.1.1](#from-011)).
 
 To build the image yourself, start from a staged tree. From the root of the engine repository, with Python 3 and Docker:
 
@@ -154,7 +156,7 @@ The limits are the ones of the [MCP server](https://github.com/qrcode-ai-com/qrc
 
 ### From 0.1.1
 
-Service 0.1.2 changes the mode of a scan that names none from `frame` to `fast`; `GET /` reports `"defaultMode": "fast"` and the upload page starts on `fast`. A request that names its mode is unchanged. A request that names none can now reach the enhance stage that `frame` skips, returns a reduced QR score where the engine measured one instead of `score: null`, and is bounded by the fast profile's 800 ms budget instead of 80 ms, times `QRSCAN_HTTP_BUDGET_SCALE`. The `frame` budget is sized for one camera frame among many: on a busy server, its deadline can stop the scan of an image before its full-resolution stage, and a barcode only that stage reads is then missing from a report marked `trace.budget_exhausted: true`. Every scan answer now names its mode in the `X-Scan-Mode` header. The engine 0.12.0, the routes, the report, the refusals and the limits do not change. To keep the former behavior, send `mode=frame`. Until the image 0.1.2 is published, the image 0.1.1 in [Run it](#run-it) keeps `frame` as its default: send `mode=fast` to it for this behavior.
+Service 0.1.2 changes the mode of a scan that names none from `frame` to `fast`; `GET /` reports `"defaultMode": "fast"` and the upload page starts on `fast`. A request that names its mode is unchanged. A request that names none can now reach the enhance stage that `frame` skips, returns a reduced QR score where the engine measured one instead of `score: null`, and is bounded by the fast profile's 800 ms budget instead of 80 ms, times `QRSCAN_HTTP_BUDGET_SCALE`. The `frame` budget is sized for one camera frame among many: on a busy server, its deadline can stop the scan of an image before its full-resolution stage, and a barcode only that stage reads is then missing from a report marked `trace.budget_exhausted: true`. Every scan answer now names its mode in the `X-Scan-Mode` header. The engine 0.12.0, the routes, the report, the refusals and the limits do not change. To keep the former behavior, send `mode=frame`. The image 0.1.1 keeps `frame` as its default: send `mode=fast` to it for this behavior, or pull the image 0.1.2 in [Run it](#run-it).
 
 ## Privacy and security
 
@@ -184,7 +186,7 @@ The same consumer judges a deployed copy: `node test/consumer.mjs https://exampl
 
 ## Release it
 
-[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.2`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.2-amd64`, `0.1.2-arm64` and the index `0.1.2`. Version 0.1.2 is prepared in this folder and not published yet. Version 0.1.1 is published: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). The owner then made the package public and linked it to this repository.
+[RELEASING.md](../../RELEASING.md#http-service-image) has the steps. On a tag `http-v0.1.2`, the job `publish`, in the protected environment `container-http`, checks the tag against the service version, re-checks that the downloaded images are the ones the consumers judged, and pushes them to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` as `0.1.2-amd64`, `0.1.2-arm64` and the index `0.1.2`. Version 0.1.2 is published: the tag `http-v0.1.2` is on commit `9160d3afe409bab1c00b867567f53bcedf1baa50`, its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45816473510) passed every job above before `publish` pushed the images, and the artifact `http-published` of that run records the digests in [Run it](#run-it). Version 0.1.1 is published too: the tag `http-v0.1.1` is on commit `383aa3d6448678af30e78440b86df7ee623f76de`, and its [run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45421056528) pushed the first images. The owner then made the package public and linked it to this repository.
 
 ## What it returns
 

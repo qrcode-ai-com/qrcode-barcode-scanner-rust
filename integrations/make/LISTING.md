@@ -3,9 +3,9 @@
 State on 21 November 2026: source and tests in this folder, **not deployed to Make**. No Make
 account, app or origin exists for it yet, and `makecomapp.json` holds no origin. **Blocked on a
 hosted endpoint, owner decision 11**: the app calls a scan service. The HTTP service of this
-repository is released since 24 November 2026, as the public image
-`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, but no scan service is hosted for Make
-users. Nothing here hosts one. Every step below is the owner's: an account, an API key, a deployment to Make, a publication
+repository is released since 24 November 2026, as a public image,
+`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` since 26 November, but no scan service
+is hosted for Make users. Nothing here hosts one. Every step below is the owner's: an account, an API key, a deployment to Make, a publication
 and a review request are not done by automation.
 
 ## Verdict
@@ -64,7 +64,7 @@ and a review request are not done by automation.
 ### 1. A scan service
 
 1. Run the scanner's HTTP service, the public image
-   `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1`, on a server you control, behind HTTPS.
+   `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2`, on a server you control, behind HTTPS.
    It has no authentication of its own: keep it on a private network, or behind a gateway that
    only your Make organization can reach.
 2. Check it answers: `curl https://scan.example.com/healthz` with your own address must return

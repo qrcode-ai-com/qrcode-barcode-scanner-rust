@@ -11,7 +11,7 @@ Railway workspace, so they are the owner's. This kit holds every value to type.
 
 | Item | Value |
 | --- | --- |
-| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 24 November 2026 it holds service 0.1.1 with the engine 0.12.0, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.1` is public. Its `package.json` must name service 0.1.2, which scans a request with no mode in `fast`, before the template is created: on 26 November 2026 it still held 0.1.1, staged from engine commit `9b4e0176`. The template itself is not created or published |
+| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. The template itself is not created or published |
 | Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0` from the lockfile's sha512, user `1000:1000` |
 | Port | Railway injects `PORT`; the service listens on it, on every address |
 | Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.2","engine":"0.12.0"}` |
