@@ -810,7 +810,8 @@ def inspect_npm(host: Host, path: pathlib.Path, notes=()) -> Artifact:
             re.search(rf"export function {fn}\([^)]*\): ScanReport;", dts) for fn in ("scan_image", "scan_frame")
         ) and re.search(r"export function capabilities\(\): Capabilities;", dts)
         art.check(f"{WASM_STEM}.d.ts re-exports report-types and returns ScanReport / Capabilities",
-                  'export * from "./report-types"' in dts and bool(retyped))
+                  'export * from "./report-types.js"' in dts and bool(retyped))
+        check_declaration_specifiers(art, files)
         check_equal_file(art, "README.md", files.get("README.md"), WASM_DIR / "README.md")
         check_readme(art, files.get("README.md"), ("npm", WASM_NAME))
         check_readme(art, files.get("examples/README.md"), ("npm", f"{WASM_NAME} examples"), "examples/README.md")
@@ -1661,6 +1662,30 @@ def check_scan_modules(art: Artifact, files: dict) -> None:
                     else list(read_module(judge, data.decode("utf-8", errors="replace"))))
         shown = problems[:12] + ([f"… {len(problems) - 12} more"] if len(problems) > 12 else [])
         art.check(check, not problems, "; ".join(shown))
+
+
+# A relative module specifier in a declaration: `from './x'`, `import './x'` and `import('./x')`.
+DECLARATION_SPECIFIER = re.compile(r"""\b(?:from|import)\s*\(?\s*(['"])(\.{1,2}/[^'"\n]*)\1""")
+
+
+def check_declaration_specifiers(art: Artifact, files: dict) -> None:
+    """The browser package is an ES module: under Node's resolution (`node16`, `nodenext`) a
+    relative import inside a declaration resolves only with its file extension. Without it
+    TypeScript reports the import, or under `skipLibCheck` says nothing and types every name it
+    brought as `any`. A bundler's resolution accepts both forms, so only this reading and the
+    consumer's nodenext typecheck see the difference."""
+    problems = []
+    for name in sorted(files):
+        if not name.endswith(".d.ts"):
+            continue
+        text = files[name].decode("utf-8", errors="replace")
+        for match in DECLARATION_SPECIFIER.finditer(text):
+            if not match.group(2).endswith(".js"):
+                line = text.count("\n", 0, match.start()) + 1
+                problems.append(f"{name}:{line} imports {match.group(2)}")
+    shown = problems[:12] + ([f"… {len(problems) - 12} more"] if len(problems) > 12 else [])
+    art.check("every relative import in a declaration names its .js file (Node's resolution needs it)",
+              not problems, "; ".join(shown))
 
 
 def check_destination_modules(art: Artifact, files: dict) -> None:
@@ -3661,7 +3686,8 @@ def _npm_wasm(version: str) -> dict:
     info = {"schema": wasm_provenance().SCHEMA, "package": WASM_NAME, "version": version,
             "inputs": wasm_provenance().inputs_digest(ROOT),
             "wasm": {"path": WASM_MODULE, "sha256": hashlib.sha256(wasm).hexdigest(), "features": []}}
-    dts = ('export * from "./report-types";\n'
+    dts = ('export * from "./report-types.js";\n'
+           'import type { Capabilities, ScanReport } from "./report-types.js";\n'
            "export function capabilities(): Capabilities;\n"
            "export function scan_frame(data: Uint8Array, width: number, height: number): ScanReport;\n"
            "export function scan_image(bytes: Uint8Array): ScanReport;\n")
@@ -3863,6 +3889,25 @@ def self_test() -> int:
             altered[name] += b"\n// altered\n"
             judge(f"wasm package with an altered {name}", [npm(f"wasm-altered-{name}", altered)], FAIL,
                   f"{name} is crates/qrcode-ai-scanner-wasm/{name} verbatim")
+        # A declaration that imports a sibling without its extension: the root one, which the
+        # pack step writes, in each form, and a copied one (the copy check refuses that one too).
+        for label, name, before, after in (
+            ("re-exporting ./report-types", f"{WASM_STEM}.d.ts",
+             b'export * from "./report-types.js"', b'export * from "./report-types"'),
+            ("importing its types from ./report-types", f"{WASM_STEM}.d.ts",
+             b'ScanReport } from "./report-types.js"', b'ScanReport } from "./report-types"'),
+            ("with camera.d.ts importing ./report-types", "camera.d.ts",
+             b"from './report-types.js'", b"from './report-types'"),
+            ("with camera-overlay.d.ts importing ./camera", "camera-overlay.d.ts",
+             b"from './camera.js'", b"from './camera'"),
+            ("with auto.d.ts naming import('./x')", "auto.d.ts",
+             f"import('./{WASM_STEM}.js')".encode(), f"import('./{WASM_STEM}')".encode()),
+        ):
+            altered = _npm_wasm(version)
+            assert altered[name].count(before) == 1, (name, before)
+            altered[name] = altered[name].replace(before, after)
+            judge(f"wasm package {label}", [npm("wasm-extensionless", altered)], FAIL,
+                  "every relative import in a declaration names its .js file")
         # The examples: every file ships, each the crate's, and nothing else sits under examples/.
         for name in WASM_EXAMPLE_FILES:
             label = re.sub(r"[^a-z0-9]+", "-", name)
