@@ -158,10 +158,18 @@ const LINK = [0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 2, 7, 1, 1, 120, 1
 // A valid header followed by a truncated type section: invalid code.
 const INVALID = [0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96];
 
+// The failures a loader does not keep (ScannerInitError.retryable): a later
+// call makes a fresh attempt. loader_import_failed is the fourth; like
+// wasm_compile_failed, a Node realm does not reach it on an installed package.
+const RETRYABLE = ["asset_network_failed", "asset_http_failed", "asset_read_failed"];
+
 /** Every initialization failure a Node realm can reach through the installed
  * ./auto loader, each with its stable code, plus one success from the same
- * installed bytes. A loader makes one attempt: a second call, concurrent or
- * after the failure, shares the first call's promise. */
+ * installed bytes. Concurrent calls share one promise. A failure a second
+ * attempt cannot change is kept: a later call returns the same rejection. A
+ * failed request or read is not kept: a later call makes a fresh attempt,
+ * which meets the same fault here and rejects with a new error of the same
+ * code. */
 export function wasmLoaderPhases({ consumer, packageName, wasmPath, fixturePath, text }) {
   const auto = JSON.stringify(`${packageName}/auto`);
   const outcome = `
@@ -176,7 +184,8 @@ export function wasmLoaderPhases({ consumer, packageName, wasmPath, fixturePath,
       } catch (error) {
         let again;
         try { await load(); } catch (retry) { again = retry; }
-        return { ok: false, shared: first === second && again === error, name: error.name,
+        return { ok: false, shared: first === second, kept: again === error, again: again?.code ?? null,
+          retryable: error.retryable, name: error.name,
           init: error instanceof ScannerInitError, code: error.code, status: error.status ?? null,
           variant: error.variant, cause: error.cause === undefined ? null : (error.cause?.name ?? typeof error.cause) };
       }
@@ -231,13 +240,16 @@ export function wasmLoaderPhases({ consumer, packageName, wasmPath, fixturePath,
     wasm_unavailable: unavailable, wasm_features_unsupported: unsupported };
   for (const [code, observed] of Object.entries(failures)) {
     const want = expected[code] ?? { variant: "portable", cause: null };
-    assert.deepEqual({ ok: observed.ok, shared: observed.shared, name: observed.name, init: observed.init,
+    const retryable = RETRYABLE.includes(code);
+    assert.deepEqual({ ok: observed.ok, shared: observed.shared, kept: observed.kept, again: observed.again,
+      retryable: observed.retryable, name: observed.name, init: observed.init,
       code: observed.code, status: observed.status, variant: observed.variant, cause: observed.cause },
-    { ok: false, shared: true, name: "ScannerInitError", init: true, code, status: want.status ?? null,
-      variant: want.variant, cause: want.cause }, code);
+    { ok: false, shared: true, kept: !retryable, again: code, retryable, name: "ScannerInitError", init: true, code,
+      status: want.status ?? null, variant: want.variant, cause: want.cause }, code);
   }
   assert.deepEqual(realm.loaded, { ok: true, shared: true, variant: "portable", version: realm.loaded.version, texts: [text] });
   return { realm: { node: process.version, capabilities: realm.capabilities },
-    codes: Object.keys(failures), stubbed_realm: ["wasm_unavailable", "wasm_features_unsupported"],
+    codes: Object.keys(failures), retried_on_next_call: RETRYABLE,
+    stubbed_realm: ["wasm_unavailable", "wasm_features_unsupported"],
     browser_only: ["loader_import_failed", "wasm_compile_failed"], loaded_version: realm.loaded.version };
 }

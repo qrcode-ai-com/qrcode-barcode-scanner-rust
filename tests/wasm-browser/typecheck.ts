@@ -1,5 +1,8 @@
 import type { ScanReport } from '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
-import { loadScanner, createScannerLoader, ScannerInitError, type ScannerVariant } from '@qrcode-ai-com/qrcode-barcode-scanner-wasm/auto';
+import {
+  loadScanner, createScannerLoader, ScannerInitError, isFinal, type BoundScanner, type ScanOptions, type ScannerVariant,
+} from '@qrcode-ai-com/qrcode-barcode-scanner-wasm/auto';
+import { bindScanner, isFinal as isFinalOfScan } from '@qrcode-ai-com/qrcode-barcode-scanner-wasm/scan';
 import {
   CameraScannerError, TRACKER_LIMITS, contentKey, createCameraScanner, createDetectionTracker, projectVideoGeometry,
   projectVideoPoint, sameContent, type CameraFrame, type CameraScanner, type CameraScannerErrorCode,
@@ -59,6 +62,26 @@ const report: ScanReport = scanner.scan_image(new Uint8Array(), 'full');
 const compatible = createScannerLoader({ variant: 'compatible', wasmUrl: new URL('/scanner.wasm', 'https://example.invalid') });
 const error = new ScannerInitError('asset_http_failed', variant, undefined, 404);
 void [report, compatible, error.code, error.status];
+// The named options on the loaded scanner: scan and scanFrame beside the positional functions,
+// isFinal, and the flag that tells a loader failure the next call retries.
+const named: ScanOptions = { profile: 'full', formats: ['qr_code', 'ean13'], budgetMs: 1500, retryBudgetMs: 0,
+  maxDimension: 4096, maxPixels: 16_000_000, scoreSkipAxes: ['perspective'], scoreSkipChecks: ['uec'],
+  alphaBackground: '#ffffff', alphaPalette: ['white', '#000000'] };
+const fromBytes: ScanReport = scanner.scan(new Uint8Array(), named);
+const fromBuffer: ScanReport = scanner.scan(new ArrayBuffer(8), { scorePreset: 'design' });
+const fromPixels: ScanReport = scanner.scanFrame(new ImageData(1, 1), { budgetMs: 80 });
+const fromRgba: ScanReport = scanner.scanFrame({ data: new Uint8Array(4), width: 1, height: 1 });
+const complete: boolean = isFinal(fromBytes) && isFinalOfScan(fromPixels) && error.retryable;
+const bound: Readonly<BoundScanner> = bindScanner(scanner);
+// @ts-expect-error the options are camelCase: budgetMs
+scanner.scan(new Uint8Array(), { budget_ms: 5 });
+// @ts-expect-error the wire name is ean13
+scanner.scan(new Uint8Array(), { formats: ['ean_13'] });
+// @ts-expect-error a file name is not image bytes
+scanner.scan('image.png');
+// @ts-expect-error the loaded scanner is frozen
+scanner.scan = bound.scan;
+void [fromBuffer, fromRgba, complete];
 
 // Camera: a tracker frame carries observedAt, in ms on the tracker's clock (performance.now()
 // by default); epoch and sequence are optional.

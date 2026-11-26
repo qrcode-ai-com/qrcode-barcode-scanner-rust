@@ -72,6 +72,9 @@ python3 "$root/scripts/wasm_provenance.py" write pkg \
   --inputs "$inputs" --built-after "$started"
 
 node test.mjs
+# Named options, isFinal, the loaders' retry rule and the Node entry, on the built pkg/: the
+# loader cases replace the global fetch with a fake, so no request leaves this machine.
+node scan.test.mjs
 node camera.test.mjs
 node camera-replay.test.mjs
 # The overlay's pure helpers and import contract (no browser needed).

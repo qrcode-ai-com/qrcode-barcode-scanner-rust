@@ -913,9 +913,10 @@ const pickFile = async (page, sample, serial) => {
   return settledView(page, serial);
 };
 const wasmPath = '/qrcode-barcode-scanner_bg.wasm';
-// Each file the page needs, served once with a static server's type, and nothing else.
+// Each file the page needs, served once with a static server's type, and nothing else. The
+// loader imports scan.js (the named options on the scanner it resolves to).
 const EXAMPLE_LOADS = ['/examples/headless.html', '/examples/headless.js', '/examples/scanner.worker.js', '/package.json',
-  '/build-info.json', '/auto.js', '/qrcode-barcode-scanner.js', wasmPath]
+  '/build-info.json', '/auto.js', '/scan.js', '/qrcode-barcode-scanner.js', wasmPath]
   .map(path => `${path} 200 ${STATIC_TYPES[extname(path)]}`).sort();
 receipt.example = { files: EXAMPLE_FILES.map(file => `examples/${file}`), loads: EXAMPLE_LOADS,
   cases: Object.fromEntries(Object.entries(exampleCases).map(([id, { file, rows }]) => [id, { file, rows }])),
@@ -1494,7 +1495,8 @@ const cspSearch = async (browser, name, site) => {
 };
 // Each file the camera page needs, served once with a static server's type, and nothing else.
 const CAMERA_LOADS = ['/examples/camera.html', '/examples/camera.js', '/camera.js', '/camera-overlay.js', '/destination.js',
-  '/examples/scanner.worker.js', '/auto.js', '/qrcode-barcode-scanner.js', wasmPath, '/package.json', '/build-info.json']
+  '/examples/scanner.worker.js', '/auto.js', '/scan.js', '/qrcode-barcode-scanner.js', wasmPath, '/package.json',
+  '/build-info.json']
   .map(path => `${path} 200 ${STATIC_TYPES[extname(path)]}`).sort();
 receipt.example.cameraLoads = CAMERA_LOADS;
 // The control code's quad as the overlay should draw it: drawn at (140, 0) in the 640x360 frame,
