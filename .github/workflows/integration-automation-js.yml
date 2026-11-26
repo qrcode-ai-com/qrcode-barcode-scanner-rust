@@ -90,15 +90,15 @@ jobs:
           git -C "$checkout" checkout -q FETCH_HEAD
           node build.mjs --activepieces "$checkout"
           npm run test:built
-          cp build/qrcode-ai-com-piece-qrcode-barcode-scanner-0.1.1.tgz "$RUNNER_TEMP/packs/"
+          cp build/qrcode-ai-com-piece-qrcode-barcode-scanner-0.1.2.tgz "$RUNNER_TEMP/packs/"
       - name: packed consumers outside the checkout
         run: |
           set -euo pipefail
           packs="$RUNNER_TEMP/packs"
           node integrations/automation-js-core/test/packed-consumers.mjs \
-            --n8n "$packs/qrcode-ai-com-n8n-nodes-qrcode-barcode-scanner-0.1.1.tgz" \
-            --node-red "$packs/qrcode-ai-com-node-red-qrcode-barcode-scanner-0.1.1.tgz" \
-            --activepieces "$packs/qrcode-ai-com-piece-qrcode-barcode-scanner-0.1.1.tgz" \
+            --n8n "$packs/qrcode-ai-com-n8n-nodes-qrcode-barcode-scanner-0.1.2.tgz" \
+            --node-red "$packs/qrcode-ai-com-node-red-qrcode-barcode-scanner-0.1.2.tgz" \
+            --activepieces "$packs/qrcode-ai-com-piece-qrcode-barcode-scanner-0.1.2.tgz" \
             --out "$packs/receipt.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.1
         with:

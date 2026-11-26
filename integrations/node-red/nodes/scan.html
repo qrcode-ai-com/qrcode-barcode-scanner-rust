@@ -6,7 +6,7 @@
     defaults: {
       name: { value: '' },
       property: { value: 'payload', required: true, validate: RED.validators.typedInput('msg') },
-      profile: { value: 'frame', required: true },
+      profile: { value: 'fast', required: true },
       budgetMs: {
         value: '',
         validate: function (value) {
@@ -38,9 +38,9 @@
   <div class="form-row">
     <label for="node-input-profile"><i class="fa fa-sliders"></i> Profile</label>
     <select id="node-input-profile" style="width: 70%">
-      <option value="frame">frame: decode without scoring</option>
-      <option value="fast">fast: decode and score with a short budget</option>
-      <option value="full">full: decode and score QR scannability</option>
+      <option value="fast">fast: decode and give a reduced QR score (default)</option>
+      <option value="frame">frame: decode without scoring, for camera frames</option>
+      <option value="full">full: decode and give the full QR score</option>
     </select>
   </div>
   <div class="form-row">
@@ -62,7 +62,7 @@
     <dd>The encoded image bytes (PNG, JPEG, WebP or GIF), or the path of an image file. A relative path starts
       from the Node-RED working directory. At most 8 MiB and 4096 pixels per side.</dd>
     <dt class="optional">profile <span class="property-type">string</span></dt>
-    <dd>Overrides the configured profile: <code>frame</code>, <code>fast</code> or <code>full</code>.</dd>
+    <dd>Overrides the configured profile: <code>fast</code>, <code>frame</code> or <code>full</code>.</dd>
     <dt class="optional">budgetMs <span class="property-type">number</span></dt>
     <dd>Overrides the profile's time budget, from 0 to 60000 milliseconds. 0 removes the budget. It is not a hard timeout.</dd>
   </dl>
@@ -82,8 +82,10 @@
   <p>The engine runs in a worker thread, so a long scan does not block the other flows. Decoded content is untrusted
     data: the node never opens a decoded link. A corrupt image, a missing file or an input over the limits raises an
     error that a Catch node receives, with a code such as <code>QRS-001</code> or <code>QRSCAN_INPUT_LIMIT</code>.</p>
-  <p>The <code>frame</code> profile decodes without scoring and leaves <code>payload.score</code> null. Use
-    <code>full</code> to measure the scannability of a QR code.</p>
+  <p>The <code>fast</code> profile, the default, decodes and gives a reduced QR score within an 800 ms budget.
+    The <code>frame</code> profile decodes without scoring, within the 80 ms budget of a camera frame, and leaves
+    <code>payload.score</code> null. Use <code>full</code> to measure the scannability of a QR code. A node saved
+    before version 0.1.2 keeps the profile its flow names.</p>
 
   <h3>References</h3>
   <ul>

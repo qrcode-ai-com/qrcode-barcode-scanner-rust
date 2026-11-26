@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // The bundled piece (build/package/src/index.js, written by build.mjs) loaded the way the
 // Activepieces engine loads it: the export whose constructor is named Piece, its metadata, and
-// the scan action run on the acceptance fixture in the three profiles, an empty image and refusals.
+// the scan action run on the acceptance fixture in the three profiles and with the default one, an
+// empty image and refusals.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -15,6 +16,8 @@ const published = JSON.parse(readFileSync(new URL('./build/package/package.json'
 const fixture = readFileSync(new URL('../../../fixtures/symbology/mixed-code128-qr.png', import.meta.url));
 const white = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAXklEQVR4nO3PMQ0AMAzAsPInvYLYYVWKESTzjhsd8KsBrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BbQHKU9LC7/CP1AAAAABJRU5ErkJggg==', 'base64');
 const EXPECTED = ['https://qrc-ai.com/76xMa', 'STOCK-4827'];
+/** A report without its timings, which differ from one scan to the next. */
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
 
 // extractPieceFromModule: the engine scans the module's exports for constructor.name === 'Piece'.
 const pieces = Object.values(bundle).filter((value) => value?.constructor?.name === 'Piece');
@@ -34,8 +37,9 @@ test('the bundle exports one Piece with the scan action and no connection', () =
   assert.deepEqual(Object.keys(scan.props), ['image', 'profile', 'budgetMs', 'includeReport']);
   assert.equal(scan.props.image.type, 'FILE');
   assert.equal(scan.props.image.required, true);
-  assert.equal(scan.props.profile.defaultValue, 'frame');
-  assert.deepEqual(scan.props.profile.options.options.map((option) => option.value), ['frame', 'fast', 'full']);
+  assert.equal(scan.props.profile.defaultValue, 'fast');
+  assert.deepEqual(scan.props.profile.options.options.map((option) => option.value), ['fast', 'frame', 'full']);
+  assert.match(scan.props.profile.options.options[0].label, /\(default\)$/);
   assert.equal(scan.audience, 'both');
   assert.equal(scan.aiMetadata.idempotent, true);
 });
@@ -71,6 +75,20 @@ for (const profile of ['fast', 'frame', 'full']) {
     assert.equal(result.report.score === null, profile === 'frame');
   });
 }
+
+// Since 0.1.2 a new step starts on fast, and a step saved without a profile runs it: frame's 80 ms
+// camera budget could cut a single image's scan before the stage that reads its barcode.
+test('the default profile is fast', async () => {
+  const image = () => new ApFile('label.png', fixture, 'png');
+  const fast = await run({ image: image(), profile: 'fast', budgetMs: 0, includeReport: true });
+  for (const profile of [undefined, null, '']) {
+    const result = await run({ image: image(), profile, budgetMs: 0, includeReport: true });
+    assert.equal(result.profile, 'fast', `a step whose profile is ${JSON.stringify(profile)} runs fast`);
+    assert.deepEqual(result.texts, EXPECTED);
+    assert.equal(typeof result.report.score.value, 'number', 'the default profile scores, which frame never does');
+    assert.deepEqual(untimed(result.report), untimed(fast.report));
+  }
+});
 
 test('empty optional inputs take the profile defaults, and the report can be left out', async () => {
   const result = await run({ image: new ApFile('label.png', fixture), profile: 'frame', budgetMs: null, includeReport: false });

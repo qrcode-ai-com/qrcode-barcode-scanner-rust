@@ -46,7 +46,7 @@ The workflow fits a print or packaging check: make the codes with the [QR code g
 
 ## Requirements
 
-You need a self-hosted n8n with the community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.1 installed, as its [README](../README.md#install) explains. n8n Cloud cannot install that node, so the template runs on self-hosted n8n only. The other nodes are n8n core nodes: Manual Trigger, Edit Fields (Set) 3.4, Read/Write Files from Disk 1.1 and Switch 3.2. The workflow was tested on n8n 2.48.7.
+You need a self-hosted n8n with the community node `@qrcode-ai-com/n8n-nodes-qrcode-barcode-scanner` 0.1.2 installed, as its [README](../README.md#install) explains. n8n Cloud cannot install that node, so the template runs on self-hosted n8n only. The other nodes are n8n core nodes: Manual Trigger, Edit Fields (Set) 3.4, Read/Write Files from Disk 1.1 and Switch 3.2. The workflow was tested on n8n 2.48.7.
 
 ## Set up and run
 
@@ -59,7 +59,7 @@ The template holds no credential, no webhook and no pinned data. It only reads t
 
 ## What each branch returns
 
-**Scan QR codes and barcodes** reads the binary field `data` of each file with the `Frame` profile, which decodes without scoring, and with no time budget, so a busy machine cannot cut a scan short and report a good label as a wrong value. Choose `Full` there to also score how well each QR code scans. **Compare with the expected value** then sends each image to one branch, and every branch writes one item with a `status`:
+**Scan QR codes and barcodes** reads the binary field `data` of each file with the `Frame` profile, which decodes without scoring, and with no time budget, so a busy machine cannot cut a scan short and report a good label as a wrong value. The template names `Frame` because a label check needs no score; the node's own default is `Fast`. Choose `Full` there to also score how well each QR code scans. **Compare with the expected value** then sends each image to one branch, and every branch writes one item with a `status`:
 
 - **Expected value found**: one of the decoded texts equals `expectedText`. The item holds the `file` name and the texts `found`.
 - **Wrong value**: codes were read, but none equals `expectedText`. The item holds the `file` name, the texts `found` and the `expected` value, so you can see the wrong label.
@@ -78,7 +78,7 @@ The [n8n template job](../../../.github/workflows/integration-n8n-template.yml) 
 - the image without a code takes **No code found**;
 - the corrupt file takes **Unreadable image** with the code `QRS-001`.
 
-Copies of the file run the fast, frame and full profiles with the full report kept, and one copy that expects `STOCK-0001` sends the mixed image to **Wrong value**. Each branch's items are compared with exact values. The job then captures the editor canvas, deletes the workflows through n8n's REST API, removes the node, and judges the three reports with the [acceptance contract](../../../distribution/acceptance/README.md). [LISTING.md](LISTING.md) holds what the template library submission needs.
+Copies of the file run the fast, frame and full profiles with the full report kept, one copy names no profile and must give the fast report, the node's default since 0.1.2, and one copy that expects `STOCK-0001` sends the mixed image to **Wrong value**. Each branch's items are compared with exact values. The job then captures the editor canvas, deletes the workflows through n8n's REST API, removes the node, and judges the three reports with the [acceptance contract](../../../distribution/acceptance/README.md). [LISTING.md](LISTING.md) holds what the template library submission needs.
 
 ## How it works
 
@@ -137,7 +137,7 @@ The same engine runs in a [Node-RED node](../../node-red/README.md), an [Activep
 
 ## Licensing
 
-The workflow file is MIT, like the [node source](../LICENSE). Version 0.1.1 of the community node it needs installs the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, which is MIT too; two of its reader parts keep their Apache-2.0 notices, which the engine package ships. Version 0.1.0 of the node installed engine 0.11.0, which keeps its AGPL-3.0-or-later license.
+The workflow file is MIT, like the [node source](../LICENSE). Version 0.1.2 of the community node it needs installs the published engine `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0, as 0.1.1 did, which is MIT too; two of its reader parts keep their Apache-2.0 notices, which the engine package ships. Version 0.1.0 of the node installed engine 0.11.0, which keeps its AGPL-3.0-or-later license.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**.
 

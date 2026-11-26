@@ -19,12 +19,12 @@
     "type": "select",
     "label": "Profile",
     "required": true,
-    "default": "frame",
-    "help": "Frame decodes without scoring. Fast and Full also score how well a QR code scans.",
+    "default": "fast",
+    "help": "Fast, the default, decodes and gives a reduced QR score within 800 ms. Frame decodes without scoring within the 80 ms of a camera frame. Full gives the full QR score within 4000 ms.",
     "options": [
-      { "label": "Frame: decode without scoring", "value": "frame" },
-      { "label": "Fast: decode and score with a short budget", "value": "fast" },
-      { "label": "Full: decode and score QR scannability", "value": "full" }
+      { "label": "Fast: decode and give a reduced QR score (default)", "value": "fast" },
+      { "label": "Frame: decode without scoring, for camera frames", "value": "frame" },
+      { "label": "Full: decode and give the full QR score", "value": "full" }
     ]
   }
 ]

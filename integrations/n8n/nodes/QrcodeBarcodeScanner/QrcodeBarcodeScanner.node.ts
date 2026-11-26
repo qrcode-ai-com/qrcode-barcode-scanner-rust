@@ -42,22 +42,22 @@ export class QrcodeBarcodeScanner implements INodeType {
 				displayName: 'Profile',
 				name: 'profile',
 				type: 'options',
-				default: 'frame',
+				default: 'fast',
 				options: [
-					{
-						name: 'Frame',
-						value: 'frame',
-						description: 'Decode every code without scoring. The quickest profile.',
-					},
 					{
 						name: 'Fast',
 						value: 'fast',
-						description: 'Decode, then score QR codes with a short budget',
+						description: 'The default. Decode every code and give a reduced QR score, within an 800 ms budget.',
+					},
+					{
+						name: 'Frame',
+						value: 'frame',
+						description: 'Decode without scoring, within the 80 ms budget of a camera frame',
 					},
 					{
 						name: 'Full',
 						value: 'full',
-						description: 'Decode and score QR scannability with the full budget',
+						description: 'Decode and give the full QR score, within a 4000 ms budget',
 					},
 				],
 			},

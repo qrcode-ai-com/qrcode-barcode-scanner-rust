@@ -27,7 +27,7 @@
     "type": "qrcode-barcode-scanner",
     "name": "",
     "property": "payload",
-    "profile": "frame",
+    "profile": "fast",
     "budgetMs": "",
     "x": 330,
     "y": 120,

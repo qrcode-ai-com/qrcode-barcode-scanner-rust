@@ -36,7 +36,8 @@ module.exports = function register(RED) {
     RED.nodes.createNode(this, config);
     const node = this;
     const property = config.property || 'payload';
-    const profile = config.profile || 'frame';
+    // A node whose configuration names no profile runs the core's default, fast.
+    const profile = config.profile || core.DEFAULT_PROFILE;
     const budgetMs = config.budgetMs === undefined || config.budgetMs === '' ? undefined : Number(config.budgetMs);
     const workingDirectory = (RED.settings && RED.settings.fileWorkingDirectory) || process.cwd();
 

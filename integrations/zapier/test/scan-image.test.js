@@ -115,12 +115,25 @@ for (const profile of scanCore.PROFILES) {
   });
 }
 
-test('the default profile is frame, and an empty optional field keeps it', TIMEOUT, async () => {
+// A scan that names no profile runs fast: frame's 80 ms camera budget could cut a single image's
+// scan before the stage that reads its barcode.
+test('the default profile is fast, and an empty optional field keeps it', TIMEOUT, async () => {
+  const field = App.creates.scan_image.operation.inputFields.find((input) => input.key === 'profile');
+  assert.equal(field.default, 'fast');
+  assert.deepEqual(field.choices.map((choice) => choice.value), ['fast', 'frame', 'full']);
+  assert.equal(scanCore.DEFAULT_PROFILE, 'fast');
+  const fast = JSON.parse((await run({ image: `${base}/label.png`, profile: 'fast', budget_ms: 0 })).report_json);
+  // With the profile's own budget, a loaded machine can cut the score: only the codes are judged.
   for (const inputData of [{ image: `${base}/label.png` }, { image: ` ${base}/label.png `, profile: '', budget_ms: '' }]) {
     const result = await run(inputData);
-    assert.equal(result.profile, 'frame');
+    assert.equal(result.profile, 'fast');
     assert.equal(result.count, 2);
   }
+  // Unbounded, so the score is the engine's: the default scores, which frame never does.
+  const unbounded = JSON.parse((await run({ image: `${base}/label.png`, budget_ms: 0 })).report_json);
+  assert.equal(typeof unbounded.score.value, 'number');
+  const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
+  assert.deepEqual(untimed(unbounded), untimed(fast), 'no profile named runs the fast profile');
 });
 
 test('an image without a code is a result with no code, not an error', TIMEOUT, async () => {

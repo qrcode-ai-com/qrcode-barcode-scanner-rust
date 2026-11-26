@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 import { createAction, Property } from '@activepieces/pieces-framework';
-import { ENGINE_VERSION, LIMITS, ScanError, scanImage, summarize } from '../scan-core';
+import { DEFAULT_PROFILE, ENGINE_VERSION, LIMITS, ScanError, scanImage, summarize } from '../scan-core';
 
 export const scanImageAction = createAction({
   name: 'scan_image',
@@ -22,15 +22,15 @@ export const scanImageAction = createAction({
     }),
     profile: Property.StaticDropdown({
       displayName: 'Profile',
-      description: 'Frame decodes without scoring. Fast and full also score how well a QR code scans.',
+      description: 'Fast, the default, decodes and gives a reduced QR score within 800 ms. Frame decodes without scoring within the 80 ms of a camera frame. Full gives the full QR score within 4000 ms.',
       required: true,
-      defaultValue: 'frame',
+      defaultValue: DEFAULT_PROFILE,
       options: {
         disabled: false,
         options: [
-          { label: 'Frame: decode without scoring', value: 'frame' },
-          { label: 'Fast: decode and score with a short budget', value: 'fast' },
-          { label: 'Full: decode and score QR scannability', value: 'full' },
+          { label: 'Fast: decode and give a reduced QR score (default)', value: 'fast' },
+          { label: 'Frame: decode without scoring, for camera frames', value: 'frame' },
+          { label: 'Full: decode and give the full QR score', value: 'full' },
         ],
       },
     }),
@@ -47,7 +47,9 @@ export const scanImageAction = createAction({
     }),
   },
   async run(context) {
-    const { image, profile, budgetMs, includeReport } = context.propsValue;
+    const { image, budgetMs, includeReport } = context.propsValue;
+    // A step saved without a profile runs the default, and says so in its output.
+    const profile = context.propsValue.profile || DEFAULT_PROFILE;
     try {
       const report = await scanImage(image.data, { profile, budgetMs: budgetMs ?? undefined });
       return {

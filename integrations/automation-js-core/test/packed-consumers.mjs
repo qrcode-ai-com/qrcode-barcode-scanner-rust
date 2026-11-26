@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // The packed host packages, installed outside the checkout the way a host installs them, then
-// loaded through their host entry points and run on the mixed fixture in the three profiles.
+// loaded through their host entry points and run on the mixed fixture in the three profiles, then
+// with no profile named, which must give the fast report.
 //
 //   node integrations/automation-js-core/test/packed-consumers.mjs \
 //     [--n8n <tgz>] [--node-red <tgz>] [--activepieces <tgz>] [--out <receipt.json>]
@@ -22,6 +23,10 @@ const ENGINE_VERSION = '0.12.0';
 const fixture = readFileSync(new URL('../../../fixtures/symbology/mixed-code128-qr.png', import.meta.url));
 const EXPECTED = ['https://qrc-ai.com/76xMa', 'STOCK-4827'];
 const PROFILES = ['fast', 'frame', 'full'];
+// The profile a scan that names none runs, since the hosts' 0.1.2.
+const DEFAULT_PROFILE = 'fast';
+/** A report without its timings, which differ from one scan to the next. */
+const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
 
 const HOSTS = {
   n8n: {
@@ -51,27 +56,36 @@ const HOSTS = {
   },
 };
 
-/** n8n: the node class run through the IExecuteFunctions surface it uses. */
+/**
+ * n8n: the node class run through the IExecuteFunctions surface it uses. A parameter the workflow
+ * does not set gets the default the node declares, as n8n gives it. `profile` undefined names none.
+ */
 async function scanWithN8n(root, profile) {
   const requireHere = createRequire(join(root, 'package.json'));
   const { QrcodeBarcodeScanner } = requireHere('./dist/nodes/QrcodeBarcodeScanner/QrcodeBarcodeScanner.node.js');
+  const node = new QrcodeBarcodeScanner();
+  const declared = Object.fromEntries(node.description.properties.map(({ name, default: value }) => [name, value]));
   const items = [{ json: {}, binary: { data: { data: fixture.toString('base64'), mimeType: 'image/png', fileName: 'label.png' } } }];
-  const parameters = { binaryPropertyName: 'data', profile, output: 'image', options: { budgetMs: 0 } };
+  const parameters = { binaryPropertyName: 'data', output: 'image', options: { budgetMs: 0 }, ...(profile === undefined ? {} : { profile }) };
   const context = {
     getInputData: () => items,
     getNode: () => ({ name: 'QR Code & Barcode Scanner', type: `${HOSTS.n8n.name}.qrcodeBarcodeScanner`, typeVersion: 1, parameters }),
     continueOnFail: () => false,
-    getNodeParameter: (name, _index, fallback) => parameters[name] ?? fallback,
+    getNodeParameter: (name, _index, fallback) => parameters[name] ?? declared[name] ?? fallback,
     helpers: {
       assertBinaryData: (index, field) => items[index].binary[field],
       getBinaryDataBuffer: async (index, field) => Buffer.from(items[index].binary[field].data, 'base64'),
     },
   };
-  const [[item]] = await new QrcodeBarcodeScanner().execute.call(context);
-  return { texts: item.json.texts, report: item.json.report };
+  const [[item]] = await node.execute.call(context);
+  return { texts: item.json.texts, report: item.json.report, profile: item.json.profile };
 }
 
-/** Node-RED: the module's register function given the runtime API surface the node calls. */
+/**
+ * Node-RED: the module's register function given the runtime API surface the node calls. A named
+ * profile comes in msg.profile over a node configured with frame; `profile` undefined is a node
+ * whose configuration and message name none.
+ */
 async function scanWithNodeRed(root, profile) {
   const requireHere = createRequire(join(root, 'package.json'));
   const types = new Map();
@@ -93,11 +107,11 @@ async function scanWithNodeRed(root, profile) {
   };
   requireHere('./nodes/scan.js')(RED);
   const Node = types.get('qrcode-barcode-scanner');
-  const node = new Node({ property: 'payload', profile: 'frame', budgetMs: '' });
+  const node = new Node(profile === undefined ? { property: 'payload', budgetMs: '' } : { property: 'payload', profile: 'frame', budgetMs: '' });
   const msg = await new Promise((resolveMessage, reject) => {
-    node.emit('input', { payload: fixture, profile, budgetMs: 0 }, resolveMessage, (error) => error && reject(error));
+    node.emit('input', { payload: fixture, ...(profile === undefined ? {} : { profile }), budgetMs: 0 }, resolveMessage, (error) => error && reject(error));
   });
-  return { texts: msg.texts, report: msg.payload };
+  return { texts: msg.texts, report: msg.payload, profile: null };
 }
 
 /** Activepieces: the bundle's Piece export found as the engine finds it, then its action. */
@@ -105,10 +119,12 @@ async function scanWithActivepieces(root, profile) {
   const requireHere = createRequire(join(root, 'package.json'));
   const bundle = requireHere('./src/index.js');
   const piece = Object.values(bundle).find((value) => value?.constructor?.name === 'Piece');
-  const result = await piece.getAction('scan_image').run({
-    propsValue: { image: { filename: 'label.png', data: fixture, extension: 'png' }, profile, budgetMs: 0, includeReport: true },
+  const action = piece.getAction('scan_image');
+  assert.equal(action.props.profile.defaultValue, DEFAULT_PROFILE, 'a new step starts on the fast profile');
+  const result = await action.run({
+    propsValue: { image: { filename: 'label.png', data: fixture, extension: 'png' }, ...(profile === undefined ? {} : { profile }), budgetMs: 0, includeReport: true },
   });
-  return { texts: result.texts, report: result.report };
+  return { texts: result.texts, report: result.report, profile: result.profile };
 }
 
 const args = process.argv.slice(2);
@@ -139,6 +155,7 @@ for (const [host, spec] of Object.entries(HOSTS)) {
   assert.deepEqual([engine.version, engine.license], [ENGINE_VERSION, 'MIT']);
 
   const scans = {};
+  const reports = {};
   for (const profile of PROFILES) {
     const { texts, report } = await spec.scan(root, profile);
     assert.deepEqual(texts, EXPECTED, `${host} ${profile}`);
@@ -146,7 +163,14 @@ for (const [host, spec] of Object.entries(HOSTS)) {
     assert.equal(report.trace.budget_exhausted, false);
     assert.equal(report.score === null, profile === 'frame');
     scans[profile] = { texts, score: report.score === null ? null : report.score.value };
+    reports[profile] = report;
   }
+  const byDefault = await spec.scan(root, undefined);
+  assert.deepEqual(byDefault.texts, EXPECTED, `${host} with no profile`);
+  assert.notEqual(byDefault.report.score, null, `${host}: the default profile scores, which frame never does`);
+  assert.deepEqual(untimed(byDefault.report), untimed(reports[DEFAULT_PROFILE]), `${host}: no profile named runs the fast profile`);
+  if (byDefault.profile !== null) assert.equal(byDefault.profile, DEFAULT_PROFILE, `${host} reports the profile it ran`);
+  scans.default = { profile: DEFAULT_PROFILE, texts: byDefault.texts, score: byDefault.report.score.value };
   receipt.packages.push({
     host,
     name: spec.name,
@@ -158,7 +182,7 @@ for (const [host, spec] of Object.entries(HOSTS)) {
     files: entries.sort(),
     scans,
   });
-  console.log(`${host}: ${basename(tarball)} installed and scanned in ${PROFILES.join(', ')}`);
+  console.log(`${host}: ${basename(tarball)} installed and scanned in ${PROFILES.join(', ')} and with no profile (${DEFAULT_PROFILE})`);
 }
 
 assert.ok(receipt.packages.length > 0, 'pass at least one of --n8n, --node-red, --activepieces');
