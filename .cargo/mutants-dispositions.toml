@@ -112,6 +112,26 @@
 # are argued below, and one debt waits on a contract for non-finite points.
 # Now 46 equivalent · 13 timeout-structural · 1 debt.
 
+# Re-anchored (2026-11-27) on the tree of the commit that carries this
+# paragraph. Twenty entries had drifted from their anchors: lib.rs +5 lines
+# (b73fa39), locate.rs +19 and +20, multi_reader.rs +6 and +12 and
+# rxing_engine.rs +90 (604d485), and ladder.rs +63 and +99 (604d485, then the
+# plane pass of pull request 275, which re-anchored its four entries). Of the
+# other sixteen, thirteen were matched to the one generated mutant with the
+# same file, column, mutation and source line, in the list of every mutant
+# with exclusions off, and each function was compared with the tree where its
+# entry last matched (8b91a62, the tree of deep-checks run 45187820319;
+# 0eddef2 for lib.rs): the bodies are unchanged, decode_format became
+# pub(crate), and decode_multiple gained a `stop` parameter and an early
+# return above the filter its entry names. The last three are
+# Grid::format_words's bit-disjoint `|`: the three statements moved into the
+# free function format_words that method now calls (604d485), where the
+# module comes from a `dark` closure instead of `self.dark` and nothing else
+# differs, and their entries follow under its name and its columns. The
+# lib.rs exclusion of .cargo/mutants.toml moved with its entry. Matched by
+# listing only: no mutant was run for this paragraph, and the next deep-checks
+# run is its measure. Still 46 equivalent · 13 timeout-structural · 1 debt.
+
 # ── equivalent ──────────────────────────────────────────────────────────────
 
 [[mutant]]
@@ -190,9 +210,9 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 470
-column = 34
-mutation = "replace | with ^ in Grid<'a>::format_words"
+line = 489
+column = 30
+mutation = "replace | with ^ in format_words"
 category = "equivalent"
 reason = """\
   `(first << 1) | u16::from(dark)`: first << 1 has bit 0 clear and the module is 0 or 1, so |, ^ \
@@ -200,9 +220,9 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 474
-column = 36
-mutation = "replace | with ^ in Grid<'a>::format_words"
+line = 493
+column = 32
+mutation = "replace | with ^ in format_words"
 category = "equivalent"
 reason = """\
   `(second << 1) | u16::from(dark)`: second << 1 has bit 0 clear and the module is 0 or 1, so |, \
@@ -210,9 +230,9 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 477
-column = 36
-mutation = "replace | with ^ in Grid<'a>::format_words"
+line = 496
+column = 32
+mutation = "replace | with ^ in format_words"
 category = "equivalent"
 reason = """\
   `(second << 1) | u16::from(dark)`: second << 1 has bit 0 clear and the module is 0 or 1, so |, \
@@ -220,7 +240,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 544
+line = 564
 column = 37
 mutation = "replace | with ^ in decode_format"
 category = "equivalent"
@@ -230,7 +250,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 562
+line = 582
 column = 40
 mutation = "replace | with ^ in decode_version"
 category = "equivalent"
@@ -240,7 +260,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/multi_reader.rs"
-line = 224
+line = 230
 column = 9
 mutation = "replace <impl Reader for FormatReader>::reset with ()"
 category = "equivalent"
@@ -251,7 +271,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/multi_reader.rs"
-line = 266
+line = 278
 column = 66
 mutation = "replace > with >= in decode_multiple"
 category = "equivalent"
@@ -261,7 +281,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/multi_reader.rs"
-line = 346
+line = 358
 column = 16
 mutation = "replace > with >= in inside"
 category = "equivalent"
@@ -306,7 +326,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/rxing_engine.rs"
-line = 427
+line = 517
 column = 14
 mutation = "replace match guard measured.is_empty() with false in footprint"
 category = "equivalent"
@@ -317,7 +337,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/rxing_engine.rs"
-line = 536
+line = 626
 column = 14
 mutation = "replace match guard n >= 4 with true in location"
 category = "equivalent"
@@ -396,13 +416,13 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/lib.rs"
-line = 107
+line = 112
 column = 9
 mutation = "replace Scanner::builder -> ScannerBuilder with Default::default()"
 category = "equivalent"
 reason = """\
   the body already is ScannerBuilder::default() and the return type pins Default::default() to \
-  that same call — .cargo/mutants.toml lib.rs 102:9"""
+  that same call — .cargo/mutants.toml lib.rs 112:9"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/matrix/zigzag.rs"
@@ -548,7 +568,7 @@ mutation = "replace + with * in downscale_to"
 category = "equivalent"
 reason = """\
   downscale `.max(u64::from(y0) + 1)`: h >= new_h in every downscale, so the guard never binds \
-  (upscale-only defense) — .cargo/mutants.toml transform.rs 376:87"""
+  (upscale-only defense) — .cargo/mutants.toml transform.rs 383:87"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/transform.rs"
@@ -558,7 +578,7 @@ mutation = "replace + with * in downscale_to"
 category = "equivalent"
 reason = """\
   downscale `.max(u64::from(x0) + 1)`: w >= new_w in every downscale, so the guard never binds — \
-  .cargo/mutants.toml transform.rs 379:96"""
+  .cargo/mutants.toml transform.rs 386:96"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/transform.rs"
@@ -568,7 +588,7 @@ mutation = "replace - with + in windowed_extremum_strided"
 category = "equivalent"
 reason = """\
   `.min(n - 1)` on prev_hi only clamps when the catch-up loop is empty either way (prev_hi >= hi \
-  there) — .cargo/mutants.toml transform.rs 488:45"""
+  there) — .cargo/mutants.toml transform.rs 495:45"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/transform.rs"
@@ -578,7 +598,7 @@ mutation = "replace - with / in windowed_extremum_strided"
 category = "equivalent"
 reason = """\
   `.min(n - 1)` on prev_hi only clamps when the catch-up loop is empty either way (prev_hi >= hi \
-  there) — .cargo/mutants.toml transform.rs 488:45"""
+  there) — .cargo/mutants.toml transform.rs 495:45"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/transform.rs"
@@ -588,7 +608,7 @@ mutation = "replace + with * in windowed_extremum_strided"
 category = "equivalent"
 reason = """\
   `prev_hi * 1` re-pushes the back index; `dominates` is non-strict, so the equal-value copy \
-  pops its original and the deque stays bit-identical — .cargo/mutants.toml transform.rs 489:31"""
+  pops its original and the deque stays bit-identical — .cargo/mutants.toml transform.rs 496:31"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/transform.rs"
@@ -598,7 +618,7 @@ mutation = "replace | with ^ in morph_filter"
 category = "equivalent"
 reason = """\
   for m = k.max(3), (m | 1) / 2 == (m ^ 1) / 2 for every m (odd and even) — .cargo/mutants.toml \
-  transform.rs 508:24"""
+  transform.rs 515:24"""
 
 # ── timeout-structural ──────────────────────────────────────────────────────
 
@@ -655,7 +675,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 534
+line = 554
 column = 15
 mutation = "replace ^= with &= in bch_remainder"
 category = "timeout-structural"
@@ -666,7 +686,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 534
+line = 554
 column = 15
 mutation = "replace ^= with |= in bch_remainder"
 category = "timeout-structural"
@@ -676,7 +696,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 534
+line = 554
 column = 28
 mutation = "replace << with >> in bch_remainder"
 category = "timeout-structural"
@@ -687,7 +707,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/locate.rs"
-line = 534
+line = 554
 column = 36
 mutation = "replace - with / in bch_remainder"
 category = "timeout-structural"
@@ -741,7 +761,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/multi_reader.rs"
-line = 372
+line = 384
 column = 28
 mutation = "replace + with * in scan_line"
 category = "debt"
