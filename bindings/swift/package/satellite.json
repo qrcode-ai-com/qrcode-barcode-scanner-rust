@@ -1,10 +1,10 @@
 {
   "schema": "qrscan-swift-pin/1",
-  "version": "0.12.0",
+  "version": "0.12.2",
   "engine": {
-    "tag": "v0.12.0",
-    "commit": "897dd50cdf27cbde54d408bf65e1ca4622035d42"
+    "tag": "v0.12.2",
+    "commit": "d0fcf8a27410f5ee182aab6477624e3fc52c4aa5"
   },
-  "release_tag": "swift-v0.12.0",
-  "checksum": "09cc53e7d538645e544ca2b617d6db519b72358e70d1a5111a70e0544bb14029"
+  "release_tag": "swift-v0.12.2",
+  "checksum": null
 }
