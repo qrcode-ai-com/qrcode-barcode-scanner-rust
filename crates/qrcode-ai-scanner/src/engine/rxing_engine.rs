@@ -205,8 +205,10 @@ fn decode_until(
             let alone = set.contains(Symbology::RectangularMicroQrCode)
                 && !set.contains(Symbology::QrCode)
                 && !set.contains(Symbology::MicroQrCode);
+            // a set of rMQR and nothing else leaves the general pass no
+            // format to read
             (
-                !alone || set != super::Formats::of(&[Symbology::RectangularMicroQrCode]),
+                set != super::Formats::of(&[Symbology::RectangularMicroQrCode]),
                 alone,
             )
         }
@@ -1585,6 +1587,49 @@ mod tests {
         );
         for rel in ["symbology/microqr.png", "clean/gen_v2_l.png"] {
             assert!(decode(&fixture(rel), only).is_empty(), "{rel}");
+        }
+    }
+
+    #[test]
+    fn an_rmqr_only_pass_reads_a_light_on_dark_symbol() {
+        // the pass of its own asks for inverted symbols as the general one
+        // does
+        let rmqr = fixture("symbology/rmqr-url-kanji.png");
+        let inverted = LumaImage::new(
+            rmqr.data().iter().map(|&p| 255 - p).collect(),
+            rmqr.width(),
+            rmqr.height(),
+        );
+        let only = FormatFilter::Only(Symbology::RectangularMicroQrCode);
+        let found = decode(&inverted, only);
+        assert!(
+            found
+                .iter()
+                .any(|d| d.raw == b"https://qrc-ai.com/\x93\xfa\x96\x7b"),
+            "{found:?}"
+        );
+    }
+
+    #[test]
+    fn a_set_of_rmqr_and_a_linear_format_reads_each_in_its_pass() {
+        // rMQR without QR Code or Micro QR is read in a pass of its own; the
+        // general pass still runs for the rest of the set
+        let set = FormatFilter::Set(crate::engine::Formats::of(&[
+            Symbology::RectangularMicroQrCode,
+            Symbology::Ean13,
+        ]));
+        for (rel, symbology) in [
+            ("symbology/ean13.png", Symbology::Ean13),
+            (
+                "symbology/rmqr-url-kanji.png",
+                Symbology::RectangularMicroQrCode,
+            ),
+        ] {
+            let found = decode(&fixture(rel), set);
+            assert!(
+                found.iter().any(|d| d.symbology == symbology),
+                "{rel}: {found:?}"
+            );
         }
     }
 

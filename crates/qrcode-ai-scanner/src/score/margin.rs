@@ -27,10 +27,11 @@
 //! sampled modules agree better with the codewords the symbol encodes (the
 //! verified sampling, corrected), and the registered grid is sampled again.
 //!
-//! Bounded and deterministic: no clock, no RNG, no engine. At most
-//! [`MAX_GRIDS`] grids are sampled in full per call and a registration
-//! reads at most [`MAX_REGISTER_SAMPLES`] pixels; a symbol no sampling
-//! verifies keeps what its reader measured.
+//! Bounded and deterministic: no clock, no RNG, no engine. At most six
+//! grids are sampled in full per call ([`MAX_RANKED`] versions and
+//! polarities, each as read and transposed) and a registration reads at
+//! most [`MAX_REGISTER_SAMPLES`] pixels; a symbol no sampling verifies
+//! keeps what its reader measured.
 
 use crate::engine::MaskedStream;
 use crate::engine::locate;
@@ -42,12 +43,9 @@ use crate::report::{EcLevel, EngineKind, Point, Symbology};
 use crate::rescue::{Acceptance, Rederived};
 use crate::score::uec;
 
-/// Grids sampled in full per call: the likeliest ones ([`MAX_RANKED`]
-/// versions and polarities, each as read and transposed).
-const MAX_GRIDS: usize = 6;
-
 /// Versions and polarities whose format information is read, the ones whose
-/// function patterns fit best ([`fit`]).
+/// function patterns fit best ([`fit`]). Each is sampled as read and
+/// transposed: six grids at most per call.
 const MAX_RANKED: usize = 3;
 
 /// The smallest share of a grid's finder and timing modules that must read
@@ -58,8 +56,8 @@ const MIN_FIT: f32 = 0.5;
 /// The smallest module pitch a grid is sampled at, in pixels.
 const MIN_PITCH: f32 = 1.0;
 
-/// Pixels a registration may read ([`register`]): its corner moves stop at
-/// this bound whatever the version.
+/// Pixels a registration may read ([`register_budget`]): its corner moves
+/// stop at this bound whatever the version.
 const MAX_REGISTER_SAMPLES: usize = 3_000_000;
 
 /// The corner moves of a registration, in modules, coarse to fine.
@@ -203,6 +201,29 @@ fn binarized(values: &[u8], size: usize, dark_is_low: bool) -> Vec<Vec<bool>> {
     grids
 }
 
+/// The mean length of a quad's four sides, in pixels.
+fn mean_side(quad: [(f32, f32); 4]) -> f32 {
+    (0..4)
+        .map(|i| {
+            let (a, b) = (quad[i], quad[(i + 1) % 4]);
+            (b.0 - a.0).hypot(b.1 - a.1)
+        })
+        .sum::<f32>()
+        / 4.0
+}
+
+/// The values of a grid's three finder patterns under `sampler`: its 7 × 7
+/// corners, top-left then top-right then bottom-left, each row by row.
+fn finders(grid: &Grid<'_>, sampler: Sampler) -> Vec<u8> {
+    let size = grid.size;
+    [(0, 0), (0, size - 7), (size - 7, 0)]
+        .into_iter()
+        .flat_map(|(top, left)| {
+            (0..49).map(move |i| grid.value(top + i / 7, left + i % 7, sampler))
+        })
+        .collect()
+}
+
 /// What the image measured of a symbol: the sampled stream with the widest
 /// margin among those that verify, and the format it verifies under.
 #[derive(Debug, Clone)]
@@ -244,13 +265,7 @@ pub(crate) fn measure(
     // outer corners on pixel edges → the sampler's pixel-centre coordinates
     let quad = corners.map(|p| (p.x - 0.5, p.y - 0.5));
     let to_image = Homography::unit_square_to_quad(quad)?;
-    let edge = (0..4)
-        .map(|i| {
-            let (a, b) = (quad[i], quad[(i + 1) % 4]);
-            (b.0 - a.0).hypot(b.1 - a.1)
-        })
-        .sum::<f32>()
-        / 4.0;
+    let edge = mean_side(quad);
     let versions = match stated.version {
         Some(version) => version..=version,
         None => 1..=40,
@@ -285,7 +300,6 @@ pub(crate) fn measure(
     }
     // stable: equal fits keep the lower version, dark-on-light first
     ranked.sort_by(|a, b| b.0.total_cmp(&a.0));
-    let mut grids_read = 0usize;
     for (fit, version, dark_is_low) in ranked.into_iter().take(MAX_RANKED) {
         if fit < MIN_FIT {
             break;
@@ -304,10 +318,6 @@ pub(crate) fn measure(
             if formats.is_empty() {
                 continue;
             }
-            if grids_read >= MAX_GRIDS {
-                return None;
-            }
-            grids_read += 1;
             let Some((measured, sampler, otsu)) = widest(&grid, version, &formats, payload) else {
                 continue;
             };
@@ -329,6 +339,7 @@ pub(crate) fn measure(
                     (version, measured.mask),
                     (sampler, otsu),
                     &truth,
+                    register_budget(grid.size, sampler),
                 )
             })
             .filter(|corners| *corners != quad)
@@ -369,18 +380,14 @@ fn fit(grid: &Grid<'_>) -> Option<f32> {
             || column == 6
             || ((2..=4).contains(&row) && (2..=4).contains(&column))
     };
+    let finders = finders(grid, Sampler::Core);
+    let threshold = midpoint(&finders)?;
     let mut modules: Vec<(u8, bool)> = Vec::with_capacity(3 * 49 + 2 * size);
-    for (top, left) in [(0, 0), (0, size - 7), (size - 7, 0)] {
-        for i in 0..49 {
-            let (row, column) = (i / 7, i % 7);
-            modules.push((
-                grid.value(top + row, left + column, Sampler::Core),
-                finder_dark(row, column),
-            ));
+    for finder in finders.chunks(49) {
+        for (i, value) in finder.iter().enumerate() {
+            modules.push((*value, finder_dark(i / 7, i % 7)));
         }
     }
-    let finders: Vec<u8> = modules.iter().map(|(value, _)| *value).collect();
-    let threshold = midpoint(&finders)?;
     for i in 8..size - 8 {
         modules.push((grid.value(6, i, Sampler::Core), i % 2 == 0));
         modules.push((grid.value(i, 6, Sampler::Core), i % 2 == 0));
@@ -399,15 +406,9 @@ fn formats(grid: &Grid<'_>, version: u8, stated: Stated) -> Vec<(EcLevel, u8)> {
     let mut found: Vec<(EcLevel, u8)> = Vec::new();
     for sampler in [Sampler::Centre, Sampler::Core] {
         // the function modules alone: a threshold from the finders' own
-        // dark and light (the three 7 × 7 corners)
+        // dark and light
         let size = grid.size;
-        let finders: Vec<u8> = [(0, 0), (0, size - 7), (size - 7, 0)]
-            .into_iter()
-            .flat_map(|(top, left)| {
-                (0..49).map(move |i| grid.value(top + i / 7, left + i % 7, sampler))
-            })
-            .collect();
-        let Some(threshold) = midpoint(&finders) else {
+        let Some(threshold) = midpoint(&finders(grid, sampler)) else {
             continue;
         };
         let dark = |row: usize, column: usize| {
@@ -499,6 +500,14 @@ fn widest(
     best
 }
 
+/// The moves a registration of a `size`-module grid may try under `sampler`:
+/// each samples the grid once, and [`MAX_REGISTER_SAMPLES`] pixels bound them
+/// all.
+fn register_budget(size: usize, sampler: Sampler) -> usize {
+    let lattice = sampler.offsets().len();
+    MAX_REGISTER_SAMPLES / (size * size * lattice * lattice).max(1)
+}
+
 /// Register a grid on its symbol: starting from the corners a reader
 /// measured, move one corner at a time by a fraction of a module
 /// ([`REGISTER_STEPS`], coarse to fine) and keep a move when fewer sampled
@@ -506,7 +515,8 @@ fn widest(
 /// ([`crate::rescue::corrected_codewords`] of the verified sampling). The
 /// modules are read as that sampling read them (`sampler`, `otsu`). Returns
 /// the registered corners, the given ones when no move helps. At most
-/// [`MAX_REGISTER_SAMPLES`] pixels are read.
+/// `budget` moves are tried ([`register_budget`]), in the order of
+/// [`MOVES`], corner after corner.
 #[expect(
     clippy::cast_precision_loss,
     reason = "module counts ≤ 177 are exact in f32"
@@ -517,10 +527,9 @@ fn register(
     (version, mask): (u8, u8),
     (sampler, otsu): (Sampler, bool),
     truth: &[u8],
+    mut budget: usize,
 ) -> [(f32, f32); 4] {
     let size = grid.size;
-    let per_grid = size * size * sampler.offsets().len() * sampler.offsets().len();
-    let mut budget = MAX_REGISTER_SAMPLES / per_grid.max(1);
     // the misread modules of the grid over `corners`; `None`: no such grid
     let misread = |corners: [(f32, f32); 4]| -> Option<u32> {
         let moved = Grid {
@@ -548,14 +557,7 @@ fn register(
     let Some(mut errors) = misread(corners) else {
         return quad;
     };
-    let edge = (0..4)
-        .map(|i| {
-            let (a, b) = (quad[i], quad[(i + 1) % 4]);
-            (b.0 - a.0).hypot(b.1 - a.1)
-        })
-        .sum::<f32>()
-        / 4.0;
-    let pitch = edge / size as f32;
+    let pitch = mean_side(quad) / size as f32;
     for step in REGISTER_STEPS {
         let step = step * pitch;
         // a sweep that moves a corner earns one more, twice at most
@@ -732,7 +734,7 @@ mod tests {
     #[test]
     fn a_clean_symbol_measures_a_full_margin_at_every_raster_size() {
         let (colors, width) = symbol(&[]);
-        for scale in [2, 3, 4, 5, 7, 10, 16] {
+        for scale in [1, 2, 3, 4, 5, 7, 10, 16] {
             let (img, corners) = draw(&colors, width, scale, 1.0);
             let measured = measure(&img, corners, PAYLOAD, Stated::default())
                 .unwrap_or_else(|| panic!("{scale} px per module measures"));
@@ -770,10 +772,14 @@ mod tests {
         }
     }
 
-    /// The margin of the grid over `corners` alone, unregistered.
-    fn unregistered(img: &LumaImage, corners: [Point; 4], width: usize) -> Option<f32> {
-        let quad = corners.map(|p| (p.x - 0.5, p.y - 0.5));
-        let grid = Grid {
+    /// `corners` in the sampler's pixel-centre coordinates.
+    fn quad_of(corners: [Point; 4]) -> [(f32, f32); 4] {
+        corners.map(|p| (p.x - 0.5, p.y - 0.5))
+    }
+
+    /// The dark-on-light grid of a `width`-module symbol over `quad`.
+    fn grid_at(img: &LumaImage, quad: [(f32, f32); 4], width: usize) -> Grid<'_> {
+        Grid {
             img,
             to_image: Homography::unit_square_to_quad(quad).unwrap(),
             size: width,
@@ -781,7 +787,40 @@ mod tests {
                 mirrored: false,
                 dark_is_low: true,
             },
-        };
+        }
+    }
+
+    /// An image [`draw`] made at `scale` with every pixel of module
+    /// `(row, column)` set by `value`, which is given the pixel's column and
+    /// row inside the cell.
+    fn repaint(
+        img: &LumaImage,
+        scale: usize,
+        (row, column): (usize, usize),
+        value: impl Fn(usize, usize) -> u8,
+    ) -> LumaImage {
+        let side = usize::try_from(img.width()).unwrap();
+        let mut data = img.data().to_vec();
+        for dy in 0..scale {
+            for dx in 0..scale {
+                data[((row + QUIET) * scale + dy) * side + (column + QUIET) * scale + dx] =
+                    value(dx, dy);
+            }
+        }
+        LumaImage::new(data, img.width(), img.height())
+    }
+
+    /// The other colour.
+    fn reversed(color: qrcode::Color) -> qrcode::Color {
+        match color {
+            qrcode::Color::Dark => qrcode::Color::Light,
+            qrcode::Color::Light => qrcode::Color::Dark,
+        }
+    }
+
+    /// The margin of the grid over `corners` alone, unregistered.
+    fn unregistered(img: &LumaImage, corners: [Point; 4], width: usize) -> Option<f32> {
+        let grid = grid_at(img, quad_of(corners), width);
         let found = formats(&grid, 3, Stated::default());
         widest(&grid, 3, &found, PAYLOAD).map(|(measured, ..)| measured.margin)
     }
@@ -939,6 +978,385 @@ mod tests {
         let (img, corners) = draw(&colors, width, 4, 1.0);
         let line = [corners[0], corners[1], corners[1], corners[0]];
         assert!(measure(&img, line, PAYLOAD, Stated::default()).is_none());
+    }
+
+    #[test]
+    fn the_side_of_a_quad_is_the_mean_of_its_four() {
+        // 30 px by 40 px, away from the origin
+        let quad = [(1.0, 2.0), (31.0, 2.0), (31.0, 42.0), (1.0, 42.0)];
+        assert_eq!(mean_side(quad), 35.0);
+    }
+
+    #[test]
+    fn the_midpoint_leaves_out_the_extreme_fiftieth_at_each_end() {
+        // of 100 values, the two lowest and the two highest are outliers
+        let mut values = vec![100u8; 48];
+        values.extend([200u8; 48]);
+        values.extend([0, 0, 255, 255]);
+        assert_eq!(midpoint(&values), Some(150));
+    }
+
+    #[test]
+    fn a_module_at_the_midpoint_is_light_and_both_binarizations_follow_the_polarity() {
+        // the midpoint of 0 and 200 is 100: a module there is not below it
+        let stepped = [0u8, 100, 200, 200];
+        assert_eq!(binarized(&stepped, 2, true)[0], [true, false, false, false]);
+        assert_eq!(binarized(&stepped, 2, false)[0], [false, true, true, true]);
+        // two clear populations: the midpoint and Otsu's threshold agree
+        let split = [10u8, 20, 230, 240];
+        let low = vec![true, true, false, false];
+        let high = vec![false, false, true, true];
+        assert_eq!(binarized(&split, 2, true), [low.clone(), low]);
+        assert_eq!(binarized(&split, 2, false), [high.clone(), high]);
+        assert!(binarized(&[90u8; 4], 2, true).is_empty(), "a flat grid");
+    }
+
+    #[test]
+    fn a_symbol_under_one_pixel_per_module_is_not_measured() {
+        let (colors, width) = symbol(&[]);
+        let (img, corners) = draw(&colors, width, 1, 1.0);
+        // its 29 modules over 28.8 px: the grid alone would still verify
+        let mut tight = corners;
+        for (corner, (dx, dy)) in [(1, (0.2, 0.0)), (2, (0.2, 0.2)), (3, (0.0, 0.2))] {
+            tight[corner].x -= dx;
+            tight[corner].y -= dy;
+        }
+        assert_eq!(
+            unregistered(&img, tight, width),
+            Some(1.0),
+            "the witness needs a grid that verifies"
+        );
+        assert!(measure(&img, tight, PAYLOAD, Stated::default()).is_none());
+    }
+
+    #[test]
+    fn the_grid_of_a_symbol_fits_every_finder_and_timing_module() {
+        let (colors, width) = symbol(&[]);
+        let (img, corners) = draw(&colors, width, 6, 1.0);
+        let grid = grid_at(&img, quad_of(corners), width);
+        assert_eq!(midpoint(&finders(&grid, Sampler::Core)), Some(127));
+        assert_eq!(fit(&grid), Some(1.0));
+        // a light timing module exactly at the threshold still reads light
+        let grey = repaint(&img, 6, (6, 9), |_, _| 127);
+        assert_eq!(fit(&grid_at(&grey, quad_of(corners), width)), Some(1.0));
+    }
+
+    #[test]
+    fn the_finders_are_read_at_the_three_corners_row_by_row() {
+        let (colors, width) = symbol(&[]);
+        let (mut img, corners) = draw(&colors, width, 6, 1.0);
+        // one module of each finder in a grey of its own, off the diagonal
+        let marks = [((1, 2), 60u8), ((4, width - 2), 120), ((width - 5, 6), 180)];
+        for (module, grey) in marks {
+            img = repaint(&img, 6, module, |_, _| grey);
+        }
+        let mut expected = Vec::new();
+        for (top, left) in [(0, 0), (0, width - 7), (width - 7, 0)] {
+            for row in top..top + 7 {
+                for column in left..left + 7 {
+                    let mark = marks.iter().find(|(module, _)| *module == (row, column));
+                    expected.push(match mark {
+                        Some((_, grey)) => *grey,
+                        None if colors[row * width + column] == qrcode::Color::Dark => 0,
+                        None => 255,
+                    });
+                }
+            }
+        }
+        let grid = grid_at(&img, quad_of(corners), width);
+        assert_eq!(finders(&grid, Sampler::Centre), expected);
+    }
+
+    #[test]
+    fn a_format_module_at_the_threshold_reads_light() {
+        let (colors, width) = symbol(&[]);
+        let (mut img, corners) = draw(&colors, width, 6, 1.0);
+        let stated = measure(&img, corners, PAYLOAD, Stated::default()).unwrap();
+        // every light module of both copies of the format information, in
+        // the grey of the threshold: read as dark, each copy would be at
+        // least four bits from its word, beyond what its code corrects
+        let beside_the_finder: Vec<(usize, usize)> = (0..9)
+            .filter(|i| *i != 6)
+            .map(|i| (8, i))
+            .chain((0..8).filter(|i| *i != 6).map(|i| (i, 8)))
+            .collect();
+        let along_the_edges: Vec<(usize, usize)> = (width - 8..width)
+            .map(|i| (8, i))
+            .chain((width - 7..width).map(|i| (i, 8)))
+            .collect();
+        for copy in [beside_the_finder, along_the_edges] {
+            assert_eq!(copy.len(), 15);
+            let light: Vec<(usize, usize)> = copy
+                .into_iter()
+                .filter(|(row, column)| colors[row * width + column] != qrcode::Color::Dark)
+                .collect();
+            assert!(light.len() >= 4, "the witness needs four light modules");
+            for module in light {
+                img = repaint(&img, 6, module, |_, _| 127);
+            }
+        }
+        let grid = grid_at(&img, quad_of(corners), width);
+        assert_eq!(
+            formats(&grid, 3, Stated::default()),
+            [(stated.ec, stated.mask)]
+        );
+    }
+
+    #[test]
+    fn a_version_seven_symbol_measures_under_its_version_information() {
+        let (colors, width) = codeword_colors(
+            qrcode::Version::Normal(7),
+            qrcode::EcLevel::M,
+            &data_codewords(7, qrcode::EcLevel::M),
+            &[],
+        );
+        let (img, corners) = draw(&colors, width, 4, 1.0);
+        let measured =
+            measure(&img, corners, PAYLOAD, Stated::default()).expect("version 7 measures");
+        assert_eq!(
+            (measured.version, measured.ec, measured.margin),
+            (7, EcLevel::M, 1.0)
+        );
+    }
+
+    #[test]
+    fn the_first_of_equal_margins_stands() {
+        let (colors, width) = symbol(&[]);
+        let (img, corners) = draw(&colors, width, 6, 1.0);
+        let grid = grid_at(&img, quad_of(corners), width);
+        let found = formats(&grid, 3, Stated::default());
+        // every sampling reads a clean symbol whole: the first one tried stays
+        let (measured, sampler, otsu) = widest(&grid, 3, &found, PAYLOAD).unwrap();
+        assert_eq!(
+            (measured.margin, sampler, otsu),
+            (1.0, Sampler::Centre, false)
+        );
+    }
+
+    #[test]
+    fn a_grid_whose_function_patterns_read_reversed_is_not_sampled() {
+        // finders and timing lines drawn light where the standard draws them
+        // dark: the data still verifies on the grid alone, but its patterns
+        // fit under one half, and the reversed reflectance verifies nothing
+        let (mut colors, width) = symbol(&[]);
+        let mut patterns: Vec<(usize, usize)> = Vec::new();
+        for (top, left) in [(0, 0), (0, width - 7), (width - 7, 0)] {
+            patterns.extend((0..49).map(|i| (top + i / 7, left + i % 7)));
+        }
+        patterns.extend((8..width - 8).flat_map(|i| [(6, i), (i, 6)]));
+        for (row, column) in patterns {
+            colors[row * width + column] = reversed(colors[row * width + column]);
+        }
+        let (img, corners) = draw(&colors, width, 6, 1.0);
+        assert_eq!(fit(&grid_at(&img, quad_of(corners), width)), Some(0.0));
+        assert_eq!(
+            unregistered(&img, corners, width),
+            Some(1.0),
+            "the witness needs a grid that verifies"
+        );
+        let stated = Stated {
+            version: Some(3),
+            ..Stated::default()
+        };
+        assert!(measure(&img, corners, PAYLOAD, stated).is_none());
+    }
+
+    #[test]
+    fn a_registration_that_only_ties_keeps_the_first_sampling() {
+        // the first codeword lies at the bottom-right corner. One of its
+        // modules is wrong for good; a dark one is drawn as a dot up and left
+        // of its centre, misread where the corners are and read after one
+        // diagonal move of the corner beside it
+        let (mut colors, width) = symbol(&[]);
+        let wrong = width * width - 1;
+        colors[wrong] = reversed(colors[wrong]);
+        let dot = [(28, 27), (27, 28), (27, 27), (26, 28), (26, 27)]
+            .into_iter()
+            .find(|(row, column)| colors[row * width + column] == qrcode::Color::Dark)
+            .expect("the witness needs a dark module of the first codeword");
+        let (img, corners) = draw(&colors, width, 10, 1.0);
+        let img = repaint(&img, 10, dot, |dx, dy| {
+            if (1..=3).contains(&dx) && (1..=3).contains(&dy) {
+                0
+            } else {
+                255
+            }
+        });
+        let quad = quad_of(corners);
+        let grid = grid_at(&img, quad, width);
+        let found = formats(&grid, 3, Stated::default());
+        let (first, sampler, otsu) = widest(&grid, 3, &found, PAYLOAD).unwrap();
+        let truth =
+            crate::rescue::corrected_codewords(&first.stream, 3, first.ec, first.mask).unwrap();
+        let moved = register(
+            &grid,
+            quad,
+            (3, first.mask),
+            (sampler, otsu),
+            &truth,
+            register_budget(width, sampler),
+        );
+        assert_ne!(moved, quad, "the witness needs a corner that moves");
+        let (again, ..) = widest(
+            &grid_at(&img, moved, width),
+            3,
+            &[(first.ec, first.mask)],
+            PAYLOAD,
+        )
+        .unwrap();
+        assert_eq!(again.margin, first.margin, "the witness needs a tie");
+        assert_ne!(
+            again.stream.bits, first.stream.bits,
+            "the witness needs another sampling"
+        );
+        let measured = measure(&img, corners, PAYLOAD, Stated::default()).unwrap();
+        assert_eq!(measured.stream.bits, first.stream.bits);
+    }
+
+    /// The version 3-M symbol at 10 px per module with the dark modules among
+    /// the sixteen data modules of its bottom-right corner drawn as centred
+    /// dots, 6 px wide on the two upper rows and 2 px wide on the two lower
+    /// ones: read at its centre, a 6 px dot survives a corner 2.5 px off and
+    /// not one 5 px off, a 2 px dot survives neither. Every other module
+    /// fills its cell and survives both.
+    struct Dotted {
+        img: LumaImage,
+        /// The symbol's corners, in pixel-centre coordinates.
+        quad: [(f32, f32); 4],
+        mask: u8,
+        /// The codewords the symbol encodes.
+        truth: Vec<u8>,
+        width: usize,
+    }
+
+    fn dotted() -> Dotted {
+        let (colors, width) = symbol(&[]);
+        let (mut img, corners) = draw(&colors, width, 10, 1.0);
+        let clean = measure(&img, corners, PAYLOAD, Stated::default()).unwrap();
+        let truth =
+            crate::rescue::corrected_codewords(&clean.stream, 3, clean.ec, clean.mask).unwrap();
+        for row in width - 4..width {
+            for column in width - 4..width {
+                if colors[row * width + column] != qrcode::Color::Dark {
+                    continue;
+                }
+                let dot = if row < width - 2 { 2..=7 } else { 4..=5 };
+                img = repaint(&img, 10, (row, column), |dx, dy| {
+                    if dot.contains(&dx) && dot.contains(&dy) {
+                        0
+                    } else {
+                        255
+                    }
+                });
+            }
+        }
+        Dotted {
+            img,
+            quad: quad_of(corners),
+            mask: clean.mask,
+            truth,
+            width,
+        }
+    }
+
+    /// The registration of `quad` on the dotted symbol, read at module
+    /// centres against the midpoint, within `budget` moves.
+    fn registered(dotted: &Dotted, quad: [(f32, f32); 4], budget: usize) -> [(f32, f32); 4] {
+        register(
+            &grid_at(&dotted.img, quad, dotted.width),
+            quad,
+            (3, dotted.mask),
+            (Sampler::Centre, false),
+            &dotted.truth,
+            budget,
+        )
+    }
+
+    /// `quad` with its bottom-right corner moved by `(dx, dy)` pixels.
+    fn shifted(quad: [(f32, f32); 4], (dx, dy): (f32, f32)) -> [(f32, f32); 4] {
+        let mut moved = quad;
+        moved[2].0 += dx;
+        moved[2].1 += dy;
+        moved
+    }
+
+    /// The coarse step of a registration of `quad`, in pixels.
+    fn coarse(quad: [(f32, f32); 4], width: usize) -> f32 {
+        REGISTER_STEPS[0] * (mean_side(quad) / width as f32)
+    }
+
+    #[test]
+    fn a_registration_moves_a_corner_back_the_way_it_is_off() {
+        let dotted = dotted();
+        // 2.5 px off, the 2 px dots are misread whichever axis the corner is
+        // off on: one off on both gains nothing from an axis move alone, and
+        // one off on one axis nothing from a diagonal
+        for (dx, dy) in [
+            (1.0, 0.0),
+            (-1.0, 0.0),
+            (0.0, 1.0),
+            (0.0, -1.0),
+            (1.0, 1.0),
+            (-1.0, -1.0),
+            (1.0, -1.0),
+            (-1.0, 1.0),
+        ] {
+            let off = shifted(dotted.quad, (2.5 * dx, 2.5 * dy));
+            let step = coarse(off, dotted.width);
+            let back = shifted(off, (-dx * step, -dy * step));
+            assert_eq!(
+                registered(&dotted, off, usize::MAX),
+                back,
+                "off by {dx} {dy}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_sweep_that_moves_a_corner_earns_another_at_the_same_step() {
+        let dotted = dotted();
+        // 5 px off: one coarse step brings the 6 px dots back and the next
+        // one the 2 px dots, and a sweep moves a corner once along an axis
+        let off = shifted(dotted.quad, (5.0, 0.0));
+        let step = coarse(off, dotted.width);
+        let back = shifted(shifted(off, (-step, 0.0)), (-step, 0.0));
+        assert_eq!(registered(&dotted, off, usize::MAX), back);
+    }
+
+    #[test]
+    fn a_registration_stops_at_its_budget_of_moves() {
+        let dotted = dotted();
+        // the moves are tried corner after corner, in the order of `MOVES`:
+        // the bottom-right corner is the third, a move against +x its second
+        // and one against +y its fourth, and a sweep is 32 moves
+        for ((dx, dy), first) in [((1.0, 0.0), 18), ((0.0, 1.0), 20)] {
+            let off = shifted(dotted.quad, (5.0 * dx, 5.0 * dy));
+            let step = coarse(off, dotted.width);
+            let once = shifted(off, (-dx * step, -dy * step));
+            let twice = shifted(once, (-dx * step, -dy * step));
+            for (budget, corners) in [
+                (0, off),
+                (first - 1, off),
+                (first, once),
+                (32 + first - 1, once),
+                (32 + first, twice),
+            ] {
+                assert_eq!(
+                    registered(&dotted, off, budget),
+                    corners,
+                    "off by {dx} {dy}, {budget} moves"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_registration_budget_is_the_pixel_bound_over_one_sampling_of_the_grid() {
+        // 3 000 000 pixels over 29 × 29 modules of 1, 9 or 25 samples each
+        assert_eq!(register_budget(29, Sampler::Centre), 3567);
+        assert_eq!(register_budget(29, Sampler::Core), 396);
+        assert_eq!(register_budget(29, Sampler::Cell), 142);
+        assert_eq!(register_budget(177, Sampler::Cell), 3);
     }
 
     /// A QR Code detection of `PAYLOAD` whose one occurrence is `corners`.
