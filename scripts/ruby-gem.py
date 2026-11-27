@@ -251,11 +251,16 @@ def gem_parts(data):
 
 
 def checksums(parts):
-    """The SHA256 lines of checksums.yaml.gz must name the two other members' digests."""
+    """The SHA256 lines of checksums.yaml.gz must name the two other members' digests.
+
+    Ruby's YAML writer puts a digest between single quotes when it starts like an octal number
+    that is not one ("08…", "0179…"): about one digest in 64, so both spellings are read.
+    """
     text = gzip.decompress(parts["checksums.yaml.gz"]).decode("utf-8")
-    block = re.search(r"^SHA256:\n((?:  \S+: [0-9a-f]{64}\n)+)", text, re.M)
+    block = re.search(r"^SHA256:\n((?:  \S+: (?:[0-9a-f]{64}|'[0-9a-f]{64}')\n)+)", text, re.M)
     require(block is not None, "checksums.yaml.gz holds no SHA256 section")
-    told = dict(re.findall(r"  (\S+): ([0-9a-f]{64})", block[1]))
+    told = {name: plain or quoted
+            for name, plain, quoted in re.findall(r"  (\S+): (?:([0-9a-f]{64})|'([0-9a-f]{64})')\n", block[1])}
     for name in ("metadata.gz", "data.tar.gz"):
         require(told.get(name) == sha256(parts[name]), f"checksums.yaml.gz does not hold the digest of {name}")
 
@@ -525,6 +530,21 @@ def self_test():
             parts["checksums.yaml.gz"] = gzip.compress(b"---\nSHA256:\n  metadata.gz: " + b"0" * 64 +
                                                        b"\n  data.tar.gz: " + b"0" * 64 + b"\n")
         refused("a stale checksum is refused", lambda: judged(complete, tamper=stale_checksum), "digest")
+
+        def quoted(digest_of):
+            def tamper(parts):
+                lines = "".join(f"  {name}: '{digest_of(parts[name])}'\n" for name in ("metadata.gz", "data.tar.gz"))
+                parts["checksums.yaml.gz"] = gzip.compress(f"---\nSHA256:\n{lines}SHA512:\n  metadata.gz: 0\n".encode())
+            return tamper
+        check("a digest Ruby wrote between quotes is read",
+              judged(complete, tamper=quoted(sha256))["platform"] == "x86_64-linux-gnu")
+        refused("a stale checksum between quotes is refused",
+                lambda: judged(complete, tamper=quoted(lambda _: "08" + "0" * 62)), "digest")
+
+        def half_quoted(parts):
+            parts["checksums.yaml.gz"] = gzip.compress(
+                f"---\nSHA256:\n  metadata.gz: '{sha256(parts['metadata.gz'])}\n".encode())
+        refused("a digest with one quote is refused", lambda: judged(complete, tamper=half_quoted), "no SHA256 section")
 
     def rubygems(chosen):
         def run(argv, **_):
