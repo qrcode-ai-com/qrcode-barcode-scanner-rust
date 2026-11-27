@@ -323,7 +323,7 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0) | 0.12.0-1.fc44 | Fedora 44, x86_64 and aarch64 |
 | [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.0) | 0.12.0 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
-| [GitHub Container Registry](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) | 0.12.0 | Linux AMD64 and ARM64 |
+| [GitHub Container Registry](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) | 0.12.1 | Linux AMD64 and ARM64 |
 
 Install `qrscan` through Homebrew.
 
