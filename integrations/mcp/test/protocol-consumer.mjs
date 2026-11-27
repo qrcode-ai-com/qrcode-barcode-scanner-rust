@@ -24,7 +24,7 @@ const white = readFileSync(join(root, "white.png"));
 const payload = "https://qrcode-ai.com/c/v5q";
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const untimed = ({ trace, ...report }) => ({ ...report, trace: { ...trace, total_ms: 0, stages: trace.stages.map((stage) => ({ ...stage, ms: 0 })) } });
-assert.equal(version(), "0.12.0");
+assert.equal(version(), "0.12.1");
 assert.ok(!relative(root, require.resolve("@qrcode-ai-com/qrcode-barcode-scanner")).startsWith(".."));
 for (const key of ["NODE_PATH", "NAPI_RS_NATIVE_LIBRARY_PATH"]) assert.equal(process.env[key], undefined, `${key} bypasses the installed consumer`);
 
@@ -60,7 +60,7 @@ async function connect(era, settings = {}) {
   await client.connect(transport);
   const onmessage = transport.onmessage;
   transport.onmessage = (message, extra) => { wire.push({ direction: "received", message }); return onmessage(message, extra); };
-  assert.deepEqual(client.getServerVersion(), { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.3", websiteUrl: "https://qrcode-ai.com/en-US/qr-code-scanner/mcp" });
+  assert.deepEqual(client.getServerVersion(), { name: "io.github.qrcode-ai-com/qrcode-barcode-scanner", version: "0.3.4", websiteUrl: "https://qrcode-ai.com/en-US/qr-code-scanner/mcp" });
   if (modern) assert.equal(client.getNegotiatedProtocolVersion(), "2026-07-28");
   else assert.equal(wire[0].message.method, "initialize");
   const pid = transport.pid;
@@ -116,7 +116,7 @@ for (const era of ["modern", "legacy"]) {
     assert.equal(absent.structuredContent, undefined);
     const call = (image, options = {}) => session.client.callTool({ name: "scan_image", arguments: { imageBase64: image.toString("base64"), ...options } });
     const full = reportFrom(await call(fixture, { profile: "full", budgetMs: 0 }));
-    assert.deepEqual(full.versions, { scanner: "0.12.0", pipeline: 5, score_contract: 5 });
+    assert.deepEqual(full.versions, { scanner: "0.12.1", pipeline: 5, score_contract: 6 });
     assert.equal(full.trace.budget_exhausted, false);
     assert.equal(full.detections.length, 1);
     assert.deepEqual(full.detections[0].content, { text: payload, raw: Buffer.from(payload).toString("base64"), charset: "utf8" });
@@ -143,7 +143,7 @@ for (const era of ["modern", "legacy"]) {
     assert.deepEqual(untimed(mixedByDefault), untimed(await fastUnbounded(mixedFixture)), "a mixed image without a profile gets the fast report");
     for (const profile of ["fast", "frame", "full"]) {
       const mixed = reportFrom(await call(mixedFixture, { profile, budgetMs: 0 }));
-      assert.deepEqual(mixed.versions, { scanner: "0.12.0", pipeline: 5, score_contract: 5 });
+      assert.deepEqual(mixed.versions, { scanner: "0.12.1", pipeline: 5, score_contract: 6 });
       assert.equal(mixed.trace.budget_exhausted, false);
       assert.deepEqual(mixed.detections.map(({ symbology, content }) => ({ symbology, text: content.text, raw: content.raw })).sort((a, b) => a.symbology.localeCompare(b.symbology)), [
         { symbology: "code128", text: "STOCK-4827", raw: Buffer.from("STOCK-4827").toString("base64") },
@@ -294,6 +294,6 @@ try {
 const loaded = Object.keys(require.cache).filter((file) => file.endsWith(".node"));
 assert.equal(loaded.length, 1);
 assert.ok(!relative(root, loaded[0]).startsWith(".."));
-const receipt = { verdict: "PASS", adapter: "0.3.3", scanner: version(), node: process.version, os: process.platform, arch: process.arch, installedEntry: entry, fixtureSha256: sha256(fixture), loadedNative: { path: loaded[0], sha256: sha256(readFileSync(loaded[0])) }, sessions: receipts, scanFile: { eras: ["modern", "legacy"], defaultProfile: DEFAULT_PROFILE, mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], refusals, symbolicLinksAndPipeChecked: links }, inputByteCap: true, dimensionCap: true, pixelCap: true, concurrencyCap: true, concurrencyAcrossFactories: true, realProductClients: "NOT VERIFIED" };
+const receipt = { verdict: "PASS", adapter: "0.3.4", scanner: version(), node: process.version, os: process.platform, arch: process.arch, installedEntry: entry, fixtureSha256: sha256(fixture), loadedNative: { path: loaded[0], sha256: sha256(readFileSync(loaded[0])) }, sessions: receipts, scanFile: { eras: ["modern", "legacy"], defaultProfile: DEFAULT_PROFILE, mixedProfiles: ["fast", "frame", "full"], mixedExactPayloads: ["STOCK-4827", "https://qrc-ai.com/76xMa"], refusals, symbolicLinksAndPipeChecked: links }, inputByteCap: true, dimensionCap: true, pixelCap: true, concurrencyCap: true, concurrencyAcrossFactories: true, realProductClients: "NOT VERIFIED" };
 writeFileSync(join(root, "protocol-receipt.json"), JSON.stringify(receipt, null, 2));
 console.log(JSON.stringify(receipt));
