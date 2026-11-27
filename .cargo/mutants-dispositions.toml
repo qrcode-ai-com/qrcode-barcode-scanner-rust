@@ -361,7 +361,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/ladder.rs"
-line = 1155
+line = 1218
 column = 49
 mutation = "replace * with / in Run<'_>::rescue_stage"
 category = "equivalent"
@@ -373,7 +373,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/ladder.rs"
-line = 1338
+line = 1437
 column = 49
 mutation = "replace * with / in Run<'_>::stage"
 category = "equivalent"
@@ -385,7 +385,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/ladder.rs"
-line = 1464
+line = 1563
 column = 51
 mutation = "replace && with || in exclude_matrix_regions"
 category = "equivalent"
@@ -708,7 +708,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/ladder.rs"
-line = 1004
+line = 1067
 column = 19
 mutation = "replace += with *= in Run<'_>::reread"
 category = "timeout-structural"

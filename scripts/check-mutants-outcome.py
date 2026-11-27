@@ -857,8 +857,8 @@ def self_test() -> int:
                 f"{core}/engine/locate.rs:315:9: replace {black} -> Option<bool> with None",
                 f"{core}/engine/locate.rs:315:9: replace {black} -> Option<bool> with Some(true)",
                 f"{core}/engine/locate.rs:315:9: replace {black} -> Option<bool> with Some(false)",
-                f"{core}/ladder.rs:1155:49: replace * with / in Run<'_>::rescue_stage",
-                f"{core}/ladder.rs:1338:49: replace * with / in Run<'_>::stage",
+                f"{core}/ladder.rs:1218:49: replace * with / in Run<'_>::rescue_stage",
+                f"{core}/ladder.rs:1437:49: replace * with / in Run<'_>::stage",
             ]
             outside = [
                 f"{core}/rescue/bitstream.rs:299:32: replace + with * in parse",
@@ -866,9 +866,9 @@ def self_test() -> int:
                 f"{core}/payload.rs:40:5: replace classify -> Payload with Default::default()",
                 f"{core}/engine/locate.rs:295:9: replace {black} -> Option<bool> with None",
                 f"{core}/engine/locate.rs:310:24: replace < with <= in {black}",
-                f"{core}/ladder.rs:1155:49: replace * with + in Run<'_>::rescue_stage",
-                f"{core}/ladder.rs:1338:49: replace * with + in Run<'_>::stage",
-                f"{core}/ladder.rs:1709:59: replace * with / in Run<'_>::finish",
+                f"{core}/ladder.rs:1218:49: replace * with + in Run<'_>::rescue_stage",
+                f"{core}/ladder.rs:1437:49: replace * with + in Run<'_>::stage",
+                f"{core}/ladder.rs:1860:59: replace * with / in Run<'_>::finish",
             ]
             kept = [n for n in excluded if versioned.matching(mutant_key({"name": n})) is None]
             dropped = [n for n in outside if versioned.matching(mutant_key({"name": n})) is not None]
