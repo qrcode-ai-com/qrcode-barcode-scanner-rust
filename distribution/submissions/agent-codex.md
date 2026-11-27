@@ -15,6 +15,12 @@ the `fast` profile, and keeps skill 0.2.1 and engine 0.12.0. The values to send 
 `v0.3.2` and MCP 0.3.3: send them once `v0.3.2` is on the plugin repository, with the commit that
 tag then carries.
 
+Updated on 2026-11-27: `v0.3.2` has been on the plugin repository since 25 November 2026. The
+next release, `v0.3.3`, starts the MCP server 0.3.4 and carries skill 0.2.2, both on the MIT
+engine 0.12.1, whose reports carry score contract 6. The values to send below now name `v0.3.3`
+and MCP 0.3.4: send them once `v0.3.3` is on the plugin repository, with the commit that tag then
+carries.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |

@@ -14,6 +14,12 @@ the `fast` profile, and keeps skill 0.2.1 and engine 0.12.0. The values to send 
 `v0.3.2` and MCP 0.3.3: send them once `v0.3.2` is on the plugin repository, with the commit that
 tag then carries.
 
+Updated on 2026-11-27: `v0.3.2` has been on the plugin repository since 25 November 2026. The
+next release, `v0.3.3`, starts the MCP server 0.3.4 and carries skill 0.2.2, both on the MIT
+engine 0.12.1, whose reports carry score contract 6. The values to send below now name `v0.3.3`
+and MCP 0.3.4: send them once `v0.3.3` is on the plugin repository, with the commit that tag then
+carries.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -49,14 +55,14 @@ consistency check.
 | GitHub repository | `qrcode-ai-com/qrcode-barcode-scanner-plugin` |
 | Plugin path inside the repository | leave empty (root) |
 | Ref to review | leave empty |
-| Commit SHA to review | the commit of tag `v0.3.2` (see the note above) |
-| Version | `0.3.2` |
+| Commit SHA to review | the commit of tag `v0.3.3` (see the note above) |
+| Version | `0.3.3` |
 | License identifier | `MIT` |
 | Author name | `QR Code AI` |
 | Author URL | `https://qrcode-ai.com/` |
 | Homepage URL | `https://qrcode-ai.com/` |
 | Keywords | `qr-code`, `barcode`, `qr-scanner`, `barcode-scanner`, `mcp`, `agent-skill` (one per line) |
-| Additional notes for reviewers | Scanning runs on the user's computer. The MCP server is started with `npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`, pinned to an exact version. The plugin source is MIT, and so are the published MCP server 0.3.3 and engine 0.12.0 it starts. |
+| Additional notes for reviewers | Scanning runs on the user's computer. The MCP server is started with `npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4`, pinned to an exact version. The plugin source is MIT, and so are the published MCP server 0.3.4 and engine 0.12.1 it starts. |
 
 The keywords are lowercase and hyphenated because the form asks for lowercase tags. The manifest
 keeps its own spaced keywords.

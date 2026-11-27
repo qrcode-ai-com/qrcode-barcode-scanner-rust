@@ -2,10 +2,10 @@
   "schema": "qrscan-readme-actions/1",
   "mcpLaunch": {
     "command": "npx",
-    "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"]
+    "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"]
   },
-  "publication": "https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3",
-  "reviewedOn": "2026-11-25",
+  "publication": "https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.4",
+  "reviewedOn": "2026-11-27",
   "installDocumentation": [
     "https://prod.cursor.com/docs/mcp/install-links",
     "https://code.visualstudio.com/api/extension-guides/ai/mcp"

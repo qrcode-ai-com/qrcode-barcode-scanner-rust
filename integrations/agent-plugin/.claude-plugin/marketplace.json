@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "The QR Code & Barcode Scanner plugin from QR Code AI.",
-    "version": "0.3.2"
+    "version": "0.3.3"
   },
   "plugins": [
     {
       "name": "qrcode-barcode-scanner",
       "source": "./",
       "description": "Read QR codes and barcodes in local images with the QR Code & Barcode Scanner skill and its pinned local MCP server.",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "author": {
         "name": "QR Code AI",
         "url": "https://qrcode-ai.com/"

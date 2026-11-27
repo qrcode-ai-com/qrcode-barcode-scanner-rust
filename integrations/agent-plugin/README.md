@@ -15,11 +15,11 @@
 
 ### Ask AI
 
-[![ChatGPT](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/chatgpt-v2.svg)](https://chatgpt.com/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.1%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
-[![Claude](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/claude-v2.svg)](https://claude.ai/new?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.1%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
+[![ChatGPT](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/chatgpt-v2.svg)](https://chatgpt.com/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.2%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.4%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
+[![Claude](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/claude-v2.svg)](https://claude.ai/new?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.2%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.4%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
 [![Gemini](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/gemini-v2.svg)](https://gemini.google.com/)
-[![Grok](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/grok-v2.svg)](https://grok.com/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.1%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
-[![Perplexity](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/perplexity-v2.svg)](https://www.perplexity.ai/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.1%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
+[![Grok](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/grok-v2.svg)](https://grok.com/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.2%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.4%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
+[![Perplexity](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/perplexity-v2.svg)](https://www.perplexity.ai/?q=Help%20me%20understand%20QR%20Code%20%26%20Barcode%20Scanner%20plugin%20for%20coding%20agents%20%28integrations%2Fagent-plugin%2FREADME.md%29%20for%20QR%20Code%20%26%20Barcode%20Scanner%2C%20the%20open-source%20scanner.%20Source%20documentation%3B%20publication%20is%20not%20implied.%20Provided%20README%20context%20%28verify%20against%20the%20sources%29%3A%20This%20plugin%20gives%20a%20coding%20agent%20a%20QR%20code%20and%20barcode%20scanner%20that%20runs%20on%20your%20own%20machine.%20Every%20client%20gets%20the%20same%20two%20parts%3A%20the%20QR%20Code%20%26%20Barcode%20Scanner%20skill%200.2.2%20and%20the%20scanner%27s%20MCP%20server%20%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.4%2C%20started%20over%20stdio%20at%20that%20exact%20version.%20One%20repository%20root%20holds%20the%20file%20each%20client%20reads.%20Read%20the%20public%20documentation%20below.%20Explain%20what%20this%20destination%20does%2C%20its%20documented%20installation%20or%20access%20steps%2C%20a%20minimal%20example%20if%20supported%2C%20prerequisites%2C%20limitations%20and%20license.%20Distinguish%20published%20packages%20from%20working%20source%20and%20preparation.%20Cite%20your%20sources%3B%20if%20a%20page%20is%20unavailable%20or%20a%20fact%20cannot%20be%20checked%2C%20say%20so.%20Do%20not%20invent%20installation%20commands%2C%20benchmark%20results%20or%20comparisons.%20Answer%20in%20my%20language.%20Public%20sources%3A%20https%3A%2F%2Fgithub.com%2Fqrcode-ai-com%2Fqrcode-barcode-scanner-rust%2Fblob%2Fmain%2Fintegrations%2Fagent-plugin%2FREADME.md%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-scanner%2Fintegrations%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fqr-code-generator%20https%3A%2F%2Fqrcode-ai.com%2Fen-US%2Fbarcode-generator)
 [![Copilot](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/copilot-v2.svg)](https://copilot.com/)
 [![DeepSeek](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/deepseek-v2.svg)](https://chat.deepseek.com/)
 [![Meta AI](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/main/docs/assets/actions/meta-ai-v2.svg)](https://www.meta.ai/)
@@ -33,14 +33,14 @@ Choose an AI assistant to explain this destination using its public sources. Gem
 Use the code block's copy control, or select its complete text, then paste it into your assistant.
 
 ```text
-Help me understand QR Code & Barcode Scanner plugin for coding agents (integrations/agent-plugin/README.md) for QR Code & Barcode Scanner, the open-source scanner. Source documentation; publication is not implied. Provided README context (verify against the sources): This plugin gives a coding agent a QR code and barcode scanner that runs on your own machine. Every client gets the same two parts: the QR Code & Barcode Scanner skill 0.2.1 and the scanner's MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3, started over stdio at that exact version. One repository root holds the file each client reads. Read the public documentation below. Explain what this destination does, its documented installation or access steps, a minimal example if supported, prerequisites, limitations and license. Distinguish published packages from working source and preparation. Cite your sources; if a page is unavailable or a fact cannot be checked, say so. Do not invent installation commands, benchmark results or comparisons. Answer in my language. Public sources: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/agent-plugin/README.md https://qrcode-ai.com/en-US/qr-code-scanner https://qrcode-ai.com/en-US/barcode-scanner https://qrcode-ai.com/en-US/qr-code-scanner/integrations https://qrcode-ai.com/en-US/barcode-scanner/integrations https://qrcode-ai.com/en-US/qr-code-generator https://qrcode-ai.com/en-US/barcode-generator
+Help me understand QR Code & Barcode Scanner plugin for coding agents (integrations/agent-plugin/README.md) for QR Code & Barcode Scanner, the open-source scanner. Source documentation; publication is not implied. Provided README context (verify against the sources): This plugin gives a coding agent a QR code and barcode scanner that runs on your own machine. Every client gets the same two parts: the QR Code & Barcode Scanner skill 0.2.2 and the scanner's MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4, started over stdio at that exact version. One repository root holds the file each client reads. Read the public documentation below. Explain what this destination does, its documented installation or access steps, a minimal example if supported, prerequisites, limitations and license. Distinguish published packages from working source and preparation. Cite your sources; if a page is unavailable or a fact cannot be checked, say so. Do not invent installation commands, benchmark results or comparisons. Answer in my language. Public sources: https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/agent-plugin/README.md https://qrcode-ai.com/en-US/qr-code-scanner https://qrcode-ai.com/en-US/barcode-scanner https://qrcode-ai.com/en-US/qr-code-scanner/integrations https://qrcode-ai.com/en-US/barcode-scanner/integrations https://qrcode-ai.com/en-US/qr-code-generator https://qrcode-ai.com/en-US/barcode-generator
 ```
 
 </details>
 
 <!-- /qrcode-ai-readme-actions:v2 -->
 
-This plugin gives a coding agent a QR code and barcode scanner that runs on your own machine. Every client gets the same two parts: the QR Code & Barcode Scanner skill 0.2.1 and the scanner's MCP server `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`, started over stdio at that exact version. One repository root holds the file each client reads.
+This plugin gives a coding agent a QR code and barcode scanner that runs on your own machine. Every client gets the same two parts: the QR Code & Barcode Scanner skill 0.2.2 and the scanner's MCP server `@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4`, started over stdio at that exact version. One repository root holds the file each client reads.
 
 It serves Claude Code, Codex, Cursor, GitHub Copilot CLI, Gemini CLI, Kiro, Kimi Code, Junie, Antigravity, goose, Pi, OpenCode, Devin, Factory, Amp, Continue and Zed. Each client section below gives the install command, the files the client reads and how to remove the plugin again. Amp, Continue and Zed take the server from their own settings, and Continue gets the server only.
 
@@ -52,7 +52,7 @@ To call the engine from your own code instead of an agent, start from the [QR co
 
 ## Status
 
-This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-plugin`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin), is written from it by [`scripts/stage-agent-plugin-satellite.py`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/scripts/stage-agent-plugin-satellite.py). It has been public since 20 November 2026. The commands below name its release [`v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.2), which starts the MCP server 0.3.3 with skill 0.2.1 and engine 0.12.0. MCP server 0.3.3, public on npm since 25 November 2026, scans with the `fast` profile when a `scan_image` or `scan_file` call names none. If the [releases page](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases) does not show `v0.3.2` yet, use `v0.3.1` in its place, which starts the MCP server 0.3.2 on the same skill and engine.
+This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrcode-barcode-scanner-plugin`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin), is written from it by [`scripts/stage-agent-plugin-satellite.py`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/scripts/stage-agent-plugin-satellite.py). It has been public since 20 November 2026. The commands below name its release [`v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.3), which starts the MCP server 0.3.4 with skill 0.2.2 and engine 0.12.1. MCP server 0.3.4, public on npm since 27 November 2026, runs the MIT engine 0.12.1 and still scans with the `fast` profile when a `scan_image` or `scan_file` call names none. Skill 0.2.2 reads the reports of engine 0.12.1, whose score contract is 6, and refuses engine 0.12.0. If the [releases page](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases) does not show `v0.3.3` yet, use `v0.3.2` in its place, which starts the MCP server 0.3.3 with skill 0.2.1 and engine 0.12.0.
 
 [Cursor Directory](https://cursor.directory/plugins/qrcode-barcode-scanner) has listed the plugin since 22 November 2026, with its rule, its MCP server and its skill. It reads the repository's default branch.
 
@@ -60,9 +60,9 @@ This folder is the source of the plugin. Its own repository, [`qrcode-ai-com/qrc
 
 | Part | Version | What it does |
 | --- | --- | --- |
-| Skill `qrcode-barcode-scanner` | 0.2.1 | Tells the agent how to scan a local image with the helper `scripts/scan.mjs` and how to read the report. |
-| MCP server `qrscan` | 0.3.3 | `scan_image` reads image bytes. `scan_file` reads a file path, only inside a directory you allow. |
-| Engine | 0.12.0 | The decoder. The MCP server brings its own copy from npm. The skill helper uses a copy you install once. |
+| Skill `qrcode-barcode-scanner` | 0.2.2 | Tells the agent how to scan a local image with the helper `scripts/scan.mjs` and how to read the report. |
+| MCP server `qrscan` | 0.3.4 | `scan_image` reads image bytes. `scan_file` reads a file path, only inside a directory you allow. |
+| Engine | 0.12.1 | The decoder. The MCP server brings its own copy from npm. The skill helper uses a copy you install once. |
 
 | Client | Files it reads |
 | --- | --- |
@@ -92,17 +92,17 @@ You need Node.js 22.19 or later, or Node.js 24 or later, with `npx` on your `PAT
 Every client starts the same server command:
 
 ```sh
-npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3
+npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4
 ```
 
 - `--yes` lets npx fetch the package without a question. `--ignore-scripts` stops npm from running install scripts. The exact version keeps the same code from one start to the next.
-- The first start downloads the server and engine 0.12.0 from npm, which can take a minute. Later starts use npm's cache.
+- The first start downloads the server and engine 0.12.1 from npm, which can take a minute. Later starts use npm's cache.
 - The server only offers `scan_image` by default. To let it read files by path, add `QRSCAN_MCP_ALLOWED_DIRECTORIES` to the server entry in your client, for example `"env": { "QRSCAN_MCP_ALLOWED_DIRECTORIES": "/absolute/path/to/images" }`, then restart the client. Separate several directories with `:` on macOS and Linux and `;` on Windows.
 
 The skill's helper uses an engine you install once, in a folder of your project:
 
 ```sh
-npm install --prefix .qrcode-barcode-scanner-runtime --ignore-scripts --no-audit --no-fund --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.0
+npm install --prefix .qrcode-barcode-scanner-runtime --ignore-scripts --no-audit --no-fund --save-exact @qrcode-ai-com/qrcode-barcode-scanner@0.12.1
 ```
 
 The skill tells the agent how to call the helper with that folder. Installing the plugin does not install it.
@@ -112,7 +112,7 @@ The skill tells the agent how to call the helper with that folder. Installing th
 ### Claude Code
 
 ```sh
-claude plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
+claude plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.3
 claude plugin install qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -121,7 +121,7 @@ To remove it, run `claude plugin uninstall qrcode-barcode-scanner@qrcode-ai-com`
 ### Codex
 
 ```sh
-codex plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.2
+codex plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.3
 codex plugin add qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -132,29 +132,29 @@ To remove it, run `codex plugin remove qrcode-barcode-scanner@qrcode-ai-com`, th
 The plugin's [Cursor Directory page](https://cursor.directory/plugins/qrcode-barcode-scanner) adds its rule, its MCP server and its skill from the repository's default branch. For the pinned release instead, clone it into Cursor's local plugin folder and reload the window:
 
 ```sh
-git clone --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git ~/.cursor/plugins/local/qrcode-barcode-scanner
+git clone --branch v0.3.3 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin.git ~/.cursor/plugins/local/qrcode-barcode-scanner
 ```
 
 To remove it, delete that folder and reload the window. The [Cursor QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/cursor) and the [Cursor barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/cursor) show the same steps.
 
-To add only the MCP server, open [Cursor's install link for the qrscan server](https://cursor.com/install-mcp?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuMyJdfQ%3D%3D). Cursor shows the command and asks you to confirm before it adds anything.
+To add only the MCP server, open [Cursor's install link for the qrscan server](https://cursor.com/install-mcp?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuNCJdfQ%3D%3D). Cursor shows the command and asks you to confirm before it adds anything.
 
 GitHub does not open `cursor://` links, so that link is Cursor's web form. The same install as a Cursor deeplink, to paste into a browser:
 
 ```text
-cursor://anysphere.cursor-deeplink/mcp/install?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuMyJdfQ==
+cursor://anysphere.cursor-deeplink/mcp/install?name=qrscan&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyItLXllcyIsIi0taWdub3JlLXNjcmlwdHMiLCJAcXJjb2RlLWFpLWNvbS9xcmNvZGUtYmFyY29kZS1zY2FubmVyLW1jcEAwLjMuNCJdfQ==
 ```
 
 Both links carry this configuration, encoded in base64:
 
 ```json
-{"command":"npx","args":["--yes","--ignore-scripts","@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"]}
+{"command":"npx","args":["--yes","--ignore-scripts","@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"]}
 ```
 
 ### GitHub Copilot CLI
 
 ```sh
-copilot plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
+copilot plugin marketplace add qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.3
 copilot plugin install qrcode-barcode-scanner@qrcode-ai-com
 ```
 
@@ -163,7 +163,7 @@ To remove it, run `copilot plugin uninstall qrcode-barcode-scanner`, then `copil
 ### Gemini CLI
 
 ```sh
-gemini extensions install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.2
+gemini extensions install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin --ref v0.3.3
 ```
 
 To remove it, run `gemini extensions uninstall qrcode-barcode-scanner`. The [Gemini CLI QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/gemini-cli) and the [Gemini CLI barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/gemini-cli) show the same install.
@@ -177,7 +177,7 @@ In Kiro, open Powers, choose Add Custom Power, then Import power from GitHub, an
 In a Kimi Code session, run these two commands:
 
 ```text
-/plugins install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.2
+/plugins install https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.3
 /reload
 ```
 
@@ -194,7 +194,7 @@ In a Junie CLI session, add the marketplace by the URL of its Junie manifest, th
 
 Junie then asks for a scope. User level, which is preselected, makes the extension available in all your projects. Project level keeps it in the current project.
 
-Use the URL, not `qrcode-ai-com/qrcode-barcode-scanner-plugin`. When a repository holds both `.claude-plugin/marketplace.json` and `.junie-extension/marketplace.json`, Junie CLI 26.11.3 reads the Claude file first. Added as a repository, the marketplace therefore installs the whole root and starts the server of the root `.mcp.json`, without the `timeout: 300000` of the Junie folder. From the URL, Junie reads the Junie manifest, whose entry fetches only `junie/qrcode-barcode-scanner/` from the default branch. Junie's extension documentation names no tag for that source, so this route follows the default branch, not `v0.3.2`.
+Use the URL, not `qrcode-ai-com/qrcode-barcode-scanner-plugin`. When a repository holds both `.claude-plugin/marketplace.json` and `.junie-extension/marketplace.json`, Junie CLI 26.11.3 reads the Claude file first. Added as a repository, the marketplace therefore installs the whole root and starts the server of the root `.mcp.json`, without the `timeout: 300000` of the Junie folder. From the URL, Junie reads the Junie manifest, whose entry fetches only `junie/qrcode-barcode-scanner/` from the default branch. Junie's extension documentation names no tag for that source, so this route follows the default branch, not `v0.3.3`.
 
 Junie names the marketplace `url-github-qrcode-ai-com-qrcode-barcode-scanner-plugin-52b9637775` and copies the extension to `~/.junie/extensions/url-github-qrcode-ai-com-qrcode-barcode-scanner-plugin-52b9637775/qrcode-barcode-scanner/`. It records no commit, but it keeps a sparse clone of this repository beside the cached manifest. Read the commit there:
 
@@ -219,7 +219,7 @@ To remove it, open `/extensions`, select the extension in the Installed tab and 
 `agy plugin install` takes no tag, so clone the release tag and install the folder:
 
 ```sh
-git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.3 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 agy plugin install ./qrcode-barcode-scanner-plugin
 ```
 
@@ -257,17 +257,17 @@ goose 1.60.2 also turns on its built-in `developer` extension by default. It let
 To add only the server, without the plugin, open this link in a browser to add it from goose Desktop:
 
 ```text
-goose://extension?cmd=npx&arg=--yes&arg=--ignore-scripts&arg=%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.3&id=qrscan&name=QR%20Code%20%26%20Barcode%20Scanner&description=Read%20QR%20codes%20and%20barcodes%20in%20local%20images
+goose://extension?cmd=npx&arg=--yes&arg=--ignore-scripts&arg=%40qrcode-ai-com%2Fqrcode-barcode-scanner-mcp%400.3.4&id=qrscan&name=QR%20Code%20%26%20Barcode%20Scanner&description=Read%20QR%20codes%20and%20barcodes%20in%20local%20images
 ```
 
-For one session only, run `goose session --with-extension "npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"`. Neither route names an allowed directory, so both offer `scan_image` only.
+For one session only, run `goose session --with-extension "npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"`. Neither route names an allowed directory, so both offer `scan_image` only.
 
 goose 1.60.2 has no command that removes a plugin. To remove it, move the folder `~/.agents/plugins/qrcode-barcode-scanner` out of `~/.agents/plugins/`, then delete the entry under `plugins:` in `~/.config/goose/config.yaml` that names that folder. To remove a server you added, delete its entry under `extensions:` or turn it off in goose's extension settings. The [goose QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/goose) and the [goose barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/goose) walk through both halves.
 
 ### Pi
 
 ```sh
-pi install git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin@v0.3.2
+pi install git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin@v0.3.3
 ```
 
 Pi loads the skill from `skills/` and the extension `pi/extension.js`, which registers the `qrscan` server. To remove it, run `pi remove git:github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin`. The [Pi QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/pi-agent) and the [Pi barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/pi-agent) cover the same package.
@@ -277,7 +277,7 @@ Pi loads the skill from `skills/` and the extension `pi/extension.js`, which reg
 With OpenCode 2, add the plugin from its repository:
 
 ```sh
-opencode plugin add github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2
+opencode plugin add github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.3
 ```
 
 With OpenCode 1, clone the repository at its tag and name the folder in `opencode.json`:
@@ -286,7 +286,7 @@ With OpenCode 1, clone the repository at its tag and name the folder in `opencod
 { "plugin": ["file:///absolute/path/to/qrcode-barcode-scanner-plugin"] }
 ```
 
-The plugin adds the `qrscan` server and the skill folder to OpenCode's configuration when OpenCode starts. A server or skill you already named the same way is left as it is. To remove it, run `opencode plugin remove github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2` with OpenCode 2, or delete the entry with OpenCode 1. The [OpenCode QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/opencode) and the [OpenCode barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/opencode) show the same step.
+The plugin adds the `qrscan` server and the skill folder to OpenCode's configuration when OpenCode starts. A server or skill you already named the same way is left as it is. To remove it, run `opencode plugin remove github:qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.3` with OpenCode 2, or delete the entry with OpenCode 1. The [OpenCode QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/opencode) and the [OpenCode barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/opencode) show the same step.
 
 ### Devin
 
@@ -299,11 +299,11 @@ Devin installs the default branch and reads `.claude-plugin/plugin.json` and `.m
 ### Factory
 
 ```sh
-droid plugin marketplace add 'qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.2'
-droid plugin install qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user
+droid plugin marketplace add 'qrcode-ai-com/qrcode-barcode-scanner-plugin#v0.3.3'
+droid plugin install qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.3 --scope user
 ```
 
-Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.2`, so the install names that marketplace. `--scope user` installs the plugin for all your projects. `--scope project` installs it in the current project only, in its `.factory/settings.json`. droid 1.20.0 scanned with either scope.
+Factory reads the Claude Code files of the repository. A pinned source registers as `qrcode-barcode-scanner-plugin@v0.3.3`, so the install names that marketplace. `--scope user` installs the plugin for all your projects. `--scope project` installs it in the current project only, in its `.factory/settings.json`. droid 1.20.0 scanned with either scope.
 
 `droid exec` needs no Factory sign-in when it runs a [custom model with your own key](https://docs.factory.com/model-independence/byok). The `droid plugin` commands did not ask for one either. The interactive `droid` screen may ask you to sign in through a browser.
 
@@ -311,17 +311,17 @@ To let the server read files by path, set `QRSCAN_MCP_ALLOWED_DIRECTORIES` in dr
 
 droid 1.20.0 records the pinned marketplace with auto-update on. Factory's [plugin documentation](https://docs.factory.com/harness/plugins) says to turn it on or off in the Marketplaces tab of `/plugins`, in the interactive `droid` screen.
 
-To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.2 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.2`. For a project install, use `--scope project` in the first command. droid 1.20.0 then leaves two empty folders: `~/.factory/plugins/cache/qrcode-barcode-scanner-plugin@v0.3.2-ce31377f7511/` and the `qrcode-barcode-scanner-e08631c4df56/` folder inside it. You can delete them. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
+To remove it, run `droid plugin uninstall qrcode-barcode-scanner@qrcode-barcode-scanner-plugin@v0.3.3 --scope user`, then `droid plugin marketplace remove qrcode-barcode-scanner-plugin@v0.3.3`. For a project install, use `--scope project` in the first command. droid 1.20.0 then leaves two empty folders under `~/.factory/plugins/cache/`, the marketplace's and the plugin's inside it. For `v0.3.2` they were `qrcode-barcode-scanner-plugin@v0.3.2-ce31377f7511/` and `qrcode-barcode-scanner-e08631c4df56/`. You can delete them. The [Factory QR code guide](https://qrcode-ai.com/en-US/qr-code-scanner/integrations/factory-droid) and the [Factory barcode guide](https://qrcode-ai.com/en-US/barcode-scanner/integrations/factory-droid) cover Droid.
 
 ### Amp
 
 An Amp plugin is a TypeScript file, and this repository ships none, so the skill and the server are added separately. Clone the release tag, copy the skill into Amp's skill folder for this machine, then add the server:
 
 ```sh
-git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.3 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 mkdir -p ~/.config/agents/skills
 cp -R qrcode-barcode-scanner-plugin/skills/qrcode-barcode-scanner ~/.config/agents/skills/
-amp mcp add qrscan -- npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3
+amp mcp add qrscan -- npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4
 ```
 
 `amp mcp add` writes this entry to `~/.config/amp/settings.json`. You can also add it there yourself:
@@ -331,7 +331,7 @@ amp mcp add qrscan -- npx --yes --ignore-scripts @qrcode-ai-com/qrcode-barcode-s
   "amp.mcpServers": {
     "qrscan": {
       "command": "npx",
-      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"]
+      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"]
     }
   }
 }
@@ -345,7 +345,7 @@ Continue's documentation describes MCP servers but no skill folder, so Continue 
 
 ```yaml
 name: QR Code and Barcode Scanner
-version: 0.3.3
+version: 0.3.4
 schema: v1
 mcpServers:
   - name: qrscan
@@ -354,7 +354,7 @@ mcpServers:
     args:
       - --yes
       - --ignore-scripts
-      - "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"
+      - "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"
     env:
       QRSCAN_MCP_ALLOWED_DIRECTORIES: /absolute/path/to/images
     connectionTimeout: 60000
@@ -372,7 +372,7 @@ Where it goes depends on the Continue you use:
 Zed reads skills from `~/.agents/skills/` and MCP servers from `context_servers` in its settings. Clone the release tag and copy the skill:
 
 ```sh
-git clone --depth 1 --branch v0.3.2 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
+git clone --depth 1 --branch v0.3.3 https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin
 mkdir -p ~/.agents/skills
 cp -R qrcode-barcode-scanner-plugin/skills/qrcode-barcode-scanner ~/.agents/skills/
 ```
@@ -384,7 +384,7 @@ Then add the server to `~/.config/zed/settings.json`, which the `zed: open setti
   "context_servers": {
     "qrscan": {
       "command": "npx",
-      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"]
+      "args": ["--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"]
     }
   }
 }
@@ -473,9 +473,9 @@ The engine repository checks this folder on every change with [its own workflow]
 
 ## License
 
-The files of this plugin are project source under the MIT License, in [LICENSE](LICENSE). The skill files are copied from skill 0.2.1, which is MIT. The skill archive published as 0.2.0 keeps the MIT-0 license it shipped with.
+The files of this plugin are project source under the MIT License, in [LICENSE](LICENSE). The skill files are copied from skill 0.2.2, which is MIT. The skill archive published as 0.2.0 keeps the MIT-0 license it shipped with.
 
-What the plugin starts keeps its own published license. The MCP server 0.3.3 that release `v0.3.2` starts, the MCP server 0.3.2 that release `v0.3.1` starts and the engine 0.12.0 that npm downloads are MIT too. The earlier MCP server 0.3.1 and engine 0.11.0, which plugin `v0.3.0` starts, keep AGPL-3.0-or-later. Installing this MIT plugin does not change their terms. Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) before you redistribute an installation.
+What the plugin starts keeps its own published license. The MCP server 0.3.4 that release `v0.3.3` starts and the engine 0.12.1 it downloads are MIT too, and so are the MCP server 0.3.3 that release `v0.3.2` starts, the MCP server 0.3.2 that release `v0.3.1` starts and the engine 0.12.0 they download. The earlier MCP server 0.3.1 and engine 0.11.0, which plugin `v0.3.0` starts, keep AGPL-3.0-or-later. Installing this MIT plugin does not change their terms. Read the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md) before you redistribute an installation.
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. Client names belong to their owners and imply no endorsement.
 
