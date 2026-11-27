@@ -46,7 +46,7 @@ To prepare a saved image for the installed Arch command, use the [QR code genera
 
 `qrcode-barcode-scanner-bin` installs the upstream `qrscan` executable for
 x86_64 Arch Linux. The recipe verifies the official
-[0.12.1 release archive](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1)
+[0.12.2 release archive](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.2)
 and keeps the executable bytes unchanged. It conflicts with other packages
 providing `qrscan`, including the unrelated AUR `qrscan-bin`.
 
@@ -60,7 +60,7 @@ makepkg -si
 ```
 
 Check `qrscan --version` and scan the
-[mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/fixtures/symbology/mixed-code128-qr.png)
+[mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/fixtures/symbology/mixed-code128-qr.png)
 to exercise both formats.
 
 <p align="center">
@@ -77,8 +77,8 @@ and the place where the engine measured it.
 
 The recipe is licensed under [0BSD](LICENSE). The executable retains its
 MIT license, notices and build metadata. The release provides the
-[corresponding source archive](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-source.tar.gz)
-and [SHA-256 manifest](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-SHA256SUMS).
+[corresponding source archive](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.2/qrcode-barcode-scanner-cli-0.12.2-source.tar.gz)
+and [SHA-256 manifest](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.2/qrcode-barcode-scanner-cli-0.12.2-SHA256SUMS).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

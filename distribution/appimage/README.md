@@ -44,7 +44,7 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a local label to scan with the downloaded AppImage, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-This recipe wraps the official scanner 0.12.1 GNU/Linux CLI in an AppImage: one file that a user
+This recipe wraps the official scanner 0.12.2 GNU/Linux CLI in an AppImage: one file that a user
 downloads, marks executable and runs as `qrscan`, with nothing to install. The executable inside
 stays byte-identical to the published `qrscan` on x86_64 and aarch64. The file also carries the
 licences, the notices and the pointer to the corresponding source.
@@ -66,8 +66,8 @@ Use a GNU/Linux machine of the architecture you build for, with `bash`, `coreuti
 
 | File | From |
 | --- | --- |
-| `qrcode-barcode-scanner-cli-0.12.1-SHA256SUMS` | the [engine release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1) |
-| `qrcode-barcode-scanner-cli-0.12.1-<target>.tar.gz` | the same release, `x86_64-unknown-linux-gnu` or `aarch64-unknown-linux-gnu` |
+| `qrcode-barcode-scanner-cli-0.12.2-SHA256SUMS` | the [engine release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.2) |
+| `qrcode-barcode-scanner-cli-0.12.2-<target>.tar.gz` | the same release, `x86_64-unknown-linux-gnu` or `aarch64-unknown-linux-gnu` |
 | `appimagetool-<machine>.AppImage` | [appimagetool 1.9.1](https://github.com/AppImage/appimagetool/releases/tag/1.9.1) |
 | `runtime-<architecture>` | [type2-runtime 20251108](https://github.com/AppImage/type2-runtime/releases/tag/20251108) |
 
@@ -77,8 +77,8 @@ bash distribution/appimage/build.sh x86_64 /path/to/inputs out
 ```
 
 `build.sh` pins the SHA-256 of the four inputs and of the executable, and stops when one differs.
-It compiles nothing. It writes `out/qrcode-barcode-scanner-0.12.1-x86_64.AppImage` and prints its
-SHA-256. Every entry of the file tree gets the commit time of the tag `v0.12.1`, and the workflow
+It compiles nothing. It writes `out/qrcode-barcode-scanner-0.12.2-x86_64.AppImage` and prints its
+SHA-256. Every entry of the file tree gets the commit time of the tag `v0.12.2`, and the workflow
 checks that a second build gives the same file.
 
 ## What the file holds
@@ -107,7 +107,7 @@ itself into a temporary directory and runs from there:
 APPIMAGE_EXTRACT_AND_RUN=1 ./qrcode-barcode-scanner-0.12.1-x86_64.AppImage --version
 ```
 
-Download the [mixed fixture](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.1/fixtures/symbology/mixed-code128-qr.png)
+Download the [mixed fixture](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.2/fixtures/symbology/mixed-code128-qr.png)
 as `mixed-code128-qr.png`. The report of each profile contains the QR URL
 `https://qrc-ai.com/76xMa` and the Code 128 value `STOCK-4827`. The scanner runs on this computer
 and opens no link.

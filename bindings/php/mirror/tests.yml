@@ -21,9 +21,9 @@ defaults:
     shell: bash
 
 env:
-  RELEASE_URL: https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.12.1
-  RELEASE_VERSION: 0.12.1
-  SUMS_SHA256: 9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055
+  RELEASE_URL: https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/download/v0.12.2
+  RELEASE_VERSION: 0.12.2
+  SUMS_SHA256: ec20e99d1b1d26208afe4dec78625a0cc5cfafd4aef7bd1e4129ab3bbd98e573
 
 jobs:
   tests:

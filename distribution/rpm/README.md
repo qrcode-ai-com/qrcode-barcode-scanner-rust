@@ -44,7 +44,7 @@ The [QR code scanner](https://qrcode-ai.com/en-US/qr-code-scanner) and [barcode 
 
 To prepare a known label for the installed Fedora command, use the [QR code generator](https://qrcode-ai.com/en-US/qr-code-generator) or the [barcode generator](https://qrcode-ai.com/en-US/barcode-generator). Keep the original payload with the exported image so that you can compare the scan result with the value you intended to encode.
 
-This recipe packages the official scanner 0.12.1 GNU/Linux CLI for Fedora.
+This recipe packages the official scanner 0.12.2 GNU/Linux CLI for Fedora.
 The executable stays byte-identical to the published `qrscan` on x86_64 and
 aarch64. The package includes the licenses, notices, and source reference.
 
@@ -52,7 +52,7 @@ aarch64. The package includes the licenses, notices, and source reference.
 
 Use Fedora 44 with `rpm-build`, `coreutils`, `gzip`, and `tar` installed.
 Download both GNU/Linux archives and the corresponding source archive from
-the [engine release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1).
+the [engine release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.2).
 Place the three files under a fresh RPM top directory and build on the desired
 architecture:
 
@@ -65,7 +65,7 @@ rpmbuild -ba --define "_topdir $PWD/rpm-build" distribution/rpm/qrcode-barcode-s
 The spec pins the SHA-256 of all three inputs and verifies the selected
 executable before packaging. The source RPM includes the same three archives
 and spec for an offline rebuild. The binary RPM contains a link to the
-[corresponding source](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-source.tar.gz).
+[corresponding source](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.2/qrcode-barcode-scanner-cli-0.12.2-source.tar.gz).
 
 ### Rebuild the published files
 
@@ -101,7 +101,7 @@ sudo dnf install "./qrcode-barcode-scanner-0.12.1-1.fc44.$(uname -m).rpm"
 qrscan --version
 ```
 
-Download the [mixed fixture](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.1/fixtures/symbology/mixed-code128-qr.png)
+Download the [mixed fixture](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.2/fixtures/symbology/mixed-code128-qr.png)
 as `mixed-code128-qr.png`. The report for each profile contains the QR URL
 `https://qrc-ai.com/76xMa` and the Code 128 value `STOCK-4827`. The CLI runs
 locally.
