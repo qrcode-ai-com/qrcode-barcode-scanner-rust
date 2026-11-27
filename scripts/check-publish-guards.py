@@ -472,23 +472,23 @@ GUARD = "startsWith(github.ref, 'refs/tags/v')"
 CONCURRENCY = "publish-${{ github.workflow }}-${{ github.ref }}"
 OCI_JOB = ("oci-publish.yml", "publish")
 OCI_GUARD = "startsWith(github.ref, 'refs/tags/oci-v')"
-# The frozen release BOM in distribution/docker/v0.12/: its native producer run, the
+# The frozen release BOM in distribution/docker/v0.12.1/: its native producer run, the
 # repository that ran it, its packaging revision and one official artifact per platform.
-OCI_RUN = "45180020718"
+OCI_RUN = "45913692147"
 OCI_REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
-OCI_PACKAGING = "6b03e6aca92b3186d4ecddfee3baf5c2a369fd3e"
-OCI_ARTIFACTS = {"amd64": "14820846459", "arm64": "14821475784"}
-OCI_GATE_RUN = 'python3 distribution/docker/v0.12/publish.py gate --ref "$GITHUB_REF"'
+OCI_PACKAGING = "cb120cd59d59346a6204df6217ad8c45f11e9b52"
+OCI_ARTIFACTS = {"amd64": "15160828462", "arm64": "15161600741"}
+OCI_GATE_RUN = 'python3 distribution/docker/v0.12.1/publish.py gate --ref "$GITHUB_REF"'
 OCI_REINSPECT_RUN = '\n'.join((
     "set -euo pipefail",
-    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture amd64',
-    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture arm64',
+    'python3 distribution/docker/v0.12.1/publish.py inspect --artifacts "$PWD/qualified" --architecture amd64',
+    'python3 distribution/docker/v0.12.1/publish.py inspect --artifacts "$PWD/qualified" --architecture arm64',
 ))
 OCI_INSPECT_RUN = '\n'.join((
     "set -euo pipefail",
-    'python3 distribution/docker/v0.12/publish.py inspect --artifacts "$PWD/qualified" --architecture "$ARCHITECTURE" --load --native',
-    'python3 distribution/docker/v0.12/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png --expected-platform "linux/$ARCHITECTURE" --packaging-revision ' + OCI_PACKAGING + ' --native --receipt "inspected/$ARCHITECTURE.json"',
-    'python3 distribution/docker/v0.12/publish.py record-consumer --architecture "$ARCHITECTURE" --receipt "inspected/$ARCHITECTURE.json"',
+    'python3 distribution/docker/v0.12.1/publish.py inspect --artifacts "$PWD/qualified" --architecture "$ARCHITECTURE" --load --native',
+    'python3 distribution/docker/v0.12.1/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png --expected-platform "linux/$ARCHITECTURE" --packaging-revision ' + OCI_PACKAGING + ' --native --receipt "inspected/$ARCHITECTURE.json"',
+    'python3 distribution/docker/v0.12.1/publish.py record-consumer --architecture "$ARCHITECTURE" --receipt "inspected/$ARCHITECTURE.json"',
 ))
 GATE_RUN = 'python3 scripts/package-inspect.py versions --tag "$GITHUB_REF" --strict --quiet'
 SHA = re.compile(r"[0-9a-f]{40}")

@@ -201,9 +201,11 @@ paths = [
   ".github/workflows/http-service.yml",
 ]
 
+# The publish guard names a release only through the image's frozen constants: the recipe folder
+# whose scripts oci-publish.yml may run. They move by hand, with that workflow.
 [[file]]
 held = "the container image, under its own tag"
-paths = [".github/workflows/distribution-checks.yml"]
+paths = [".github/workflows/distribution-checks.yml", "scripts/check-publish-guards.py"]
 
 [[file]]
 held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
