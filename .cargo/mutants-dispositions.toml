@@ -132,6 +132,26 @@
 # listing only: no mutant was run for this paragraph, and the next deep-checks
 # run is its measure. Still 46 equivalent · 13 timeout-structural · 1 debt.
 
+# Extended (2026-11-27) after deep-checks run 45939517883, the first to judge
+# the margin measure of score/margin.rs and the probe schedule of
+# score/mod.rs: 74 mutants came back missed with no disposition, 67 of them
+# in the margin measure. Four are equivalent and argued below; a test now
+# catches each of the others, or the code it mutated is gone. The measure's
+# module tests pin its thresholds at their boundary, the finder and format
+# readings, which sampling stands on a tie, and the direction, the order and
+# the budget of a registration's moves: the side of a quad, the finder values
+# and the budget became functions of their own for it, and a count of sampled
+# grids that the loop's own bounds kept it from reaching is gone. The rMQR
+# pass is read under a set and on a light-on-dark symbol, a reader is probed
+# for a symbology it does not read, and a walk that ends on a rung is checked
+# for the rung's own pairs. In rxing_engine.rs the condition of the general
+# pass lost a disjunct its other operand implies, which removes two of the
+# mutants and moves the file's two entries down two lines. Measured with
+# cargo-mutants on the tree of the commit that carries this paragraph: the
+# 241 mutants of score/margin.rs against its module tests (230 caught, 8
+# unviable, the 3 argued here), the others by name against the whole suite.
+# Now 50 equivalent · 13 timeout-structural · 1 debt.
+
 # ── equivalent ──────────────────────────────────────────────────────────────
 
 [[mutant]]
@@ -326,7 +346,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/rxing_engine.rs"
-line = 517
+line = 519
 column = 14
 mutation = "replace match guard measured.is_empty() with false in footprint"
 category = "equivalent"
@@ -337,7 +357,7 @@ reason = """\
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/engine/rxing_engine.rs"
-line = 626
+line = 628
 column = 14
 mutation = "replace match guard n >= 4 with true in location"
 category = "equivalent"
@@ -506,6 +526,50 @@ category = "equivalent"
 reason = """\
   the three-codeword designator `(first & 0x1F) << 16 | bits.take(16)?`: take(16) < 0x10000 \
   fills bits 0-15 only, the shifted prefix bits 16-20 — bit-disjoint, so |, ^ and + agree"""
+
+[[mutant]]
+file = "crates/qrcode-ai-scanner/src/score/margin.rs"
+line = 143
+column = 42
+mutation = "replace + with - in Grid<'_>::value"
+category = "equivalent"
+reason = """\
+  every sampler's offsets are symmetric about zero (0; 0 and ±0.25; 0, ±0.2 and ±0.4), so \
+  subtracting the offset reads the same lattice points with the columns in reverse order, and \
+  the sum of at most 25 samples, each a whole number of at most 255, is exact in f32 in any order"""
+
+[[mutant]]
+file = "crates/qrcode-ai-scanner/src/score/margin.rs"
+line = 144
+column = 39
+mutation = "replace + with - in Grid<'_>::value"
+category = "equivalent"
+reason = """\
+  the row offset of the same lattice: subtracting it reads the same points with the rows in \
+  reverse order, and the sum of whole-number samples is exact in f32 in any order"""
+
+[[mutant]]
+file = "crates/qrcode-ai-scanner/src/score/margin.rs"
+line = 304
+column = 16
+mutation = "replace < with <= in measure"
+category = "equivalent"
+reason = """\
+  a fit is the share of an odd number of modules that read as drawn (three finders of 49 and two \
+  timing lines of one length: 157 to 469 for versions 1 to 40), and the other polarity's is one \
+  minus it. A share of an odd count is at least 1/938 from one half, far beyond what f32 rounds \
+  away, so neither fit ever equals MIN_FIT"""
+
+[[mutant]]
+file = "crates/qrcode-ai-scanner/src/score/mod.rs"
+line = 176
+column = 47
+mutation = "replace == with != in Pair::slot"
+category = "equivalent"
+reason = """\
+  a slot is only an index into Schedule::trials, which every read and write reaches through this \
+  function: with the comparison reversed the two readers of a variant swap places, the pairs \
+  still map to different slots, and each trial is found where it was stored"""
 
 [[mutant]]
 file = "crates/qrcode-ai-scanner/src/score/structural.rs"

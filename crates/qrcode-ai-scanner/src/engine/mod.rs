@@ -471,6 +471,28 @@ mod tests {
         assert_eq!(outcome.panics, 0);
     }
 
+    #[cfg(feature = "engine-rqrr")]
+    #[test]
+    fn a_reader_probed_for_a_symbology_it_does_not_read_accepts_nothing() {
+        // rqrr reads QR Code alone: probed for another symbology over a QR
+        // Code it reads, it makes no pass
+        let (luma, _) = qr_luma(b"read by rqrr", qrcode::EcLevel::M, 6);
+        let any = |_: &RawDetection| true;
+        assert!(
+            probe(&luma, Symbology::QrCode, EngineKind::Rqrr, &any).accepted,
+            "precondition: rqrr reads the symbol"
+        );
+        for symbology in [
+            Symbology::MicroQrCode,
+            Symbology::DataMatrix,
+            Symbology::Code128,
+        ] {
+            let made = probe(&luma, symbology, EngineKind::Rqrr, &any);
+            assert!(!made.accepted, "{symbology:?}");
+            assert_eq!(made.panics, 0, "{symbology:?}");
+        }
+    }
+
     #[cfg(feature = "engine-rxing")]
     #[test]
     fn non_qr_completion_does_not_repeat_either_qr_engine() {

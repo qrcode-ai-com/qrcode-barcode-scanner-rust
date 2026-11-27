@@ -2674,6 +2674,45 @@ mod tests {
         (calibrated, walk.spent())
     }
 
+    /// A walk that ends on a deep rung remembers the pass that read the
+    /// rung's image as the rung's own: the pairs of the cell as built and of
+    /// its binarization read the base alone, which no class reads here.
+    #[test]
+    fn a_walk_that_ends_on_a_rung_remembers_the_rungs_own_pairs() {
+        let (luma, detection, key) = kneed_example();
+        let base = transform::downscale_to(&luma, STRESS_BASE_SIDE);
+        let cancel = CancelToken::new();
+        let mut walk = Bound::new(&cancel, None);
+        let calibrated =
+            CellProbe::calibrate_within(&base, &key, detection.symbology, &mut walk).unwrap();
+        assert!(
+            matches!(
+                calibrated,
+                Calibrated::Class(CellProbe { rung: Some(_), .. })
+            ),
+            "precondition: only a rung reads the base"
+        );
+        let read = |variant: Variant| {
+            engine::probe_readers(detection.symbology)
+                .iter()
+                .filter_map(|reader| {
+                    let pair = Pair {
+                        variant,
+                        reader: *reader,
+                    };
+                    walk.schedule.trials[pair.slot()]
+                })
+                .map(|trial| trial.read)
+                .collect::<Vec<bool>>()
+        };
+        assert!(read(Variant::Rung).contains(&true), "the rung's pass");
+        for variant in [Variant::Otsu, Variant::Plain] {
+            let passes = read(variant);
+            assert!(!passes.is_empty(), "{variant:?}: the base was tried");
+            assert!(!passes.contains(&true), "{variant:?}: the base reads");
+        }
+    }
+
     /// The probe steps a complete judgment needs, derived independently of
     /// `judge`: the calibration walk (to a class, or through every class when
     /// none reads the base), then every PLANNED cell — a ramp runs through
