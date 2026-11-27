@@ -40,7 +40,7 @@ To make a test image with a known payload, use the [QR code generator](https://q
 
 - `glama.json`: the Glama schema and the maintainer, the GitHub account `ThibautMelen`.
 - `Dockerfile`: the container that Glama builds to start the server and read its tools.
-- `package.json` and `package-lock.json`: the one dependency, the MCP server 0.3.3, and the exact packages it installs.
+- `package.json` and `package-lock.json`: the one dependency, the MCP server 0.3.4, and the exact packages it installs.
 - `SOURCE.json`, in the staged repository: the engine commit that the files come from and the SHA-256 of each file.
 
 ## Run it
@@ -54,7 +54,7 @@ The container needs no network and writes nothing. It has no allowed directory, 
 
 ## How it is tested
 
-The workflow `.github/workflows/integration-glama.yml` of the [engine repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) stages this folder, builds the container on amd64 and arm64 runners, and starts it the way a client would, with no network and a read-only file system. The MCP driver of `distribution/acceptance` lists the tools, calls `scan_image` on the [mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/fixtures/symbology/mixed-code128-qr.png) with the fast, frame and full profiles, and requires both codes in each report. The job then removes the image and checks the receipt. On 24 November 2026, when the folder moved to 0.3.2, the same lockfile installed MCP 0.3.2 and the engine 0.12.0 outside a container, on Node.js 22.22.2, and the driver read both payloads in the three profiles. On 25 November 2026, when it moved to 0.3.3, the same check installed MCP 0.3.3 and read both payloads in the three profiles, and a call that named no profile ran fast.
+The workflow `.github/workflows/integration-glama.yml` of the [engine repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) stages this folder, builds the container on amd64 and arm64 runners, and starts it the way a client would, with no network and a read-only file system. The MCP driver of `distribution/acceptance` lists the tools, calls `scan_image` on the [mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/fixtures/symbology/mixed-code128-qr.png) with the fast, frame and full profiles, and requires both codes in each report. The job then removes the image and checks the receipt. On 24 November 2026, when the folder moved to 0.3.2, the same lockfile installed MCP 0.3.2 and the engine 0.12.0 outside a container, on Node.js 22.22.2, and the driver read both payloads in the three profiles. On 25 November 2026, when it moved to 0.3.3, the same check installed MCP 0.3.3 and read both payloads in the three profiles, and a call that named no profile ran fast. On 27 November 2026, when it moved to 0.3.4, the same check installed MCP 0.3.4 and the engine 0.12.1 and read both payloads in the three profiles, each report naming score contract 6.
 
 ## Publish it
 

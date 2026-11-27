@@ -1,6 +1,6 @@
 {
   "name": "qrcode-barcode-scanner-mcpb-check",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "description": "The official MCPB tool, pinned, that validates the bundle's manifest and resolves its launch command as an MCPB host does",
   "type": "module",

@@ -48,7 +48,7 @@ To make a test image with a known payload, use the [QR code generator](https://q
 
 - `manifest.json`: the MCPB manifest, version 0.3. It names the server, its two tools, its one optional setting, the three platforms and the Node.js range of the server.
 - `server/launch.mjs`: the entry point. It turns the folders the host passes into the server's `QRSCAN_MCP_ALLOWED_DIRECTORIES`, then starts the published server unchanged.
-- `package.json` and `package-lock.json`: the one dependency, the MCP server 0.3.3, and the eleven packages it installs, each with its registry address and sha512.
+- `package.json` and `package-lock.json`: the one dependency, the MCP server 0.3.4, and the eleven packages it installs, each with its registry address and sha512.
 - `check/`: the consumer that installs a bundle as a host does and drives its server over MCP stdio, with the lockfile of the official MCPB tool 2.1.2 that it uses.
 
 The builder adds the icon (`integrations/vscode/images/icon.png`), `LICENSE.md`, `SOURCE.md`, the engine's third-party notices and the MIT license of the files above.
@@ -89,6 +89,15 @@ gh attestation verify qrcode-barcode-scanner-0.3.1.mcpb --repo qrcode-ai-com/qrc
 
 Its SHA-256 is `f635bab0320483aa592979f6772d3fd53f8cfe542ee59f48528804acb4d2158a`. The tag run [45015236558](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45015236558) built it from commit `1e1e33f4b3e3f711327b5d096e5a71161849cb40` and attested it. When the release was created, on 22 November 2026, a download without signing in had the same digest, `gh attestation verify` passed, and `python3 scripts/build-mcpb-bundle.py verify <file> --revision mcpb-v0.3.1` reported ok. That release was not marked as the latest either. Bundle 0.3.1 holds the MCP server 0.3.1 and the engine 0.11.0, under AGPL-3.0-or-later.
 
+Once the release `mcpb-v0.3.4` is created, it carries `qrcode-barcode-scanner-0.3.4.mcpb` and `qrcode-barcode-scanner-mcpb-0.3.4-SHA256SUMS`, which you check the same way:
+
+```sh
+shasum -a 256 -c qrcode-barcode-scanner-mcpb-0.3.4-SHA256SUMS
+gh attestation verify qrcode-barcode-scanner-0.3.4.mcpb --repo qrcode-ai-com/qrcode-barcode-scanner-rust
+```
+
+Its digest is recorded here when that release exists. Until then, bundle 0.3.4 comes only from your own build. Its server 0.3.4 runs engine 0.12.1, whose reports carry score contract 6; bundle 0.3.3 runs engine 0.12.0 and contract 5. Both run the fast profile when a call names none.
+
 Then open the `.mcpb` file with your MCPB host. Claude for macOS and Windows shows an installation dialog with the extension's setting, and Node.js ships with it. Another host needs Node.js 22.19 or later on line 22, or 24 or later: the range the server declares, which the manifest repeats in `compatibility.runtimes.node`.
 
 To build the bundle yourself instead, follow [Build and check it](#build-and-check-it) below, then open the file you built the same way.
@@ -110,15 +119,15 @@ From the root of the engine repository, with Python 3 and Node.js 22 or 24:
 ```sh
 python3 scripts/build-mcpb-bundle.py --self-test
 python3 scripts/build-mcpb-bundle.py build --out /tmp/qrscan-mcpb
-python3 scripts/build-mcpb-bundle.py verify /tmp/qrscan-mcpb/qrcode-barcode-scanner-0.3.3.mcpb
+python3 scripts/build-mcpb-bundle.py verify /tmp/qrscan-mcpb/qrcode-barcode-scanner-0.3.4.mcpb
 (cd distribution/mcpb/check && npm ci --ignore-scripts)
-node distribution/mcpb/check/consumer.mjs /tmp/qrscan-mcpb/qrcode-barcode-scanner-0.3.3.mcpb \
+node distribution/mcpb/check/consumer.mjs /tmp/qrscan-mcpb/qrcode-barcode-scanner-0.3.4.mcpb \
   fixtures/symbology/mixed-code128-qr.png
 ```
 
 `build` reads the files of this folder at a commit (`HEAD` by default, another with `--revision`), not from the working tree. It downloads the eleven archives, or reads them from `--cache`, and checks each sha512, each license file and each native addon. Then it writes the bundle, its `SHA256SUMS` file and `build-receipt.json`, which records the Python and zlib versions. The entries are sorted, carry fixed modes and the date of the commit in UTC (or `SOURCE_DATE_EPOCH`), so one commit gives the same bytes on any machine and in any time zone. `verify` builds again and compares. The builder uses only the Python standard library. The bundle is about 14 MB and holds about 1,000 files.
 
-For bundle 0.3.1, builds on macOS arm64 (Python 3.14.5, zlib 1.2.12) and on Ubuntu 24.04 (Python 3.12.3, zlib 1.3) gave the same bytes. For 0.3.2, two builds on macOS arm64 (Python 3.14.5, zlib 1.2.12), the second in another time zone and without the download cache, gave the same bytes, and `verify` reported ok. For 0.3.3, the same two builds gave the same bytes, and `verify` reported ok.
+For bundle 0.3.1, builds on macOS arm64 (Python 3.14.5, zlib 1.2.12) and on Ubuntu 24.04 (Python 3.12.3, zlib 1.3) gave the same bytes. For 0.3.2, two builds on macOS arm64 (Python 3.14.5, zlib 1.2.12), the second in another time zone and without the download cache, gave the same bytes, and `verify` reported ok. For 0.3.3, the same two builds gave the same bytes, and `verify` reported ok. For 0.3.4, so did they.
 
 ## How it is tested
 
@@ -127,17 +136,17 @@ The workflow `.github/workflows/mcpb.yml` of the [engine repository](https://git
 - unpacks the bundle with the official MCPB tool and checks its manifest with `mcpb validate`;
 - starts the server from the manifest's `mcp_config`, as a host does, for eight settings: none, empty, one folder, two folders, a folder inherited from the environment, a folder holding the separator, a relative folder and a missing folder;
 - speaks MCP over stdio: `initialize`, then `tools/list`, which offers `scan_file` only when folders are set;
-- calls `scan_image` on the [mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/fixtures/symbology/mixed-code128-qr.png) with the fast, frame and full profiles, and requires both payloads exactly;
+- calls `scan_image` on the [mixed QR and Code 128 sample](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/fixtures/symbology/mixed-code128-qr.png) with the fast, frame and full profiles, and requires both payloads exactly;
 - calls `scan_file` on the sample inside an allowed folder, with the same result, and requires a path outside the folders to be refused.
 
-For bundle 0.3.1, the consumer passed on macOS arm64 with Node.js 22.22.2, and with no network in glibc containers on arm64 and x64 and in a musl container on x64. For 0.3.2, it passed on macOS arm64 with Node.js 22.22.2 before the pull request, with the report naming engine 0.12.0, then on every runner and in both containers with no network in the tag run [45428554322](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45428554322). For 0.3.3, it passed on macOS arm64 with Node.js 22.22.2 before the pull request, with the server naming 0.3.3 and the report engine 0.12.0, then on every runner and in both containers with no network in the tag run [45626377022](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45626377022), and on macOS arm64 again with the file downloaded from the release without signing in.
+For bundle 0.3.1, the consumer passed on macOS arm64 with Node.js 22.22.2, and with no network in glibc containers on arm64 and x64 and in a musl container on x64. For 0.3.2, it passed on macOS arm64 with Node.js 22.22.2 before the pull request, with the report naming engine 0.12.0, then on every runner and in both containers with no network in the tag run [45428554322](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45428554322). For 0.3.3, it passed on macOS arm64 with Node.js 22.22.2 before the pull request, with the server naming 0.3.3 and the report engine 0.12.0, then on every runner and in both containers with no network in the tag run [45626377022](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45626377022), and on macOS arm64 again with the file downloaded from the release without signing in. For 0.3.4, it passed on macOS arm64 with Node.js 22.22.2 before the pull request, with the server naming 0.3.4 and the report engine 0.12.1 and score contract 6.
 
 ## Release it
 
-[RELEASING.md](../../RELEASING.md#mcp-bundle) has the steps. On a tag `mcpb-v0.3.3`, the workflow builds and tests the bundle, then its job `attest`, in the protected environment `mcpb`, builds the tagged commit again, requires the same bytes and records their build provenance in GitHub's attestations. No workflow creates the release: the owner creates `mcpb-v0.3.3` and attaches the attested file and its `SHA256SUMS`. Anyone can then check a downloaded file:
+[RELEASING.md](../../RELEASING.md#mcp-bundle) has the steps. On a tag `mcpb-v0.3.4`, the workflow builds and tests the bundle, then its job `attest`, in the protected environment `mcpb`, builds the tagged commit again, requires the same bytes and records their build provenance in GitHub's attestations. No workflow creates the release: the owner creates `mcpb-v0.3.4` and attaches the attested file and its `SHA256SUMS`. Anyone can then check a downloaded file:
 
 ```sh
-gh attestation verify qrcode-barcode-scanner-0.3.3.mcpb --repo qrcode-ai-com/qrcode-barcode-scanner-rust
+gh attestation verify qrcode-barcode-scanner-0.3.4.mcpb --repo qrcode-ai-com/qrcode-barcode-scanner-rust
 ```
 
 ## Smithery

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.3, the same bytes on every host.
+"""Build the MCP Bundle (.mcpb) of the published MCP server 0.3.4, the same bytes on every host.
 
   build-mcpb-bundle.py build --out DIR [--revision REV] [--cache DIR]
   build-mcpb-bundle.py verify FILE [--revision REV] [--cache DIR]
@@ -8,8 +8,8 @@
 
 An MCP Bundle is a ZIP archive with a manifest.json at its root, which MCPB hosts such as Claude
 Desktop install in one step (https://github.com/modelcontextprotocol/mcpb). This one runs the
-published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.3 with its dependencies, the
-scanner engine 0.12.0 and its six native platform packages included: it installs nothing and
+published npm package @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.4 with its dependencies, the
+scanner engine 0.12.1 and its six native platform packages included: it installs nothing and
 needs no network. Nothing is compiled.
 
 `build` reads distribution/mcpb at REV (HEAD by default) from git, never from the working tree:
@@ -17,7 +17,7 @@ manifest.json, package.json, package-lock.json and server/launch.mjs. Every npm 
 lock is downloaded from its `resolved` address and must match its `integrity` (SHA-512): npm ci
 would install only the host's native package, the bundle carries all six. Each archive is
 extracted unchanged under node_modules/; a link, a device or a path leaving the package is
-refused. Two notice files of the engine's rxing-derived source come from tag v0.12.0, pinned by
+refused. Two notice files of the engine's rxing-derived source come from tag v0.12.1, pinned by
 SHA-256. The bundle adds icon.png (the QR Code AI logo of the VS Code extension), LICENSE.md,
 SOURCE.md and licenses/LICENSE-MIT (this repository's license at REV, for the bundle's own files).
 
@@ -57,17 +57,17 @@ PACKAGE = "distribution/mcpb"
 SCHEMA = "qrscan-mcpb-build/1"
 NAME = "qrcode-barcode-scanner"
 DISPLAY_NAME = "QR Code & Barcode Scanner"
-VERSION = "0.3.3"
+VERSION = "0.3.4"
 TAG_PREFIX = "refs/tags/mcpb-v"
 BUNDLE = f"{NAME}-{VERSION}.mcpb"
 SUMS = f"{NAME}-mcpb-{VERSION}-SHA256SUMS"
 REGISTRY = "https://registry.npmjs.org/"
 ADAPTER = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
-ADAPTER_INTEGRITY = "sha512-vKfTDkQ54hPI16Vt+bWAZa3dbc0O+ocsdpIH+qLyndVe82VhevXBhwhbN2jVwdaF4eu17v4QrVkIq3hPP0Eiiw=="
-ADAPTER_COMMIT = "e6675aa55ddeca25a9883df443d61b27fe9db419"  # tag agents-v0.3.3
+ADAPTER_INTEGRITY = "sha512-p4AtZpveP03uFu4dv0hJOtYNgQWDh6gBJqV1oBFuqbiWskIJeh3ZChtF5nvY7aRh67Yn9fJHMEpT2hhxQkU+rQ=="
+ADAPTER_COMMIT = "54ac7a3b3a4e888a5f55b98ccc0bb80b3711ae1f"  # tag agents-v0.3.4
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
-ENGINE_VERSION = "0.12.0"
-ENGINE_COMMIT = "897dd50cdf27cbde54d408bf65e1ca4622035d42"  # tag v0.12.0
+ENGINE_VERSION = "0.12.1"
+ENGINE_COMMIT = "5b2c580c78b0693e58909f889b66f24fc1c548b1"  # tag v0.12.1
 NATIVES = ("darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu", "linux-x64-musl", "win32-x64-msvc")
 APACHE, MIT = "Apache-2.0", "MIT"
 # Every package the bundle holds: (version, license). The lock may hold no other.
@@ -89,7 +89,7 @@ SERVER_CONFIG = {
 }
 TOOLS = ("scan_image", "scan_file")
 PLATFORMS = ["darwin", "win32", "linux"]
-# The engine's notices for the reader parts derived from rxing (Apache-2.0), at tag v0.12.0.
+# The engine's notices for the reader parts derived from rxing (Apache-2.0), at tag v0.12.1.
 RAW = f"https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/{ENGINE_COMMIT}/"
 NOTICES = (
     (f"licenses/engine-{ENGINE_VERSION}/THIRD-PARTY.md", RAW + "crates/qrcode-ai-scanner/THIRD-PARTY.md",
@@ -601,9 +601,9 @@ def self_test():
         lock, lambda d: d["packages"]["node_modules/zod"].update(resolved="https://example.com/zod-4.6.7.tgz"))}),
         "not the registry's archive")
     refused("an adapter range in package.json", lambda: attempt(**{"package.json": edited(
-        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.3"}))}), "exactly")
+        json.loads(inputs.files["package.json"][0]), lambda d: d["dependencies"].update({ADAPTER: "^0.3.4"}))}), "exactly")
     refused("a manifest at another version", lambda: attempt(**{"manifest.json": edited(
-        manifest, lambda d: d.update(version="0.3.4"))}), "manifest.json version")
+        manifest, lambda d: d.update(version="0.3.5"))}), "manifest.json version")
     refused("the adapter locked under its earlier AGPL license", lambda: attempt(**{"package-lock.json": edited(
         lock, lambda d: d["packages"][f"node_modules/{ADAPTER}"].update(license="AGPL-3.0-or-later"))}),
         f"not {VERSION} (MIT)")
@@ -629,10 +629,10 @@ def self_test():
         refused(label, lambda files=files, links=links: members("x", tarball(files, links)), needle)
     refused("a file twice up to letter case", lambda: members("x", tarball(
         {"package.json": b"{}", "LICENSE": b"a", "license": b"b"})), "twice")
-    refused("the tag of the previous bundle", lambda: gate("refs/tags/mcpb-v0.3.2"), "is not refs/tags/mcpb-v0.3.3")
-    refused("the adapter's tag", lambda: gate("refs/tags/agents-v0.3.3"), "is not refs/tags/mcpb-v0.3.3")
-    refused("the engine's tag", lambda: gate("refs/tags/v0.12.0"), "is not refs/tags/mcpb-v0.3.3")
-    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.3")
+    refused("the tag of the previous bundle", lambda: gate("refs/tags/mcpb-v0.3.3"), "is not refs/tags/mcpb-v0.3.4")
+    refused("the adapter's tag", lambda: gate("refs/tags/agents-v0.3.4"), "is not refs/tags/mcpb-v0.3.4")
+    refused("the engine's tag", lambda: gate("refs/tags/v0.12.1"), "is not refs/tags/mcpb-v0.3.4")
+    refused("a branch", lambda: gate("refs/heads/main"), "is not refs/tags/mcpb-v0.3.4")
     try:
         gate(TAG_PREFIX + VERSION)
     except Refused as error:
