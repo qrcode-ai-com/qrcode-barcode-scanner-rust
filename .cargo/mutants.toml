@@ -68,12 +68,12 @@ test_tool = "nextest"
 #   66:23 / 67:37  `%`→`+` inside is_multiple_of(2): +2 preserves parity
 #     and %2 preserves value mod 2 — same predicate.
 # lib.rs
-#   107:9  `Scanner::builder`→`Default::default()`: the fn body already IS
+#   112:9  `Scanner::builder`→`Default::default()`: the fn body already IS
 #     `ScannerBuilder::default()`, and the `-> ScannerBuilder` return type
 #     pins `Default::default()` to `<ScannerBuilder as Default>::default()`
 #     — the byte-identical call. No test can distinguish them. The killable
-#     builder siblings DISCARD state and ARE caught: `limits` (300:9) and
-#     `profile` (293:9) drop the argument, `build` (307:9) recurses through
+#     builder siblings DISCARD state and ARE caught: `limits` (323:9) and
+#     `profile` (316:9) drop the argument, `build` (330:9) recurses through
 #     `Scanner::default` until the stack overflows. This one alone is a true
 #     equivalent.
 #
@@ -81,11 +81,11 @@ test_tool = "nextest"
 #   Both replace `* 1_000.0` with `/ 1_000.0` in a stage-scope seconds→ms
 #   conversion (`started.elapsed().as_secs_f64() * 1_000.0`). They shrink the
 #   reported `ms` by 1e6 to a smaller-but-still-positive value.
-#   1155:49  Run::rescue_stage `ms`  ·  1338:49  Run::stage `ms`
+#   1218:49  Run::rescue_stage `ms`  ·  1437:49  Run::stage `ms`
 #   The three KILLABLE siblings are caught (ladder_mutant_kills): the `+ 1000`
 #   inflations blow past the `stage.ms <= total_ms` sub-interval invariant
-#   (1338 `+`, and the rescue unit's `rescue.ms < 100`), and the TOTAL-scope
-#   `/ 1000` (1709:59, in Run::finish) drops total below a real stage's ms.
+#   (1437 `+`, and the rescue unit's `rescue.ms < 100`), and the TOTAL-scope
+#   `/ 1000` (1860:59, in Run::finish) drops total below a real stage's ms.
 #   A STAGE-scope `/` has no machine-independent distinguisher: `ms` is a
 #   documented wall-clock field, explicitly excluded from the determinism
 #   contract (lib.rs §Deterministic + the determinism tests skip it), and
@@ -153,7 +153,7 @@ exclude_re = [
     "zigzag\\.rs:33:75: replace < with <= in reserved_cell",
     "zigzag\\.rs:66:23: replace % with \\+ in mask_bit",
     "zigzag\\.rs:67:37: replace % with \\+ in mask_bit",
-    "lib\\.rs:107:9: replace Scanner::builder -> ScannerBuilder with Default::default\\(\\)",
+    "lib\\.rs:112:9: replace Scanner::builder -> ScannerBuilder with Default::default\\(\\)",
     "ladder\\.rs:1218:49: replace \\* with / in Run",
     "ladder\\.rs:1437:49: replace \\* with / in Run",
     "gs1\\.rs:227:15: replace > with >= in split_head",
