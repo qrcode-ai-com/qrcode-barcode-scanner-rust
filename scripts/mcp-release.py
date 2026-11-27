@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner-mcp"
 ENGINE = "@qrcode-ai-com/qrcode-barcode-scanner"
-ENGINE_VERSION = "0.12.1"
+ENGINE_VERSION = "0.12.2"
 MCP_NAME = "io.github.qrcode-ai-com/qrcode-barcode-scanner"
 REPOSITORY = "qrcode-ai-com/qrcode-barcode-scanner-rust"
 REPOSITORY_ID = "1126991539"

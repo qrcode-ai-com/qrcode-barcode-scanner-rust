@@ -57,7 +57,7 @@ TEXT_FIELD = re.compile(r'\\?"text\\?": \\?"')
 OTHER_DIGESTS = {
     FIXTURE_SHA256: "the mixed fixture of tag v0.11.0",
     "1ca488eaa04eec33022cf7211221c888b2ea8b00d3889e68b2ae8e5e066d1f03": "the PyPI sdist of 0.11.0",
-    "9f6d5975c7dca860947d3915877f85607946403fc55349f39b4bc3688448bb6e": "the node:22.22.2-bookworm-slim index",
+    "74b28494d25c04046835cf2ebb354c992129f9c73a633f051090889d14e0b6f6": "the cgr.dev/chainguard/node:latest index",
     "a5d684cec3863e210bbb7f473267dcf07a8321ff57bf17a321af58f5d261ab68": "the WASM of the npm package 0.11.0",
     # The published container image 0.11.0 (distribution/artifacthub/compose-index.py checks them).
     "fd0433f29b0dabd469ce6a8fdcfc7bf6554960301b5bc57b5fca97928fd7cb96": "the image index of tag 0.11.0",

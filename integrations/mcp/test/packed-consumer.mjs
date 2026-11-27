@@ -36,12 +36,12 @@ for (const file of ["README.md", "LICENSE", "scan-report.schema.json", "src/cli.
 copyFileSync(join(here, "readme-consumer.mjs"), join(consumer, "readme-probe.mjs"));
 execFileSync(process.execPath, ["readme-probe.mjs"], { cwd: consumer, encoding: "utf8", timeout: 120_000 });
 copyFileSync(join(consumer, "readme-example-receipt.json"), join(evidence, "readme-example-receipt.json"));
-// Frozen v0.12.1 (5b2c580) schema, byte-for-byte; update with the engine pin.
+// Frozen v0.12.2 (d0fcf8a) schema, byte-for-byte, unchanged since v0.12.1; update with the engine pin.
 const pinnedEngineSchemaSha256 = "7d18991c1ef5467aa47ee7f23b17c456b0debf83e92dd9dc1ee72b72907a0592";
 assert.equal(createHash("sha256").update(readFileSync(join(installed, "scan-report.schema.json"))).digest("hex"), pinnedEngineSchemaSha256, "the packaged schema is the pinned engine release's schema");
 assert.deepEqual(readFileSync(join(installed, "LICENSE")), readFileSync(join(source, "LICENSE")));
 const locked = JSON.parse(readFileSync(join(consumer, "package-lock.json")));
-assert.equal(locked.packages["node_modules/@qrcode-ai-com/qrcode-barcode-scanner"].version, "0.12.1");
+assert.equal(locked.packages["node_modules/@qrcode-ai-com/qrcode-barcode-scanner"].version, "0.12.2");
 assert.equal(locked.packages["node_modules/@modelcontextprotocol/server"].version, "2.3.1");
 assert.equal(locked.packages["node_modules/zod"].version, "4.6.7");
 const oversized = spawn(process.execPath, [join(installed, "src/cli.mjs")], { cwd: consumer, env: { PATH: process.env.PATH }, stdio: ["pipe", "pipe", "pipe"] });
