@@ -1,3 +1,12 @@
+## 0.12.2
+
+* The bundled engine is 0.12.2. A scan does the same work in less time: an
+  attempt that would hand the readers the bytes of an earlier attempt takes
+  that attempt's result, and three loops that run once per pixel spend fewer
+  cycles. Reports do not change, durations aside, and
+  `versions.score_contract` stays 6.
+* Calls written for 0.12.1 compile and behave as before.
+
 ## 0.12.1
 
 * The bundled engine is 0.12.1, whose reports carry `versions.score_contract`

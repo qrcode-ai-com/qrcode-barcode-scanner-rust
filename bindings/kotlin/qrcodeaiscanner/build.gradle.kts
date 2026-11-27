@@ -17,7 +17,7 @@ plugins {
 // The workspace version SSOT is root Cargo.toml [workspace.package].version.
 // This field is the drift point the architecture plan §3 closes with
 // `xtask sync-version` (regex/line edit of `version = "..."` below).
-version = "0.12.1"
+version = "0.12.2"
 // The group of the publication: JitPack serves it as `com.github.qrcode-ai-com`, the default;
 // the Maven Central bundle is written as `io.github.qrcode-ai-com`, with
 // `-PscannerGroup=io.github.qrcode-ai-com` (.github/workflows/maven-central.yml).

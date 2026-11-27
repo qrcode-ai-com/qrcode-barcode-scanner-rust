@@ -30,7 +30,7 @@ test = ["pytest", "jsonschema", "pillow"]
 [project.urls]
 Homepage = "https://qrcode-ai.com/en-US/qr-code-scanner/sdk/python"
 Repository = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust"
-Documentation = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.1/docs"
+Documentation = "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/v0.12.2/docs"
 
 [tool.maturin]
 module-name = "qrcode_barcode_scanner"

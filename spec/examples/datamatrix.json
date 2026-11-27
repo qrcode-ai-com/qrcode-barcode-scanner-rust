@@ -102,12 +102,12 @@
       {
         "stage": "direct",
         "transforms_tried": 1,
-        "ms": 1.460333,
+        "ms": 2.049455,
         "detections_found": 1
       }
     ],
     "engine_panics": 0,
-    "total_ms": 1.508458,
+    "total_ms": 2.0630650000000004,
     "budget_exhausted": false,
     "saturation": {
       "reads": false,
@@ -116,7 +116,7 @@
     }
   },
   "versions": {
-    "scanner": "0.12.1",
+    "scanner": "0.12.2",
     "pipeline": 5,
     "score_contract": 6
   }
