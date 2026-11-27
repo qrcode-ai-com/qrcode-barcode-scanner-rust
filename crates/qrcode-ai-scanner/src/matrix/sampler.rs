@@ -97,29 +97,16 @@ impl Homography {
     reason = "floor() output bounded by the f32 pixel-coordinate domain"
 )]
 pub(crate) fn sample_bilinear(img: &LumaImage, x: f32, y: f32) -> u8 {
-    let (w, h) = (i64::from(img.width()), i64::from(img.height()));
     let x0 = x.floor();
     let y0 = y.floor();
     let fx = x - x0;
     let fy = y - y0;
     let (ix, iy) = (x0 as i64, y0 as i64);
 
-    let fetch = |px: i64, py: i64| -> f32 {
-        if px < 0 || py < 0 || px >= w || py >= h {
-            255.0
-        } else {
-            #[expect(
-                clippy::cast_possible_truncation,
-                clippy::cast_sign_loss,
-                reason = "bounds-checked above against u32-sized dimensions"
-            )]
-            let idx = (py as usize) * (img.width() as usize) + (px as usize);
-            f32::from(img.data()[idx])
-        }
-    };
-
-    let top = fetch(ix, iy) * (1.0 - fx) + fetch(ix + 1, iy) * fx;
-    let bottom = fetch(ix, iy + 1) * (1.0 - fx) + fetch(ix + 1, iy + 1) * fx;
+    let [top_left, top_right, bottom_left, bottom_right] =
+        interior(img, ix, iy).unwrap_or_else(|| bordered(img, ix, iy));
+    let top = f32::from(top_left) * (1.0 - fx) + f32::from(top_right) * fx;
+    let bottom = f32::from(bottom_left) * (1.0 - fx) + f32::from(bottom_right) * fx;
     #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_sign_loss,
@@ -128,6 +115,49 @@ pub(crate) fn sample_bilinear(img: &LumaImage, x: f32, y: f32) -> u8 {
     {
         (top * (1.0 - fy) + bottom * fy).clamp(0.0, 255.0) as u8
     }
+}
+
+/// The pixels at `(ix, iy)`, `(ix + 1, iy)`, `(ix, iy + 1)` and
+/// `(ix + 1, iy + 1)` when all four are in the image, read as two pairs
+/// from two rows. `None` on the border and outside, where [`bordered`]
+/// answers. Almost every sample of a stress warp is an interior one: this
+/// reader spares it the four separate bounds tests of [`bordered`].
+fn interior(img: &LumaImage, ix: i64, iy: i64) -> Option<[u8; 4]> {
+    let (width, height) = (img.width() as usize, img.height() as usize);
+    let (ix, iy) = (usize::try_from(ix).ok()?, usize::try_from(iy).ok()?);
+    if ix + 1 >= width || iy + 1 >= height {
+        return None;
+    }
+    let data = img.data();
+    let top = iy * width + ix;
+    let bottom = top + width;
+    let (top, bottom) = (&data[top..top + 2], &data[bottom..bottom + 2]);
+    Some([top[0], top[1], bottom[0], bottom[1]])
+}
+
+/// The same four pixels with white (255) for each one outside the image.
+#[cold]
+fn bordered(img: &LumaImage, ix: i64, iy: i64) -> [u8; 4] {
+    let (w, h) = (i64::from(img.width()), i64::from(img.height()));
+    let fetch = |px: i64, py: i64| -> u8 {
+        if px < 0 || py < 0 || px >= w || py >= h {
+            255
+        } else {
+            #[expect(
+                clippy::cast_possible_truncation,
+                clippy::cast_sign_loss,
+                reason = "bounds-checked above against u32-sized dimensions"
+            )]
+            let idx = (py as usize) * (img.width() as usize) + (px as usize);
+            img.data()[idx]
+        }
+    };
+    [
+        fetch(ix, iy),
+        fetch(ix + 1, iy),
+        fetch(ix, iy + 1),
+        fetch(ix + 1, iy + 1),
+    ]
 }
 
 /// Module-space sampler over a detected symbol.
@@ -367,5 +397,68 @@ mod tests {
                 "({u},{v}) → ({x},{y}), want ({ex},{ey})"
             );
         }
+    }
+
+    /// Five columns, four rows, every pixel its own value and none white.
+    fn numbered() -> LumaImage {
+        LumaImage::new((10..30).collect(), 5, 4)
+    }
+
+    /// The pixel at a signed position, white outside the image: what both
+    /// readers of the four neighbours answer to.
+    fn pixel_or_white(img: &LumaImage, x: i64, y: i64) -> u8 {
+        let row = usize::try_from(y)
+            .ok()
+            .and_then(|y| img.data().chunks(img.width() as usize).nth(y));
+        usize::try_from(x)
+            .ok()
+            .and_then(|x| row?.get(x).copied())
+            .unwrap_or(255)
+    }
+
+    #[test]
+    fn both_neighbour_readers_answer_the_definition_at_every_position() {
+        let img = numbered();
+        for iy in -2..=5 {
+            for ix in -2..=6 {
+                let want = [
+                    pixel_or_white(&img, ix, iy),
+                    pixel_or_white(&img, ix + 1, iy),
+                    pixel_or_white(&img, ix, iy + 1),
+                    pixel_or_white(&img, ix + 1, iy + 1),
+                ];
+                assert_eq!(bordered(&img, ix, iy), want, "bordered ({ix},{iy})");
+                // the fast reader answers exactly where all four are inside
+                let inside = (0..4).contains(&ix) && (0..3).contains(&iy);
+                assert_eq!(
+                    interior(&img, ix, iy),
+                    inside.then_some(want),
+                    "interior ({ix},{iy})"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_interior_reader_declines_a_position_no_image_holds() {
+        // a coordinate far outside saturates the cast in `sample_bilinear`
+        let img = numbered();
+        assert_eq!(interior(&img, i64::MAX, 1), None);
+        assert_eq!(interior(&img, 1, i64::MAX), None);
+        assert_eq!(interior(&img, i64::MIN, i64::MIN), None);
+    }
+
+    #[test]
+    fn a_sample_blends_the_same_way_inside_and_on_the_border() {
+        let img = numbered();
+        // inside: 16, 17 over 21, 22 → 16.25 over 21.25 → 18.75
+        assert_eq!(sample_bilinear(&img, 1.25, 1.5), 18);
+        // right edge: 19 beside white over 24 beside white, halfway across
+        // and a quarter down → 137 over 139.5 → 137.625
+        assert_eq!(sample_bilinear(&img, 4.5, 1.25), 137);
+        // bottom edge: 26, 27 over white, three quarters down → 26.5 · ¼ + 255 · ¾
+        assert_eq!(sample_bilinear(&img, 1.5, 3.75), 197);
+        // above and left of the image: only the bottom right neighbour is a pixel
+        assert_eq!(sample_bilinear(&img, -0.5, -0.5), 193);
     }
 }
