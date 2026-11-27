@@ -1,0 +1,636 @@
+{
+  "schema": 1,
+  "version": "0.12.1",
+  "tag": "oci-v0.12.1",
+  "repository": "qrcode-ai-com/qrcode-barcode-scanner-rust",
+  "image": "ghcr.io/qrcode-ai-com/qrcode-barcode-scanner",
+  "engine_source": "5b2c580c78b0693e58909f889b66f24fc1c548b1",
+  "producer_source": "cb120cd59d59346a6204df6217ad8c45f11e9b52",
+  "producer_run": 45913692147,
+  "producer_workflow": "distribution-checks.yml",
+  "image_packaging_revision": "cb120cd59d59346a6204df6217ad8c45f11e9b52",
+  "annotations": {
+    "org.opencontainers.image.description": "Local QR code, barcode and matrix-code scanning. Mount input read-only and run qrscan without network access.",
+    "org.opencontainers.image.documentation": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/distribution/docker/v0.12.1",
+    "org.opencontainers.image.licenses": "MIT",
+    "org.opencontainers.image.revision": "5b2c580c78b0693e58909f889b66f24fc1c548b1",
+    "org.opencontainers.image.source": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+    "org.opencontainers.image.title": "QR Code & Barcode Scanner",
+    "org.opencontainers.image.url": "https://qrcode-ai.com/",
+    "org.opencontainers.image.version": "0.12.1"
+  },
+  "index_annotations": {
+    "io.artifacthub.package.keywords": "qr-code,barcode,scanner,qrscan,offline,cli,data-matrix,pdf417",
+    "io.artifacthub.package.license": "MIT",
+    "io.artifacthub.package.logo-url": "https://avatars.githubusercontent.com/u/349890106?v=4",
+    "io.artifacthub.package.maintainers": "[{\"name\":\"QR Code AI\",\"email\":\"contact@qrcode-ai.com\"}]",
+    "io.artifacthub.package.readme-url": "https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/cb120cd59d59346a6204df6217ad8c45f11e9b52/distribution/artifacthub/LISTING.md",
+    "org.opencontainers.image.created": "2026-11-26T23:55:16.711795279Z",
+    "org.opencontainers.image.description": "Local QR code, barcode and matrix-code scanning. Mount input read-only and run qrscan without network access.",
+    "org.opencontainers.image.documentation": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/distribution/docker/v0.12.1",
+    "org.opencontainers.image.licenses": "MIT",
+    "org.opencontainers.image.revision": "5b2c580c78b0693e58909f889b66f24fc1c548b1",
+    "org.opencontainers.image.source": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+    "org.opencontainers.image.title": "QR Code & Barcode Scanner",
+    "org.opencontainers.image.url": "https://qrcode-ai.com/",
+    "org.opencontainers.image.vendor": "QR Code AI",
+    "org.opencontainers.image.version": "0.12.1"
+  },
+  "artifacts": {
+    "amd64": {
+      "id": 15160828462,
+      "name": "qrscan-oci0121-amd64",
+      "official_zip_digest": "sha256:c9f745aab70d4b28a33ff9603e74e54f189ab80a32bd5b339b1b6710e16d3d5e",
+      "files": {
+        "candidate-bom.json": "7caa90e05a7e92168cd41d7f5bc71e9721c57607f36dfb03af7c9084fa3c28c4",
+        "consumer.json": "5d4875d52928fe3e8176773e30662af4a724271ad0c9fef0e8aed2ccc829e876",
+        "image-inspect.json": "0c1fd8ce89185f0ad94567dcdffa1ea1469d907838fa86228ef81e98be85cbd9",
+        "image.tar.gz": "8c63965f0f23464ddd08322557123237737c80d9dbb9b44d4f0bee920842ca42",
+        "preparation.json": "e0f345beed57325ba6e20739dac9a150fc5cb3dc37e6b96aba4ce13bf1ff518a"
+      },
+      "archive_sha256": "8c63965f0f23464ddd08322557123237737c80d9dbb9b44d4f0bee920842ca42",
+      "image_id": "sha256:10c3d364c146d9864a759fe20c38eafa46760fd4c4a8f9406d3d3f644a2db265",
+      "config_size": 4128,
+      "raw_layers": [
+        {
+          "digest": "sha256:1d7b9dd8778ebc4d9bf2f64436dd358640718cb349f5640b33bebaea4ffd62c2",
+          "size": 77946880
+        },
+        {
+          "digest": "sha256:d67762248df031fc0993149f3cc31b9cf6af265ac0e27b77aa30f7a0c1a0b3ba",
+          "size": 4257792
+        },
+        {
+          "digest": "sha256:ca5c04fc1610d45ed50b3cc56001215dd6cfe5f2fb5f09448278ed43976f6b67",
+          "size": 1836032
+        },
+        {
+          "digest": "sha256:4fcdd1615557993261877a1998400cb4e7dd87753d8073f21b0ff7719d3851c6",
+          "size": 35156480
+        },
+        {
+          "digest": "sha256:e94c02f1d575f1d97cbb623a45a632324d9644589d2846559555bdc25af602e7",
+          "size": 5632
+        },
+        {
+          "digest": "sha256:e9344717f55a42bb75f2933be93886da6d90e193597bcdc9017b40735c832dd3",
+          "size": 1536
+        }
+      ],
+      "binary_sha256": "dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de",
+      "consumer_case_exits": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        0,
+        2
+      ],
+      "truth_profiles": [
+        {
+          "id": "qr-v5q-control",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "micro-qr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-matrix",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "aztec",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "pdf417",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "ean13",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "ean8",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "upc-a",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code39",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "itf",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "rmqr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "upc-e",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code93",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "codabar",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-bar",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-bar-expanded",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "telepen",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "maxicode-over-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "fast",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "frame",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-small-data-matrix",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "fast",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "frame",
+          "exit": 0
+        },
+        {
+          "id": "eci4-eci26-equal-text",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "eci899-binary",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "hanzi-gb18030",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-gs1-fnc1",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-matrix-gs1-fnc1",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "jpeg-exif-qr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "jpeg-exif-ean13",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "webp-artistic",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "rescue-occluded",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code93-without-checks",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "data-bar-expanded-illegal-finders",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "valid-empty",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "malformed",
+          "profile": "full",
+          "exit": 2
+        }
+      ]
+    },
+    "arm64": {
+      "id": 15161600741,
+      "name": "qrscan-oci0121-arm64",
+      "official_zip_digest": "sha256:fcdb111ddafc42da3b4450ed1bfe8620802e74f02ef03159a3cebf1c72646b1e",
+      "files": {
+        "candidate-bom.json": "3e6ef7edc3fc205fdec96c30698f67fb4f9fc6312f0030f22d2c0771e07a1d6f",
+        "consumer.json": "aa62d9f1f260d50c0a7b0e2fabddc58a4476db9f351bfcca9d8cc1b4b99cd30a",
+        "image-inspect.json": "2d1d8c7f5c13eb7ac6b7f5af806735a82fb8f4c28d585ec218148a8b22645fc7",
+        "image.tar.gz": "0aba41e638faf5e913fca561aaed9a60ae5048ea867d8502d2bd0d74f4ebb406",
+        "preparation.json": "e0f345beed57325ba6e20739dac9a150fc5cb3dc37e6b96aba4ce13bf1ff518a"
+      },
+      "archive_sha256": "0aba41e638faf5e913fca561aaed9a60ae5048ea867d8502d2bd0d74f4ebb406",
+      "image_id": "sha256:3f2a3ff76be56e6b454a2098ae18288f478ccd852ec3c16f2e8fcefd787710de",
+      "config_size": 4127,
+      "raw_layers": [
+        {
+          "digest": "sha256:c96c411090da09187c55ab267826b3903b542b5c03f1cafa912d60e060e7850c",
+          "size": 100270080
+        },
+        {
+          "digest": "sha256:91657435a2f8b30dae18baa355c3cebb6ed7f199eb6f7fa97c0a5a0631271a47",
+          "size": 3729920
+        },
+        {
+          "digest": "sha256:f25d444db4f93c8a78895de557b7588a72bb9938ed5f8346b09b427a2aaef473",
+          "size": 1836032
+        },
+        {
+          "digest": "sha256:ca9d184c8fb14a7b9a70ca1b629e7b2ddc3dd54c0b47327835fb42717583df5a",
+          "size": 35156480
+        },
+        {
+          "digest": "sha256:32fff7a23f6d3719c9d621c61d9f42d643e3012e48e3e8f5039a688e9af97b55",
+          "size": 5632
+        },
+        {
+          "digest": "sha256:49396589d6b73db9d941e1fe65745925c96b508a16dcfbce37cd89bcda3a5cb5",
+          "size": 1536
+        }
+      ],
+      "binary_sha256": "b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b",
+      "consumer_case_exits": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        0,
+        2
+      ],
+      "truth_profiles": [
+        {
+          "id": "qr-v5q-control",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "micro-qr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-matrix",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "aztec",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "pdf417",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "ean13",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "ean8",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "upc-a",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code39",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "itf",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "rmqr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "upc-e",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code93",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "codabar",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-bar",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-bar-expanded",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "telepen",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "maxicode-over-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "fast",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-code128",
+          "profile": "frame",
+          "exit": 0
+        },
+        {
+          "id": "qr-and-small-data-matrix",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "fast",
+          "exit": 0
+        },
+        {
+          "id": "qr-twins-and-code128",
+          "profile": "frame",
+          "exit": 0
+        },
+        {
+          "id": "eci4-eci26-equal-text",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "eci899-binary",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "hanzi-gb18030",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "qr-gs1-fnc1",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "data-matrix-gs1-fnc1",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "jpeg-exif-qr",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "jpeg-exif-ean13",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "webp-artistic",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "rescue-occluded",
+          "profile": "full",
+          "exit": 0
+        },
+        {
+          "id": "code93-without-checks",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "data-bar-expanded-illegal-finders",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "valid-empty",
+          "profile": "full",
+          "exit": 1
+        },
+        {
+          "id": "malformed",
+          "profile": "full",
+          "exit": 2
+        }
+      ]
+    }
+  },
+  "source_file_sha256": {
+    "distribution/docker/v0.12.1/Dockerfile": "3c9aad78c1be363d250ac3b27a5156075723d625c6415715b70d1aece73f1238",
+    "distribution/docker/v0.12.1/SOURCE.md": "fadb3cd18ae387c9a1d1de9282cc085ad5ec2f12be336e3195f40afbe5a60071",
+    "distribution/docker/v0.12.1/inputs.json": "84f8c64741952ac708dc113f304b80f9202179c7704c558642aea5756f2d4bff",
+    "distribution/docker/v0.12.1/prepare.py": "16540772bdb404efb98dba4cd205ce4612b13fc5877bbd3a7617f5e4a66f094d",
+    "distribution/docker/v0.12.1/record.py": "b832ef686c3f190d6fe416d6496da2b223136332ff00d4d049c5f33ea6967d76",
+    "distribution/docker/v0.12.1/verify.py": "6162df9419ddc4d4a423ccb6ed6ecb02d7d02eccc84e207b2505569dc88fd108",
+    ".github/workflows/distribution-checks.yml": "d9f9068eeb38f3cc4932d435cc83eb888cbfdc3e41601bbe394ab92c6c1015c4",
+    "scripts/consumer_truth.py": "772eb9fd06bdd60fed2302e86a5d3efd49879b62c08e83a631934e2eecb54d75",
+    "fixtures/consumer-truth.json": "a20d08d9da7f5676030503d0ac6bf6af33d3e2f1af3ea00ba2fa64d54fcc80bc"
+  }
+}

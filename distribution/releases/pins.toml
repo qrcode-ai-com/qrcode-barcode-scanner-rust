@@ -201,9 +201,11 @@ paths = [
   ".github/workflows/http-service.yml",
 ]
 
+# The publish guard names a release only through the image's frozen constants: the recipe folder
+# whose scripts oci-publish.yml may run. They move by hand, with that workflow.
 [[file]]
 held = "the container image, under its own tag"
-paths = [".github/workflows/distribution-checks.yml"]
+paths = [".github/workflows/distribution-checks.yml", "scripts/check-publish-guards.py"]
 
 [[file]]
 held = "the Wasmer package, built from the source of tag v0.12.0 and published by the owner: moved when a later source is packaged"
@@ -360,7 +362,7 @@ match = 'so it installs no engine wheel; with engine'
 [[line]]
 held = "the container image, under its own tag"
 paths = ["RELEASING.md", ".github/workflows/oci-publish.yml"]
-match = '`v0\.12\.\d+` Linux CLI archives, MIT|\[0\.12 BOM\]|^Engine source is the commit of the `v0\.12|`0\.12\.\d+` is therefore its own listing tag|needs the exact `oci-v0\.12|`0\.12\.\d+-amd64`|add the tag `0\.12\.\d+` to the repository in the Artifact Hub|the `oci-v0\.12\.\d+` \[tag run\]|under the tag `0\.12\.\d+`, after|preserves the immutable v0\.12'
+match = '`v0\.12\.\d+` Linux CLI archives, MIT|\[0\.12 BOM\]|^Engine source is the commit of the `v0\.12|`0\.12\.\d+` is therefore its own listing tag|needs the exact `oci-v0\.12|`0\.12\.\d+-amd64`|add the tag `0\.12\.\d+` to the repository in the Artifact Hub|the `oci-v0\.12\.\d+` \[tag run\]|under the tag `0\.12\.\d+`, after|preserves the immutable v0\.12|^### OCI \d+\.\d+\.\d+ '
 
 [[line]]
 held = "the HTTP service image, under its own tag http-v: it runs the published engine it pins"
@@ -428,6 +430,11 @@ match = 'release-0\.11\.0\.json|preserves the immutable v0\.11\.0'
 keep = "The runbook names 0.11.0 where it records what was done for that release."
 paths = ["RELEASING.md"]
 match = '0\.11\.0|Engine source remains'
+
+[[line]]
+keep = "The runbook names the image release whose retarget of oci-publish.yml ended the turn of the image before it."
+paths = ["RELEASING.md"]
+match = '^Until the \d+\.\d+\.\d+ retarget, '
 
 [[line]]
 keep = "A package with its own versions: its first one, and an example of a value."
