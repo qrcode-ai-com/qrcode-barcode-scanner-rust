@@ -14,6 +14,12 @@ the `fast` profile, and keeps skill 0.2.1 and engine 0.12.0. The values to send 
 `v0.3.2` and MCP 0.3.3: send them once `v0.3.2` is on the plugin repository, with the commit that
 tag then carries.
 
+Updated on 2026-11-27: `v0.3.2` has been on the plugin repository since 25 November 2026. The
+next release, `v0.3.3`, starts the MCP server 0.3.4 and carries skill 0.2.2, both on the MIT
+engine 0.12.1, whose reports carry score contract 6. The values to send below now name `v0.3.3`
+and MCP 0.3.4: send them once `v0.3.3` is on the plugin repository, with the commit that tag then
+carries.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -37,13 +43,13 @@ Mechanism: no form and no pull request. The gallery indexes npm packages that ca
 
 ## What the listing needs
 
-A first npm publication of `@qrcode-ai-com/qrcode-barcode-scanner-plugin` 0.3.2 by the owner.
+A first npm publication of `@qrcode-ai-com/qrcode-barcode-scanner-plugin` 0.3.3 by the owner.
 Publishing is outside what this preparation may do, and the scope's npm account needs the owner's
 OTP. No publish workflow exists for this package in either repository.
 
 If the owner decides to publish:
 
-1. From a clean clone of `qrcode-ai-com/qrcode-barcode-scanner-plugin` at tag `v0.3.2`, check the
+1. From a clean clone of `qrcode-ai-com/qrcode-barcode-scanner-plugin` at tag `v0.3.3`, check the
    file list with `npm pack --dry-run`.
 2. Run `npm publish --access public` and enter the OTP.
 3. Optionally, on npmjs.com, add a trusted publisher for a future release workflow so that later

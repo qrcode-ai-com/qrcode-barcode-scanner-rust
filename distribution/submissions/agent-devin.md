@@ -14,6 +14,12 @@ the `fast` profile, and keeps skill 0.2.1 and engine 0.12.0. The values to send 
 `v0.3.2` and MCP 0.3.3: send them once `v0.3.2` is on the plugin repository, with the commit that
 tag then carries.
 
+Updated on 2026-11-27: `v0.3.2` has been on the plugin repository since 25 November 2026. The
+next release, `v0.3.3`, starts the MCP server 0.3.4 and carries skill 0.2.2, both on the MIT
+engine 0.12.1, whose reports carry score contract 6. The values to send below now name `v0.3.3`
+and MCP 0.3.4: send them once `v0.3.3` is on the plugin repository, with the commit that tag then
+carries.
+
 ## Live route
 
 | Read (UTC) | URL | HTTP | Finding |
@@ -74,7 +80,7 @@ PR body (their template):
 Adds QR Code & Barcode Scanner as an optional third-party plugin, pinned to commit
 f37ab720795a7a15f27d5a00c302afdb321b9b3d of qrcode-ai-com/qrcode-barcode-scanner-plugin. It reads
 QR codes and barcodes in local images through a skill and a local MCP server pinned to
-@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3. Scanning runs on the user's computer and needs no
+@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4. Scanning runs on the user's computer and needs no
 credential.
 
 `python3 scripts/validate.py --fix` and `python3 scripts/validate.py --fetch` pass. Installed with

@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const ID = "qrcode-barcode-scanner";
 const SERVER = "qrscan";
-const LAUNCH = ["npx", "--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3"];
+const LAUNCH = ["npx", "--yes", "--ignore-scripts", "@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4"];
 const SKILLS = join(dirname(fileURLToPath(import.meta.url)), "..", "skills");
 const SKILL_FILE = join(SKILLS, ID, "SKILL.md");
 
