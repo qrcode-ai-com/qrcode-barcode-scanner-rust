@@ -1,6 +1,6 @@
 {
   "name": "@qrcode-ai-com/qrcode-barcode-scanner-mcp",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Local MCP server for QR code and barcode image scanning, preserved payload bytes and QR scannability reports",
   "type": "module",
   "license": "MIT",
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.3.1",
-    "@qrcode-ai-com/qrcode-barcode-scanner": "0.12.1",
+    "@qrcode-ai-com/qrcode-barcode-scanner": "0.12.2",
     "zod": "4.6.7"
   },
   "devDependencies": {
