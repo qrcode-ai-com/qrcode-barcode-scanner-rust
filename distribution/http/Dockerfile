@@ -1,4 +1,4 @@
-# The QR Code & Barcode Scanner HTTP service. It installs the published engine 0.12.0 from npm,
+# The QR Code & Barcode Scanner HTTP service. It installs the published engine 0.12.1 from npm,
 # pinned with its six native packages by package-lock.json, compiles nothing and serves
 # server.mjs as a non-root user. The native engine comes from its linux-x64-gnu or
 # linux-arm64-gnu package, so the base is glibc (Debian). npm reaches the registry while the
@@ -7,8 +7,8 @@ FROM node:22.22.2-bookworm-slim@sha256:9f6d5975c7dca860947d3915877f85607946403fc
 
 ARG SOURCE_REVISION=""
 LABEL org.opencontainers.image.title="QR Code & Barcode Scanner HTTP service" \
-      org.opencontainers.image.description="Scan QR codes and barcodes over HTTP with the open-source scanner engine 0.12.0. Images are scanned in memory and never stored." \
-      org.opencontainers.image.version="0.1.2" \
+      org.opencontainers.image.description="Scan QR codes and barcodes over HTTP with the open-source scanner engine 0.12.1. Images are scanned in memory and never stored." \
+      org.opencontainers.image.version="0.1.3" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust" \
       org.opencontainers.image.url="https://qrcode-ai.com/" \
@@ -26,7 +26,7 @@ WORKDIR /opt/qrscan-http
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts \
     && npm cache clean --force \
-    && test "$(node -p 'require("@qrcode-ai-com/qrcode-barcode-scanner/package.json").version')" = 0.12.0
+    && test "$(node -p 'require("@qrcode-ai-com/qrcode-barcode-scanner/package.json").version')" = 0.12.1
 # SOURCE.json names the engine commit this tree was generated from; the service names it as its source.
 COPY server.mjs LICENSE LICENSE-NOTES.md SOURCE.json* ./
 COPY licenses/ ./licenses/

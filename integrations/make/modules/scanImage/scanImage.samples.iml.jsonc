@@ -15,5 +15,5 @@
   "score": null,
   "hints": [],
   "trace": { "engine_panics": 0, "budget_exhausted": false },
-  "versions": { "scanner": "0.12.0", "pipeline": 5, "score_contract": 5 }
+  "versions": { "scanner": "0.12.1", "pipeline": 5, "score_contract": 6 }
 }

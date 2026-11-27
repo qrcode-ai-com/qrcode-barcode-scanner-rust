@@ -169,7 +169,7 @@ describe("what the service refuses before a scan", () => {
   });
 
   test("another engine version is refused at start", () => {
-    assert.throws(() => createScanServer({ engine: { version: () => "0.11.0", scan: engine.scan }, source }), /0\.12\.0 is required/);
+    assert.throws(() => createScanServer({ engine: { version: () => "0.12.0", scan: engine.scan }, source }), /0\.12\.1 is required/);
   });
 
   test("the source record names the exact commit, or main when there is none", () => {
@@ -208,7 +208,7 @@ describe("what the service refuses before a scan", () => {
   });
 
   test("uploads past their slots are refused, and an engine error about its options is the server's", async () => {
-    const failing = { version: () => "0.12.0", scan: async () => { throw new Error("[QRS-006] budgetMs out of range"); } };
+    const failing = { version: () => "0.12.1", scan: async () => { throw new Error("[QRS-006] budgetMs out of range"); } };
     const server = createScanServer({ engine: failing, limits: limitsFromEnvironment({ QRSCAN_HTTP_MAX_CONCURRENT: "1" }), source });
     const base = await listen(server);
     const held = [];
@@ -237,7 +237,7 @@ describe("what the service refuses before a scan", () => {
   test("a scan that names no mode runs fast, and every scan names its mode", async () => {
     assert.equal(DEFAULT_PROFILE, "fast");
     const calls = [];
-    const recording = { version: () => "0.12.0", scan: async (bytes, options) => { calls.push(options); return { detections: [] }; } };
+    const recording = { version: () => "0.12.1", scan: async (bytes, options) => { calls.push(options); return { detections: [] }; } };
     const server = createScanServer({ engine: recording, limits: limitsFromEnvironment({}), budgetScale: 2, source });
     const base = await listen(server);
     try {
@@ -269,7 +269,7 @@ describe("what the service refuses before a scan", () => {
 
   test("a budget scale above 1 scans with the scaled budget, and 1 leaves it to the engine", async () => {
     const calls = [];
-    const recording = { version: () => "0.12.0", scan: async (bytes, options) => { calls.push(options); return engine.scan(bytes, options); } };
+    const recording = { version: () => "0.12.1", scan: async (bytes, options) => { calls.push(options); return engine.scan(bytes, options); } };
     for (const scale of [1, 10]) {
       const server = createScanServer({ engine: recording, limits: limitsFromEnvironment({}), budgetScale: scale, source });
       const base = await listen(server);
@@ -293,7 +293,7 @@ describe("what the service refuses before a scan", () => {
   test("scans past the concurrency limit are refused, and an engine failure is not a 200", async () => {
     let release;
     const gate = new Promise((resolve) => { release = resolve; });
-    const slow = { version: () => "0.12.0", scan: async () => { await gate; throw new Error("boom"); } };
+    const slow = { version: () => "0.12.1", scan: async () => { await gate; throw new Error("boom"); } };
     const server = createScanServer({ engine: slow, limits: limitsFromEnvironment({ QRSCAN_HTTP_MAX_CONCURRENT: "1" }), source });
     const base = await listen(server);
     try {

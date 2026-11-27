@@ -279,19 +279,19 @@ scoop bucket add qrcode-ai https://github.com/qrcode-ai-com/scoop-bucket
 scoop install qrcode-ai/qrcode-barcode-scanner
 ```
 
-For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.0-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0)
+For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.1-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1)
 for amd64 or arm64. Check its SHA-256 and install the local file with
-`sudo apt install ./qrcode-barcode-scanner_0.12.0-1_amd64.deb` (use the arm64
+`sudo apt install ./qrcode-barcode-scanner_0.12.1-1_amd64.deb` (use the arm64
 file on ARM64).
 
 On Arch Linux x86_64, install
-[`qrcode-barcode-scanner-bin` 0.12.0-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
+[`qrcode-barcode-scanner-bin` 0.12.1-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
 The [Arch install guide](distribution/aur/README.md) shows the commands and
 explains the conflict with packages that already provide `qrscan`.
 
-On Fedora 44, download the [RPM 0.12.0-1.fc44](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0)
+On Fedora 44, download the [RPM 0.12.1-1.fc44](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1)
 for x86_64 or aarch64, verify its SHA-256 and install it with
-`sudo dnf install ./qrcode-barcode-scanner-0.12.0-1.fc44.x86_64.rpm`
+`sudo dnf install ./qrcode-barcode-scanner-0.12.1-1.fc44.x86_64.rpm`
 (use the aarch64 file on ARM64).
 
 You can also build with Cargo or download a
@@ -402,7 +402,7 @@ the architecture, mount the folder that holds your image read-only, then read th
 the host. The [QR code scanner Docker guide](https://qrcode-ai.com/en-US/qr-code-scanner/docker)
 and the [barcode scanner Docker guide](https://qrcode-ai.com/en-US/barcode-scanner/docker) follow
 this route, and the
-[offline container example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/docker/v0.12/README.md#run-the-public-image)
+[offline container example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/docker/v0.12.1/README.md#run-the-public-image)
 gives the pinned command.
 
 <p align="center">
@@ -548,7 +548,7 @@ The following agent integrations are published: the MCP adapter 0.3.3, the ClawH
 
 The [Official MCP Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.3) points clients to the same local stdio adapter published on npm, at 0.3.3, its latest listed version since 25 November 2026; the entries for 0.3.2 and 0.3.1 stay listed beside it. Adapter 0.3.3, published on npm on 25 November 2026, has signed npm provenance and passed fresh installs on Linux x64 with Node 22/24 in its [release run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45601914357); its `scan_image` and `scan_file` tools run the `fast` profile when a call names none, where 0.3.2 ran `frame`. The [0.3.3 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.3) carries the skill 0.2.1 as files. Public 0.3.1 bytes and both SDK protocol clients were also checked on macOS ARM64 with Node 24; additional product clients need their own checks. The skill and bundle 0.2.0 passed runtime calls in OpenClaw 2026.11.1 on macOS ARM64; that bundle pins adapter 0.2.0, and bundle 0.2.1 sets up adapter 0.3.2. The [MCP Bundle 0.3.2](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) holds adapter 0.3.2 and the same engine as one `.mcpb` file for Claude for macOS and Windows. See the [distribution guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/README.md) for install commands and tested clients.
 
-- The [public GHCR image](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) ships `qrscan` 0.12.0, MIT, for Linux AMD64 and ARM64. Pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner:0.12.0` and follow the [offline container example](distribution/docker/v0.12/README.md#run-the-public-image). Anonymous pulls and exact scan checks passed on [both native architectures](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45229648921). The 0.11.0 image stays available under the AGPL.
+- The [public GHCR image](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) ships `qrscan` 0.12.1, MIT, for Linux AMD64 and ARM64. Pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner:0.12.1` and follow the [offline container example](distribution/docker/v0.12.1/README.md#run-the-public-image). Anonymous pulls and exact scan checks passed on [both native architectures](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45918697977). The 0.12.0 image stays available under the MIT License, and the 0.11.0 image under the AGPL.
 - For a version-pinned install of the portable skill 0.2.1, use the [GitHub route for Codex](distribution/README.md#install-the-portable-skill-from-git-in-a-codex-project). [OpenCode setup](distribution/README.md#connect-the-published-mcp-adapter-to-opencode) uses the published npm adapter 0.3.3.
 - The [Docker Hub image](https://hub.docker.com/r/thibautmelen/qrcode-ai-scanner) is a historical mirror for 0.10.0. Its pinned digest is in the [historical installation guide](distribution/README.md#docker-run-the-local-cli).
 - Public Flutter package [`qr_barcode_scanner` 0.12.0](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.0) is available under verified publisher `qrcode-ai.com`. Follow the [Flutter installation guide and native consumer limits](docs/api/flutter.mdx): an app build links a signed precompiled native library by default without rustup and compiles the Rust core otherwise, the tag runs built the example for Android and iOS with and without Rust, and scanning with the published archive on an emulator, simulator or device is not yet qualified.

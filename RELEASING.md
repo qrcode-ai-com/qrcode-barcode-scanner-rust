@@ -1635,7 +1635,61 @@ The image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner` repackages the public
 Linux CLI archives of an engine release without recompilation, under its own
 `oci-v` tag. No Docker Hub upload and no `latest` tag are part of it.
 
-### OCI 0.12 — the MIT image
+### OCI 0.12.1 — the current MIT image
+
+The [0.12.1 recipe](distribution/docker/v0.12.1/README.md) repackages the public
+`v0.12.1` Linux CLI archives, MIT. Its input manifest pins both binaries, the
+public SHA256SUMS, the source archive, both crates and the Debian runtime index.
+The native `distribution-checks` AMD64/ARM64 matrix, dispatched on `main` at
+`cb120cd59d59346a6204df6217ad8c45f11e9b52`, prepared the context, executed the shared truth and the mixed
+QR/Code 128 profiles (35 truth inputs, 39 profile runs and 51 CLI commands per
+architecture, two of them on the `--formats` option), and exported each tested
+image once as `qrscan-oci0121-<architecture>`: run `45913692147`, AMD64 artifact
+`15160828462`, ARM64 artifact `15161600741`.
+
+The frozen [0.12.1 BOM](distribution/docker/v0.12.1/release-0.12.1.json) names
+that run, its packaging revision, both artifacts with their ZIP digests, config
+IDs, raw layers and binary hashes, and the hashes of the recipe, verifier,
+workflow and consumer truth (the recipe README is left out: it records the
+publication).
+Engine source is the commit of the `v0.12.1` tag; the image label
+`org.opencontainers.image.licenses` is `MIT`.
+
+The index of this image carries the Artifact Hub listing keys
+(`index_annotations`), as the index of the previous image does: creation time
+`2026-11-26T23:55:16.711795279Z`, the build time of the later of the two images,
+MIT, vendor, keywords, logo, maintainer and
+`distribution/artifacthub/LISTING.md` at `cb120cd59d59346a6204df6217ad8c45f11e9b52`. The
+version tag `0.12.1` is therefore its own listing tag; the images keep only the
+eight OCI labels. `oci-publish.yml` consumes this BOM through
+`distribution/docker/v0.12.1/publish.py`: default dispatch **inspect** runs only
+the read-only native inspectors; the publisher
+needs the exact `oci-v0.12.1` tag, the `container` environment and a fresh
+in-job reinspection before ephemeral `github.token` authentication. It pushes
+`0.12.1-amd64`, `0.12.1-arm64`, then the index `0.12.1` last, so the newest
+package version is the version tag. After upload, dispatch **public-pull** on the
+same tag; both native anonymous consumers must pass before public delivery is
+claimed. Then add the tag `0.12.1` to the repository in the Artifact Hub control
+panel. Producer artifacts have 14-day retention; expiry is not authority to
+substitute a rebuild.
+
+The publisher compares the tagged tree with the BOM: the workspace version must
+equal the BOM version, and the nine pinned files must hash to their recorded
+values. The `oci-v` tag therefore goes on a commit of `main` that holds this BOM
+and leaves those files unchanged, before the next version bump.
+
+Published on 27 November 2026: the `oci-v0.12.1` [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45918280379)
+pushed index `sha256:1d9f3a3985b7198a8a2f3437289f2190735c550d9ef46baebc494e7e13142558`
+(AMD64 manifest `sha256:d697bef525e7de81b17e77cc8a3cadb907f0f8083d9541cd40880d07a99b37e4`, ARM64 manifest
+`sha256:7307b11160317d32b95abb5a93bea12a5b55408e993a5b8c4302fb4982f942df`) under the tag `0.12.1`, after
+`0.12.1-amd64` and `0.12.1-arm64`. Its receipt is the `qrscan-oci-published`
+artifact of that run. The **public-pull** [dispatch](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45918697977) passed
+on both native architectures; its receipts are `qrscan-oci-public-<architecture>`.
+On that date the owner had not yet added this tag to the repository in the
+Artifact Hub control panel, so Artifact Hub still listed the previous image as
+its latest version.
+
+### OCI 0.12 — the first MIT image, retained
 
 The [0.12 recipe](distribution/docker/v0.12/README.md) repackages the public
 `v0.12.0` Linux CLI archives, MIT. Its input manifest pins both binaries, the
@@ -1658,7 +1712,8 @@ Unlike 0.11, the published index also carries the Artifact Hub listing keys
 (`index_annotations`): creation time `2026-11-23T13:03:14.406718446Z`, MIT, vendor, keywords, logo,
 maintainer and `distribution/artifacthub/LISTING.md` at `6b03e6aca92b3186d4ecddfee3baf5c2a369fd3e`. The
 version tag `0.12.0` is therefore its own listing tag; the images keep only the
-eight OCI labels. `oci-publish.yml` consumes this BOM through
+eight OCI labels.
+Until the 0.12.1 retarget, `oci-publish.yml` consumed this BOM through
 `distribution/docker/v0.12/publish.py` with the same gates as 0.11: default
 dispatch **inspect** runs only the read-only native inspectors; the publisher
 needs the exact `oci-v0.12.0` tag, the `container` environment and a fresh
@@ -1721,13 +1776,14 @@ exact artifacts are available; expiry is not authority to substitute a rebuild.
 ## HTTP service image
 
 `distribution/http` is a small HTTP service around the published npm package
-`@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`: `POST /scan` answers with the
+`@qrcode-ai-com/qrcode-barcode-scanner@0.12.1`: `POST /scan` answers with the
 engine's report, unchanged. Its image runs Node.js 22 from a base pinned by
 digest and installs the engine and its six native packages from the lockfile's
 sha512, so it compiles nothing. It is a packaging release with its own version
 (`SERVICE_VERSION` in `server.mjs`, the same in `package.json` and the
-`Dockerfile` label) and its own tag `http-v<version>`. The engine tag `v0.12.0`
-and its packages stay as published. Services 0.1.1 and 0.1.2 run the MIT
+`Dockerfile` label) and its own tag `http-v<version>`. The engine tag `v0.12.1`
+and its packages stay as published. Service 0.1.3 runs the MIT engine 0.12.1.
+Services 0.1.1 and 0.1.2 run the MIT
 engine 0.12.0, and the image's license label is `MIT`; 0.1.2 scans a request
 that names no mode with `fast` instead of `frame`. Service 0.1.0 ran the engine
 0.11.0, which keeps its AGPL-3.0-or-later license, and no image of it was
@@ -1751,9 +1807,9 @@ to a local registry and pulls them back, as the release does.
 On a pull request or a dispatch, nothing more runs. On a tag `http-v*`,
 `publish` runs in the protected environment `container-http`. It runs the gate
 first (`http-service-release.py gate`: the tag must be `http-v` and the service
-version, and the engine pin 0.12.0), downloads the images the consumers judged,
+version, and the engine pin 0.12.1), downloads the images the consumers judged,
 requires their sha256 and config digest to be the ones the consumers recorded,
-then pushes them as `0.1.2-amd64` and `0.1.2-arm64` and their index as `0.1.2`
+then pushes them as `0.1.3-amd64` and `0.1.3-arm64` and their index as `0.1.3`
 to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` with the job's own
 `github.token`, and reads each back. It never rebuilds, never moves `latest`
 and holds `contents: read` and `packages: write` only.
@@ -1770,14 +1826,14 @@ Both are in place: the environment `container-http` holds these rules, and
 1. Merge the change to `main`, with `http-service.yml` green on its pull
    request.
 2. Tag the merged commit and push the tag:
-   `git tag -a http-v0.1.2 <commit> -m 'HTTP service 0.1.2'`, then
-   `git push origin http-v0.1.2`.
+   `git tag -a http-v0.1.3 <commit> -m 'HTTP service 0.1.3'`, then
+   `git push origin http-v0.1.3`.
 3. Approve `publish` in the environment once the consumers are green. Its
    artifact `http-published` records the digests it pushed.
 4. A new GitHub package starts private: in the package settings of
    `qrcode-barcode-scanner-http`, link it to this repository and make it
    public.
-5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2`
+5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.3`
    and compare its index digest with the receipt. Only then may a README name
    the image as published.
 
