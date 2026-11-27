@@ -9,7 +9,7 @@
 # package-lock.json, SOURCE.json, the notices). The script installs:
 #   - Node.js 22.22.2 from nodejs.org, checked against its sha256, in /opt/qrscan-http/node;
 #   - the service in /opt/qrscan-http/app with `npm ci --omit=dev --ignore-scripts`: the engine
-#     0.12.1 and its native package, each checked against the lockfile's sha512;
+#     0.12.2 and its native package, each checked against the lockfile's sha512;
 #   - the systemd unit qrscan-http (a dynamic unprivileged user that may bind port 80 only, on a
 #     read-only system), started and enabled;
 #   - ufw allowing SSH and port 80 only, and the login message 99-qrcode-barcode-scanner.
@@ -18,7 +18,7 @@ set -euo pipefail
 
 NODE_VERSION=22.22.2
 NODE_SHA256=88fd1ce767091fd8d4a99fdb2356e98c819f93f3b1f8663853a2dee9b438068a
-ENGINE=0.12.1
+ENGINE=0.12.2
 PREFIX=/opt/qrscan-http
 HERE=$(cd "$(dirname "$0")" && pwd)
 

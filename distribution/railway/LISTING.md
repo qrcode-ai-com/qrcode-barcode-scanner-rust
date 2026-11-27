@@ -11,13 +11,13 @@ Railway workspace, so they are the owner's. This kit holds every value to type.
 
 | Item | Value |
 | --- | --- |
-| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. Its `package.json` must name service 0.1.3, on the engine 0.12.1, before the template is created: the repository holds 0.1.2 until it is staged again. The template itself is not created or published |
-| Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.1` from the lockfile's sha512, user `1000:1000` |
+| Source repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, branch `main`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. Its `package.json` must name service 0.1.4, on the engine 0.12.2, before the template is created: the repository holds 0.1.2 until it is staged again. The template itself is not created or published |
+| Build | the `Dockerfile` at the root ("Railway will always build with a Dockerfile if it finds one"): Node.js 26 on Chainguard's `cgr.dev/chainguard/node` (Wolfi, glibc), its multi-platform index pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.2` from the lockfile's sha512, user `1000:1000` |
 | Port | Railway injects `PORT`; the service listens on it, on every address |
-| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.3","engine":"0.12.1"}` |
+| Health check | `GET /healthz`, `200 {"status":"ok","service":"0.1.4","engine":"0.12.2"}` |
 | Checked in the engine | `http-service.yml`, job `hosts`, entry `railway`: the judged image run with a `PORT` that is not the default one, `QRSCAN_HTTP_MAX_CONCURRENT=1`, `QRSCAN_HTTP_BUDGET_SCALE=2`, 1 vCPU and 512 MB, judged by `test/consumer.mjs` (mixed QR code and Code 128 in fast, frame and full, exact payloads, every refusal); and no `railway.json` or `railway.toml` in the staged tree |
 | Icon | `integrations/vscode/images/icon.png` in the engine repository: 512 by 512 pixels, transparent corners, sha256 `97469c90140c94dc621d3cbfc0df4d0841b35648b2fe77044fecd214a7465af1`. Railway asks for a 1:1 icon with a transparent background |
-| License | the image is MIT: the service and the engine 0.12.1 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and Debian keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
+| License | the image is MIT: the service and the engine 0.12.2 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and the Wolfi packages of the base keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
 
 ## Composer values
 
@@ -52,8 +52,8 @@ and get back a JSON report of every code it holds, with its format and exact tex
 
 ## About Hosting QR Code & Barcode Scanner
 
-The service is one container built from the Dockerfile of its repository: Node.js 22 and the
-published engine 0.12.1, with no database, no disk and no secret. Railway builds it, gives it a
+The service is one container built from the Dockerfile of its repository: Node.js 26 and the
+published engine 0.12.2, with no database, no disk and no secret. Railway builds it, gives it a
 public address and checks `GET /healthz` before it takes traffic. Images are read in memory and
 never stored, and the service makes no outbound request. It has no account or key of its own:
 anyone who has its address can use it, so keep the address private or put your own access control

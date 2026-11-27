@@ -1,7 +1,7 @@
 name: HTTP service
 
 # The scanner HTTP service of distribution/http, on GitHub-hosted runners. unit runs its tests on
-# the published engine 0.12.1 and the stagers' self-tests. image stages the tree that the
+# the published engine 0.12.2 and the stagers' self-tests. image stages the tree that the
 # service's own repository holds (scripts/stage-http-satellite.py), builds the image from it on
 # each architecture and saves it. consume runs each saved image fresh, read-only, with no route
 # out of an internal network, judges it from a second container (fast, frame and full, raw and

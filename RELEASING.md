@@ -1777,19 +1777,27 @@ exact artifacts are available; expiry is not authority to substitute a rebuild.
 ## HTTP service image
 
 `distribution/http` is a small HTTP service around the published npm package
-`@qrcode-ai-com/qrcode-barcode-scanner@0.12.1`: `POST /scan` answers with the
-engine's report, unchanged. Its image runs Node.js 22 from a base pinned by
-digest and installs the engine and its six native packages from the lockfile's
-sha512, so it compiles nothing. It is a packaging release with its own version
-(`SERVICE_VERSION` in `server.mjs`, the same in `package.json` and the
-`Dockerfile` label) and its own tag `http-v<version>`. The engine tag `v0.12.1`
-and its packages stay as published. Service 0.1.3 runs the MIT engine 0.12.1.
+`@qrcode-ai-com/qrcode-barcode-scanner@0.12.2`: `POST /scan` answers with the
+engine's report, unchanged. Its image runs Node.js 26 on Chainguard's
+`cgr.dev/chainguard/node` (Wolfi, glibc), whose multi-platform index is pinned
+by digest, and installs the engine and its six native packages from the
+lockfile's sha512, so it compiles nothing. It is a packaging release with its
+own version (`SERVICE_VERSION` in `server.mjs`, the same in `package.json` and
+the `Dockerfile` label) and its own tag `http-v<version>`. The engine tag `v0.12.2`
+and its packages stay as published. Service 0.1.4 runs the MIT engine 0.12.2.
+Service 0.1.3 runs the MIT engine 0.12.1.
 Services 0.1.1 and 0.1.2 run the MIT
 engine 0.12.0, and the image's license label is `MIT`; 0.1.2 scans a request
 that names no mode with `fast` instead of `frame`. Service 0.1.0 ran the engine
 0.11.0, which keeps its AGPL-3.0-or-later license, and no image of it was
 published. A new engine needs its pins, its lockfile, its notices and the
 constants of `scripts/stage-http-satellite.py` changed in one commit.
+Chainguard's public image carries no Node.js version tag, only `latest` and
+`latest-dev`, so the base is pinned as a digest of `latest`: a new base is a
+new digest, whose Node.js version is read before it moves the `Dockerfile`,
+`BASE` in `scripts/stage-http-satellite.py` and `NODE_IMAGE` in
+`scripts/http-service-release.py` together. The published images 0.1.1, 0.1.2
+and 0.1.3 run Node.js 22 on `node:22.22.2-bookworm-slim`, pinned by digest.
 
 `scripts/stage-http-satellite.py` writes the folder as the tree of its own
 repository, `qrcode-ai-com/qrcode-barcode-scanner-http`, with the test fixture
@@ -1808,9 +1816,9 @@ to a local registry and pulls them back, as the release does.
 On a pull request or a dispatch, nothing more runs. On a tag `http-v*`,
 `publish` runs in the protected environment `container-http`. It runs the gate
 first (`http-service-release.py gate`: the tag must be `http-v` and the service
-version, and the engine pin 0.12.1), downloads the images the consumers judged,
+version, and the engine pin 0.12.2), downloads the images the consumers judged,
 requires their sha256 and config digest to be the ones the consumers recorded,
-then pushes them as `0.1.3-amd64` and `0.1.3-arm64` and their index as `0.1.3`
+then pushes them as `0.1.4-amd64` and `0.1.4-arm64` and their index as `0.1.4`
 to `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http` with the job's own
 `github.token`, and reads each back. It never rebuilds, never moves `latest`
 and holds `contents: read` and `packages: write` only.
@@ -1827,14 +1835,14 @@ Both are in place: the environment `container-http` holds these rules, and
 1. Merge the change to `main`, with `http-service.yml` green on its pull
    request.
 2. Tag the merged commit and push the tag:
-   `git tag -a http-v0.1.3 <commit> -m 'HTTP service 0.1.3'`, then
-   `git push origin http-v0.1.3`.
+   `git tag -a http-v0.1.4 <commit> -m 'HTTP service 0.1.4'`, then
+   `git push origin http-v0.1.4`.
 3. Approve `publish` in the environment once the consumers are green. Its
    artifact `http-published` records the digests it pushed.
 4. A new GitHub package starts private: in the package settings of
    `qrcode-barcode-scanner-http`, link it to this repository and make it
    public.
-5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.3`
+5. Signed out, pull `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.4`
    and compare its index digest with the receipt. Only then may a README name
    the image as published.
 
@@ -1883,6 +1891,28 @@ manifests. The package was already public, so step 4 did not apply. The
 satellite `qrcode-ai-com/qrcode-barcode-scanner-http` was staged from that
 commit the same day; its `SOURCE.json` names the commit of its latest stage.
 The deploy kits' owner steps are unchanged and not submitted.
+
+**Published: 0.1.3, 27 November 2026.** The annotated tag `http-v0.1.3` is on
+`a7b38fc2d89ac68d0a9ec13417833991c4d52847`, the merge of pull request #273. Its
+[run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46008898519)
+passed the service tests, both images, both clean consumers, the three deploy
+host profiles, the 1-Click Droplet on a fresh Ubuntu 24.04 and the local
+registry rehearsal, then `publish`, approved in `container-http`, pushed
+`ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http`. Its receipt
+`http-published` records the index `0.1.3`,
+`sha256:036dbd55937ca747b53c2dceade8f07e40f156ecb902656d2bf4d2370ce1fe29`,
+with the AMD64 manifest
+`sha256:bc5f69f9d6718387d6440eb627eb2e5d9be0a37910d3a708691957b195beeb64`
+(config `sha256:a0d1bfdc4ae069f74de9b018d463ea482a6e320ee5657b45247959d83237899d`)
+and the ARM64 manifest
+`sha256:22cf4ed608e06d194de50a6d612cc30be3044246fa6dd67971e15153e75f8d6b`
+(config `sha256:77ca99b1318848132e19d2c16adb59d27cc25c07f723b178429df282f980b444`),
+version label 0.1.3, revision `a7b38fc2`, user `1000:1000`, engine 0.12.1. A
+signed-out pull of `0.1.3` returned that index digest with those two
+manifests, and their signed-out configs are the two above. The package was
+already public, so step 4 did not apply. The satellite
+`qrcode-ai-com/qrcode-barcode-scanner-http` was not staged again: it holds
+service 0.1.2. The deploy kits' owner steps are unchanged and not submitted.
 
 ## Swift package — its own repository
 

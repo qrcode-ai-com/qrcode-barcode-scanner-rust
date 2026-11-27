@@ -21,9 +21,9 @@ from one commit of this repository (scripts/satellite_stage.py says how), with:
 
 The image of .github/workflows/http-service.yml is built from this staged tree, so the image that
 CI judges and the one a host builds come from the same files. Before writing, the stage checks the
-service: one version in package.json, server.mjs and the Dockerfile label; the engine 0.12.1 pinned
+service: one version in package.json, server.mjs and the Dockerfile label; the engine 0.12.2 pinned
 with its six native packages and their sha512 in package-lock.json; a base image pinned by digest;
-the engine's notices byte-equal to tag v0.12.1; the MIT LICENSE equal to this repository's. Exit 0
+the engine's notices byte-equal to tag v0.12.2; the MIT LICENSE equal to this repository's. Exit 0
 when the step passes, 1 when it fails, 2 for usage. Stdlib only.
 """
 import hashlib
@@ -35,15 +35,15 @@ from satellite_stage import ROOT, Refused, Satellite
 
 PACKAGE = "distribution/http"
 FIXTURE = "fixtures/symbology/mixed-code128-qr.png"
-ENGINE = "0.12.1"
+ENGINE = "0.12.2"
 ENGINE_PACKAGE = "@qrcode-ai-com/qrcode-barcode-scanner"
 NATIVES = ("darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu", "linux-x64-musl", "win32-x64-msvc")
-BASE = "node:22.22.2-bookworm-slim@sha256:9f6d5975c7dca860947d3915877f85607946403fc55349f39b4bc3688448bb6e"
-# crates/qrcode-ai-scanner/<name> at tag v0.12.1 (commit 5b2c580), the engine the image runs.
-# Both files are byte-equal to their copies at tag v0.12.0.
+BASE = "cgr.dev/chainguard/node:latest@sha256:74b28494d25c04046835cf2ebb354c992129f9c73a633f051090889d14e0b6f6"
+# crates/qrcode-ai-scanner/<name> at tag v0.12.2 (commit d0fcf8a), the engine the image runs.
+# Both files are byte-equal to their copies at tags v0.12.0 and v0.12.1.
 NOTICES = {
-    "licenses/engine-0.12.1/THIRD-PARTY.md": "542c2d99262bf4215de4de3d7e1a6e8b065b934b61ccb650dd82d2c4f96a71ab",
-    "licenses/engine-0.12.1/LICENSE-APACHE-2.0": "865b180617725f20be71aa305e82efaa8e56b3c6936d68089bc63cf91cb23087",
+    "licenses/engine-0.12.2/THIRD-PARTY.md": "542c2d99262bf4215de4de3d7e1a6e8b065b934b61ccb650dd82d2c4f96a71ab",
+    "licenses/engine-0.12.2/LICENSE-APACHE-2.0": "865b180617725f20be71aa305e82efaa8e56b3c6936d68089bc63cf91cb23087",
 }
 
 

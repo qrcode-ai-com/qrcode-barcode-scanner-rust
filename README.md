@@ -264,14 +264,14 @@ An empty `detections` list is a valid scan result. [Rust API](https://docs.rs/qr
   </a>
 </p>
 
-Install the prebuilt `qrscan` 0.12.1 binary on macOS or GNU/Linux with the
+Install the prebuilt `qrscan` 0.12.2 binary on macOS or GNU/Linux with the
 [QR Code AI Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap).
 
 ```sh
 brew install qrcode-ai-com/tap/qrscan
 ```
 
-On Windows x64, install `qrscan` 0.12.1 from the
+On Windows x64, install `qrscan` 0.12.2 from the
 [QR Code AI Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket).
 
 ```powershell
