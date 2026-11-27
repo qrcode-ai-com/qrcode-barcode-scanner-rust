@@ -15,7 +15,7 @@ schema = "qrscan-release-pins/1"
 
 # The public engine release that the engine mentions and the pinned values follow.
 [engine]
-manifest = "v0.12.1.json"
+manifest = "v0.12.2.json"
 
 # ------------------------------------------------------------------ whole files that never move
 
@@ -353,6 +353,13 @@ match = 'agent integrations are published|native engine\. Choose|with engine \d|
 held = "the agent integrations: they name the engine they were released on"
 paths = ["distribution/README.md", "SOURCE-AND-EXTRACTION.md", "LICENSING.md", "RELEASING.md", "docs/guides/agents.mdx"]
 match = 'the MCP adapter \S+ runs `|Its helper used engine|^`@qrcode-ai-com/qrcode-barcode-scanner@\S+`\.$|^\S+ Its skill archives hold|report naming engine|run the MIT engine|on the MIT engine|hold the MIT server of their version|reuses the published MIT scanner|use the published scanner|the MIT engine \S+ and its six native'
+
+# The same, for the statements written at the adapter, skill and bundle publications of
+# 27 November 2026: each names the engine that publication runs or holds.
+[[line]]
+held = "the agent integrations: they name the engine they were released on"
+paths = ["README.md", "distribution/README.md", "LICENSING.md"]
+match = '^The \[Official MCP Registry entry\]|; it runs engine \S+, whose reports|sets up MCP \S+ on engine|The earlier files stay where they|To remove either install|bundle \S+ holds the MIT server'
 
 [[line]]
 held = "the JupyterLab extension, under its own tag jupyterlab-v: it bundles the browser module its package.json pins"

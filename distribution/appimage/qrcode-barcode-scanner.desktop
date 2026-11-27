@@ -8,4 +8,4 @@ Icon=qrcode-barcode-scanner
 Terminal=true
 Categories=Utility;
 Keywords=qr;qrcode;barcode;scanner;decode;
-X-AppImage-Version=0.12.1
+X-AppImage-Version=0.12.2

@@ -2,15 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>qrcode-barcode-scanner</id>
-    <version>0.12.1</version>
+    <version>0.12.2</version>
     <title>QR Code &amp; Barcode Scanner</title>
     <authors>QR Code AI</authors>
     <projectUrl>https://qrcode-ai.com/</projectUrl>
     <projectSourceUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner</projectSourceUrl>
     <packageSourceUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/tree/main/distribution/chocolatey</packageSourceUrl>
-    <docsUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/blob/v0.12.1/distribution/cli/README.md</docsUrl>
+    <docsUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/blob/v0.12.2/distribution/cli/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/issues</bugTrackerUrl>
-    <licenseUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/blob/v0.12.1/LICENSE</licenseUrl>
+    <licenseUrl>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/blob/v0.12.2/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>qr-code barcode code128 data-matrix scanner cli portable windows x64</tags>
     <summary>Read QR codes and barcodes from local images with the qrscan CLI.</summary>
@@ -51,7 +51,7 @@ QR Code, Micro QR, rMQR, Data Matrix, Aztec, PDF417, MaxiCode, EAN-13, EAN-8, UP
 
 The Rust, Node.js, browser and Python packages hold the engine; Go and PHP run `qrscan`. The [scanner repository](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust) lists every route.
 ]]></description>
-    <releaseNotes>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/tag/v0.12.1</releaseNotes>
+    <releaseNotes>https://github.com/qrcode-ai-com/qrcode-barcode-scanner/releases/tag/v0.12.2</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

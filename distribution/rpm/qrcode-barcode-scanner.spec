@@ -1,5 +1,5 @@
 Name:           qrcode-barcode-scanner
-Version:        0.12.1
+Version:        0.12.2
 Release:        1%{?dist}
 Summary:        Offline QR code and barcode scanner
 # Both release archives retain the complete upstream license expressions.
@@ -35,18 +35,18 @@ https://qrcode-ai.com/en-US/barcode-scanner
 
 %prep
 printf '%s  %s\n' \
-  5e99d584447b03eef3818e14034c12ad09c88f31f8535b5929b0b846203a0665 '%{SOURCE0}' \
-  ba2af3b5304b0756ba172d38ce9f839fc3b668c38d4a7ab49b719e5f0cfd5789 '%{SOURCE1}' \
-  2fa08f66f7f5840f4abbbcda947a108ed8b2639c42322a338bbd04805ee4d7ff '%{SOURCE2}' \
+  320e13c0ffd87953b9b2002dbe9a5cd23cb534c12dbd8206f0aa7e88640435f6 '%{SOURCE0}' \
+  7c0258697839d8aa9b54602ec6a56d9961a5e9ed793419b8bd751a83f22f0c79 '%{SOURCE1}' \
+  ceed71c46c7a8b908d53ad79a7b7fb67e8bc04c6e4b30e61dbfd9bff6db402f8 '%{SOURCE2}' \
   | sha256sum --strict --check
 
 %ifarch x86_64
 %global cli_input %{SOURCE0}
-%global executable_sha256 dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de
+%global executable_sha256 eca19b7eb8e407d19380d5d4d9d11ed925b06bc36663fbc9d87d8f81fd4900f7
 %endif
 %ifarch aarch64
 %global cli_input %{SOURCE1}
-%global executable_sha256 b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b
+%global executable_sha256 175f69309b439f27bdda855e523bf9f4c32a7540f8db8476d99007b8e2de459b
 %endif
 %global cli_archive %{archive}-%{_arch}-unknown-linux-gnu
 
@@ -72,6 +72,9 @@ install -m0644 README.md build-info.json '%{buildroot}%{_docdir}/%{name}/'
 %doc %{_docdir}/%{name}
 
 %changelog
+* Fri Nov 27 2026 QR Code AI <contact@qrcode-ai.com> - 0.12.2-1
+- Package the published 0.12.2 CLI for Fedora.
+
 * Thu Nov 26 2026 QR Code AI <contact@qrcode-ai.com> - 0.12.1-1
 - Package the published 0.12.1 CLI for Fedora.
 
