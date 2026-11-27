@@ -1,0 +1,68 @@
+{
+  "schema": "qrscan-oci-inputs/2",
+  "version": "0.12.2",
+  "engineSource": "d0fcf8a27410f5ee182aab6477624e3fc52c4aa5",
+  "repository": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust",
+  "license": "MIT",
+  "rustc": "1.99.1",
+  "baseImage": "cgr.dev/chainguard/glibc-dynamic@sha256:a96ba3c8d5ffc646e1092c03d72000b5e2ccd9f6cda695d6342a0e31ce4d52ee",
+  "base": {
+    "os": "wolfi",
+    "packages": [
+      "ca-certificates-bundle 20261020-r1",
+      "glibc-2.44 2.44-r29",
+      "glibc-2.44-locale-posix 2.44-r29",
+      "ld-linux-2.44 2.44-r29",
+      "libgcc 16.2.0-r5",
+      "libstdc++ 16.2.0-r5",
+      "wolfi-baselayout 20230201-r31"
+    ],
+    "programs": [
+      "etc/apk/commit_hooks.d/ldconfig-commit.sh",
+      "usr/bin/ld.so",
+      "usr/bin/ldconfig"
+    ],
+    "writable": [
+      "home/nonroot",
+      "tmp",
+      "var/tmp"
+    ]
+  },
+  "scanner": {
+    "image": "ghcr.io/aquasecurity/trivy@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb",
+    "version": "0.76.2",
+    "maxDatabaseAgeHours": 72
+  },
+  "releaseManifest": {
+    "name": "qrcode-barcode-scanner-cli-0.12.2-SHA256SUMS",
+    "sha256": "ec20e99d1b1d26208afe4dec78625a0cc5cfafd4aef7bd1e4129ab3bbd98e573"
+  },
+  "platforms": {
+    "amd64": {
+      "target": "x86_64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.2-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "320e13c0ffd87953b9b2002dbe9a5cd23cb534c12dbd8206f0aa7e88640435f6",
+      "binarySha256": "eca19b7eb8e407d19380d5d4d9d11ed925b06bc36663fbc9d87d8f81fd4900f7"
+    },
+    "arm64": {
+      "target": "aarch64-unknown-linux-gnu",
+      "archive": "qrcode-barcode-scanner-cli-0.12.2-aarch64-unknown-linux-gnu.tar.gz",
+      "sha256": "7c0258697839d8aa9b54602ec6a56d9961a5e9ed793419b8bd751a83f22f0c79",
+      "binarySha256": "175f69309b439f27bdda855e523bf9f4c32a7540f8db8476d99007b8e2de459b"
+    }
+  },
+  "sources": {
+    "qrcode-barcode-scanner-cli-0.12.2-source.tar.gz": {
+      "url": "https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.2/qrcode-barcode-scanner-cli-0.12.2-source.tar.gz",
+      "sha256": "ceed71c46c7a8b908d53ad79a7b7fb67e8bc04c6e4b30e61dbfd9bff6db402f8"
+    },
+    "qrcode-barcode-scanner-0.12.2.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner/qrcode-barcode-scanner-0.12.2.crate",
+      "sha256": "88bbfdd75b89c73274f81c53f05a2ca1450ea5dd7cf0b34706a46a90fe35a244"
+    },
+    "qrcode-barcode-scanner-cli-0.12.2.crate": {
+      "url": "https://static.crates.io/crates/qrcode-barcode-scanner-cli/qrcode-barcode-scanner-cli-0.12.2.crate",
+      "sha256": "7df47767d823a6c5a8ed17072dcf1ea067dfb5a5973eade6ae6e82b2b299fd16"
+    }
+  }
+}
