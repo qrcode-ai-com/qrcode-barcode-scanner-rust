@@ -279,19 +279,19 @@ scoop bucket add qrcode-ai https://github.com/qrcode-ai-com/scoop-bucket
 scoop install qrcode-ai/qrcode-barcode-scanner
 ```
 
-For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.0-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0)
+For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.1-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1)
 for amd64 or arm64. Check its SHA-256 and install the local file with
-`sudo apt install ./qrcode-barcode-scanner_0.12.0-1_amd64.deb` (use the arm64
+`sudo apt install ./qrcode-barcode-scanner_0.12.1-1_amd64.deb` (use the arm64
 file on ARM64).
 
 On Arch Linux x86_64, install
-[`qrcode-barcode-scanner-bin` 0.12.0-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
+[`qrcode-barcode-scanner-bin` 0.12.1-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
 The [Arch install guide](distribution/aur/README.md) shows the commands and
 explains the conflict with packages that already provide `qrscan`.
 
-On Fedora 44, download the [RPM 0.12.0-1.fc44](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0)
+On Fedora 44, download the [RPM 0.12.1-1.fc44](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1)
 for x86_64 or aarch64, verify its SHA-256 and install it with
-`sudo dnf install ./qrcode-barcode-scanner-0.12.0-1.fc44.x86_64.rpm`
+`sudo dnf install ./qrcode-barcode-scanner-0.12.1-1.fc44.x86_64.rpm`
 (use the aarch64 file on ARM64).
 
 You can also build with Cargo or download a
