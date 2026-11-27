@@ -95,9 +95,16 @@ Description: offline QR code and barcode scanner
  and https://qrcode-ai.com/en-US/barcode-scanner
 CONTROL
 
-# Use the packaging changelog timestamp and retain root-owned payload files.
-export SOURCE_DATE_EPOCH=1795374973
+# Date every file from the packaging changelog written above, so that the two cannot
+# disagree, and retain root-owned payload files.
 export TZ=UTC LC_ALL=C
+changelog_date=$(gzip -dc "$docdir/changelog.Debian.gz" | sed -n 's/^ -- .*>  //p')
+SOURCE_DATE_EPOCH=$(date -u -d "$changelog_date" +%s)
+if [[ ! $SOURCE_DATE_EPOCH =~ ^[0-9]+$ ]]; then
+  echo "The packaging changelog gives no date: '$changelog_date'" >&2
+  exit 1
+fi
+export SOURCE_DATE_EPOCH
 find "$root" -type d -exec chmod 0755 {} +
 find "$root" -type f ! -path "$root/usr/bin/qrscan" -exec chmod 0644 {} +
 find "$root" -exec touch -d "@$SOURCE_DATE_EPOCH" {} +
