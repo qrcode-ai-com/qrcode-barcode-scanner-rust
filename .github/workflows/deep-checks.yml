@@ -436,3 +436,28 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1 · cargo-deny 0.20.2
         with:
           command: check advisories
+
+  # The published container image, scanned again. Its producer refused any known finding on
+  # the day it was built; a package of its base can receive one later. The scanner is the one
+  # the recipe pins, with the database of the day, and it reads both platforms from the
+  # registry by the index digest that published.json records. Nothing is scanned, and the
+  # job passes with a notice, until that record exists.
+  image-advisories:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: scan the published image with the pinned scanner
+        run: |
+          set -euo pipefail
+          python3 distribution/docker/v0.12.2/scan.py --self-test
+          python3 distribution/docker/v0.12.2/scan.py --published --receipt published-scan/scan.json
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() && hashFiles('published-scan/scan.json') != '' }}
+        with:
+          name: published-image-scan
+          path: published-scan/
+          if-no-files-found: error
+          retention-days: 30
