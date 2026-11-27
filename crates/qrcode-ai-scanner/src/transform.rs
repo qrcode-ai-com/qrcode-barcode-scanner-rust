@@ -281,10 +281,10 @@ fn flatten(
     reason = "t is simultaneously the histogram index AND the candidate threshold value"
 )]
 pub(crate) fn otsu_threshold(img: &LumaImage) -> LumaImage {
-    let mut histogram = [0u64; 256];
-    for &px in img.data() {
-        histogram[px as usize] += 1;
-    }
+    // four counters per value: on a single one, a run of equal pixels (most
+    // of a clean or a binarized image) makes each increment wait for the
+    // write of the one before it
+    let histogram = histogram(img.data());
     let total: u64 = img.data().len() as u64;
     let weighted_sum: u64 = histogram
         .iter()
@@ -552,6 +552,29 @@ pub(crate) fn gaussian_blur(img: &LumaImage, sigma: f32) -> LumaImage {
     let blurred = image::imageops::blur(&buffer, sigma);
     let (w, h) = (blurred.width(), blurred.height());
     LumaImage::new(blurred.into_raw(), w, h)
+}
+
+/// How many pixels of `data` hold each value: four counters per value, one
+/// for each pixel position modulo four, added up at the end. The count is
+/// the same sum; [`otsu_threshold`] says why it is split.
+fn histogram(data: &[u8]) -> [u64; 256] {
+    let mut lanes = [[0u64; 256]; 4];
+    let (quads, rest) = data.as_chunks::<4>();
+    for quad in quads {
+        for (lane, &px) in lanes.iter_mut().zip(quad) {
+            lane[usize::from(px)] += 1;
+        }
+    }
+    for &px in rest {
+        lanes[0][usize::from(px)] += 1;
+    }
+    let mut histogram = [0u64; 256];
+    for lane in &lanes {
+        for (count, own) in histogram.iter_mut().zip(lane) {
+            *count += own;
+        }
+    }
+    histogram
 }
 
 #[cfg(test)]
@@ -1123,5 +1146,21 @@ mod tests {
         assert_eq!(alpha.background, "white");
         assert_eq!(alpha.coverage.to_bits(), 1.0_f32.to_bits());
         assert_eq!(alpha.content_luma, 18);
+    }
+
+    #[test]
+    fn the_histogram_counts_every_pixel_once_at_any_length() {
+        // lengths around the four-pixel stride, and values that repeat
+        // within a stride and across strides
+        for len in 0..=13_usize {
+            let data: Vec<u8> = (0..len)
+                .map(|i| [7, 7, 200, 7, 0, 255, 200][i % 7])
+                .collect();
+            let mut want = [0u64; 256];
+            for &px in &data {
+                want[usize::from(px)] += 1;
+            }
+            assert_eq!(histogram(&data), want, "{len} pixels");
+        }
     }
 }

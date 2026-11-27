@@ -19,6 +19,17 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   reaches its enhance stage; ordinary designs, which stop earlier, move by
   about 2 %.
 
+- **A scan spends less time in three pixel loops.** The count of pixels per
+  value behind the Otsu threshold, the four pixels read under each bilinear
+  sample of a stress image, and the adaptive threshold that prepares an image
+  for the rqrr reader, which the scanner now computes itself and hands over as
+  a bitmap, do the same arithmetic in fewer cycles. Reports are unchanged,
+  durations aside. Measured natively on an Apple M3 Pro, default profile, no
+  budget, in CPU cycles: about 12 % fewer on 16 ordinary QR designs, 5 to 8 %
+  fewer on 12 fixtures of this repository (clean, degraded, artistic, linear
+  and Data Matrix) and 3 to 6 % fewer on 13 QR codes drawn with hollow
+  modules.
+
 ### Fixed
 
 - **Browser package: its types under Node's module resolution.** With

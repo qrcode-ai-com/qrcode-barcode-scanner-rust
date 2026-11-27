@@ -47,6 +47,95 @@ pub(super) struct Pass {
     pub(super) refused: Vec<Refusal>,
 }
 
+/// rqrr's binarization of a luma plane, `true` where it paints a pixel
+/// black: the adaptive threshold of the pinned `PreparedImage::prepare`
+/// (quirc lineage), computed here so that rqrr receives the bitmap ready.
+///
+/// Two running averages sweep every row, one from each end; each step is
+/// `average * (span - 1) / span + pixel`, with `span` an eighth of the
+/// width. A pixel is black when it is under 95 % of the mean of the two
+/// averages at its column.
+///
+/// rqrr divides three times per pixel, and two of those divisions sit on
+/// the path from one step of a sweep to the next: they set the pace of the
+/// whole pass. Here a step shifts when `span` is a power of two (a width
+/// of 512, 1024 or 2048) and multiplies by the reciprocal of `span`
+/// otherwise ([`quotient`]), and the comparison is cross-multiplied. Same
+/// integers, same bitmap: the test `binarize_matches_rqrr` reads rqrr's
+/// own back.
+///
+/// An average stays within `255 * span`, so the product a step divides
+/// stays within `255 * span²`: the reciprocal is exact while `255 * span³`
+/// fits 64 bits (a width of three million pixels), and the division itself
+/// answers past that.
+fn binarize(luma: &LumaImage) -> Vec<bool> {
+    let span = (luma.width() as usize / 8).max(1);
+    let wide = span as u64;
+    if span.is_power_of_two() {
+        let shift = span.trailing_zeros();
+        binarize_with(luma, span, |average| (average * (span - 1)) >> shift)
+    } else if wide
+        .checked_pow(3)
+        .is_some_and(|cube| cube.checked_mul(255).is_some())
+    {
+        let reciprocal = reciprocal(wide);
+        binarize_with(luma, span, |average| {
+            quotient(average * (span - 1), reciprocal)
+        })
+    } else {
+        binarize_with(luma, span, |average| average * (span - 1) / span)
+    }
+}
+
+/// `⌈2⁶⁴ / span⌉` for a `span` of two or more.
+fn reciprocal(span: u64) -> u64 {
+    // one more than ⌊(2⁶⁴ - 1) / span⌋, whether `span` divides 2⁶⁴ or not
+    u64::MAX / span + 1
+}
+
+/// `⌊n / span⌋` from the [`reciprocal`] of `span`, exact while `n * span`
+/// fits 64 bits: `reciprocal * span` is `2⁶⁴ + e` with `e < span`, so
+/// `n * reciprocal / 2⁶⁴` is `n / span` plus `n * e / (span * 2⁶⁴)`, a
+/// surplus under `1 / span` that cannot reach the next whole number.
+#[expect(
+    clippy::cast_possible_truncation,
+    reason = "the high half of a 128-bit product, and no more than n"
+)]
+fn quotient(n: usize, reciprocal: u64) -> usize {
+    ((u128::from(reciprocal) * n as u128) >> 64) as usize
+}
+
+/// [`binarize`] under one way to take `average * (span - 1) / span`.
+fn binarize_with(luma: &LumaImage, span: usize, decay: impl Fn(usize) -> usize) -> Vec<bool> {
+    let width = luma.width() as usize;
+    let mut black = Vec::with_capacity(luma.data().len());
+    let mut sums = vec![0usize; width];
+    let scale = (200 * span) as u64;
+    // rqrr's `avg_u` and `avg_v`: neither restarts at a new row, and the one
+    // that ended a row at the right edge sweeps the next row from there
+    let (mut forward, mut backward) = (0usize, 0usize);
+    for row in luma.data().chunks_exact(width.max(1)) {
+        sums.fill(0);
+        for (x, (&front, &back)) in row.iter().zip(row.iter().rev()).enumerate() {
+            forward = decay(forward) + usize::from(front);
+            backward = decay(backward) + usize::from(back);
+            sums[x] += forward;
+            sums[width - 1 - x] += backward;
+        }
+        // `pixel < sum * 95 / (200 * span)` without the division: for whole
+        // numbers, p < ⌊a / b⌋ exactly when (p + 1) · b ≤ a. The two
+        // products rqrr takes stay in its `usize`; ours is wider, so that a
+        // 32-bit target cannot wrap it
+        black.extend(
+            row.iter()
+                .zip(&sums)
+                .map(|(&pixel, &sum)| (u64::from(pixel) + 1) * scale <= (sum * 95) as u64),
+        );
+        std::mem::swap(&mut forward, &mut backward);
+    }
+    black
+}
+
 /// One rqrr pass. `orient_candidates`: the caller consumes the rescue
 /// candidates (the ladder), so the first [`MAX_CANDIDATES`] undecodable grids
 /// get their orientation decided here — once, carried in the candidate. A
@@ -54,10 +143,10 @@ pub(super) struct Pass {
 /// them: the grid as sampled, as before.
 pub(super) fn decode(luma: &LumaImage, orient_candidates: bool) -> Pass {
     let width = luma.width() as usize;
-    let data = luma.data();
+    let black = binarize(luma);
     let mut prepared =
-        rqrr::PreparedImage::prepare_from_greyscale(width, luma.height() as usize, |x, y| {
-            data[y * width + x]
+        rqrr::PreparedImage::prepare_from_bitmap(width, luma.height() as usize, |x, y| {
+            black[y * width + x]
         });
 
     let mut pass = Pass {
@@ -487,7 +576,8 @@ mod tests {
     #![allow(clippy::unwrap_used, clippy::expect_used, clippy::cast_precision_loss)]
 
     use super::{
-        Account, Decision, Transposed, account, decode, rederive_sampled, rescue_input, settle,
+        Account, Decision, Transposed, account, binarize, decode, quotient, reciprocal,
+        rederive_sampled, rescue_input, settle,
     };
     use crate::engine::content::{ContentKey, EciEvidence, EciMark, Fnc1, Segments};
     use crate::input::LumaImage;
@@ -1679,5 +1769,91 @@ mod tests {
                 declarations: true,
             })
         );
+    }
+
+    /// A plane of `width` × `height` pixels: runs, ramps and noise, so the
+    /// two averages cross the pixels often.
+    fn textured(width: u32, height: u32, seed: u32) -> LumaImage {
+        let mut state = seed;
+        let data = (0..width * height)
+            .map(|i| {
+                state = state.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+                let (x, y) = (i % width, i / width);
+                let noise = (state >> 24) as u8;
+                match (x / 5 + y / 3 + seed) % 4 {
+                    0 => noise,
+                    1 => 255 - (noise / 8),
+                    2 => noise / 8,
+                    _ => u8::try_from(x * 255 / width).unwrap(),
+                }
+            })
+            .collect();
+        LumaImage::new(data, width, height)
+    }
+
+    /// The bitmap the pinned rqrr computes from the same plane, read back pixel
+    /// by pixel (`1` is its black).
+    fn rqrr_bitmap(luma: &LumaImage) -> Vec<bool> {
+        let (width, height) = (luma.width() as usize, luma.height() as usize);
+        let prepared = rqrr::PreparedImage::prepare_from_greyscale(width, height, |x, y| {
+            luma.data()[y * width + x]
+        });
+        (0..height)
+            .flat_map(|y| (0..width).map(move |x| (x, y)))
+            .map(|(x, y)| u8::from(prepared.get_pixel_at(x, y)) == 1)
+            .collect()
+    }
+
+    #[test]
+    fn binarize_matches_rqrr() {
+        // widths whose eighth is 1, a power of two and neither; one row,
+        // several rows, an odd count of rows (the sweeps trade ends)
+        let widths = [1, 2, 7, 8, 15, 16, 17, 24, 31, 32, 64, 100, 128, 200, 257];
+        for (seed, width) in (0..).zip(widths) {
+            for height in [1, 2, 3, 8] {
+                let luma = textured(width, height, seed);
+                assert_eq!(
+                    binarize(&luma),
+                    rqrr_bitmap(&luma),
+                    "{width}×{height}, seed {seed}"
+                );
+            }
+        }
+        // the sizes the scanner works at, and a real symbol
+        for (width, height) in [(512, 3), (640, 5), (1024, 2), (1536, 2), (2048, 1)] {
+            let luma = textured(width, height, 9);
+            assert_eq!(binarize(&luma), rqrr_bitmap(&luma), "{width}×{height}");
+        }
+        let (symbol, _) = render(b"https://example.com/threshold", qrcode::EcLevel::M);
+        assert_eq!(binarize(&symbol), rqrr_bitmap(&symbol));
+        let blank = LumaImage::new(vec![255; 64 * 64], 64, 64);
+        assert_eq!(binarize(&blank), rqrr_bitmap(&blank));
+    }
+
+    #[test]
+    fn the_reciprocal_divides_exactly_up_to_its_bound() {
+        // 255 * span³ fits 64 bits up to a span of 416 670; the largest
+        // product a sweep divides there is 255 * span * (span - 1)
+        for span in [2_usize, 3, 5, 12, 25, 64, 75, 1_000, 4_103, 416_670] {
+            let reciprocal = reciprocal(span as u64);
+            let top = 255 * span * (span - 1);
+            let multiples = [1, 2, 254, 255 * (span - 1) - 1, 255 * (span - 1)];
+            let around = multiples
+                .iter()
+                .flat_map(|k| [k * span - 1, k * span, k * span + 1]);
+            for n in [0, 1, span - 1, top - 1, top].into_iter().chain(around) {
+                assert_eq!(quotient(n, reciprocal), n / span, "{n} / {span}");
+            }
+        }
+    }
+
+    #[test]
+    fn binarize_matches_rqrr_at_and_past_the_reach_of_the_reciprocal() {
+        // one row each: the reciprocal on the last span it serves, the
+        // division on the next
+        for span in [416_670, 416_671] {
+            let luma = textured(span * 8 + 5, 1, 3);
+            assert_eq!(binarize(&luma), rqrr_bitmap(&luma), "span {span}");
+        }
     }
 }
