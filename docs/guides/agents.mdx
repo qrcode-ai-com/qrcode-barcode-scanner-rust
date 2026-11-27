@@ -8,23 +8,29 @@ workflows, CI bots) consuming the scanner.
 
 ## Published agent integrations
 
-The [MCP stdio adapter 0.3.3](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3)
-reuses the published MIT scanner 0.12.0. Since 0.3.3, a `scan_image` or
+The [MCP stdio adapter 0.3.4](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.4)
+reuses the published MIT scanner 0.12.1, whose reports carry score
+contract 6. Since 0.3.3, a `scan_image` or
 `scan_file` call that names no `profile` runs `fast`; up to 0.3.2 it ran
 `frame`, so pass `profile` when your pipeline depends on one. The
-[ClawHub skill 0.2.1](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner)
-and [OpenClaw bundle 0.2.3](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner)
-reuse that scanner too; the skill 0.2.1 is also published as files on the
-[agents-v0.3.3 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.3).
+[ClawHub skill 0.2.2](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner)
+and [OpenClaw bundle 0.2.4](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner)
+reuse that scanner too; the skill 0.2.2 is also published as files on the
+[agents-v0.3.4 release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/agents-v0.3.4).
 See the
 [distribution guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/distribution/README.md)
-for installation and exact qualification scope. Adapter 0.3.3 was installed
+for installation and exact qualification scope. Adapter 0.3.4 was installed
 from npm and tested on Linux x64 with Node.js 22/24 in its release run. The skill and bundle 0.2.0
 were installed and exercised through OpenClaw 2026.11.1 on macOS ARM64; that
-bundle pins MCP 0.2.0, bundle 0.2.1 sets up MCP 0.3.2, and bundles 0.2.2 and 0.2.3 set up MCP 0.3.3. The
-[Official MCP Registry entry for 0.3.3](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.3)
+bundle pins MCP 0.2.0, bundle 0.2.1 sets up MCP 0.3.2, and bundles 0.2.2 and 0.2.3 set up MCP 0.3.3.
+Bundle 0.2.4 sets up MCP 0.3.4; it was installed from ClawHub and its MCP server exercised
+through OpenClaw 2026.11.10 on macOS ARM64. The
+[Official MCP Registry entry for 0.3.4](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.4)
 points to the npm adapter at that version, its latest listing; the entries for
-0.3.2 and 0.3.1 stay listed.
+0.3.3, 0.3.2 and 0.3.1 stay listed. The agent plugin release
+[`v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-plugin/releases/tag/v0.3.3)
+starts adapter 0.3.4 with the skill 0.2.2 in coding agents such as Claude Code, Codex
+and Cursor.
 Verify tool discovery and a fixture call in each additional product client.
 
 ## Ground truth to load
