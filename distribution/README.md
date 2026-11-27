@@ -124,16 +124,21 @@ published to npm or crates.io.
 ## Published agent integrations
 
 These independently versioned integrations reuse a published native engine:
-the MCP adapter 0.3.3 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.0`, and
-the skill 0.2.1 and the bundle 0.2.3 that ClawHub serves run that MIT engine too. Choose the
+the MCP adapter 0.3.4 runs `@qrcode-ai-com/qrcode-barcode-scanner@0.12.1`, and
+the skill 0.2.2 and the bundle 0.2.4 that ClawHub serves run that MIT engine too. Choose the
 interface your application or agent already supports:
 
 | Integration | Public package | Install |
 | --- | --- | --- |
-| MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.3) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.3` |
-| Portable skill | [`qrcode-barcode-scanner@0.2.1`](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner) | `clawhub install qrcode-barcode-scanner --version 0.2.1` |
-| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.3`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.3` |
+| MCP stdio adapter | [`@qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4`](https://www.npmjs.com/package/@qrcode-ai-com/qrcode-barcode-scanner-mcp/v/0.3.4) | `npm install --save-exact --ignore-scripts @qrcode-ai-com/qrcode-barcode-scanner-mcp@0.3.4` |
+| Portable skill | [`qrcode-barcode-scanner@0.2.2`](https://clawhub.ai/qrcode-ai-com/skills/qrcode-barcode-scanner) | `clawhub install qrcode-barcode-scanner --version 0.2.2` |
+| OpenClaw plugin bundle | [`@qrcode-ai-com/qrcode-barcode-scanner@0.2.4`](https://clawhub.ai/qrcode-ai-com/plugins/qrcode-barcode-scanner) | `openclaw plugins install clawhub:@qrcode-ai-com/qrcode-barcode-scanner@0.2.4` |
 
+MCP adapter 0.3.4 passed fresh public npm installations on **Linux x64 with
+Node.js 22 and 24** in its [release run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46008889466) on 27 November 2026,
+published through GitHub Trusted Publishing from its tag `agents-v0.3.4` with npm
+provenance; it runs engine 0.12.1, whose reports carry score contract 6, with the tools
+and the `fast` default of 0.3.3.
 MCP adapter 0.3.3 passed fresh public npm installations on **Linux x64 with
 Node.js 22 and 24** in its
 [release run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45601914357)
@@ -141,10 +146,10 @@ on 25 November 2026. It was published through GitHub Trusted Publishing from
 its tag `agents-v0.3.3`; the public bytes match the qualified archive, and npm
 serves provenance metadata. It changes one default of 0.3.2: a `scan_image` or
 `scan_file` call that names no profile runs `fast` instead of `frame`; its
-engine, tools and report contract are unchanged. The adapters 0.3.2 and 0.3.3,
-the skill 0.2.1 and engine 0.12.0 are MIT; adapter 0.3.1 with engine 0.11.0 keeps
-AGPL-3.0-or-later, and skill and bundle 0.2.0 keep MIT-0. ClawHub labels every skill
-MIT-0, so its page shows skill 0.2.1 as MIT-0; the files of skill 0.2.1 carry the MIT License.
+engine, tools and report contract are unchanged. The adapters 0.3.2 to 0.3.4,
+the skills 0.2.1 and 0.2.2 and engines 0.12.0 and 0.12.1 are MIT; adapter 0.3.1 with engine 0.11.0
+keeps AGPL-3.0-or-later, and skill and bundle 0.2.0 keep MIT-0. ClawHub labels every skill
+MIT-0, so its page shows skills 0.2.1 and 0.2.2 as MIT-0; their files carry the MIT License.
 The npx acceptance
 workflow also checks Linux and macOS from an empty home.
 The skill and bundle 0.2.0 passed registry installation and real
@@ -158,19 +163,27 @@ agent model called it. Bundle 0.2.3, published on ClawHub on 26 November 2026 as
 archive with its OpenClaw compatibility (plugin API `>=2026.11.1`, built with OpenClaw
 2026.11.10), passed the same checks after its installation from ClawHub by OpenClaw 2026.11.10;
 before its upload, the same archive passed them from a local file on OpenClaw 2026.11.1 and
-2026.11.10. Other clients and native engine targets need their own installed-consumer checks.
+2026.11.10. Bundle 0.2.4, published on ClawHub on 27 November 2026 with the same
+compatibility, holds the skill 0.2.2 and sets up MCP 0.3.4 on engine 0.12.1; it passed the
+same checks after its installation from ClawHub by OpenClaw 2026.11.10, and from a local file
+on OpenClaw 2026.11.10 before its upload. ClawHub has served the skill 0.2.2 since that day;
+an anonymous `clawhub install` of it gave the five files of `agents-v0.3.4` byte for byte.
+Other clients and native engine targets need their own installed-consumer checks.
 
 Read the [MCP installation and stdio configuration](../integrations/mcp/),
 [portable skill instructions](../skills/qrcode-barcode-scanner/) or
-[bundle setup](../integrations/openclaw/) before activation. Bundles 0.2.3 and 0.2.2 install
-their exact adapter dependency (MCP 0.3.3) through explicit setup; bundle 0.2.1 installs MCP 0.3.2 and bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
+[bundle setup](../integrations/openclaw/) before activation. Bundle 0.2.4 installs
+its exact adapter dependency (MCP 0.3.4) through explicit setup; bundles 0.2.3 and 0.2.2 install MCP 0.3.3,
+bundle 0.2.1 installs MCP 0.3.2 and bundle 0.2.0 installs MCP 0.2.0. The adapter, skill and
 bundle are versioned separately from the engine; adapter patch releases need
 not change the other integration versions.
 
-The [Official MCP Registry lists adapter 0.3.3](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.3)
+The [Official MCP Registry lists adapter 0.3.4](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.qrcode-ai-com%2Fqrcode-barcode-scanner/versions/0.3.4)
 under `io.github.qrcode-ai-com/qrcode-barcode-scanner`, as its latest version. Its entry points to the
-npm package at 0.3.3. Its separate publication completed in
-[run 45617423494](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45617423494) on 25 November 2026; the entries for 0.3.2, from
+npm package at 0.3.4. Its separate publication completed in
+[run 46017178012](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46017178012) on 27 November 2026, and on that day its exact-version and
+latest records both named npm 0.3.4 over stdio and matched the `server.json` of `agents-v0.3.4`. The
+entries for 0.3.3, from [run 45617423494](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45617423494), 0.3.2, from
 [run 45433268310](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45433268310), and 0.3.1, from
 [run 43267825878](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/43267825878), stay listed.
 On 25 November 2026 its exact-version and latest records both named npm 0.3.3
@@ -415,8 +428,9 @@ SHA-256 of its checksum list, and its checks run in this repository. The Termux 
 0.12.1 source archive instead, and its update function follows each later CLI release. The Glama
 container and the MCP Bundle hold the published MCP server instead, with the engine it was released on,
 each package pinned by its npm integrity. None of these destinations serves the scanner yet, except
-Glama, which lists the MCP server since 20 November 2026, the MCP Bundle, whose 0.3.3 file is on
-the release [`mcpb-v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) since 25 November 2026 and whose 0.3.2 file is
+Glama, which lists the MCP server since 20 November 2026, the MCP Bundle, whose 0.3.4 file is on
+the release [`mcpb-v0.3.4`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.4) since 27 November 2026, its 0.3.3 file on
+the release [`mcpb-v0.3.3`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) since 25 November 2026 and its 0.3.2 file
 on the release [`mcpb-v0.3.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.2) since 24 November 2026, and the Termux User Repository, which
 serves the CLI package since its maintainer merged the pull request on 26 November 2026. Four
 destinations received pull requests (conda-forge two, one per recipe). The two conda-forge pull
@@ -430,7 +444,7 @@ still needs, usually an account or a review in that registry.
 | Artifact Hub | [artifacthub](artifacthub/README.md) | prepared | index composed against the pinned GHCR digests |
 | JSR | [jsr](jsr/README.md) | prepared | `jsr publish --dry-run` and a Deno scan of the staged module |
 | Glama | [glama](glama/README.md) | [listed](https://glama.ai/mcp/servers/qrcode-ai-com/qrcode-barcode-scanner-mcp) | MCP container built and judged offline on amd64 and arm64 |
-| MCP Bundle for Claude for macOS and Windows | [mcpb](mcpb/README.md) | [released: 0.3.3](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.3) | `mcpb.yml` builds the MCP Bundle twice to the same bytes, runs `mcpb validate` and drives its server over MCP stdio on Linux, macOS and Windows runners and offline in glibc and musl containers |
+| MCP Bundle for Claude for macOS and Windows | [mcpb](mcpb/README.md) | [released: 0.3.4](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/mcpb-v0.3.4) | `mcpb.yml` builds the MCP Bundle twice to the same bytes, runs `mcpb validate` and drives its server over MCP stdio on Linux, macOS and Windows runners and offline in glibc and musl containers |
 | conda-forge | [conda-forge](conda-forge/README.md) | submitted: [CLI](https://github.com/conda-forge/staged-recipes/pull/35745), [Python](https://github.com/conda-forge/staged-recipes/pull/35746) | recipe schema and the test script against the published wheel |
 | Nixpkgs | [nix](nix/README.md) | prepared | evaluated against nixos-unstable, with the crate hash recorded |
 | openSUSE Build Service | [obs](obs/README.md) | prepared | `rpmspec`, `rpmlint` and the service file |

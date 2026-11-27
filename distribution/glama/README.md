@@ -62,7 +62,7 @@ The files are staged into their own repository, [`qrcode-ai-com/qrcode-barcode-s
 
 1. In the engine repository, run `python3 scripts/stage-glama-package.py stage --out /tmp/qrscan-mcp-glama`, then `python3 scripts/stage-glama-package.py verify /tmp/qrscan-mcp-glama`.
 2. Copy the staged folder over a clean checkout of `qrcode-ai-com/qrcode-barcode-scanner-mcp` and push it to its `main` branch.
-3. On glama.ai, signed in with the GitHub account `ThibautMelen`, open the server's admin page and run Build & Release. Glama builds the Dockerfile again, reads the tools and publishes a new release of its listing. Glama numbers these releases itself: its first, 0.1.0, carries the MCP server 0.3.1, and the stage of 24 November 2026 carries 0.3.2. Release 0.1.3, built on 25 November 2026 from the listing commit `d79d4a7`, carries 0.3.3: its tool `scan_image` names the default fast profile. The next one built from this folder carries 0.3.4.
+3. On glama.ai, signed in with the GitHub account `ThibautMelen`, open the server's admin page and run Build & Release. Glama builds the Dockerfile again, reads the tools and publishes a new release of its listing. Glama numbers these releases itself: its first, 0.1.0, carries the MCP server 0.3.1, and the stage of 24 November 2026 carries 0.3.2. Release 0.1.3, built on 25 November 2026 from the listing commit `d79d4a7`, carries 0.3.3: its tool `scan_image` names the default fast profile. Release 0.1.4, built on 27 November 2026 from the listing commit `2c1de92`, carries 0.3.4 on the engine 0.12.1, whose reports carry score contract 6.
 
 The server was added from this repository and claimed once, on 20 November 2026; a new stage needs neither step again.
 
