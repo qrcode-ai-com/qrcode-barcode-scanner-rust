@@ -332,8 +332,8 @@ a fresh engine 0.12.1.
 | Destination | Version | Platforms |
 | --- | --- | --- |
 | [GitHub Releases](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.2) | 0.12.2 | macOS ARM64/x64, GNU/Linux ARM64/x64, [Windows x64](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.2/qrcode-barcode-scanner-cli-0.12.2-x86_64-pc-windows-msvc.zip), and source |
-| [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.1 | macOS and GNU/Linux on ARM64/x64 |
-| [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.1 | Windows x64 |
+| [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.2 | macOS and GNU/Linux on ARM64/x64 |
+| [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.2 | Windows x64 |
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1) | 0.12.1-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.1-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1) | 0.12.1-1.fc44 | Fedora 44, x86_64 and aarch64 |
@@ -353,11 +353,11 @@ scoop bucket add qrcode-ai https://github.com/qrcode-ai-com/scoop-bucket
 scoop install qrcode-ai/qrcode-barcode-scanner
 ```
 
-The [Homebrew consumer run](https://github.com/qrcode-ai-com/homebrew-tap/actions/runs/45896392319)
-installed `qrscan` 0.12.1 from the public tap on macOS and GNU/Linux, ARM64 and x64, ran
+The [Homebrew consumer run](https://github.com/qrcode-ai-com/homebrew-tap/actions/runs/46048408295)
+installed `qrscan` 0.12.2 from the public tap on macOS and GNU/Linux, ARM64 and x64, ran
 `brew test`, read the QR code and the Code 128 `STOCK-4827` together in `fast`, `frame`
 and `full`, and uninstalled it. The
-[Scoop Windows run](https://github.com/qrcode-ai-com/scoop-bucket/actions/runs/45896250486)
+[Scoop Windows run](https://github.com/qrcode-ai-com/scoop-bucket/actions/runs/46048072093)
 did the same from the public bucket on Windows x64.
 For direct downloads, follow the [CLI archive and checksum guide](cli/README.md#download-and-verify).
 

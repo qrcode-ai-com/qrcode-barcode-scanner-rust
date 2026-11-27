@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // A stand-in for the scan service (distribution/http) while that service is not on main: the same
 // routes, the same JSON answers and refusal codes, and the real engine, the published WebAssembly
-// package 0.12.1, behind them. It scans with no budget, so its reports do not depend on the speed
+// package 0.12.2, behind them. It scans with no budget, so its reports do not depend on the speed
 // of the machine. The tests run against the real service instead when QRSCAN_MAKE_SERVICE_URL is set.
 import { readFileSync } from 'node:fs';
 import http from 'node:http';
@@ -11,8 +11,8 @@ const require = createRequire(import.meta.url);
 const PACKAGE = '@qrcode-ai-com/qrcode-barcode-scanner-wasm';
 const PROFILES = ['fast', 'frame', 'full'];
 const LIMITS = { inputBytes: 8 * 1024 * 1024, dimension: 4096, pixels: 16_000_000 };
-export const SERVICE_VERSION = '0.1.3';
-export const ENGINE_VERSION = '0.12.1';
+export const SERVICE_VERSION = '0.1.4';
+export const ENGINE_VERSION = '0.12.2';
 
 class Refusal extends Error {
   constructor(status, code, message) {

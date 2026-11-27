@@ -9,12 +9,12 @@ kit holds what the owner needs to deploy it once for acceptance and then add the
 
 | Item | Value |
 | --- | --- |
-| Repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. Its `package.json` must name service 0.1.3, on the engine 0.12.1, before step 2: the repository holds 0.1.2 until it is staged again. Render builds its own copy from the `Dockerfile` |
+| Repository | `https://github.com/qrcode-ai-com/qrcode-barcode-scanner-http`, generated from `distribution/http` by `scripts/stage-http-satellite.py`; `SOURCE.json` names the engine commit. Since 26 November 2026 it holds service 0.1.2 with the engine 0.12.0, which scans a request with no mode in `fast`, the service whose image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http:0.1.2` is public. Its `package.json` must name service 0.1.4, on the engine 0.12.2, before step 2: the repository holds 0.1.2 until it is staged again. Render builds its own copy from the `Dockerfile` |
 | Blueprint | `render.yaml` at its root: one `web` service named `qrcode-barcode-scanner-http`, `runtime: docker`, `plan: 0.5c-512mb`, `healthCheckPath: /healthz`, `autoDeployTrigger: 'off'`, `QRSCAN_HTTP_MAX_CONCURRENT=1`, `QRSCAN_HTTP_BUDGET_SCALE=4` |
-| Image | built by Render from the `Dockerfile` at the root: Node.js 22 on `node:22.22.2-bookworm-slim` pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.1` from the lockfile's sha512, user `1000:1000` |
+| Image | built by Render from the `Dockerfile` at the root: Node.js 26 on Chainguard's `cgr.dev/chainguard/node` (Wolfi, glibc), its multi-platform index pinned by digest, the engine `@qrcode-ai-com/qrcode-barcode-scanner@0.12.2` from the lockfile's sha512, user `1000:1000` |
 | Port | the service reads `PORT`, which Render sets to `10000` for every web service |
 | Checked in the engine | `http-service.yml`, job `hosts`: `render.yaml` against `https://render.com/schema/render.yaml.json`, then the judged image run with `PORT=10000`, the file's variables, half a CPU and 512 MB, judged by `test/consumer.mjs` (mixed QR code and Code 128 in fast, frame and full, exact payloads, every refusal) |
-| License | the image is MIT: the service and the engine 0.12.1 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and Debian keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
+| License | the image is MIT: the service and the engine 0.12.2 are MIT, two reader parts of the engine keep their Apache-2.0 notice, and Node.js and the Wolfi packages of the base keep their own licenses. Every answer names its source in `X-Source-Code`. Service 0.1.0 ran the engine 0.11.0, which keeps its AGPL-3.0-or-later license |
 
 ## Cost, read on render.com on 21 November 2026
 
@@ -42,7 +42,7 @@ kit holds what the owner needs to deploy it once for acceptance and then add the
    (7 USD a month, prorated to the second). Give the Blueprint a name, keep the region, add a
    payment method if Render asks for one, and approve it.
 3. Wait for the deploy to end with the service live, then open `https://<service>.onrender.com/healthz`
-   (Render shows the address). It answers `{"status":"ok","service":"0.1.3","engine":"0.12.1"}`.
+   (Render shows the address). It answers `{"status":"ok","service":"0.1.4","engine":"0.12.2"}`.
 4. From a clone of the repository, with Node.js 22, run the consumer against the deployed copy:
    `node test/consumer.mjs https://<service>.onrender.com test/fixtures/mixed-code128-qr.png --revision <commit>`,
    where `<commit>` is `engine.revision` in `SOURCE.json`. It must end with

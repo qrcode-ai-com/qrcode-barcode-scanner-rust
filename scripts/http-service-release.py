@@ -13,7 +13,7 @@ The image of distribution/http is built by .github/workflows/http-service.yml fr
 scripts/stage-http-satellite.py writes, once per architecture, and saved as a tar archive:
 
   gate      REF is refs/tags/http-vX.Y.Z, X.Y.Z is the version of distribution/http/package.json
-            and of server.mjs, and the service pins the engine 0.12.1.
+            and of server.mjs, and the service pins the engine 0.12.2.
   save      `docker save` of TAG into DIR/qrscan-http-ARCH.tar, with DIR/ARCH.json: the tar's
             sha256, the image config digest read from the tar, the architecture and the commit.
   consume   loads the tar after checking its sha256, checks the image (non-root, labels,
@@ -47,14 +47,14 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SERVICE = ROOT / "distribution/http"
 IMAGE = "ghcr.io/qrcode-ai-com/qrcode-barcode-scanner-http"
-ENGINE = "0.12.1"
+ENGINE = "0.12.2"
 ARCHITECTURES = ("amd64", "arm64")
 TAG = re.compile(r"refs/tags/http-v(\d+\.\d+\.\d+)")
 HEX = re.compile(r"[0-9a-f]{64}")
 COMMIT = re.compile(r"[0-9a-f]{40}")
 FIXTURE_SHA256 = "c636e8d56df483ff1ec06dbe9b5bcba226c579f8fc1c3d10c4ccf4e100762ec8"
-# The judge runs in this image, the one the service is built on.
-NODE_IMAGE = "node:22.22.2-bookworm-slim@sha256:9f6d5975c7dca860947d3915877f85607946403fc55349f39b4bc3688448bb6e"
+# The judge runs in this image, the one the service is built on, with node as its entrypoint.
+NODE_IMAGE = "cgr.dev/chainguard/node:latest@sha256:74b28494d25c04046835cf2ebb354c992129f9c73a633f051090889d14e0b6f6"
 REGISTRY_IMAGE = "registry:3.0.0@sha256:6c5666b861f3505b116bb9aa9b25175e71210414bd010d92035ff64018f9457e"
 LABELS = {
     "org.opencontainers.image.title": "QR Code & Barcode Scanner HTTP service",
@@ -224,7 +224,7 @@ def consume(images, architecture, fixture, receipt, host=None):
         consumer = SERVICE / "test/consumer.mjs"
         judge = run("docker", "run", "--rm", "--network", network, "--read-only", "--user", "1000:1000",
                     "--volume", f"{consumer}:/judge/consumer.mjs:ro", "--volume", f"{fixture}:/judge/fixture.png:ro",
-                    "--volume", f"{out}:/out", NODE_IMAGE, "node", "/judge/consumer.mjs",
+                    "--volume", f"{out}:/out", "--entrypoint", "node", NODE_IMAGE, "/judge/consumer.mjs",
                     f"http://{name}:{port}", "/judge/fixture.png", "--revision", record["revision"],
                     "--receipt", "/out/consumer.json", check=False)
         print(judge.stdout, end="")
@@ -378,7 +378,7 @@ def self_test():
             failures.append("the tag of this version did not gate to it")
     except Refused as error:
         failures.append(f"the tag of this version was refused: {error}")
-    refused("an engine tag", lambda: gate("refs/tags/v0.12.1"), "is not a refs/tags/http-vX.Y.Z tag")
+    refused("an engine tag", lambda: gate("refs/tags/v0.12.2"), "is not a refs/tags/http-vX.Y.Z tag")
     refused("a branch", lambda: gate("refs/heads/main"), "is not a refs/tags/http-vX.Y.Z tag")
     refused("another version", lambda: gate("refs/tags/http-v9.9.9"), "must be one version")
     with tempfile.TemporaryDirectory() as temporary:
