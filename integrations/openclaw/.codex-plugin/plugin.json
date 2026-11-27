@@ -1,6 +1,6 @@
 {
   "name": "qrcode-barcode-scanner",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Local QR and barcode scanning with a portable skill and stdio MCP tools.",
   "author": {
     "name": "QR Code AI",

@@ -1,9 +1,9 @@
 {
   "name": "qrcode-barcode-scanner-mcp-container",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
-  "description": "The container that runs the published MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.3 over stdio",
+  "description": "The container that runs the published MCP server @qrcode-ai-com/qrcode-barcode-scanner-mcp 0.3.4 over stdio",
   "dependencies": {
-    "@qrcode-ai-com/qrcode-barcode-scanner-mcp": "0.3.3"
+    "@qrcode-ai-com/qrcode-barcode-scanner-mcp": "0.3.4"
   }
 }
