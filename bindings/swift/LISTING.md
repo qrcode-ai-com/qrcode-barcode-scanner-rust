@@ -34,8 +34,8 @@ release or sends a submission is the owner's; no workflow performs it.
 | Package version | `X.Y.Z`, a tag of the satellite repository |
 
 `satellite.json` pins the engine tag, the package version, the release tag `swift-vX.Y.Z` and the
-sha256 of the zip. The pinned engine today is the published engine tag `v0.12.0`, whose source
-is licensed MIT, so the package 0.12.0 is distributed under the MIT License. Engine tags through
+sha256 of the zip. The pinned engine today is the published engine tag `v0.12.2`, whose source
+is licensed MIT, so the package 0.12.2 is distributed under the MIT License. Engine tags through
 `v0.11.0` were licensed AGPL-3.0-or-later, and a package built from one of them would carry that
 license (decision 12, which is the owner's). Moving the pin to a later engine tag is one reviewed
 change of that file: a new zip, a new checksum, a new package version.
