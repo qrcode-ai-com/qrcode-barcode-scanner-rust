@@ -64,12 +64,12 @@ Swift bindings (one serde wire contract).
 
 ## Install
 
-Public Flutter package [`qr_barcode_scanner` 0.12.1](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.1)
+Public Flutter package [`qr_barcode_scanner` 0.12.2](https://pub.dev/packages/qr_barcode_scanner/versions/0.12.2)
 is available under verified publisher `qrcode-ai.com`. In a Flutter project, pin
 the version explicitly:
 
 ```bash
-flutter pub add qr_barcode_scanner:0.12.1
+flutter pub add qr_barcode_scanner:0.12.2
 ```
 
 The package includes the Rust core sources and `rust/cargokit.yaml`: your

@@ -1,6 +1,6 @@
 {
   "name": "@qrcode-ai-com/qrcode-barcode-scanner",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "QR decoding + scannability scoring for artistic and AI-generated QR codes — async native bindings (Rust)",
   "main": "index.js",
   "types": "index.d.ts",

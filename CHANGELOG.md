@@ -4,7 +4,7 @@ All notable changes to this workspace. Every surface versions together — the R
 crate + CLI, the npm node + wasm packages, the Python wheel, and the
 Kotlin/Android · Swift/iOS · Flutter bindings.
 
-## Unreleased
+## 0.12.2 — 2026-11-27
 
 ### Changed
 
@@ -28,7 +28,8 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
   budget, in CPU cycles: about 12 % fewer on 16 ordinary QR designs, 5 to 8 %
   fewer on 12 fixtures of this repository (clean, degraded, artistic, linear
   and Data Matrix) and 3 to 6 % fewer on 13 QR codes drawn with hollow
-  modules.
+  modules. The WebAssembly module, measured in Node on the same fixtures,
+  stays within the noise of the measure for this change.
 
 ### Fixed
 

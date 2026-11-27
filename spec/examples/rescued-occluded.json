@@ -173,30 +173,30 @@
       {
         "stage": "direct",
         "transforms_tried": 1,
-        "ms": 33.859,
+        "ms": 33.16754,
         "detections_found": 0
       },
       {
         "stage": "enhance",
         "transforms_tried": 3,
-        "ms": 115.678,
+        "ms": 58.462812,
         "detections_found": 0
       },
       {
         "stage": "deep",
         "transforms_tried": 17,
-        "ms": 146.92875,
+        "ms": 122.85721199999999,
         "detections_found": 0
       },
       {
         "stage": "rescue",
         "transforms_tried": 1,
-        "ms": 0.09525,
+        "ms": 0.09984000000000001,
         "detections_found": 1
       }
     ],
     "engine_panics": 0,
-    "total_ms": 296.58804100000003,
+    "total_ms": 214.62551299999998,
     "budget_exhausted": false,
     "saturation": {
       "reads": false,
@@ -205,7 +205,7 @@
     }
   },
   "versions": {
-    "scanner": "0.12.1",
+    "scanner": "0.12.2",
     "pipeline": 5,
     "score_contract": 6
   }

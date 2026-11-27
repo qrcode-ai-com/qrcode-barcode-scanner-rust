@@ -107,7 +107,7 @@ var report = Scanner.Scan(image, new ScanOptions { Profile = ScanProfile.Fast, B
 | `Formats` | The symbologies the scan looks for, by the engine's names, such as `qr_code` and `ean13`. No reader of another symbology runs. Left out, every symbology is read. |
 
 The values each option takes are those of the engine: see the
-[option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/spec/02-profiles.md).
+[option domains](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/spec/02-profiles.md).
 
 ## Read the report
 
@@ -118,7 +118,7 @@ back in the same report, each with its format and the place where the engine mea
 
 `report.Json` is the exact text the engine returned. Nothing is renamed, rounded or
 recalculated, so decode it yourself for the payload, the measured places and the trace. It
-follows the engine's [report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/spec/01-report.md). The other members read the
+follows the engine's [report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/spec/01-report.md). The other members read the
 most used parts:
 
 | Member | Meaning |
@@ -149,7 +149,7 @@ Every refusal is one exception type, `ScanException`. Its message is the engine'
 | `UnknownAlphaBackground`, `UnknownPaletteColor`, `UnknownScorePreset`, `UnknownStressAxis`, `UnknownScoreCheck`, `PaletteTooLarge`, `ScorePresetConflict` | An option holds a value the engine does not know, or two options that cannot go together. | `null` |
 | `EngineFault` | A fault inside the engine itself, not a refusal of your input. | `null` |
 
-The codes are listed in the engine's [error catalog](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/errors.mdx).
+The codes are listed in the engine's [error catalog](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/docs/api/errors.mdx).
 
 ## What it reads
 

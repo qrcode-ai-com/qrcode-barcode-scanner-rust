@@ -52,11 +52,11 @@ results and suggestions for improving artistic or photo-captured codes.
 `qrcode-barcode-scanner` is the Rust core of [QR Code AI](https://qrcode-ai.com/en-US/qr-code-scanner/sdk/rust).
 It runs locally, with no network requests.
 
-[API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/rust.mdx) ·
-[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/spec/01-report.md) ·
-[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/SCORING.md)
+[API](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/docs/api/rust.mdx) ·
+[Report contract](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/spec/01-report.md) ·
+[Scoring](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/docs/SCORING.md)
 
-For a one-off image check, the [browser image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml) uses the same engine.
+For a one-off image check, the [browser image example](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/crates/qrcode-ai-scanner-wasm/examples/README.md#scan-an-image-headlesshtml) uses the same engine.
 
 ## How it works
 
@@ -81,9 +81,9 @@ version so that the dependency and the documentation can be reviewed together:
 ```sh
 cargo new scan-label
 cd scan-label
-cargo add qrcode-barcode-scanner@=0.12.1
+cargo add qrcode-barcode-scanner@=0.12.2
 curl -fsSL -o label.png \
-  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.1/fixtures/symbology/mixed-code128-qr.png
+  https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.2/fixtures/symbology/mixed-code128-qr.png
 ```
 
 For working source, verify that the selected version exists on
@@ -228,9 +228,9 @@ each one starts `qrscan` and hands you its report.
 
 ## Documentation and licensing
 
-[Architecture](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/ARCHITECTURE.md) ·
-[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/errors.mdx) ·
-[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/SECURITY.md) ·
+[Architecture](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/docs/ARCHITECTURE.md) ·
+[Error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/docs/api/errors.mdx) ·
+[Security](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.2/SECURITY.md) ·
 [Report a bug](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/issues)
 
 Releases up to 0.10.1 were published as `qrcode-ai-scanner`.
