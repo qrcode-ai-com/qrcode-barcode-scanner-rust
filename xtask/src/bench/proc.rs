@@ -2173,10 +2173,11 @@ pub(crate) mod tests {
     #[cfg(not(target_os = "macos"))]
     const RESUME: i32 = 18;
 
-    /// `ps -o stat=` of a pid: `T…` stopped, `S…` or `R…` running.
+    /// `ps -o stat= -o comm=` of a pid: its state (`T…` stopped, `S…` or `R…` running), then the
+    /// command it runs. Empty when the pid is gone.
     fn state(pid: u32) -> String {
         let out = Command::new("ps")
-            .args(["-o", "stat=", "-p", &pid.to_string()])
+            .args(["-o", "stat=", "-o", "comm=", "-p", &pid.to_string()])
             .output()
             .expect("ps");
         String::from_utf8_lossy(&out.stdout).trim().to_owned()
@@ -2186,15 +2187,23 @@ pub(crate) mod tests {
     /// busy hosted macOS runner three seconds were not always enough to see a child that had been
     /// stopped: the test failed that way twice in November 2026 and passed when run again. The
     /// wait ends at the first look that agrees, so a healthy run is as fast as before.
-    fn stopped_within(pid: u32, stopped: bool) -> bool {
+    ///
+    /// A wait that never agrees returns the last line `ps` gave, so the failure names what was
+    /// seen: `S` or `R` for a process still running, `Z` or nothing for one that is gone, and
+    /// the command tells a child still in its shell from one that reached `sleep`. The longer
+    /// wait did not end the failures: a child was still not seen stopped after 15 s on
+    /// 27 November 2026, at the first pause only, and the bare `false` could not say which.
+    fn stopped_within(pid: u32, stopped: bool) -> Result<(), String> {
         let started = Instant::now();
+        let mut last = String::new();
         while started.elapsed() < Duration::from_secs(15) {
-            if state(pid).starts_with('T') == stopped {
-                return true;
+            last = state(pid);
+            if last.starts_with('T') == stopped {
+                return Ok(());
             }
             std::thread::sleep(Duration::from_millis(20));
         }
-        false
+        Err(last)
     }
 
     fn signal(pid: u32, number: i32) {
@@ -2261,7 +2270,7 @@ pub(crate) mod tests {
         let status = harness.wait().expect("the harness exits");
         let went = gone_within(victim, Duration::from_secs(2));
         signal(victim, 9);
-        let failed: Vec<_> = seen.iter().filter(|(_, _, ok)| !ok).collect();
+        let failed: Vec<_> = seen.iter().filter(|(_, _, look)| look.is_err()).collect();
         assert!(failed.is_empty(), "{failed:?}");
         assert_eq!((status.code(), went), (Some(143), true));
     }
