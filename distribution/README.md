@@ -321,7 +321,7 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 | [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.1 | Windows x64 |
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1) | 0.12.1-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
-| [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0) | 0.12.0-1.fc44 | Fedora 44, x86_64 and aarch64 |
+| [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1) | 0.12.1-1.fc44 | Fedora 44, x86_64 and aarch64 |
 | [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.0) | 0.12.0 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
 | [GitHub Container Registry](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) | 0.12.1 | Linux AMD64 and ARM64 |
 
@@ -365,11 +365,11 @@ of 23 November 2026, a clean Arch Linux container on an x86_64 runner cloned the
 public recipe signed out at AUR commit `a739e38`, built and installed the
 package it describes, read both codes in all three profiles, and removed it.
 
-On Fedora 44, download the [RPM release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0),
+On Fedora 44, download the [RPM release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1),
 verify its SHA-256, then run
-`sudo dnf install ./qrcode-barcode-scanner-0.12.0-1.fc44.x86_64.rpm` or use the
+`sudo dnf install ./qrcode-barcode-scanner-0.12.1-1.fc44.x86_64.rpm` or use the
 aarch64 file. The [Fedora recipe](rpm/README.md) documents how to rebuild it.
-On 23 November 2026, fresh installs of the public downloads, signed out, passed
+On 27 November 2026, fresh installs of the public downloads, signed out, passed
 the destination acceptance contract (the mixed scan in `fast`, `frame` and
 `full`, then removal) in Fedora 44 containers with no network, on both
 architectures; the x86_64 container ran under emulation. COPR follows its own
