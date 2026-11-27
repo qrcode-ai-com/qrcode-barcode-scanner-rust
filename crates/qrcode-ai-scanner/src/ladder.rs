@@ -805,6 +805,21 @@ struct Run<'a> {
     panics: u8,
     /// The deadline prevented a planned unit of the walk.
     cut: bool,
+    /// The walk's working plane, once [`run_seeded`] built it: the image
+    /// several attempts hand the engines unchanged ([`Run::engine_pass`]).
+    plane: Option<&'a LumaImage>,
+    /// The engine passes made over the working plane, one per filter.
+    plane_passes: Vec<(engine::FormatFilter, engine::EngineOutcome)>,
+}
+
+#[cfg(test)]
+thread_local! {
+    /// Engine passes the walks of this thread ran ([`Run::engine_pass`]) —
+    /// the witness that an attempt reused one.
+    static ENGINE_PASSES: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    /// Test-only: while set, every attempt runs the engines — the walk a
+    /// reusing walk is held to.
+    static EVERY_PASS_RUNS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
 /// The candidate geometry: its grid's corners with the photometry of its
@@ -881,6 +896,8 @@ impl<'a> Run<'a> {
             confirmations: Vec::new(),
             panics: 0,
             cut: false,
+            plane: None,
+            plane_passes: Vec::new(),
         }
     }
 }
@@ -1343,6 +1360,42 @@ impl Run<'_> {
         }
     }
 
+    /// The engines' pass over one attempt image under `filter`.
+    ///
+    /// Several attempts of a walk can build the same image: a contrast
+    /// stretch leaves a plane that already spans 0 to 255 as it is, a grey
+    /// source stored as RGB has three channels equal to its luma, a
+    /// two-level plane is its own binarization. The engines read the image
+    /// and the filter and nothing else, so the pass over the walk's working
+    /// plane is made once per filter: an attempt whose image is that plane,
+    /// byte for byte, gets the outcome the first one read. The attempt is
+    /// still collected, counted and followed by its confirmation decodes
+    /// like any other — only the engines' time is not spent twice. (Where a
+    /// reader is not a function of its image — rxing's PDF417 tie-break,
+    /// spec/04 § Determinism — the first pass's answer stands for the
+    /// plane.)
+    fn engine_pass(
+        &mut self,
+        img: &LumaImage,
+        filter: engine::FormatFilter,
+    ) -> engine::EngineOutcome {
+        let plain = self.plane.is_some_and(|plane| plane == img);
+        #[cfg(test)]
+        let plain = plain && !EVERY_PASS_RUNS.with(std::cell::Cell::get);
+        if plain
+            && let Some((_, outcome)) = self.plane_passes.iter().find(|(own, _)| *own == filter)
+        {
+            return outcome.clone();
+        }
+        #[cfg(test)]
+        ENGINE_PASSES.with(|passes| passes.set(passes.get() + 1));
+        let outcome = engine::decode_filtered(img, filter);
+        if plain {
+            self.plane_passes.push((filter, outcome.clone()));
+        }
+        outcome
+    }
+
     /// Run one stage as a fixed sequence of lazily-built attempts, each
     /// collected ([`Run::collect_attempt`]) and followed by its confirmation
     /// decodes ([`Run::confirm`]). Returns `Ok(true)` when the ladder should
@@ -1365,7 +1418,7 @@ impl Run<'_> {
                 break;
             }
             let img = (attempt.build)();
-            let outcome = engine::decode_filtered(&img, filter);
+            let outcome = self.engine_pass(&img, filter);
             let pending: Vec<(Symbology, Vec<u8>)> = outcome
                 .detections
                 .iter()
@@ -1627,6 +1680,7 @@ pub(crate) fn run_seeded(
     );
     let mut stages = Vec::new();
     let luma = &work;
+    run.plane = Some(luma);
     let longest = luma.width().max(luma.height());
     let reads = StageFormats::of(config);
 
@@ -4467,6 +4521,225 @@ mod ladder_mutant_kills {
             run.collect_rescue(vec![grid_candidate(2, beside)], (200, 200), false);
             let kept: Vec<[Point; 4]> = run.rescue_candidates.iter().map(|c| c.corners).collect();
             assert_eq!(kept, [first, beside]);
+        }
+    }
+}
+
+#[cfg(test)]
+mod plane_pass_reuse {
+    //! An attempt that rebuilds the walk's working plane reuses the engine
+    //! pass made over it ([`Run::engine_pass`]): the walk reads, counts and
+    //! traces what the walk that runs every pass does, in fewer passes.
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
+    use super::*;
+    use crate::input::{ImageInput, Limits};
+    use crate::transform::normalize;
+    use pretty_assertions::assert_eq;
+
+    /// An unbounded walk as it ends, wall time left out, and the engine
+    /// passes it ran. `every_pass`: no attempt reuses one.
+    fn walked(planes: &SourcePlanes, config: &ScanConfig, every_pass: bool) -> (String, u32) {
+        EVERY_PASS_RUNS.with(|flag| flag.set(every_pass));
+        ENGINE_PASSES.with(|passes| passes.set(0));
+        let outcome = run(planes, config, &CancelToken::new(), None);
+        EVERY_PASS_RUNS.with(|flag| flag.set(false));
+        let mut outcome = outcome.unwrap();
+        outcome.trace.total_ms = 0.0;
+        for stage in &mut outcome.trace.stages {
+            stage.ms = 0.0;
+        }
+        (
+            format!("{outcome:#?}"),
+            ENGINE_PASSES.with(std::cell::Cell::get),
+        )
+    }
+
+    fn unbounded() -> ScanConfig {
+        let mut config = ScanConfig::full();
+        config.budget_ms = None;
+        config
+    }
+
+    /// A 64 px plane no reader decodes, spanning 0 to 255.
+    fn full_range_noise() -> Vec<u8> {
+        let data: Vec<u8> = (0..64u32 * 64)
+            .map(|i| u8::try_from((i % 64 * 7 + i / 64 * 13) % 256).unwrap())
+            .collect();
+        assert!(data.contains(&0) && data.contains(&255));
+        data
+    }
+
+    #[test]
+    fn a_stretch_that_changes_nothing_reuses_the_direct_pass() {
+        let data = full_range_noise();
+        let planes = normalize(&ImageInput::luma8(&data, 64, 64), &Limits::default()).unwrap();
+        // the identity the reuse stands on: this stretch is the plane itself
+        assert_eq!(transform::contrast_stretch(&planes.luma), planes.luma);
+        let (reference, every) = walked(&planes, &unbounded(), true);
+        let (reused, fewer) = walked(&planes, &unbounded(), false);
+        assert_eq!(reused, reference);
+        // one attempt in the walk rebuilds the plane: the enhance stretch
+        assert_eq!(every - fewer, 1, "{fewer} of {every}");
+    }
+
+    #[test]
+    fn a_grey_source_stored_as_rgb_reads_its_plane_once() {
+        let grey = full_range_noise();
+        let rgba: Vec<u8> = grey.iter().flat_map(|&v| [v, v, v, 255]).collect();
+        let planes = normalize(&ImageInput::rgba8(&rgba, 64, 64), &Limits::default()).unwrap();
+        assert!(planes.has_color());
+        assert_eq!(planes.channel(Channel::G).unwrap(), planes.luma);
+        let (reference, every) = walked(&planes, &unbounded(), true);
+        let (reused, fewer) = walked(&planes, &unbounded(), false);
+        assert_eq!(reused, reference);
+        // the stretch and the three channels are the plane the direct
+        // stage read
+        assert_eq!(every - fewer, 4, "{fewer} of {every}");
+    }
+
+    /// One stage of `attempts` under `filter`: the attempts and the reads
+    /// its trace counts.
+    fn staged(
+        run: &mut Run<'_>,
+        attempts: Vec<Attempt<'_>>,
+        filter: engine::FormatFilter,
+    ) -> (u32, u32) {
+        let mut stages = Vec::new();
+        run.stage("pin", attempts, filter, &mut stages).unwrap();
+        (stages[0].transforms_tried, stages[0].detections_found)
+    }
+
+    fn passes() -> u32 {
+        ENGINE_PASSES.with(std::cell::Cell::get)
+    }
+
+    #[test]
+    fn a_pass_is_reused_for_the_same_plane_under_the_same_filter_only() {
+        let code = qrcode::QrCode::with_error_correction_level(
+            "https://qrcode-ai.com/plane-pass-pin",
+            qrcode::EcLevel::Q,
+        )
+        .unwrap();
+        let img = code
+            .render::<image::Luma<u8>>()
+            .module_dimensions(4, 4)
+            .build();
+        let dims = (img.width(), img.height());
+        let plane = LumaImage::new(img.into_raw(), dims.0, dims.1);
+        let other = transform::invert(&plane);
+        let twice = || {
+            vec![
+                Attempt::plain(|| plane.clone()),
+                Attempt::plain(|| plane.clone()),
+            ]
+        };
+        let cancel = CancelToken::new();
+
+        // the walk held to: no working plane, every attempt runs the engines
+        ENGINE_PASSES.with(|count| count.set(0));
+        let mut bare = Run::new(&cancel, None, dims, Seed::default());
+        let every = staged(&mut bare, twice(), engine::FormatFilter::All);
+        assert_eq!(passes(), 2);
+        assert_eq!(every.0, 2);
+        assert!(every.1 >= 2, "each attempt delivers the symbol: {every:?}");
+
+        ENGINE_PASSES.with(|count| count.set(0));
+        let mut run = Run::new(&cancel, None, dims, Seed::default());
+        run.plane = Some(&plane);
+        // the second attempt is collected and counted from the first's pass
+        assert_eq!(staged(&mut run, twice(), engine::FormatFilter::All), every);
+        assert_eq!(passes(), 1);
+        assert_eq!(run.attempts, 2);
+        // another filter is another pass over the plane, made once as well
+        let family = staged(&mut run, twice(), engine::FormatFilter::QrFamily);
+        assert_eq!(passes(), 2);
+        assert_eq!(family.0, 2);
+        assert!(
+            family.1 >= 2,
+            "each attempt delivers the symbol: {family:?}"
+        );
+        // another image never takes the plane's pass
+        let inverted = staged(
+            &mut run,
+            vec![Attempt::inverting(|| other.clone())],
+            engine::FormatFilter::All,
+        );
+        assert_eq!(passes(), 3);
+        assert_eq!(inverted.0, 1);
+        // and both filters' passes are still the plane's
+        assert_eq!(staged(&mut run, twice(), engine::FormatFilter::All), every);
+        assert_eq!(
+            staged(&mut run, twice(), engine::FormatFilter::QrFamily),
+            family
+        );
+        assert_eq!(passes(), 3);
+    }
+
+    /// The committed fixtures under `dir`, the PDF417 ones left out: rxing's
+    /// PDF417 reader is the one documented reader that is not a function of
+    /// its image (spec/04 § Determinism).
+    fn fixtures(dir: &str) -> Vec<std::path::PathBuf> {
+        let dir = format!("{}/../../fixtures/{dir}", env!("CARGO_MANIFEST_DIR"));
+        let mut paths: Vec<std::path::PathBuf> = std::fs::read_dir(&dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .filter(|path| {
+                let image = path.extension().is_some_and(|ext| {
+                    ["png", "jpg", "webp"]
+                        .iter()
+                        .any(|own| ext.eq_ignore_ascii_case(own))
+                });
+                let pdf417 = path
+                    .file_name()
+                    .is_some_and(|name| name.to_string_lossy().starts_with("pdf417"));
+                image && !pdf417
+            })
+            .collect();
+        paths.sort();
+        assert!(!paths.is_empty(), "no fixture under {dir}");
+        paths
+    }
+
+    /// Both walks of every fixture under `dir` agree; returns the engine
+    /// passes of (the walk that runs every pass, the walk that reuses).
+    fn walks_agree(dir: &str, config: &ScanConfig) -> (u32, u32) {
+        let (mut every_total, mut fewer_total) = (0, 0);
+        for path in fixtures(dir) {
+            let bytes = std::fs::read(&path).unwrap();
+            let planes = normalize(&ImageInput::encoded(&bytes), &Limits::default()).unwrap();
+            let (reference, every) = walked(&planes, config, true);
+            let (reused, fewer) = walked(&planes, config, false);
+            assert_eq!(reused, reference, "{}", path.display());
+            assert!(fewer <= every, "{}", path.display());
+            every_total += every;
+            fewer_total += fewer;
+        }
+        (every_total, fewer_total)
+    }
+
+    #[test]
+    fn symbology_fixtures_walk_the_same_with_and_without_reuse() {
+        let (every, fewer) = walks_agree("symbology", &unbounded());
+        assert!(fewer <= every, "{fewer} of {every}");
+        // read as QR Code only, most of these walk the whole ladder: the
+        // comparison covers reused passes
+        let qr_only = ScanConfig {
+            formats: vec![Symbology::QrCode],
+            ..unbounded()
+        };
+        let (every, fewer) = walks_agree("symbology", &qr_only);
+        assert!(fewer < every, "{fewer} of {every}");
+    }
+
+    #[test]
+    fn qr_fixtures_walk_the_same_with_and_without_reuse() {
+        let qr_only = ScanConfig {
+            formats: vec![Symbology::QrCode],
+            ..unbounded()
+        };
+        for dir in ["clean", "degraded", "eci", "payloads"] {
+            walks_agree(dir, &qr_only);
         }
     }
 }
