@@ -67,6 +67,28 @@ executable before packaging. The source RPM includes the same three archives
 and spec for an offline rebuild. The binary RPM contains a link to the
 [corresponding source](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-source.tar.gz).
 
+### Rebuild the published files
+
+The published `0.12.1-1.fc44` RPMs were rebuilt byte for byte on Fedora 44 with
+rpm 6.0.2, in two commands. On aarch64, `rpmbuild -ba` writes the aarch64 RPM
+and the source RPM. On x86_64, `rpmbuild --rebuild` of that source RPM writes
+the x86_64 RPM; that step was checked under emulation. The build host, set
+here by `_buildhost`, and the top directory of the first command, which the
+source RPM keeps in its expanded spec, end up in the files: keep both as
+written. `rpmbuild -ba` on x86_64 and `--rebuild` on aarch64 write RPMs that
+differ from the published bytes. Check the three files against the SHA-256
+manifest of the release.
+
+```sh
+# aarch64, with the three engine archives in /tmp/rpm/SOURCES
+rpmbuild -ba --define "_topdir /tmp/rpm" --define "_buildhost reproducible.invalid" \
+  distribution/rpm/qrcode-barcode-scanner.spec
+# x86_64, with the source RPM written above or the one of the release
+rpmbuild --rebuild --define "_topdir /tmp/rpm" --define "_buildhost reproducible.invalid" \
+  qrcode-barcode-scanner-0.12.1-1.fc44.src.rpm
+sha256sum --check --ignore-missing qrcode-barcode-scanner-rpm-0.12.1-1.fc44-SHA256SUMS
+```
+
 ## Install and test
 
 On Fedora 44, choose the RPM for your architecture and verify it against the
