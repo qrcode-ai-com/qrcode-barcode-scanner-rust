@@ -71,7 +71,7 @@ def test_the_mixed_sample_returns_both_codes_exactly_once(node_package, mixed_im
     assert report["detections"][0]["symbology"] == "qr_code"
     assert report["trace"]["budget_exhausted"] is False
     assert report["trace"]["engine_panics"] == 0
-    assert report["versions"]["scanner"] == "0.12.0"
+    assert report["versions"]["scanner"] == "0.12.1"
     assert (report["score"] is None) == (profile == "frame")
     assert texts.split("\n") == [QR, CODE128]
     assert (matches, count) == (True, 2)
@@ -192,7 +192,7 @@ def test_the_registry_metadata_follows_the_comfy_specification():
     assert comfy["Icon"].startswith("https://raw.githubusercontent.com/qrcode-ai-com/")
     requirements = (NODE_ROOT / "requirements.txt").read_text().split()
     assert requirements == [f"qrcode-barcode-scanner=={qrcode_barcode_scanner.__version__}"] == [
-        "qrcode-barcode-scanner==0.12.0"]
+        "qrcode-barcode-scanner==0.12.1"]
     # The registry standards: no install at run time, no dynamic code.
     for source in NODE_ROOT.glob("*.py"):
         text = source.read_text()

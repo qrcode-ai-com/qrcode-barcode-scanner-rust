@@ -1,6 +1,6 @@
 [project]
 name = "qrcode-barcode-scanner-nodes"
-version = "0.1.1"
+version = "0.1.2"
 description = "Read QR codes and barcodes from ComfyUI images with the QR Code & Barcode Scanner engine: decoded texts, a match check and the engine's JSON report."
 readme = "README.md"
 license = { file = "LICENSE" }

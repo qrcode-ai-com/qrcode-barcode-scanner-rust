@@ -3,12 +3,46 @@
 // from the release manifest of the engine repository (distribution/releases/vX.Y.Z.json), which
 // records the published SHA256SUMS file and every archive. The staging program checks that this
 // table still equals that manifest before it writes the action's repository, so a version lists
-// every archive its release publishes: the two musl archives of 0.12.0 are pinned, although
-// targetFor() only chooses glibc archives on Linux.
+// every archive its release publishes: the two musl archives of 0.12.1 and 0.12.0 are pinned,
+// although targetFor() only chooses glibc archives on Linux.
 export const REPOSITORY = 'qrcode-ai-com/qrcode-barcode-scanner-rust';
-export const DEFAULT_VERSION = '0.12.0';
+export const DEFAULT_VERSION = '0.12.1';
 
 export const RELEASES = Object.freeze({
+  '0.12.1': Object.freeze({
+    tag: 'v0.12.1',
+    sums: '9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055',
+    archives: Object.freeze({
+      'aarch64-apple-darwin': Object.freeze({
+        sha256: '8d9608bcd7680c1e6a40625c2764b66fc2922e3da92b5dabc21d4238bb145af0',
+        executable: 'bc1346cabf47be1514af9802a1daa5cd4d9fe74c28162062f0869e903c56c6d5',
+      }),
+      'aarch64-unknown-linux-gnu': Object.freeze({
+        sha256: 'ba2af3b5304b0756ba172d38ce9f839fc3b668c38d4a7ab49b719e5f0cfd5789',
+        executable: 'b0ab8be5e1f80c272aaebeb3bfa4423d0558001d8329ccae0c0ebf0d5249d09b',
+      }),
+      'aarch64-unknown-linux-musl': Object.freeze({
+        sha256: '55712a2777f3921df033fd2aa7a1ac921c5fcfe5ade779e4eea6031980716774',
+        executable: '0294a2e1f250753253b2edf0df32751057806a2da6f4b570594644afc944a011',
+      }),
+      'x86_64-apple-darwin': Object.freeze({
+        sha256: 'b8fbd821aae6a0969940aab169befd525755fe834018ced8969328629097fe80',
+        executable: '4f9b60c7c444fbd4dae1b0273f840074c9e49e8e0502cc1df9c258bb542a1bd8',
+      }),
+      'x86_64-pc-windows-msvc': Object.freeze({
+        sha256: '0b75043f656ed534a0db50e7bc97dfe714d193f285b970b77866dec15c12b2fc',
+        executable: '65f53ad3b24363d3740a4e134f3cf7feb92a8f991ea70ed8729daa06c3e83f04',
+      }),
+      'x86_64-unknown-linux-gnu': Object.freeze({
+        sha256: '5e99d584447b03eef3818e14034c12ad09c88f31f8535b5929b0b846203a0665',
+        executable: 'dfbe10313047de7303c2df38f61160e06c9ee3a8c5eaa3b26c6c94cffc7580de',
+      }),
+      'x86_64-unknown-linux-musl': Object.freeze({
+        sha256: '0c51ca4a90afbbb110bb14fe850150d2ac661111df0c4070eca157f0d865becf',
+        executable: '969c37e38876b854ebb16376cf8fda24649b91cff8f433ce6e161b3c7314e29e',
+      }),
+    }),
+  }),
   '0.12.0': Object.freeze({
     tag: 'v0.12.0',
     sums: 'f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691',

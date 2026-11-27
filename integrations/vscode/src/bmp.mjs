@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// The published 0.12.0 WASM module reads PNG, JPEG, WebP and GIF, not BMP. This reader turns an
+// The published 0.12.1 WASM module reads PNG, JPEG, WebP and GIF, not BMP. This reader turns an
 // uncompressed BMP into RGBA pixels for the module's scan_frame. Every offset comes from the
 // file, so every read is checked against its length before it happens.
 

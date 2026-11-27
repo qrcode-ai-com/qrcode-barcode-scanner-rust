@@ -39,8 +39,8 @@ env:
   DIFY_PLUGIN_CLI_VERSION: 0.6.15
   DIFY_PLUGIN_CLI_SHA256: d0a1e3b25bd6c5f6cd749cad2cf04817ea808344e6cc07a2c49bb0108019ab93
   PLUGIN_ID: qrcode-ai-com/qrcode-barcode-scanner
-  PLUGIN_VERSION: 0.1.1
-  ENGINE_VERSION: 0.12.0
+  PLUGIN_VERSION: 0.1.2
+  ENGINE_VERSION: 0.12.1
 
 jobs:
   template:

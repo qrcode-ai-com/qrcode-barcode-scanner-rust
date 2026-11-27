@@ -29,16 +29,24 @@ const FIVE_TARGETS = ['aarch64-apple-darwin', 'aarch64-unknown-linux-gnu', 'x86_
 const SEVEN_TARGETS = [...FIVE_TARGETS, 'aarch64-unknown-linux-musl', 'x86_64-unknown-linux-musl'].sort();
 
 test('the pinned table names every published target of the default version', () => {
-  assert.equal(DEFAULT_VERSION, '0.12.0');
+  assert.equal(DEFAULT_VERSION, '0.12.1');
   const pinned = RELEASES[DEFAULT_VERSION];
   assert.equal(pinned.tag, `v${DEFAULT_VERSION}`);
-  assert.equal(pinned.sums, 'f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691');
+  assert.equal(pinned.sums, '9bd29f8aa586dcafefd6cf6e29c2f4ae7a42240a243665d51f90cea0294bd055');
   assert.deepEqual(Object.keys(pinned.archives).sort(), SEVEN_TARGETS);
   for (const value of [pinned.sums, ...Object.values(pinned.archives).flatMap((a) => [a.sha256, a.executable])]) {
     assert.match(value, /^[0-9a-f]{64}$/);
   }
   assert.equal(assetNames(DEFAULT_VERSION, 'x86_64-pc-windows-msvc').archive, `qrcode-barcode-scanner-cli-${DEFAULT_VERSION}-x86_64-pc-windows-msvc.zip`);
   assert.equal(assetNames(DEFAULT_VERSION, 'x86_64-unknown-linux-musl').archive, `qrcode-barcode-scanner-cli-${DEFAULT_VERSION}-x86_64-unknown-linux-musl.tar.gz`);
+});
+
+test('0.12.0 stays pinned with its seven archives, so a workflow that names it keeps installing it', () => {
+  const pinned = RELEASES['0.12.0'];
+  assert.equal(pinned.tag, 'v0.12.0');
+  assert.equal(pinned.sums, 'f3d7027a558992f9c07232110d06ee3c07e84d877120165b0e072429cb486691');
+  assert.deepEqual(Object.keys(pinned.archives).sort(), SEVEN_TARGETS);
+  assert.equal(trustFor('0.12.0', '').sums, pinned.sums);
 });
 
 test('0.11.0 stays pinned with its five archives, so a workflow that names it keeps installing it', () => {

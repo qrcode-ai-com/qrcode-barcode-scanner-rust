@@ -68,7 +68,7 @@ def png(width, height, color="white"):
 
 def test_the_runtime_loads_the_declaration_and_the_classes(registration):
     manifest = registration.configuration
-    assert (manifest.author, manifest.name, manifest.version) == ("qrcode-ai-com", "qrcode-barcode-scanner", "0.1.1")
+    assert (manifest.author, manifest.name, manifest.version) == ("qrcode-ai-com", "qrcode-barcode-scanner", "0.1.2")
     assert [arch.value for arch in manifest.meta.arch] == ["amd64", "arm64"]
     assert (manifest.meta.runner.language.value, manifest.meta.runner.version,
             manifest.meta.runner.entrypoint) == ("python", "3.12", "main")
@@ -100,7 +100,7 @@ def test_the_manifest_meets_the_daemon_and_marketplace_rules():
     assert (PLUGIN_ROOT / "README.md").is_file()
     requirements = (PLUGIN_ROOT / "requirements.txt").read_text().split()
     assert requirements == ["dify_plugin==0.11.1", f"qrcode-barcode-scanner=={qrcode_barcode_scanner.__version__}"]
-    assert requirements[1] == "qrcode-barcode-scanner==0.12.0"
+    assert requirements[1] == "qrcode-barcode-scanner==0.12.1"
     assert not (PLUGIN_ROOT / "pyproject.toml").exists(), "the daemon would prefer it to requirements.txt"
     ignored = (PLUGIN_ROOT / ".difyignore").read_text().split()
     assert {"tests/", "template/", "mirror/", ".env"} <= set(ignored)
@@ -120,7 +120,7 @@ def test_the_mixed_sample_returns_both_codes_through_invoke(tool, files, mixed_i
     assert sorted((row["symbology"], row["content"]["text"]) for row in report["detections"]) == [
         ("code128", CODE128), ("qr_code", QR)]
     assert report["trace"]["budget_exhausted"] is False and report["trace"]["engine_panics"] == 0
-    assert report["versions"]["scanner"] == "0.12.0"
+    assert report["versions"]["scanner"] == "0.12.1"
     assert (report["score"] is None) == (profile == "frame")
     assert out["variables"] == {"texts": [QR, CODE128], "count": 2, "complete": True}
     # The JSON message is the engine's report, unchanged.
