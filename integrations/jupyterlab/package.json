@@ -57,6 +57,14 @@
     "@types/node": "22.19.1",
     "typescript": "5.5.4"
   },
+  "overrides": {
+    "@jupyter/builder": {
+      "minimatch": "^11.0.1"
+    },
+    "@jupyterlab/apputils": {
+      "sanitize-html": "^2.18.0"
+    }
+  },
   "jupyterlab": {
     "extension": true,
     "outputDir": "jupyterlab_qrcode_barcode_scanner/labextension"
