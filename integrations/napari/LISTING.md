@@ -3,8 +3,10 @@
 What the napari hub and napari's plugin manager show for this plugin, where each value comes from,
 and the owner's steps to publish a version. Version 0.1.0, on engine 0.11.0, has been on PyPI since
 22 November 2026, published from the tag `napari-v0.1.0`, and the napari hub listed it on
-24 November 2026. Version 0.1.1, on the MIT engine 0.12.0, goes to PyPI from the tag
-`napari-v0.1.1`; neither listing shows a version before PyPI serves it.
+24 November 2026. Version 0.1.1, on the MIT engine 0.12.0, has been on PyPI since 24 November
+2026, published from the tag `napari-v0.1.1`, and napari's plugin index served it when it was read
+on 27 November 2026. Version 0.1.2, on the MIT engine 0.12.1, goes to PyPI from the tag
+`napari-v0.1.2`; neither listing shows a version before PyPI serves it.
 
 The napari hub lists a plugin that has a release on PyPI with the `Framework :: napari` classifier,
 a valid npe2 manifest declared by the `napari.manifest` entry point and `visibility: public`. It
@@ -16,15 +18,15 @@ every 4 hours. There is no submission form.
 | Field | Value |
 |---|---|
 | PyPI project | `napari-qrcode-barcode-scanner` |
-| Version | 0.1.1, tag `napari-v0.1.1` |
-| Engine | `qrcode-barcode-scanner==0.12.0`, installed from PyPI as a dependency; the plugin does not bundle it |
-| Licence | MIT (`License-Expression: MIT`, `LICENSE`); the engine wheel 0.12.0 is MIT too and ships its own `LICENSE` |
-| Wheel | `napari_qrcode_barcode_scanner-0.1.1-py3-none-any.whl` |
-| sdist | `napari_qrcode_barcode_scanner-0.1.1.tar.gz` |
+| Version | 0.1.2, tag `napari-v0.1.2` |
+| Engine | `qrcode-barcode-scanner==0.12.1`, installed from PyPI as a dependency; the plugin does not bundle it |
+| Licence | MIT (`License-Expression: MIT`, `LICENSE`); the engine wheel 0.12.1 is MIT too and ships its own `LICENSE` |
+| Wheel | `napari_qrcode_barcode_scanner-0.1.2-py3-none-any.whl` |
+| sdist | `napari_qrcode_barcode_scanner-0.1.2.tar.gz` |
 
-Version 0.1.0 installed the engine wheel 0.11.0, which keeps the licence it shipped with,
-AGPL-3.0-or-later. Before that release, the job `napari` of `integration-python-hosts` built
-commit `3612ef3` of pull request #137 on CI
+Version 0.1.1 installed the MIT engine wheel 0.12.0. Version 0.1.0 installed the engine wheel
+0.11.0, which keeps the licence it shipped with, AGPL-3.0-or-later. Before that release, the job
+`napari` of `integration-python-hosts` built commit `3612ef3` of pull request #137 on CI
 (run [44886529397](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/44886529397), 21 November 2026), checked both files with
 `twine check --strict` and printed:
 
@@ -44,7 +46,14 @@ e86fe7682296b6f7b3e2cbed1a29c5de804ea3e4898f8c43b586fa18f5d70db1  napari_qrcode_
 38ee01ca23d85a134c3c813a40dda6a2a119d80af6eea4800c9e789b1e1eee88  napari_qrcode_barcode_scanner-0.1.0.tar.gz
 ```
 
-The run of the tag `napari-v0.1.1` prints the two digests of 0.1.1 the same way.
+For 0.1.1, PyPI serves the files of the run of the tag `napari-v0.1.1`:
+
+```text
+9ffc6e39fc8fe66fdced7540c50cfdd3ed11dc3eb5ca720b7b76c2620b3b61a5  napari_qrcode_barcode_scanner-0.1.1-py3-none-any.whl
+b64201dace7cbb6cc301bbfdc423fa9616126c4827dbf26f19fb3e190c3db37e  napari_qrcode_barcode_scanner-0.1.1.tar.gz
+```
+
+The run of the tag `napari-v0.1.2` prints the two digests of 0.1.2 the same way.
 
 ## What the listing reads
 
@@ -61,7 +70,7 @@ The run of the tag `napari-v0.1.1` prints the two digests of 0.1.1 the same way.
 | Licence | MIT | `pyproject.toml` `license` |
 | Python | >= 3.11 (napari 0.10 needs 3.11) | `pyproject.toml` `requires-python` |
 | Operating systems | macOS, Windows, Linux | classifiers |
-| Requirements | numpy >= 1.24, magicgui >= 0.8, qrcode-barcode-scanner == 0.12.0; napari and Qt are the user's | `pyproject.toml` `dependencies` |
+| Requirements | numpy >= 1.24, magicgui >= 0.8, qrcode-barcode-scanner == 0.12.1; napari and Qt are the user's | `pyproject.toml` `dependencies` |
 | Homepage | <https://qrcode-ai.com/en-US/qr-code-scanner/integrations/napari> | `[project.urls]` |
 | Documentation | <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/tree/main/integrations/napari> | `[project.urls]` |
 | Source Code (the hub's GitHub link) | <https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust> | `[project.urls]` |
@@ -88,12 +97,12 @@ pixels, sha256 `a047712e60529ebded32f47d336c8836b960952ae3e2970f258848628b146f9f
 ## The owner's steps
 
 Steps 1 to 3 were done on 22 November 2026, and version 0.1.0 was published through them. The
-pending publisher was added under the PyPI organization `qrcode-ai`, so the project the first
-upload created belongs to that organization. When the GitHub API was read again on 24 November
-2026, the environment `pypi-napari` had the owner as its required reviewer, no administrator
-bypass, no secret, no variable and the one deployment rule `napari-v*` (tag), and
-`refs/tags/napari-v*` was in the ruleset `distribution-tags-maintainer-only`. A next version needs
-none of them again: it starts at step 4.
+pending publisher was added under the PyPI organization `qrcode-ai`, so the project the first upload
+created belongs to that organization. When the GitHub API was read again on 24 and 27 November 2026,
+the environment `pypi-napari` had the owner as its required reviewer, no administrator bypass, no
+secret, no variable and the one deployment rule `napari-v*` (tag), and `refs/tags/napari-v*` was in
+the ruleset `distribution-tags-maintainer-only`. A next version needs none of them again: it starts
+at step 4.
 
 ### Once
 
@@ -127,24 +136,24 @@ none of them again: it starts at step 4.
    **Status** into the published wording and adds to **Install** the two ways a published plugin
    installs: pip with the project name, and napari's **Plugins**, **Install/Uninstall Plugins**.
    The README is the PyPI description of the version: it cannot change once uploaded. Check that
-   the Homepage page answers. It answered 404 on 21, 22 and 24 November 2026; on 22 November the
-   owner chose to release 0.1.0 with that Homepage, the definitive address, which goes live with
-   the website's napari pages, and 0.1.1 keeps it. Wait for `integration-python-hosts` to pass on
-   that pull request.
+   the Homepage page answers. It answered 404 on 21, 22, 24 and 27 November 2026; on 22 November the
+   owner chose to release 0.1.0 with that Homepage, the definitive address, which goes live with the
+   website's napari pages, and 0.1.1 and 0.1.2 keep it. Wait for `integration-python-hosts` to pass
+   on that pull request.
 
 5. **The tag.** Tag the merged commit and push the tag:
-   `git tag -a napari-v0.1.1 <commit> -m 'napari plugin 0.1.1'`, then
-   `git push origin napari-v0.1.1`.
+   `git tag -a napari-v0.1.2 <commit> -m 'napari plugin 0.1.2'`, then
+   `git push origin napari-v0.1.2`.
 
 6. **The run.** Open **Actions**, **Publish · Python plugins**, the run of that tag. When
    `napari-build` has passed, it prints the two digests. `napari-publish` waits: press **Review
    deployments**, tick `pypi-napari` and **Approve and deploy**. It checks the tag, re-inspects the
    two files, compares them with what PyPI serves and uploads them through OIDC.
 
-7. **Read back PyPI.** Open <https://pypi.org/project/napari-qrcode-barcode-scanner/0.1.1/>.
+7. **Read back PyPI.** Open <https://pypi.org/project/napari-qrcode-barcode-scanner/0.1.2/>.
    **Download files** lists the wheel and the sdist with the digests the run printed, and each
-   file's **Provenance** names the workflow `python-plugins-publish.yml`. Installing version 0.1.1
-   from PyPI in a new environment must install the engine wheel 0.12.0 with it.
+   file's **Provenance** names the workflow `python-plugins-publish.yml`. Installing version 0.1.2
+   from PyPI in a new environment must install the engine wheel 0.12.1 with it.
 
 8. **Read back the napari hub.** After npe2api's next daily build and up to 4 hours more, the
    plugin's page at <https://napari-hub.org/plugins/napari-qrcode-barcode-scanner> shows the new

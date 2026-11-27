@@ -51,9 +51,9 @@ public since 20 November 2026, holds the same files and runs the same tests.
 ## Install
 
 In Dify, open **Plugins**, then **Marketplace**, search for **QR Code & Barcode Scanner** and
-install it. Dify then installs the plugin's two dependencies from PyPI. Version 0.1.1 pins
+install it. Dify then installs the plugin's two dependencies from PyPI. Version 0.1.2 pins
 [`dify_plugin`](https://pypi.org/project/dify_plugin/0.11.1/) 0.11.1 and the engine wheel
-[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0. A plugin
+[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.1/) 0.12.1. A plugin
 installed from the Marketplace carries the Marketplace's signature, so a self-hosted Dify accepts it
 with its default settings.
 
@@ -173,10 +173,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 The tool returns the summary text, the report as JSON and the `texts`, `count` and `complete` variables. The JSON message is the engine's report, unchanged.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -228,7 +228,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored plugin source is MIT; see [LICENSE](LICENSE). The plugin installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI and does not ship it. Engine 0.12.0 is MIT too: its wheel ships the MIT `LICENSE`. Version 0.1.0 of the plugin installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
+Project-authored plugin source is MIT; see [LICENSE](LICENSE). The plugin installs the engine wheel `qrcode-barcode-scanner` 0.12.1 from PyPI and does not ship it. Engine 0.12.1 is MIT too: its wheel ships the MIT `LICENSE`. Version 0.1.1 of the plugin installed the MIT engine 0.12.0. Version 0.1.0 installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 

@@ -104,7 +104,7 @@ for (const profile of ['fast', 'frame', 'full']) {
 
     const lines = channel().lines;
     assert.ok(lines.includes('mixed.png'));
-    assert.ok(lines.includes(`  Profile ${profile} · budget none · scanner 0.12.0`));
+    assert.ok(lines.includes(`  Profile ${profile} · budget none · scanner 0.12.1`));
     assert.ok(lines.some((line) => /^ {2}\d\. QR Code: https:\/\/qrc-ai\.com\/76xMa$/.test(line)));
     assert.ok(lines.some((line) => /^ {2}\d\. Code 128: STOCK-4827$/.test(line)));
     assert.equal(lines.includes('  QR quality score: not measured by the frame profile.'), profile === 'frame');

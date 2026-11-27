@@ -26,10 +26,10 @@ const EXPECTED = [['code128', 'STOCK-4827'], ['qr_code', 'https://qrc-ai.com/76x
 const payloads = (report) => report.detections.map((d) => [d.symbology, d.content.text]).sort();
 const schema = JSON.parse(readFileSync(join(repository, 'spec', 'scan-report.schema.json'), 'utf8')).$defs;
 
-test('the pinned module is the published 0.12.0 engine', () => {
-  assert.equal(scanner.version(), '0.12.0');
+test('the pinned module is the published 0.12.1 engine', () => {
+  assert.equal(scanner.version(), '0.12.1');
   const { versions } = scanner.capabilities();
-  assert.deepEqual(versions, { scanner: '0.12.0', pipeline: 5, score_contract: 5 });
+  assert.deepEqual(versions, { scanner: '0.12.1', pipeline: 5, score_contract: 6 });
 });
 
 for (const profile of PROFILES) {
@@ -39,7 +39,7 @@ for (const profile of PROFILES) {
     assert.deepEqual(options, { profile, budgetMs: 0 });
     assert.deepEqual(payloads(report), EXPECTED);
     assert.equal(report.trace.budget_exhausted, false);
-    assert.equal(report.versions.scanner, '0.12.0');
+    assert.equal(report.versions.scanner, '0.12.1');
     const qr = report.detections.find((d) => d.symbology === 'qr_code');
     assert.equal(Buffer.from(qr.content.raw, 'base64').toString('utf8'), 'https://qrc-ai.com/76xMa');
     assert.equal(report.detections.find((d) => d.symbology === 'code128').meta.version, null, 'a linear read carries no QR metadata');
@@ -237,7 +237,7 @@ test('the output lines name the file, the settings, each code and the report', (
   const result = scanBytes(scanner, MIXED, { profile: 'full', budgetMs: 0 });
   const lines = reportLines('fixtures/mixed.png', result);
   assert.equal(lines[0], 'fixtures/mixed.png');
-  assert.equal(lines[1], '  Profile full · budget none · scanner 0.12.0');
+  assert.equal(lines[1], '  Profile full · budget none · scanner 0.12.1');
   assert.ok(lines.includes('  2 codes found:'));
   assert.ok(lines.some((line) => /^ {2}\d\. QR Code: https:\/\/qrc-ai\.com\/76xMa$/.test(line)));
   assert.ok(lines.some((line) => /^ {2}\d\. Code 128: STOCK-4827$/.test(line)));
@@ -245,6 +245,6 @@ test('the output lines name the file, the settings, each code and the report', (
   const json = lines.slice(lines.indexOf('  Engine report:') + 1).map((line) => line.slice(2)).join('\n');
   assert.deepEqual(JSON.parse(json), result.report);
   const frame = reportLines('m.png', scanBytes(scanner, MIXED, { profile: 'frame' }));
-  assert.equal(frame[1], '  Profile frame · budget profile default · scanner 0.12.0');
+  assert.equal(frame[1], '  Profile frame · budget profile default · scanner 0.12.1');
   assert.ok(frame.includes('  QR quality score: not measured by the frame profile.'));
 });

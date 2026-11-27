@@ -36,8 +36,8 @@ import zipfile
 HERE = pathlib.Path(__file__).resolve().parent
 TEMPLATE = HERE.parent / "template" / "qr-and-barcode-reader.yml"
 PLUGIN_ID = "qrcode-ai-com/qrcode-barcode-scanner"
-PLUGIN_VERSION = "0.1.1"
-ENGINE_VERSION = "0.12.0"
+PLUGIN_VERSION = "0.1.2"
+ENGINE_VERSION = "0.12.1"
 EXPECTED = ["https://qrc-ai.com/76xMa", "STOCK-4827"]
 SUMMARY = "Found 2 codes. qr_code: https://qrc-ai.com/76xMa; code128: STOCK-4827"
 # The same 64 x 64 white PNG as the n8n node's tests: an image with no code.

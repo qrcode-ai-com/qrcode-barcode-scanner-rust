@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2
+
+- Bundles the published `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.1 module instead of
+  0.12.0. Its SHA-256 is the one the engine's v0.12.1 release records. It reads the same 19
+  formats, and the output channel now names scanner 0.12.1.
+- Engine 0.12.1 scores with contract 6 instead of 5: the report's `versions.score_contract` is 6.
+  The engine is MIT, like 0.12.0, and ships the same license files.
+- The commands, menus and settings are unchanged.
+
 ## 0.1.1
 
 - Bundles the published `@qrcode-ai-com/qrcode-barcode-scanner-wasm` 0.12.0 module instead of

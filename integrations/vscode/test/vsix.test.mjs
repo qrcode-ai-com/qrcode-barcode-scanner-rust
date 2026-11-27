@@ -90,14 +90,14 @@ test('the manifest names one universal extension of the proposed publisher', () 
   assert.deepEqual([...read('extension/images/icon.png').subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 });
 
-test('the bundled engine is the published 0.12.0 module, byte for byte', () => {
+test('the bundled engine is the published 0.12.1 module, byte for byte', () => {
   const info = JSON.parse(text('extension/dist/engine/build-info.json'));
   assert.deepEqual(info, engineInfo);
   const wasm = read('extension/dist/qrcode-barcode-scanner_bg.wasm');
   assert.equal(sha256(wasm), info.wasm.sha256);
-  // The SHA-256 that distribution/releases/v0.12.0.json records, built at the v0.12.0 tag commit.
-  assert.equal(info.wasm.sha256, '298fd9df8bc23639d00cb8effd5f1d1a742db2f53866868aec21723468f08868');
-  assert.equal(info.source_revision, '897dd50cdf27cbde54d408bf65e1ca4622035d42');
+  // The SHA-256 that distribution/releases/v0.12.1.json records, built at the v0.12.1 tag commit.
+  assert.equal(info.wasm.sha256, '1368dbee7a1c48692f11c8ded35173f149f840e3ba9951a9fb5a8ab772c4ef85');
+  assert.equal(info.source_revision, '5b2c580c78b0693e58909f889b66f24fc1c548b1');
   for (const file of ['LICENSE', 'LICENSE-APACHE-2.0', 'THIRD-PARTY.md']) {
     assert.ok(read(`extension/dist/engine/${file}`).equals(readFileSync(join(engineRoot, file))), file);
   }
@@ -139,13 +139,13 @@ test('the README holds no SVG image, only absolute links, and the six links in s
   }
 });
 
-test('LICENSE.md states the licenses: MIT extension code, MIT engine 0.12.0 with its Apache-2.0 notices', () => {
+test('LICENSE.md states the licenses: MIT extension code, MIT engine 0.12.1 with its Apache-2.0 notices', () => {
   const license = text('extension/LICENSE.md');
   assert.match(license, /## The extension's own code: MIT\n/);
   assert.match(license, /## The bundled scanner engine: MIT\n/);
   assert.equal(license.match(/MIT License\n\nCopyright \(c\) \d{4}/g).length, 2, 'the MIT text of the extension and of the engine package');
-  assert.ok(license.includes('`@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.0`'));
-  assert.ok(license.includes('897dd50cdf27cbde54d408bf65e1ca4622035d42'));
+  assert.ok(license.includes('`@qrcode-ai-com/qrcode-barcode-scanner-wasm@0.12.1`'));
+  assert.ok(license.includes('5b2c580c78b0693e58909f889b66f24fc1c548b1'));
   assert.ok(license.includes('`dist/engine/LICENSE-APACHE-2.0`'));
   assert.ok(!/AGPL|AFFERO/i.test(license), 'no AGPL text or name');
   assert.equal(manifest.license, 'MIT');

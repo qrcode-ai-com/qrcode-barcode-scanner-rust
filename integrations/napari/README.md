@@ -48,13 +48,13 @@ To make a test image with a known value, use the [QR code generator](https://qrc
 
 The plugin is on PyPI as
 [`napari-qrcode-barcode-scanner`](https://pypi.org/project/napari-qrcode-barcode-scanner/).
-Version 0.1.1 runs on the MIT engine 0.12.0. Version 0.1.0, on PyPI since 22 November 2026, runs
-on engine 0.11.0. The engine repository publishes each version from its own tag, `napari-v0.1.1`
-for this one, after the owner's review, through PyPI trusted publishing: no token is stored. The
-files on PyPI are the sdist and the wheel that the tag's run built, checked with
-`twine check --strict`, installed in a new environment and tested on the sample in the three
-profiles. The plugin has also run in a napari window, from its dock widget, as the picture below
-shows.
+Version 0.1.2 runs on the MIT engine 0.12.1. Version 0.1.1, on PyPI since 24 November 2026, runs on
+the MIT engine 0.12.0, and version 0.1.0, on PyPI since 22 November 2026, on engine 0.11.0. The
+engine repository publishes each version from its own tag, `napari-v0.1.2` for this one, after the
+owner's review, through PyPI trusted publishing: no token is stored. The files on PyPI are the sdist
+and the wheel that the tag's run built, checked with `twine check --strict`, installed in a new
+environment and tested on the sample in the three profiles. The plugin has also run in a napari
+window, from its dock widget, as the picture below shows.
 
 The plugin is listed on the
 [napari hub](https://napari-hub.org/plugins/napari-qrcode-barcode-scanner) and in napari's plugin
@@ -75,7 +75,7 @@ Or, in napari, choose **Plugins**, **Install/Uninstall Plugins**, search for `qr
 **QR Code & Barcode Scanner** and restart napari.
 
 Its dependencies are numpy, magicgui and the engine wheel
-[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.0/) 0.12.0. PyPI
+[`qrcode-barcode-scanner`](https://pypi.org/project/qrcode-barcode-scanner/0.12.1/) 0.12.1. PyPI
 has prebuilt engine wheels for macOS on Apple silicon and Intel, Linux on x86-64 and ARM64, musl
 Linux on x86-64, and 64-bit Windows. Anywhere else pip builds the engine from source, which needs a
 Rust toolchain. As napari plugins do, it does not install napari or Qt: use the napari you have,
@@ -176,10 +176,10 @@ measured it: `https://qrc-ai.com/76xMa` and `STOCK-4827`.
 The plugin returns a shapes layer: one shape per place the engine measured a code, with the code's `text` and `symbology` as features. The layer has the image's scale, translation, rotation, shear and affine transform, so the outlines sit on the codes.
 
 The report itself is described field by field in the
-[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/report.mdx).
+[report reference](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/report.mdx).
 An empty list of detections means the image holds no code the engine could read. A refused file
 is an error with a `QRS-` code instead, listed in the
-[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.0/docs/api/errors.mdx).
+[error codes](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/v0.12.1/docs/api/errors.mdx).
 
 ## What it reads
 
@@ -231,7 +231,7 @@ each one starts `qrscan` and hands you its report.
 
 ## Licence
 
-Project-authored plugin source is MIT; see [LICENSE](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/napari/LICENSE). The plugin installs the engine wheel `qrcode-barcode-scanner` 0.12.0 from PyPI and does not ship it. Engine 0.12.0 is MIT too: its wheel ships the MIT `LICENSE`. Version 0.1.0 of the plugin installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
+Project-authored plugin source is MIT; see [LICENSE](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/integrations/napari/LICENSE). The plugin installs the engine wheel `qrcode-barcode-scanner` 0.12.1 from PyPI and does not ship it. Engine 0.12.1 is MIT too: its wheel ships the MIT `LICENSE`. Version 0.1.1 of the plugin installed the MIT engine 0.12.0. Version 0.1.0 installed engine 0.11.0, which keeps the license it shipped with, AGPL-3.0-or-later. Read the license packaged with the version you install and the [licensing guide](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/blob/main/LICENSING.md).
 
 Maintained by **Thibaut Mélen & Nicolas Cella** for **QR Code AI**, a product of **SuperNovae Studio**. The license of each component is stated in its own license files.
 
