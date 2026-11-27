@@ -31,9 +31,11 @@ jobs:
       - name: verify public CLI inputs and prepare a minimal context
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.12.1/prepare.py --self-test
-          python3 distribution/docker/v0.12.1/record.py --self-test
-          env -u GH_TOKEN -u GITHUB_TOKEN python3 distribution/docker/v0.12.1/prepare.py \
+          python3 distribution/docker/v0.12.2/prepare.py --self-test
+          python3 distribution/docker/v0.12.2/record.py --self-test
+          python3 distribution/docker/v0.12.2/verify.py --self-test
+          python3 distribution/docker/v0.12.2/scan.py --self-test
+          env -u GH_TOKEN -u GITHUB_TOKEN python3 distribution/docker/v0.12.2/prepare.py \
             --assets "$RUNNER_TEMP/qrscan-public-assets" --out "$RUNNER_TEMP/qrscan-oci-context" \
             --receipt qualified/preparation.json
       - name: package unchanged public CLI bytes in the pinned runtime base
@@ -51,7 +53,7 @@ jobs:
           }
           test "$(normalize "$(uname -m)")" = "$ARCHITECTURE"
           test "$(normalize "$(docker info --format '{{.Architecture}}')")" = "$ARCHITECTURE"
-          docker build --no-cache --network none -f distribution/docker/v0.12.1/Dockerfile \
+          docker build --no-cache --network none -f distribution/docker/v0.12.2/Dockerfile \
             --platform "linux/$ARCHITECTURE" --build-arg "PACKAGING_REVISION=$GITHUB_SHA" \
             -t qrscan:qualified "$RUNNER_TEMP/qrscan-oci-context"
       - name: execute mounted input, shared truth and mixed profiles without network or write access
@@ -59,18 +61,24 @@ jobs:
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.12.1/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png \
+          python3 distribution/docker/v0.12.2/verify.py qrscan:qualified fixtures/clean/gen_v5_q.png \
             --expected-platform "linux/$ARCHITECTURE" --packaging-revision "$GITHUB_SHA" --native \
             --receipt qualified/consumer.json
+      # The pinned scanner reads the tested image from a file, with no Docker socket, no
+      # credential and no network while the image is in reach. Any known finding stops the job.
+      - name: refuse any known vulnerability in the tested image
+        run: |
+          set -euo pipefail
+          python3 distribution/docker/v0.12.2/scan.py qrscan:qualified --receipt qualified/scan.json
       - name: export the tested image without rebuilding
         run: |
           set -euo pipefail
-          python3 distribution/docker/v0.12.1/record.py qrscan:qualified \
-            --consumer qualified/consumer.json --out qualified-export
+          python3 distribution/docker/v0.12.2/record.py qrscan:qualified \
+            --consumer qualified/consumer.json --scan qualified/scan.json --out qualified-export
           cp qualified/preparation.json qualified-export/preparation.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: qrscan-oci0121-${{ matrix.architecture }}
+          name: qrscan-oci0122-${{ matrix.architecture }}
           path: qualified-export/
           if-no-files-found: error
           retention-days: 14
