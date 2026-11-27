@@ -2,6 +2,7 @@
 # pillow 13.0.0 (all 82 wheels, Python >= 3.11) resolved 2026-11-02 for its security fixes.
 # No source builds: the consumers install with --only-binary=:all: --require-hashes.
 # Versions and all wheel hashes are explicit, including transitive dependencies.
+# Read again on 2026-11-27: each pin below is the only version of its package a consumer installs.
 
 pytest==9.1.1 \
     --hash=sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c
