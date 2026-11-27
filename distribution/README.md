@@ -319,7 +319,7 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 | [GitHub Releases](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/v0.12.1) | 0.12.1 | macOS ARM64/x64, GNU/Linux ARM64/x64, [Windows x64](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/download/v0.12.1/qrcode-barcode-scanner-cli-0.12.1-x86_64-pc-windows-msvc.zip), and source |
 | [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.1 | macOS and GNU/Linux on ARM64/x64 |
 | [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.1 | Windows x64 |
-| [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0) | 0.12.0-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
+| [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1) | 0.12.1-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
 | [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.0) | 0.12.0-1.fc44 | Fedora 44, x86_64 and aarch64 |
 | [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.0) | 0.12.0 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
@@ -347,11 +347,11 @@ did the same from the public bucket on Windows x64.
 For direct downloads, follow the [CLI archive and checksum guide](cli/README.md#download-and-verify).
 
 For Debian or Ubuntu, download the `.deb` for your architecture from the
-[Linux package release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0).
+[Linux package release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1).
 Check the accompanying SHA-256, then run
-`sudo apt install ./qrcode-barcode-scanner_0.12.0-1_amd64.deb` or substitute
+`sudo apt install ./qrcode-barcode-scanner_0.12.1-1_amd64.deb` or substitute
 the arm64 file. The [Debian package recipe](debian/README.md) documents the
-build and removal. On 23 November 2026, fresh installs of these public
+build and removal. On 27 November 2026, fresh installs of these public
 assets, downloaded signed out, passed the destination acceptance contract (the
 mixed scan in `fast`, `frame` and `full`, then removal) in Debian 12 and
 Ubuntu 24.04 containers with no network, for both architectures; the amd64

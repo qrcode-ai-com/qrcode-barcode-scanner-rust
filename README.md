@@ -279,9 +279,9 @@ scoop bucket add qrcode-ai https://github.com/qrcode-ai-com/scoop-bucket
 scoop install qrcode-ai/qrcode-barcode-scanner
 ```
 
-For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.0-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.0)
+For Debian 12 or Ubuntu 24.04, download the [Debian package 0.12.1-1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1)
 for amd64 or arm64. Check its SHA-256 and install the local file with
-`sudo apt install ./qrcode-barcode-scanner_0.12.0-1_amd64.deb` (use the arm64
+`sudo apt install ./qrcode-barcode-scanner_0.12.1-1_amd64.deb` (use the arm64
 file on ARM64).
 
 On Arch Linux x86_64, install
