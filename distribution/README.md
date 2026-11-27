@@ -386,11 +386,12 @@ AlmaLinux 8, Ubuntu 22.04 and Fedora containers, for both architectures. The
 20 November 2026; its page still describes the earlier file it tested on that day, until the
 catalogue tests the entry again.
 
-For containers, use the [public GHCR image 0.12.0](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
-on Linux AMD64 or ARM64, MIT. The [container guide](docker/v0.12/README.md#run-the-public-image)
+For containers, use the [public GHCR image 0.12.1](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
+on Linux AMD64 or ARM64, MIT. The [container guide](docker/v0.12.1/README.md#run-the-public-image)
 shows how to scan an image locally using the verified index digest. Both
-[native public consumers](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45229648921)
-pulled anonymously and ran the exact-content regression checks. The earlier AGPL
+[native public consumers](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45918697977)
+pulled anonymously and ran the exact-content regression checks. The earlier MIT
+image stays available; see the [0.12 container guide](docker/v0.12/README.md#run-the-public-image). The earlier AGPL
 image stays available; see the [0.11 container guide](docker/v0.11/README.md#run-the-public-image). The public
 0.10 GHCR and Docker Hub images and 0.1 agent archives remain available below.
 
