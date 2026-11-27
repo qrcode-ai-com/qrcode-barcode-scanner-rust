@@ -20,6 +20,11 @@ assert.ok(archiveArg && outputArg, 'usage: packed-wasm-browser.mjs ARCHIVE.tgz R
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const archive = resolve(archiveArg), output = resolve(outputArg);
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+// The hash of a served response's body. The body is read while the witness goes on, and a
+// witness may close its page before the read ends: the read then settles as a named miss
+// instead of rejecting. A witness that never judges the served module cannot end the run with
+// an unhandled rejection, and one that does fails its own assertion with the miss in the diff.
+const servedSha = response => response.body().then(body => sha(body), error => `unread: ${error.message}`);
 // The receipt grows as the checks pass. A failure, a child check that timed out included, writes
 // it as it stands, with ok false and the failing step, before the process exits with that error:
 // the phases, suites and runtimes that passed before it stay on record. Its keys keep the order
@@ -586,7 +591,7 @@ const openCameraPage = async browser => {
   const seen = { requests: [], served: [], errors: [] };
   page.on('request', request => { if (/\.wasm(?:\?|$)/.test(request.url())) seen.requests.push(request.url()); });
   page.on('response', response => { if (/\.wasm(?:\?|$)/.test(response.url()) && response.ok())
-    seen.served.push(response.body().then(body => sha(body))); });
+    seen.served.push(servedSha(response)); });
   page.on('pageerror', error => seen.errors.push(error.message));
   await page.goto(base); await page.waitForFunction(() => !!window.harness);
   return { context, page, seen };
@@ -938,7 +943,7 @@ const exampleWitness = async (browser, name, site, runtimeSupport) => {
   const seen = { requests: [], served: [], errors: [], console: [], pages: 0, navigations: 0 };
   context.on('request', request => seen.requests.push(request.url()));
   context.on('page', () => { seen.pages += 1; });
-  page.on('response', response => { if (response.url().endsWith(wasmPath) && response.ok()) seen.served.push(response.body().then(sha)); });
+  page.on('response', response => { if (response.url().endsWith(wasmPath) && response.ok()) seen.served.push(servedSha(response)); });
   page.on('pageerror', error => seen.errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') seen.console.push(message.text()); });
   page.on('framenavigated', frame => { if (frame === page.mainFrame()) seen.navigations += 1; });
@@ -1888,7 +1893,7 @@ try {
       const served = [];
       page.on('request', request => { if (/\.wasm(?:\?|$)/.test(request.url())) requests.push(request.url()); });
       page.on('response', response => { if (/\.wasm(?:\?|$)/.test(response.url()) && response.ok())
-        served.push(response.body().then(body => sha(body))); });
+        served.push(servedSha(response)); });
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(base); await page.waitForFunction(() => !!window.harness);
       const capabilities = await page.evaluate(() => window.harness.scannerCapabilities());
