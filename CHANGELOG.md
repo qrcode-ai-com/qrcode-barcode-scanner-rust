@@ -6,6 +6,19 @@ Kotlin/Android · Swift/iOS · Flutter bindings.
 
 ## Unreleased
 
+### Changed
+
+- **A scan no longer reads the same image twice.** Several attempts of one
+  scan can hand the readers the same bytes: stretching the contrast of an
+  image that already spans black to white changes nothing, and a grey picture
+  stored as RGB has three channels equal to its luma. Such an attempt now
+  takes the result of the first read. Reports are unchanged, durations aside:
+  the attempt is still counted, traced and confirmed as before. Measured with
+  the native CLI on 98 QR codes drawn with hollow modules, read as QR Code
+  only without a budget, CPU time falls by about a fifth where the scan
+  reaches its enhance stage; ordinary designs, which stop earlier, move by
+  about 2 %.
+
 ### Fixed
 
 - **Browser package: its types under Node's module resolution.** With
