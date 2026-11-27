@@ -48,8 +48,8 @@ pub(super) struct Pass {
 }
 
 /// rqrr's binarization of a luma plane, `true` where it paints a pixel
-/// black: the adaptive threshold of `PreparedImage::prepare` (0.11.0, quirc
-/// lineage), computed here so that rqrr receives the bitmap ready.
+/// black: the adaptive threshold of the pinned `PreparedImage::prepare`
+/// (quirc lineage), computed here so that rqrr receives the bitmap ready.
 ///
 /// Two running averages sweep every row, one from each end; each step is
 /// `average * (span - 1) / span + pixel`, with `span` an eighth of the
@@ -1791,7 +1791,7 @@ mod tests {
         LumaImage::new(data, width, height)
     }
 
-    /// The bitmap rqrr 0.11.0 computes from the same plane, read back pixel
+    /// The bitmap the pinned rqrr computes from the same plane, read back pixel
     /// by pixel (`1` is its black).
     fn rqrr_bitmap(luma: &LumaImage) -> Vec<bool> {
         let (width, height) = (luma.width() as usize, luma.height() as usize);
