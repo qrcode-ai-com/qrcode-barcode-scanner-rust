@@ -285,7 +285,7 @@ for amd64 or arm64. Check its SHA-256 and install the local file with
 file on ARM64).
 
 On Arch Linux x86_64, install
-[`qrcode-barcode-scanner-bin` 0.12.0-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
+[`qrcode-barcode-scanner-bin` 0.12.1-1 from AUR](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin).
 The [Arch install guide](distribution/aur/README.md) shows the commands and
 explains the conflict with packages that already provide `qrscan`.
 

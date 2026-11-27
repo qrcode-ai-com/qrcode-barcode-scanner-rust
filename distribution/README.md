@@ -320,7 +320,7 @@ at `e6675aa`, and the extracted helper passed its 26 checks with Node.js
 | [Homebrew tap](https://github.com/qrcode-ai-com/homebrew-tap) | 0.12.1 | macOS and GNU/Linux on ARM64/x64 |
 | [Scoop bucket](https://github.com/qrcode-ai-com/scoop-bucket) | 0.12.1 | Windows x64 |
 | [GitHub Debian packages](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1) | 0.12.1-1 | Debian 12 and Ubuntu 24.04, amd64 and arm64 |
-| [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.0-1 | Arch Linux x86_64 |
+| [AUR · qrcode-barcode-scanner-bin](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin) | 0.12.1-1 | Arch Linux x86_64 |
 | [GitHub Fedora RPMs](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1) | 0.12.1-1.fc44 | Fedora 44, x86_64 and aarch64 |
 | [GitHub AppImage](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.1) | 0.12.1 | GNU/Linux x86_64 and aarch64, C library 2.28 or later |
 | [GitHub Container Registry](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner) | 0.12.1 | Linux AMD64 and ARM64 |
@@ -360,9 +360,9 @@ containers ran under emulation.
 On Arch Linux x86_64, clone the
 [`qrcode-barcode-scanner-bin` AUR recipe](https://aur.archlinux.org/packages/qrcode-barcode-scanner-bin)
 and run `makepkg -si`. The [Arch install guide](aur/README.md) covers the
-existing `qrscan` command conflict. In the [destination acceptance run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45179767772)
-of 23 November 2026, a clean Arch Linux container on an x86_64 runner cloned the
-public recipe signed out at AUR commit `a739e38`, built and installed the
+existing `qrscan` command conflict. In the [destination acceptance run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/45894126617)
+of 26 November 2026, a clean Arch Linux container on an x86_64 runner cloned the
+public recipe signed out at AUR commit `8e8336b`, built and installed the
 package it describes, read both codes in all three profiles, and removed it.
 
 On Fedora 44, download the [RPM release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1),
