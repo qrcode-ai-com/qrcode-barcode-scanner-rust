@@ -1687,9 +1687,19 @@ rebuild.
 The publisher compares the tagged tree with the BOM: the workspace version must
 equal the BOM version, and the ten pinned files must hash to their recorded
 values. The `oci-v` tag therefore goes on a commit of `main` that holds this BOM
-and leaves those files unchanged, before the next version bump. Until its tag run
-and its **public-pull** dispatch have passed, this image is prepared, not
-published.
+and leaves those files unchanged, before the next version bump.
+
+Published on 28 November 2026: the `oci-v0.12.2` [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46152621680)
+pushed index `sha256:fbf5c619343241a7e5273225178dbc8a10447c5dce313f3a67bb2bfe59ac1479`
+(AMD64 manifest `sha256:47123b2da3d0de07ac479b784f6a1330ac08259b302b7e0347f2f3f7ae9d90ed`, ARM64 manifest
+`sha256:9a904855232fa0484fd271bcd544678393908ad58517ce8c7ff6eea8cad6a975`) under the tag `0.12.2`, after
+`0.12.2-amd64` and `0.12.2-arm64`. Its receipt is the `qrscan-oci-published`
+artifact of that run. The **public-pull** [dispatch](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46152851945) passed
+on both native architectures; its receipts are `qrscan-oci-public-<architecture>`.
+`published.json` records the index, so the weekly `image-advisories` job scans
+this image again. On that date the tag `0.12.2` was not yet added to the
+repository in the Artifact Hub control panel, so Artifact Hub still listed the
+previous image as its latest version.
 
 ### OCI 0.12.1 — the last image on a Debian base, retained
 

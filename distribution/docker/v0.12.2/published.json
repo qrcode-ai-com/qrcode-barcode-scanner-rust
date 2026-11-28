@@ -1,0 +1,6 @@
+{
+  "schema": "qrscan-oci-published/1",
+  "version": "0.12.2",
+  "image": "ghcr.io/qrcode-ai-com/qrcode-barcode-scanner",
+  "index": "sha256:fbf5c619343241a7e5273225178dbc8a10447c5dce313f3a67bb2bfe59ac1479"
+}
