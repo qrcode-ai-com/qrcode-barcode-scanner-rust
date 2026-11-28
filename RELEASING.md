@@ -1637,7 +1637,61 @@ The image `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner` repackages the public
 Linux CLI archives of an engine release without recompilation, under its own
 `oci-v` tag. No Docker Hub upload and no `latest` tag are part of it.
 
-### OCI 0.12.1 — the current MIT image
+### OCI 0.12.2 — the current MIT image
+
+The [0.12.2 recipe](distribution/docker/v0.12.2/README.md) repackages the public
+`v0.12.2` Linux CLI archives, MIT, on a base that holds the C library and neither
+a shell nor a package manager. Its input manifest pins both binaries, the
+public SHA256SUMS, the source archive, both crates, the index of the base image
+with its seven packages, and the scanner image.
+The native `distribution-checks` AMD64/ARM64 matrix, dispatched on `main` at
+`b2a9dc2259faaaeee8439e895ffb4fece372e621`, prepared the context, executed the shared truth and the mixed
+QR/Code 128 profiles (35 truth inputs, 39 profile runs and 51 CLI commands per
+architecture, two of them on the `--formats` option), read the file system of
+each image from the host, refused any known vulnerability in it (the pinned
+Trivy listed none on either platform that day), and exported each tested
+image once as `qrscan-oci0122-<architecture>`: run `46053605099`, AMD64 artifact
+`15226060024`, ARM64 artifact `15225691453`.
+
+The frozen [0.12.2 BOM](distribution/docker/v0.12.2/release-0.12.2.json) names
+that run, its packaging revision, both artifacts with their ZIP digests, config
+IDs, raw layers and binary hashes, and the hashes of the recipe, verifier, scan
+gate, workflow and consumer truth (the recipe README is left out: it records the
+publication). Each artifact holds the scan receipt of its image beside the
+consumer receipt; the publisher refuses an artifact whose scan receipt is not a
+pass with zero findings for that image.
+Engine source is the commit of the `v0.12.2` tag; the image label
+`org.opencontainers.image.licenses` is `MIT`.
+
+The index of this image carries the Artifact Hub listing keys
+(`index_annotations`), as the index of the previous image does: creation time
+`2026-11-27T19:01:10.229552395Z`, the build time of the later of the two images,
+MIT, vendor, keywords, logo, maintainer and
+`distribution/artifacthub/LISTING.md` at `b2a9dc2259faaaeee8439e895ffb4fece372e621`. The
+version tag `0.12.2` is therefore its own listing tag; the images keep only the
+eight OCI labels. `oci-publish.yml` consumes this BOM through
+`distribution/docker/v0.12.2/publish.py`: default dispatch **inspect** runs only
+the read-only native inspectors; the publisher
+needs the exact `oci-v0.12.2` tag, the `container` environment and a fresh
+in-job reinspection before ephemeral `github.token` authentication. It pushes
+`0.12.2-amd64`, `0.12.2-arm64`, then the index `0.12.2` last, so the newest
+package version is the version tag. After upload, dispatch **public-pull** on the
+same tag; both native anonymous consumers must pass before public delivery is
+claimed. Then add the tag `0.12.2` to the repository in the Artifact Hub control
+panel, and record the digest of the published index in `published.json` of the
+recipe folder: from then on the weekly `image-advisories` job of `deep-checks`
+scans the published image again, because a scan is of its day. Producer
+artifacts have 14-day retention; expiry is not authority to substitute a
+rebuild.
+
+The publisher compares the tagged tree with the BOM: the workspace version must
+equal the BOM version, and the ten pinned files must hash to their recorded
+values. The `oci-v` tag therefore goes on a commit of `main` that holds this BOM
+and leaves those files unchanged, before the next version bump. Until its tag run
+and its **public-pull** dispatch have passed, this image is prepared, not
+published.
+
+### OCI 0.12.1 — the last image on a Debian base, retained
 
 The [0.12.1 recipe](distribution/docker/v0.12.1/README.md) repackages the public
 `v0.12.1` Linux CLI archives, MIT. Its input manifest pins both binaries, the
@@ -1663,7 +1717,8 @@ The index of this image carries the Artifact Hub listing keys
 MIT, vendor, keywords, logo, maintainer and
 `distribution/artifacthub/LISTING.md` at `cb120cd59d59346a6204df6217ad8c45f11e9b52`. The
 version tag `0.12.1` is therefore its own listing tag; the images keep only the
-eight OCI labels. `oci-publish.yml` consumes this BOM through
+eight OCI labels.
+Until the 0.12.2 retarget, `oci-publish.yml` consumed this BOM through
 `distribution/docker/v0.12.1/publish.py`: default dispatch **inspect** runs only
 the read-only native inspectors; the publisher
 needs the exact `oci-v0.12.1` tag, the `container` environment and a fresh
