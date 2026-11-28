@@ -39,8 +39,8 @@ publication here. The public ClawHub
 skill 0.2.2 and OpenClaw bundle 0.2.4 run the MIT engine 0.12.1. The MCP adapter is 0.3.4
 on npm, on the MIT engine 0.12.1, and the Official MCP Registry lists 0.3.4. The
 skill 0.2.2 is also published as files on the release `agents-v0.3.4`, and the MCP Bundle 0.3.4
-on the release `mcpb-v0.3.4`. Homebrew distributes the CLI 0.12.1, and GHCR the CLI
-0.12.0. See the [distribution guide](distribution/README.md) for coordinates
+on the release `mcpb-v0.3.4`. Homebrew distributes the CLI 0.12.2, and GHCR the CLI
+0.12.2. See the [distribution guide](distribution/README.md) for coordinates
 and platform evidence. The initial engine npm uploads were manual. The adapter
 0.3.1, 0.3.2, 0.3.3 and 0.3.4 and PyPI uploads have their own trusted publishing evidence.
 The agent plugin release `v0.3.3` of `qrcode-ai-com/qrcode-barcode-scanner-plugin` starts the
