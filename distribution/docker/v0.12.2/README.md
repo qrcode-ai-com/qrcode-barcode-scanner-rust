@@ -39,21 +39,29 @@ image is published, and another scanner, or the same one with a later
 database, can then report it. The published image is never edited: the answer
 to a finding is a new image. See [Scan again later](#scan-again-later).
 
-## Run the image
+## Run the public image
 
-The image target is `ghcr.io/qrcode-ai-com/qrcode-barcode-scanner`, tag `0.12.2`,
-for Linux AMD64 and ARM64. This recipe is prepared; the image is not published
-until the release boundary below is complete, and this section then names the
-verified multi-platform index digest. Until then, the published image is
-[0.12.1](../v0.12.1/README.md#run-the-public-image).
-
-The command is the one of 0.12.1. Put an input image named `label.png` in the
-current directory, set `image` to the published address, then run:
+The [GHCR image 0.12.2](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/pkgs/container/qrcode-barcode-scanner)
+supports Linux AMD64 and ARM64. The digest below names the verified multi-platform
+index. Put an input image named `label.png` in the current directory before
+running the command.
 
 ```sh
+image=ghcr.io/qrcode-ai-com/qrcode-barcode-scanner@sha256:fbf5c619343241a7e5273225178dbc8a10447c5dce313f3a67bb2bfe59ac1479
+docker pull "$image"
 docker run --rm --network none --read-only --cap-drop ALL \
   --mount type=bind,src="$PWD",dst=/input,readonly "$image" /input/label.png --pretty
 ```
+
+The index names the AMD64 manifest `sha256:47123b2da3d0de07ac479b784f6a1330ac08259b302b7e0347f2f3f7ae9d90ed`
+and the ARM64 manifest `sha256:9a904855232fa0484fd271bcd544678393908ad58517ce8c7ff6eea8cad6a975`.
+The [tag run](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46152621680) pushed `0.12.2-amd64`, `0.12.2-arm64` and then
+the index `0.12.2`, so the newest package version is the version tag.
+[Anonymous public pulls](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/actions/runs/46152851945) and exact scans passed on both
+native architectures. The 0.12.1 and 0.12.0 images and their tags stay
+published; see the [0.12.1 recipe](../v0.12.1/README.md#run-the-public-image). The
+0.11.0 image and its tags stay published under the AGPL; see the
+[0.11 recipe](../v0.11/README.md#run-the-public-image).
 
 ### Read a file of the image
 
