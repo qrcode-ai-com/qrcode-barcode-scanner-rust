@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.2">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-debian-dark.gif?v=6a8c6397a452">
       <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-debian-light.gif?v=674c3047311a" alt="QR Code &amp; Barcode Scanner CLI for Debian and Ubuntu: the Debian logo, the apt commands, and a QR code and a barcode being read" width="100%">
@@ -71,11 +71,11 @@ named in the installed documentation. Its SHA-256 is
 ## Install and test
 
 Download the file for your architecture and check its SHA-256 from the
-[public Linux package release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.1).
+[public Linux package release](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/linux-packages-v0.12.2).
 Install the file and check the scanner version:
 
 ```sh
-sudo apt install ./qrcode-barcode-scanner_0.12.1-1_amd64.deb
+sudo apt install ./qrcode-barcode-scanner_0.12.2-1_amd64.deb
 qrscan --version
 curl -fL -O https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner/d0fcf8a27410f5ee182aab6477624e3fc52c4aa5/fixtures/symbology/mixed-code128-qr.png
 for profile in fast frame full; do
