@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.1">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/rpm-packages-v0.12.2">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-fedora-dark.gif?v=32ff0d34d3da">
       <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-fedora-light.gif?v=48020cbb3369" alt="QR Code &amp; Barcode Scanner CLI for Fedora: the Fedora logo, the dnf commands, and a QR code and a barcode being read" width="100%">
@@ -69,7 +69,7 @@ and spec for an offline rebuild. The binary RPM contains a link to the
 
 ### Rebuild the published files
 
-The published `0.12.1-1.fc44` RPMs were rebuilt byte for byte on Fedora 44 with
+The published `0.12.2-1.fc44` RPMs were rebuilt byte for byte on Fedora 44 with
 rpm 6.0.2, in two commands. On aarch64, `rpmbuild -ba` writes the aarch64 RPM
 and the source RPM. On x86_64, `rpmbuild --rebuild` of that source RPM writes
 the x86_64 RPM; that step was checked under emulation. The build host, set
@@ -85,19 +85,19 @@ rpmbuild -ba --define "_topdir /tmp/rpm" --define "_buildhost reproducible.inval
   distribution/rpm/qrcode-barcode-scanner.spec
 # x86_64, with the source RPM written above or the one of the release
 rpmbuild --rebuild --define "_topdir /tmp/rpm" --define "_buildhost reproducible.invalid" \
-  qrcode-barcode-scanner-0.12.1-1.fc44.src.rpm
-sha256sum --check --ignore-missing qrcode-barcode-scanner-rpm-0.12.1-1.fc44-SHA256SUMS
+  qrcode-barcode-scanner-0.12.2-1.fc44.src.rpm
+sha256sum --check --ignore-missing qrcode-barcode-scanner-rpm-0.12.2-1.fc44-SHA256SUMS
 ```
 
 ## Install and test
 
 On Fedora 44, choose the RPM for your architecture and verify it against the
 SHA-256 manifest that accompanies the release. The package revision is
-`0.12.1-1.fc44` and the CLI reports `qrscan 0.12.1`.
+`0.12.2-1.fc44` and the CLI reports `qrscan 0.12.2`.
 
 ```sh
-sha256sum --check --ignore-missing qrcode-barcode-scanner-rpm-0.12.1-1.fc44-SHA256SUMS
-sudo dnf install "./qrcode-barcode-scanner-0.12.1-1.fc44.$(uname -m).rpm"
+sha256sum --check --ignore-missing qrcode-barcode-scanner-rpm-0.12.2-1.fc44-SHA256SUMS
+sudo dnf install "./qrcode-barcode-scanner-0.12.2-1.fc44.$(uname -m).rpm"
 qrscan --version
 ```
 

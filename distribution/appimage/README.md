@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.1">
+  <a href="https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.2">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-appimage-dark.gif?v=095b1eb649ed">
       <img src="https://raw.githubusercontent.com/qrcode-ai-com/.github/main/profile/assets/banner-appimage-light.gif?v=9ce18305c427" alt="QR Code &amp; Barcode Scanner CLI as one Linux file: the AppImage logo, the commands that run the file, and a QR code and a barcode being read" width="100%">
@@ -50,12 +50,12 @@ stays byte-identical to the published `qrscan` on x86_64 and aarch64. The file a
 licences, the notices and the pointer to the corresponding source.
 
 **Published on GitHub.** The two files and their SHA-256 list are attached to the release
-[`appimage-v0.12.1`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.1).
-The engine release `v0.12.1` and its files did not change. The AppImage catalogue lists the
+[`appimage-v0.12.2`](https://github.com/qrcode-ai-com/qrcode-barcode-scanner-rust/releases/tag/appimage-v0.12.2).
+The engine release `v0.12.2` and its files did not change. The AppImage catalogue lists the
 application as [qrcode-barcode-scanner](https://appimage.github.io/qrcode-barcode-scanner/)
 since 20 November 2026, from the entry added by
 [AppImage/appimage.github.io#12218](https://github.com/AppImage/appimage.github.io/pull/12218).
-The catalogue last read the entry on 23 November 2026, from the file of the earlier release:
+The catalogue last read the entry on 23 November 2026, from the file of an earlier release:
 [its record](https://github.com/AppImage/appimage.github.io/blob/master/apps/qrcode-barcode-scanner.md)
 keeps that version until the catalogue tests the entry again.
 
@@ -95,16 +95,16 @@ checks that a second build gives the same file.
 ## Run and test
 
 ```sh
-chmod +x qrcode-barcode-scanner-0.12.1-x86_64.AppImage
-./qrcode-barcode-scanner-0.12.1-x86_64.AppImage --version
-./qrcode-barcode-scanner-0.12.1-x86_64.AppImage label.png --profile full
+chmod +x qrcode-barcode-scanner-0.12.2-x86_64.AppImage
+./qrcode-barcode-scanner-0.12.2-x86_64.AppImage --version
+./qrcode-barcode-scanner-0.12.2-x86_64.AppImage label.png --profile full
 ```
 
 The file mounts itself through FUSE. On a host without FUSE, such as most containers, it unpacks
 itself into a temporary directory and runs from there:
 
 ```sh
-APPIMAGE_EXTRACT_AND_RUN=1 ./qrcode-barcode-scanner-0.12.1-x86_64.AppImage --version
+APPIMAGE_EXTRACT_AND_RUN=1 ./qrcode-barcode-scanner-0.12.2-x86_64.AppImage --version
 ```
 
 Download the [mixed fixture](https://raw.githubusercontent.com/qrcode-ai-com/qrcode-barcode-scanner-rust/v0.12.2/fixtures/symbology/mixed-code128-qr.png)
@@ -153,7 +153,7 @@ carries: it downloads the file signed out, checks it against the release's SHA-2
 `judge.sh` on it.
 
 ```sh
-gh workflow run appimage.yml -f release_tag=appimage-v0.12.1
+gh workflow run appimage.yml -f release_tag=appimage-v0.12.2
 ```
 
 ## Limits and choices to review
