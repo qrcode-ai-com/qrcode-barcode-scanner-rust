@@ -27,6 +27,7 @@ Nothing is built, installed or published. Stdlib and git only. Exit 0 when the s
 """
 import argparse
 import base64
+import gzip
 import hashlib
 import http.client
 import io
@@ -405,12 +406,15 @@ def verify(source, path):
 # ------------------------------------------------------------------ self-test
 
 def packed_tar(files):
+    # tarfile's "w:gz" writes the current second into the gzip header, so two worlds built
+    # across a second boundary differed and the same-bytes check failed at random.
     buffer = io.BytesIO()
-    with tarfile.open(fileobj=buffer, mode="w:gz") as archive:
-        for path, data in files.items():
-            info = tarfile.TarInfo(path)
-            info.size = len(data)
-            archive.addfile(info, io.BytesIO(data))
+    with gzip.GzipFile(fileobj=buffer, mode="wb", mtime=0) as compressed:
+        with tarfile.open(fileobj=compressed, mode="w") as archive:
+            for path, data in files.items():
+                info = tarfile.TarInfo(path)
+                info.size = len(data)
+                archive.addfile(info, io.BytesIO(data))
     return buffer.getvalue()
 
 
@@ -605,6 +609,8 @@ def self_test():
     manifest = build(world, World.TAG_NAME)
     again = build(World().publish(), World.TAG_NAME)
     check("the same release gives the same bytes", serialize(manifest) == serialize(again))
+    check("a packed test archive holds no clock time",
+          packed_tar({"a": b"a"})[4:8] == bytes(4), "the gzip header's MTIME field")
     assets = manifest["release"]["assets"]
     check("a manifest names the tag object, the commit and the source date",
           (manifest["tag_object"], manifest["commit"], manifest["source_date_epoch"])
